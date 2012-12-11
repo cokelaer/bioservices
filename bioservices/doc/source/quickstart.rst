@@ -72,9 +72,22 @@ Then, you need to scan it with xml standard python module::
     >>> import xml.etree.ElementTree as ET
     >>> root = ET.fromstring(data)
 
-Kegg Tutorial
+Biomdodels
+==============
+
+You can access to the biomodels service and obtain a model as follows::
+
+
+    >>> from bioservices import biomodels
+    >>> b = biomodels.BioModels()
+    >>> b.getModelSBMLById('BIOMD0000000299')
+
+
+
+More Tutorials
 =================
 
 .. toctree::
 
     kegg_tutorial.rst
+    biomodels.rst
