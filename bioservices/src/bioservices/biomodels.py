@@ -231,7 +231,7 @@ records.
 
         .. seealso:: How to retrieve REACTOME IDs in :meth:`extra_getReactomeIds`
         """
-        return b.serv.getSimpleModelsByReactomeIds('REACT_1590')
+        return self.serv.getSimpleModelsByReactomeIds(reacID)
 
 
     def getModelsIdByUniprotId(self, Id):
@@ -255,7 +255,7 @@ records.
         """
         return self.serv.getModelsIdByUniprotId(Id)
 
-    def getModelsIdByName(self, name)
+    def getModelsIdByName(self, name):
         """Retrieves the models' identifiers which name includes the given keyword.
 
         :param str name: 
@@ -268,6 +268,29 @@ records.
         """
         
         return self.serv.getModelsIdByName(name)
+
+    def getModelsIdByPublication(self, pubId):
+        """
+
+        ::
+
+            b.getModelsIdByPublication('18308339')
+            ['BIOMD0000000201']
+
+        """
+        return self.serv.getModelsIdByPublication(pubId)
+
+
+    def getModelsIdByGO(self, goId):
+        """
+    
+        ::
+
+            >>> b.getModelsIdByGO('0001756')
+            ['BIOMD0000000201', 'BIOMD0000000275']
+        """
+        return self.serv.getModelsIdByGO(goId)
+
 
 
     def extra_getReactomeIds(self, start=0, end=1000):
@@ -322,11 +345,8 @@ records.
 
 
 todo = [
- u'getModelsIdByGO',
  u'getModelsIdByGOId',
- u'getModelsIdByName',
  u'getModelsIdByPerson',
- u'getModelsIdByPublication',
  u'getModelsIdByTaxonomy',
  u'getModelsIdByTaxonomyId',
  u'getModelsIdByUniprot',
