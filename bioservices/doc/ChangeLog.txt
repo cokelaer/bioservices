@@ -4,7 +4,7 @@ Whats' new, what has changed
 
 Revision 0.1
 ------------------- 
-
+* 0.2.0: finalise biomodels and add picr service + test for biomdodel service..
 * 0.1.0: add database and kegg modules + its documentation and tests
 
 

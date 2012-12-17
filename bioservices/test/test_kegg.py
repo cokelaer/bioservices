@@ -4,6 +4,7 @@ from nose import with_setup
 import easydev
 import os
 sharepath = easydev.get_shared_directory_path("bioservices") + os.sep + "data"
+sharepath = easydev.get_shared_directory_path("bioservices") + os.sep  
 
 
 
