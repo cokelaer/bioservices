@@ -11,7 +11,7 @@ ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapp
 # Import SOAPpy WSDL package.
 from SOAPpy import WSDL
 from services import Service
-
+import urllib2
 
 
 class UniProt(Service):
@@ -172,3 +172,26 @@ class UniProt(Service):
         Returns: an array of strings containing the database and style names. For example: 
         """
         retur.serv.getSupportedStyles()
+
+
+
+    def mapping(self, fro="ID", to="KEGG_ID", format="tab", query="P13368"):
+        """
+
+        res = u.mapping(fro="ACC", to="KEGG_ID", query='P43403')
+        res.split()
+        ['From', 'To', 'P43403', 'hsa:7535']
+
+
+        """
+        import urllib
+        url = 'http://www.uniprot.org/mapping/'
+        params = {'from':fro, 'to':to, 'format':format, 'query':query}
+        data = urllib.urlencode(params)
+        print data
+        request = urllib2.Request(url, data)
+        contact = ""
+        request.add_header('User-Agent', 'Python contact')
+        response = urllib2.urlopen(request)
+        result = response.read(200000)
+        return result
