@@ -66,4 +66,7 @@ class Service(object):
 
 
 
-    
+class REST(object):
+
+    def __init__(self, name):
+        self.name = name
