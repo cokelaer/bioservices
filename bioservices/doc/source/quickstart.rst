@@ -72,7 +72,7 @@ Then, you need to scan it with xml standard python module::
     >>> import xml.etree.ElementTree as ET
     >>> root = ET.fromstring(data)
 
-Biomdodels
+Biomodels
 ==============
 
 You can access to the biomodels service and obtain a model as follows::
