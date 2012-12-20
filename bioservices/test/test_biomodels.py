@@ -8,7 +8,7 @@ GOId = 'GO:0001756'
 reacID = "REACT_1590" 
 personName = "LeNovere"
 
-class test_biomodels():
+class _test_biomodels():
 
 
     def __init__(self):

@@ -13,18 +13,18 @@
 #  website: http://www.ebi.ac.uk/~cokelaer/bioservices
 #
 ##############################################################################
-"""This module provides a class :class:`~Reactome` that allows an easy access MIRIAM registry service.
+"""This module provides a class :class:`~Reactome` .
 
 """
 
 
-from services import Service
+from services import WSDLService
 import webbrowser
 import copy
 
 
 
-class Reactome(Service):
+class Reactome(WSDLService):
     """Interface to the Reactome service
 
     ::
@@ -100,7 +100,7 @@ i
 
 #caBIOService: http://www.reactome.org:8080/caBIOWebApp/services/caBIOService?wsdl
 
-class ReactomeBioPAXExporter(Service):
+class ReactomeBioPAXExporter(WSDLService):
     """http://www.reactome.org/entitylevelview/PathwayBrowser.html#DB=gk_current&FOCUS_SPECIES_ID=48887&FOCUS_PATHWAY_ID=177929&ID=177929"""
 
     def __init__(self, verbose=True, debug=False, url=None):

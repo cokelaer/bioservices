@@ -9,13 +9,13 @@ ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapp
 
 """
 # Import SOAPpy WSDL package.
-from SOAPpy import WSDL
-from services import Service
+#from SOAPpy import WSDL
+from services import WSDLService
 import urllib2
 
 
-class UniProt(Service):
-    """
+class UniProt(WSDLService):
+    """Interface to the `UniProt <http://www.uniprot.org>`_ service
 
 
         >>> u = Uniprot()

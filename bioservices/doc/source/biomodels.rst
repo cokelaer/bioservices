@@ -5,6 +5,9 @@
 
 .. _biomodels_tutorial:
 
+Biomodels tutorial
+======================
+
 Introduction
 --------------
 Start a biomodels interface:

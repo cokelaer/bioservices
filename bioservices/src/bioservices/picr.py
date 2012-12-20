@@ -1,9 +1,13 @@
 import urllib2
-from services import REST
+from services import RESTService
 
 
 
-class PICR(REST):
+class PICR(RESTService):
+    """Interface to the `PICR (Protein Identifier Cross reference ) <http://www.ebi.ac.uk/Tools/picr/>`_ service
+
+
+    """
     def __init__(self):
         super(PICR, self).__init__(name="PICR")
 

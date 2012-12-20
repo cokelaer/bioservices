@@ -4,6 +4,14 @@
 
 
 
+Service interface module
+===================================================================
+
+.. automodule:: bioservices.services
+    :members:
+    :undoc-members:
+    :synopsis: 
+
 kegg module
 ===================================================================
 
@@ -13,21 +21,12 @@ kegg module
     :synopsis: 
 
 
-
-Service interface module
-===================================================================
-
-.. automodule:: bioservices.services
+.. automodule:: bioservices.rhea
     :members:
     :undoc-members:
     :synopsis: 
 
-
-
-uniprot module
-===================================================================
-
-.. automodule:: bioservices.uniprot
+.. automodule:: bioservices.reactome
     :members:
     :undoc-members:
     :synopsis: 
@@ -38,4 +37,24 @@ biomodels module
     :members:
     :undoc-members:
     :synopsis: 
+
+uniprot module
+===================================================================
+
+.. automodule:: bioservices.uniprot
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+
+picr module
+===================================================================
+
+.. automodule:: bioservices.picr
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+
+
 

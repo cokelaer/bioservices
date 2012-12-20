@@ -1,5 +1,5 @@
 from SOAPpy import SOAPProxy, WSDL
-
+import urllib2
 
 #from SOAPpy import SOAPProxy            1
 #>>> url = 'http://services.xmethods.net:80/soap/servlet/rpcrouter'
@@ -8,8 +8,10 @@ from SOAPpy import SOAPProxy, WSDL
 ##>>> server.getTemp('27502')                 4
 
 
+__all__ = ["WSDLService", "RESTService"]
 
-class Service(object):
+
+class WSDLService(object):
     """A common database class for service using WSDL
 
 
@@ -66,7 +68,23 @@ class Service(object):
 
 
 
-class REST(object):
+class RESTService(object):
 
-    def __init__(self, name):
+    def __init__(self, name, verbose=True):
         self.name = name
+        self.verbose = verbose
+
+    def request(self, url):
+        try:
+            if self.verbose: 
+                print("Fetching url=%s" % url)
+            res = urllib2.urlopen(url).read()
+
+            return res
+        except Exception, e:
+            print(e)
+            print("An exception occured while reading the URL")
+            print(url)
+            print("Error caught within bioservices. Invalid requested URL ? ")
+            raise ValueError(e)
+

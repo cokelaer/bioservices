@@ -5,6 +5,9 @@
 
 .. _kegg_tutorial:
 
+Kegg Tutorial
+==============
+
 Introduction
 --------------
 Start a kegg interface (default organism is human, that is called **hsa**):

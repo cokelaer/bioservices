@@ -3,10 +3,15 @@
 Quick Start
 #################
 
+Bioservices provides several services. Each service requires some expertise so
+we will neither cover all the services nor all their functionalities in this quickstart. However by the end of this tutorials you should be able to play with all services provided in bioservices. 
 
+There are two main technology involved in web services: the WSDL and the REST
+styles. The Kegg and Biomodels services presented uses WSDL whereas uniprot uses
+REST.
 
-Kegg
-=====
+Kegg service
+=============
 
 
 Start a kegg interface (default organism is human, that is called hsa)::
@@ -54,8 +59,8 @@ service method via the attribute :meth:`~bioservices.kegg.Kegg.serv`.
 In addition to the Kegg service, we implemented extra commands. 
 The tutorial links here below provides more examples.
 
-Uniprot
-===========
+Uniprot service
+==================
 
 There is a uniprot module that allows to access to the uniprot WSDL. However,
 there are really few service and the only relevant method returns raw data that
@@ -67,27 +72,24 @@ the user will need to scan. For instance::
     >>> u = uniprot.Uniprot()
     >>> data = u.fetchBatch("uniprot" ,"zap70_human", "xml", "raw")
 
+
 Then, you need to scan it with xml standard python module::
 
     >>> import xml.etree.ElementTree as ET
     >>> root = ET.fromstring(data)
 
-Biomodels
-==============
+
+Biomodels service
+===================
 
 You can access to the biomodels service and obtain a model as follows::
 
 
     >>> from bioservices import biomodels
     >>> b = biomodels.BioModels()
-    >>> b.getModelSBMLById('BIOMD0000000299')
+    >>> model = b.getModelSBMLById('BIOMD0000000299')
+
+Then you can play with the SBML file with your favorite tools.
 
 
 
-More Tutorials
-=================
-
-.. toctree::
-
-    kegg_tutorial.rst
-    biomodels.rst

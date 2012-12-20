@@ -36,10 +36,11 @@ publicationIdOrText     publication identifier (PMID or DOI) or text
 """
 
 
-from services import Service
+from services import WSDLService
 import webbrowser
 import copy
 
+__all__ = ["BioModels"]
 
 
 def checkId(fn):
@@ -52,10 +53,10 @@ def checkId(fn):
     Id provided is not a valid ID. See modelsId attribute.""")
     return wrapped
 
-class BioModels(Service):
-    """Interface to the KEGG database
+class BioModels(WSDLService):
+    """Interface to the `BioModels <http://www.ebi.ac.uk/biomodels>`_ service 
 
-    ::
+    
 
 
     """
@@ -136,7 +137,7 @@ class BioModels(Service):
     @checkId
     def getAuthorsByModelId(self, Id):
         """Retrieves the name of the authors of the publication associated with
-a given model.
+        a given model.
 
         :param str Id: a valid model Id. See :attr:`modelsId` attribute.
 

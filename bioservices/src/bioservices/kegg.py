@@ -83,7 +83,7 @@ we provide additional functionalities:
 """
 
 
-from services import Service
+from services import WSDLService
 import webbrowser
 import copy
 
@@ -151,8 +151,8 @@ class Items(object):
 
 
 
-class Kegg(Service):
-    """Interface to the KEGG database
+class Kegg(WSDLService):
+    """Interface to the `KEGG <http://www.genome.jp/kegg/pathway.html>`_ database
 
     ::
 
