@@ -16,4 +16,3 @@ Tutorials
     kegg_tutorial.rst
     biomodels.rst
 
-

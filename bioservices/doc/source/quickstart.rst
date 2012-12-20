@@ -92,4 +92,41 @@ You can access to the biomodels service and obtain a model as follows::
 Then you can play with the SBML file with your favorite tools.
 
 
+Rhea service 
+==============
 
+Create a :class:`~bioservices.rhea.Rhea` instance as follows:
+
+.. doctest::
+
+    from bioservices import Rhea
+    r = Rhea()
+
+Rhea provides only 2 type of requests with a REST interface that are available with the :meth:`~bioservices.rhea.Rhea.search` and :meth:`~bioservices.rhea.Rhea.entry` methods. Let us first find information about the chemical product **caffein** using the :meth:`search` method::
+
+    xml_response = r.search("caffein")
+
+The output is in XML format. Python provides lots of tools to deal with xml so
+you can surely found good tools. However, we provide a couple of tools for basic
+usage that are gathered in the :meth:`xmltools` module. As an example, we can
+extract the Ids found in the **xml_response** variable as follows::
+
+    >>> from bioservices import xmltools
+    >>> ex = xmltools.easyXML_RheaSearch(xml_response)
+    >>> ex.get_reactions_ids()
+    ['27902', '10280', '20944', '30447', '30319', '30315', '30311', '30307']
+
+The second method provided is the :meth:`entry` method. Given an Id, 
+you can query the Rhea database using Id found earlier (e.g., 10280)::
+
+    >>> xml_response = r.entry(10280, "biopax2")
+
+.. warning:: the r.entry output is also in XML format but we do not provide a
+   specific XML parser for it unlike for the "search" method.
+
+output format can be found in ::
+
+    >>> r.format_entry
+    ['cmlreact', 'biopax2', 'rxn']
+
+.. note:: Id may be in only a subset of the above formats

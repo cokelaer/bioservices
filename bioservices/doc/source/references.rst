@@ -20,11 +20,16 @@ kegg module
     :undoc-members:
     :synopsis: 
 
+rhea module
+==============
 
 .. automodule:: bioservices.rhea
     :members:
     :undoc-members:
     :synopsis: 
+
+Reactome module
+=====================
 
 .. automodule:: bioservices.reactome
     :members:
@@ -55,6 +60,13 @@ picr module
     :undoc-members:
     :synopsis: 
 
+xmltools module
+========================
+
+.. automodule:: bioservices.xmltools
+    :members:
+    :undoc-members:
+    :synopsis: 
 
 
 
