@@ -8,6 +8,7 @@ class test_rhea():
         self.s = Rhea()
 
     def test_search(self):
+        r1 = self.s.search("caffeine")
         r1 = self.s.search("caffeine", format="cmlreact")
         r2 = self.s.search("caffeine", format="biopax2")
         try:
@@ -18,11 +19,19 @@ class test_rhea():
 
     def test_entry_cmlreact(self):
         self.s.entry(10280, "cmlreact")
+
     def test_entry_biopax2(self):
         self.s.entry(10280, "biopax2")
+
     def test_entry_rxn(self):
         self.s.entry(10090, "rxn")
 
+    def test_entry_badformat(self):
+        try:
+            self.s.entry(10090, "ggg")
+            assert False
+        except:
+            assert True
 
 
 

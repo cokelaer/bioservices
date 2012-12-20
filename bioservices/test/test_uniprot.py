@@ -2,7 +2,7 @@ from bioservices import uniprot
 
 
 
-class test_UniProt(object):
+class _test_UniProt(object):
     def __init__(self):
        self.u = uniprot.UniProt()
 

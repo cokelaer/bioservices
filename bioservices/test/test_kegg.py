@@ -8,7 +8,7 @@ sharepath = easydev.get_shared_directory_path("bioservices") + os.sep
 
 
 
-class test_Kegg():
+class _test_Kegg():
 
 
     def __init__(self):
