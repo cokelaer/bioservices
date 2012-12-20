@@ -1,4 +1,4 @@
-from services import Service
+from services import WSDLService
 import copy
 
 
@@ -28,7 +28,7 @@ class Items2(object):
     #def _get_entry_ids(self):
 
 
-class Wikipath(Service):
+class Wikipath(WSDLService):
     """Interface to the WikiPathways database
     
     ::

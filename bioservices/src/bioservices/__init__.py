@@ -12,3 +12,6 @@ from rhea import *
 
 import xmltools
 from xmltools import *
+
+
+import wikipathway
