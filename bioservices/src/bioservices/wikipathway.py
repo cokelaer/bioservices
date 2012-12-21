@@ -1,5 +1,6 @@
 from services import WSDLService
 import copy
+import base64
 
 
 class Items2(object):
@@ -33,8 +34,8 @@ class Wikipath(WSDLService):
     
     ::
     
-       import wikipathways
-       w = wikipathways.WikiPath()
+       import wikipathway
+       w = wikipathway.WikiPath()
        w.methods
        
        w.organism #'Homo sapiens', by default
@@ -67,7 +68,7 @@ class Wikipath(WSDLService):
         self._organism = 'Homo sapiens' ## This function is redundant (see class service)
         if self.verbose:
             print "Fetching organisms..."
-        self.organisms = Items2(self.serv.listOrganisms(),'organisms',self.verbose)
+        self.organisms = self.serv.listOrganisms()
 
 #        self.recentChanges = Items2(self.serv.getRecentChanges(time
 
@@ -108,8 +109,27 @@ class Wikipath(WSDLService):
 
 #    def get_pathway_by_pathID(self, 
 
-    def findInteractions(self, id_list):
-        return self.serv.findInteractions(query = id_list)
+    def findInteractions(self, id_list, organism = None, raw = False, verbose = False):
+        if raw:
+            return self.serv.findInteractions(query = id_list)
+        else:
+            output = {'interactions':[],'scores':[],'pathway_ids':[],'revision':[],}
+            intA = []
+            intB = []
+            if organism == None:
+                organism = self.organism
+            for x in self.serv.findInteractions(query = id_list):
+                if x['species'] == organism:
+                    intA.append(x['fields'][1]['values'])
+                    intB.append(x['fields'][2]['values'])
+                    output['scores'].append(x['score'])
+                    output['pathway_ids'].append(x['id'])
+                    output['revision'].append(x['revision'])
+            output['interactions'] = zip(intA,intB)
+            if verbose:
+                return output 
+            else:
+                return output['interactions']
 
     def listPathways(self, organism = None):
         if organism == None:
@@ -133,8 +153,12 @@ class Wikipath(WSDLService):
 #    def login(self, usrname, password):
 #        return self.serv.login(name = usrname, pass = password)
 
-    def getPathwayAs(self, filetype, pathwayId, revisionNumb = 0):
-        return self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, revision = revisionNumb)
+    def getPathwayAs(self, filetype, pathwayId, revisionNumb = 0, verbose = False):
+        res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, revision = revisionNumb)
+        if verbose:
+            return res
+        else:
+            return base64.b64decode(res)
 
     def updatePathway(self, pathwayId, describeChanges, gpmlCode, revisionNumb, authInfo):
         return self.serv.updatePathway(pwId = pathwayId, description = describeChanges, gpml = gpmlCode, revision = revisionNumb, auth = authInfo) 
@@ -158,10 +182,14 @@ class Wikipath(WSDLService):
     def getCurationTagsByName(self, name):
         return self.serv.getCurationTagsByName(tagName = name)
 
-    def getColoredPathway(self, pathwayId, graphIds, revisionNumb = 0, colors = None, filetype = 'pdf'):
+    def getColoredPathway(self, pathwayId, graphIds, revisionNumb = 0, colors = None, filetype = 'pdf', verbose = False):
         if colors == None:
             colors = 'FF0000' 
-        return self.serv.getColoredPathway(pwId = pathwayId, revision = revisionNumb, graphId = graphIds, color = colors, fileType = filetype)
+        res = self.serv.getColoredPathway(pwId = pathwayId, revision = revisionNumb, graphId = graphIds, color = colors, fileType = filetype)
+        if verbose:
+            return res
+        else:
+            return base64.b64decode(res)
 
     def getXrefList(self, pathwayId, sysCode):
         return self.serv.getXrefList(pwId = pathwayId, code = sysCode)  
