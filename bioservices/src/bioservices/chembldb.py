@@ -6,9 +6,6 @@ ChEMBL REST API Methods
 
 Using the ChEMBL web service API users can retrieve data from the ChEMBL database in a programmatic fashion. The following list defines the currently supported functionality and defines the expected inputs and outputs of each method.
 
-API Features
-
-
 """
 
 from services import RESTService
