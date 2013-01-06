@@ -24,13 +24,29 @@ class Chembl(RESTService):
         return target_data
 
 
-    def get_compound_by_ChemblId(chembl_id):
+    def get_compound_by_ChemblId(self,chembl_id):
         """
         Description: Get compound by ChEMBLID
         Input: Compound ChEMBLID
         Output: Compound Record
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/compounds/CHEMBL1
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/compounds/CHEMBL1.json
+
+        OUT:
+           A dictionary is returned. The dictionary has a unique key 'compound'. The value of that key is another dictionary keyed by                smiles
+                chemblId
+                medChemFriendly
+                molecularWeight
+                molecularFormula
+                acdLogp
+                stdInChiKey
+                knownDrug
+                passesRuleOfThree
+                rotatableBonds
+                alogp
+                numRo5Violations
+                acdLogd
+
         """
         url = 'http://www.ebi.ac.uk/chemblws/compounds/%s.json'%chembl_id
         target_data = urllib2.urlopen(url).read()
@@ -200,6 +216,3 @@ class Chembl(RESTService):
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/assays/CHEMBL1217643/bioactivities
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/assays/CHEMBL1217643/bioactivities.json 
         """
-
-
-"""
