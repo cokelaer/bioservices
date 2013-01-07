@@ -36,7 +36,7 @@ except Exception, e:
 import pkg_resources
 version = pkg_resources.require(pkg_name)[0].version
 release = version
-author = "Thomas Cokelaer"
+author = "Thomas Cokelaer, Dennis Pultz, Jordi Serra-Musach"
 title = pkg_name
 copyright = author + ", 2012"
 project = pkg_name
