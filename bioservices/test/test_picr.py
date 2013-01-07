@@ -2,15 +2,25 @@ from bioservices import picr
 
 
 
-class TestPICR(object):
+class TestPICR(picr.PICR):
 
     def __init__(self):
-        self.picr = picr.PICR()
-        self.sequence="MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS"
+        super(TestPICR, self).__init__()
 
 
     def test_getUPIForSequence(self):
-        res = self.picr.getUPIForSequence(self.sequence, ["IPI", "ENSEMBL", "SWISSPROT"])
-        assert len(res)>0
+        res = self.getUPIForSequence(self._sequence_example, ["IPI", "ENSEMBL", "SWISSPROT"])
+        print res
+
+    def test_databases(self):
+        assert len(self.databases)>0
+
+    def test_MappedDB(self):
+        self.getMappedDatabaseNames()
 
 
+    def test_getUPIForAccession(self):
+        self.getUPIForAccession(self._accession_example, ["SWISSPROT"])
+
+    def test_getUPIForBLAST(self):
+        self.getUPIForBLAST(self._blastfrag_example, "SWISSPROT",program="blastp",matrix="BLOSUM62")
