@@ -1,5 +1,5 @@
 from services import WSDLService
-import copy
+import copy, webbrowser
 import base64
 
 
@@ -153,13 +153,24 @@ class Wikipath(WSDLService):
 #    def login(self, usrname, password):
 #        return self.serv.login(name = usrname, pass = password)
 
-    def getPathwayAs(self, filetype, pathwayId, revisionNumb = 0, verbose = False):
+    def getPathwayAs(self, pathwayId, filetype = 'gpml', revisionNumb = 0, verbose = False):
         res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, revision = revisionNumb)
         if verbose:
             return res
         else:
             return base64.b64decode(res)
 
+    def savePathwayAs(self, pathwayId, filename, revisionNumb = 0, display = True):
+        if filename.find('.') == -1:
+            filename = "%s.%s" %(filename,'pdf')  
+        filetype = filename.split('.')[-1]
+        res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, revision = revisionNumb)
+        f = open(filename,'w')
+        f.write(base64.b64decode(res))
+        if display:
+            webbrowser.open(filename)
+        f.close()
+        
     def updatePathway(self, pathwayId, describeChanges, gpmlCode, revisionNumb, authInfo):
         return self.serv.updatePathway(pwId = pathwayId, description = describeChanges, gpml = gpmlCode, revision = revisionNumb, auth = authInfo) 
 
@@ -209,3 +220,6 @@ class Wikipath(WSDLService):
     def getPathwaysByParentOntologyTerm(self, ontologyTermId):
         return self.serv.getPathwaysByParentOntologyTerm(term = ontologyTermId)
 
+    def show_pathway_in_browser(self, pathwayId):
+        url = self.serv.getPathwayInfo(pwId=pathwayId).url
+        webbrowser.open(url)
