@@ -7,11 +7,15 @@ ChEMBL REST API Methods
 Using the ChEMBL web service API users can retrieve data from the ChEMBL database in a programmatic fashion. The following list defines the currently supported functionality and defines the expected inputs and outputs of each method.
 
 """
-
 from services import RESTService
 import urllib2, json, re
 
 class Chembl(RESTService):
+
+    def __init__(self):
+        super(Chembl, self).__init__(name="Chembl")
+
+
     def api_status(self):
         """
         Description: Check API status
@@ -61,6 +65,7 @@ class Chembl(RESTService):
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/compounds/stdinchikey/QFFGVLORLPOAEC-SNVBAGLBSA-N
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/compounds/stdinchikey/QFFGVLORLPOAEC-SNVBAGLBSA-N.json
         """
+        pass
 
 
     def get_comppunds_by_SMILES(self,smiles_string):
@@ -83,6 +88,7 @@ class Chembl(RESTService):
         POST parameter: smiles (Required)
         Example parameter value: COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56
         """
+        pass
 
 
     def get_compounds_containing_SMILES(self,smiles_string):
@@ -93,6 +99,7 @@ class Chembl(RESTService):
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/compounds/substructure/COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/compounds/substructure/COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56.json
         """
+        pass
 
 
     def get_compunds_containing_SMILES_by_HTTP_POST(self,smiles_string):
@@ -105,6 +112,7 @@ class Chembl(RESTService):
         POST parameter: smiles (Required)
         Example parameter value: N#CCc2ccc1ccccc1c2
         """
+        pass
             
     def get_compounds_similar_to_SMILES(self,smiles_string):
         """
@@ -114,6 +122,7 @@ class Chembl(RESTService):
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/compounds/similarity/COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56/70
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/compounds/similarity/COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56/70.json
         """
+        pass
 
         
     def get_compounds_similar_to_SMILES_by_http_post(self,smiles_string):
@@ -138,6 +147,7 @@ class Chembl(RESTService):
         Example URL: http://www.ebi.ac.uk/chemblws/compounds/CHEMBL192/image
         Example URL with dimensions parameter: http://www.ebi.ac.uk/chemblws/compounds/CHEMBL192/image?dimensions=200
         """
+        pass
 
     def get_compound_activities(self,chembl_id):
         """
@@ -147,6 +157,7 @@ class Chembl(RESTService):
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/compounds/CHEMBL2/bioactivities
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/compounds/CHEMBL2/bioactivities.json
         """
+        pass
 
     def get_target_by_chemblId(self,chembl_id):
         """
@@ -156,6 +167,7 @@ class Chembl(RESTService):
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/targets/CHEMBL2477
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/targets/CHEMBL2477.json
         """
+        pass
 
 
     def get_target_by_uniprotId(self,uniprot_id):
@@ -166,6 +178,7 @@ class Chembl(RESTService):
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/targets/uniprot/Q13936
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/targets/uniprot/Q13936.json
         """
+        pass
 
 
     def get_target_by_refSeqId(self,refseq_id):
@@ -186,9 +199,10 @@ class Chembl(RESTService):
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/targets/CHEMBL240/bioactivities
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/targets/CHEMBL240/bioactivities.json
         """
+        pass
 
 
-    def get_all_targets():
+    def get_all_targets(self):
         """
         Description: Get all targets
         Input: N/A
@@ -196,6 +210,7 @@ class Chembl(RESTService):
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/targets
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/targets.json
         """
+        pass
 
 
     def get_assay_by_chemblId(self, assay_chembl_id):
@@ -206,6 +221,7 @@ class Chembl(RESTService):
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/assays/CHEMBL1217643
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/assays/CHEMBL1217643.json
         """
+        pass
 
 
     def get_assay_bioactivities(self,assay_chembl_id):
@@ -216,3 +232,4 @@ class Chembl(RESTService):
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/assays/CHEMBL1217643/bioactivities
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/assays/CHEMBL1217643/bioactivities.json 
         """
+        pass
