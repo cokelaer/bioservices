@@ -1,6 +1,5 @@
 from services import WSDLService
-import copy, webbrowser
-import base64
+import copy, webbrowser, xmltools, base64
 
 
 class Items2(object):
@@ -84,7 +83,7 @@ class Wikipath(WSDLService):
 
     def _set_keywords(self, keywords):
         self._keywords = keywords    
-#    chosen_pathways = Items2(self.serv.findPathwaysByText())#query = self.keywords))
+
     def _get_keywords(self):
         return self._keywords
     keywords = property(_get_keywords, _set_keywords, doc = "read/write attribute for the organism")
@@ -99,15 +98,10 @@ class Wikipath(WSDLService):
             res = self.serv.findPathwaysByText(query = keywords, species = organism)
         return res
 
-#    extract_pathways = property(_get_pathwayInfo_by_keywords)
-#    chosen_pathways = Items2(get_pathwayInfo_by_keywords(self,'mTOR'))
     def findPathwaysByXref(self, id_list):
         if isinstance(id_list,str):
             res = self.serv.findPathwaysByXref(ids = id_list)
-#        get_pathways_by_external_id.test = 
         return res 
-
-#    def get_pathway_by_pathID(self, 
 
     def findInteractions(self, id_list, organism = None, raw = False, verbose = False):
         if raw:
@@ -153,7 +147,7 @@ class Wikipath(WSDLService):
 #    def login(self, usrname, password):
 #        return self.serv.login(name = usrname, pass = password)
 
-    def getPathwayAs(self, pathwayId, filetype = 'gpml', revisionNumb = 0, verbose = False):
+    def getPathwayAs(self, pathwayId, filetype = 'owl', revisionNumb = 0, verbose = False):
         res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, revision = revisionNumb)
         if verbose:
             return res
@@ -170,6 +164,9 @@ class Wikipath(WSDLService):
         if display:
             webbrowser.open(filename)
         f.close()
+
+    def displaySavedPathwayInBrowser(self, filename):
+        webbrowser.open(filename)
         
     def updatePathway(self, pathwayId, describeChanges, gpmlCode, revisionNumb, authInfo):
         return self.serv.updatePathway(pwId = pathwayId, description = describeChanges, gpml = gpmlCode, revision = revisionNumb, auth = authInfo) 
@@ -193,17 +190,17 @@ class Wikipath(WSDLService):
     def getCurationTagsByName(self, name):
         return self.serv.getCurationTagsByName(tagName = name)
 
-    def getColoredPathway(self, pathwayId, graphIds, revisionNumb = 0, colors = None, filetype = 'pdf', verbose = False):
-        if colors == None:
-            colors = 'FF0000' 
-        res = self.serv.getColoredPathway(pwId = pathwayId, revision = revisionNumb, graphId = graphIds, color = colors, fileType = filetype)
-        if verbose:
-            return res
-        else:
-            return base64.b64decode(res)
+#    def getColoredPathway(self, pathwayId, graphIds, revisionNumb = 0, colors = None, filetype = 'pdf', verbose = False):
+#        if colors == None:
+#            colors = 'FF0000' 
+#        res = self.serv.getColoredPathway(pwId = pathwayId, revision = revisionNumb, graphId = graphIds, color = colors, fileType = filetype)
+#        if verbose:
+#            return res
+#        else:
+#            return base64.b64decode(res)
 
-    def getXrefList(self, pathwayId, sysCode):
-        return self.serv.getXrefList(pwId = pathwayId, code = sysCode)  
+#    def getXrefList(self, pathwayId, sysCode):
+#        return self.serv.getXrefList(pwId = pathwayId, code = sysCode)  
 
     def findPathwaysByLiterature(self, refQuery):
         return self.serv.findPathwaysByLiterature(query = refQuery)
@@ -220,6 +217,10 @@ class Wikipath(WSDLService):
     def getPathwaysByParentOntologyTerm(self, ontologyTermId):
         return self.serv.getPathwaysByParentOntologyTerm(term = ontologyTermId)
 
-    def show_pathway_in_browser(self, pathwayId):
+    def showPathwayInBrowser(self, pathwayId):
         url = self.serv.getPathwayInfo(pwId=pathwayId).url
         webbrowser.open(url)
+
+#    def get_genes_by_pathway(self, pathwayId):
+#        
+        
