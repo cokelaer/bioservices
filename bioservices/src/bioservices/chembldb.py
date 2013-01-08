@@ -13,7 +13,8 @@ import urllib2, json, re
 class Chembl(RESTService):
 
     def __init__(self):
-        super(Chembl, self).__init__(name="Chembl")
+        super(Chembl, self).__init__(url="http://www.ebi.ac.uk/chemblws/status/", 
+            name="Chembl")
 
 
     def api_status(self):

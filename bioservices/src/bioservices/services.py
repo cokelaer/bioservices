@@ -70,9 +70,14 @@ class WSDLService(object):
 
 class RESTService(object):
 
-    def __init__(self, name, verbose=True):
+    def __init__(self, name, url=None, verbose=True):
         self.name = name
+        self.url = url
         self.verbose = verbose
+
+    def _get_baseURL(self):
+        return self.url
+    baseURL = property(_get_baseURL)
 
     def request(self, url):
         try:
@@ -86,5 +91,38 @@ class RESTService(object):
             print("An exception occured while reading the URL")
             print(url)
             print("Error caught within bioservices. Invalid requested URL ? ")
-            raise ValueError(e)
+            raise
 
+
+    # Wrapper for a REST (HTTP GET) request
+    def restRequest(self,url):
+        printDebugMessage('restRequest', 'Begin', 11)
+        printDebugMessage('restRequest', 'url: ' + url, 11)
+        try:
+            # Set the User-agent.
+            user_agent = getUserAgent()
+            http_headers = { 'User-Agent' : user_agent }
+            req = urllib2.Request(url, None, http_headers)
+            # Make the request (HTTP GET).
+            reqH = urllib2.urlopen(req)
+            result = reqH.read()
+            reqH.close()
+        # Errors are indicated by HTTP status codes.
+        except urllib2.HTTPError, ex:
+            # Trap exception and output the document to get error message.
+            print >>sys.stderr, ex.read()
+            raise
+        printDebugMessage('restRequest', 'End', 11)
+        return result
+
+    def urlencode(self, params):
+        """
+
+        """
+        import urllib
+        postData = urllib.urlencode(params)
+        return postData
+
+    def easyXML(self,res):
+        import xmltools
+        return xmltools.easyXML(res)
