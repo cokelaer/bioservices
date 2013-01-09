@@ -42,6 +42,7 @@ For tutorials and quick start please follow the links below. Before that let us
 show you how to install bioservices.
 
 
+.. note:: RESTful URLs are useful in that there is no need for any external dependency. You simply need to build a well-formatted URL and you will retrieve an XML document that you can consume with your preferred technology platform. The XML document that is returned will contain elements defined in the WSDL schema.
 
 .. _installation:
 
