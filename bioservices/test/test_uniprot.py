@@ -1,12 +1,13 @@
-from bioservices import uniprot
+from bioservices.uniprot import *
 
 
 
-class _test_UniProt(object):
+class test_UniProt(UniProt):
     def __init__(self):
-       self.u = uniprot.UniProt()
+        super(test_UniProt, self).__init__(self)
 
     def test_mapping(self):
-        res = self.u.mapping(fro="ACC", to="KEGG_ID", query='P43403')
-        assert res.split() == ['From', 'To', 'P43403', 'hsa:7535']
+        res = self.mapping(fr="ACC", to="KEGG_ID", query='P43403')
+        assert res == ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535']
+
 

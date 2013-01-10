@@ -2,33 +2,32 @@ from bioservices.rhea import Rhea
 
 
 
-class test_rhea():
+class test_rhea(Rhea):
     def __init__(self):
-
-        self.s = Rhea()
+        super(test_rhea, self).__init__()
 
     def test_search(self):
-        r1 = self.s.search("caffeine")
-        r1 = self.s.search("caffeine", format="cmlreact")
-        r2 = self.s.search("caffeine", format="biopax2")
+        r1 = self.search("caffeine")
+        r1 = self.search("caffeine", format="cmlreact")
+        r2 = self.search("caffeine", format="biopax2")
         try:
-            self.s.search("caffeine", format="biopaxddddddd2")
+            self.search("caffeine", format="biopaxddddddd2")
             assert False
         except:
             assert True
 
     def test_entry_cmlreact(self):
-        self.s.entry(10280, "cmlreact")
+        self.entry(10280, "cmlreact")
 
     def test_entry_biopax2(self):
-        self.s.entry(10280, "biopax2")
+        self.entry(10280, "biopax2")
 
     def test_entry_rxn(self):
-        self.s.entry(10090, "rxn")
+        self.entry(10090, "rxn")
 
     def test_entry_badformat(self):
         try:
-            self.s.entry(10090, "ggg")
+            self.entry(10090, "ggg")
             assert False
         except:
             assert True
