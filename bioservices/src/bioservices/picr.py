@@ -46,8 +46,8 @@ class PICR(RESTService):
         """
         url = self.url + "/getMappedDatabaseNames"
 	res = self.request(url)
-        x = xmltools.easyXML(res)
-        return x
+        #x = xmltools.easyXML(res)
+        return res
 
     def _get_databases(self):
         res = self.getMappedDatabaseNames()
@@ -112,7 +112,7 @@ class PICR(RESTService):
 
         #res = urllib2.urlopen(url).read()
         res = self.request(url)
-        res = xmltools.easyXML(res)
+        #res = xmltools.easyXML(res)
         return res
 
     def _checkDBname(self, db):
@@ -165,7 +165,7 @@ class PICR(RESTService):
         if onlyactive == False:
             url += "&onlyactive=false"
         res = self.request(url)
-        res = xmltools.easyXML(res)
+        #res = xmltools.easyXML(res)
         return res
 
     def getUPIForBLAST(self, blasfrag, database,
@@ -223,7 +223,7 @@ class PICR(RESTService):
         else:
             res = self.request(url)
 
-        res = xmltools.easyXML(res)
+        #res = xmltools.easyXML(res)
         return res
 
 

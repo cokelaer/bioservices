@@ -35,6 +35,7 @@ Here is a list of services that you can access from **bioservices**:
     bioservices.picr.PICR
     bioservices.reactome.Reactome
     bioservices.rhea.Rhea
+    bioservices.chembl.chembldb
 
 The links above refers to the offical web site of each service (right column)
 and our reference guide (left column) that provides an exhaustive documentation.

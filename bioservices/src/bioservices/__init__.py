@@ -19,3 +19,5 @@ import wikipathway
 import uniprot
 
 import wsdbfetch
+
+import xmltools

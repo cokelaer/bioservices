@@ -16,7 +16,8 @@ class test_quickGO(QuickGO):
             qualifier="NOT")
 
     def test_annotation_qualifier(self):
-        res = set([ x for x in g.Annotation(tax='9606', format='tsv', col="qualifier",ref="PMID:*").split()])
+
+        res = set([ x for x in self.Annotation(tax='9606', format='tsv', col="qualifier",ref="PMID:*").split()])
 
         assert 'NOT' in res
 

@@ -142,8 +142,11 @@ class RESTService(Service):
                 print("done")
                 if self.easyXMLConversion:
                     print("--Conversion to easyXML"),
-                    res = self.easyXML(res)
-                    print("done")
+                    try:
+                        res = self.easyXML(res)
+                        print("done")
+                    except:
+                         print("skipped")
             return res
         except Exception, e:
             print(e)
