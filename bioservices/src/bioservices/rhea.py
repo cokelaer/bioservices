@@ -1,8 +1,8 @@
 # -*- python -*-
 #
-#  This file is part of XXX software
+#  This file is part of bioservices software
 #
-#  Copyright (c) 2011-2012
+#  Copyright (c) 2011-2013
 #
 #  File author(s): Thomas Cokelaer <cokelaer@ebi.ac.uk>
 #
@@ -10,7 +10,7 @@
 #  See accompanying file LICENSE.txt or copy at
 #      http://www.gnu.org/licenses/gpl-3.0.html
 #
-#  website: http://www.ebi.ac.uk/~cokelaer/XXX
+#  website: https://www.assembla.com/spaces/bioservices/wiki
 #
 ##############################################################################
 """Interface to the Rhea web services
@@ -21,14 +21,16 @@
 
     .. highlights::
 
-        "Rhea is a freely available, manually annotated database of chemical
+        Rhea is a freely available, manually annotated database of chemical
         reactions created in collaboration with the Swiss Institute of Bioinformatics
-        (SIB). All data in Rhea is freely accessible and available for anyone to use. " 
-        -- from Rhea Home page
+        (SIB). All data in Rhea is freely accessible and available for anyone to
+        use. 
+
+        -- from Rhea Home page, Dec 2012
+
 
 
 .. rubric:: Quick example:
-
 
 Searching for caffein will find reactions with participants such as caffeine,
 trans-caffeic acid or caffeoyl-CoA.
@@ -55,6 +57,7 @@ class Rhea(RESTService):
     (e.g. EC number) or citation (author name, title, abstract text, publication ID).
     You can use double quotes - to match an exact phrase - and the following
     wildcards: 
+
         * ? (question mark = one character),
         * `*` (asterisk = several characters).
 
@@ -75,10 +78,13 @@ class Rhea(RESTService):
     See :meth:`search` :meth:`entry` methods for more information about format.
 
     """
-    def __init__(self, version="1.0", verbose=True):
+    def __init__(self, version="1.0",  verbose=True,
+        url="http://www.ebi.ac.uk/rhea/rest"):
+
         """.. rubric:: Rhea constructor
 
-        :param str version: the current version of the interface
+        :param str url: should not be used in principle.
+        :param str version: the current version of the interface (1.0)
         :param bool verbose: True by default
 
         ::
@@ -87,8 +93,8 @@ class Rhea(RESTService):
             >>> r = Rhea()
         """
 
-        super(Rhea, self).__init__(name="Rhea", verbose=verbose)
-        self.baseurl = "http://www.ebi.ac.uk/rhea/rest"
+        super(Rhea, self).__init__(name="Rhea", url=url, 
+            verbose=verbose)
         self.version = version
         self.format_entry = ["cmlreact", "biopax2", "rxn"]
 
@@ -100,16 +106,18 @@ class Rhea(RESTService):
 
 
         :Returns: an XML document containing the reactions with undefined
-            direction, with links to the corresponding bi-directional ones
+            direction, with links to the corresponding bi-directional ones.
+            the format is easyXML.
 
         ::
 
             >>> r = Rhea()
             >>> r.search("caffeine")  # id 10280
+            >>> r.search("caffeine", format="biopax2")  # id 10280
 
-        The output is in XML format. The parsing of the XML file is not part of
-        bioservices. This page from the Rhea web site explains what are the
-        `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of the XML file.
+        The output is in XML format. This page from the Rhea web site explains 
+        what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of 
+        the XML file.
 
         """
         _format = format    # format is a keyword but we want to use it so rhea
@@ -119,7 +127,7 @@ class Rhea(RESTService):
         if _format not in ["biopax2", "cmlreact"]:
             raise ValueError("format must be either cmlreact (default) or biopax2")
 
-        url = self.baseurl + "/" + self.version + "/ws/reaction/%s?q=" % _format
+        url = self.url + "/" + self.version + "/ws/reaction/%s?q=" % _format
         url += query
 
         response = self.request(url)
@@ -129,16 +137,36 @@ class Rhea(RESTService):
     def entry(self, id, format):
         """Retrieve a concrete reaction for the given id in a given format
 
+        :param int id: the id of a reaction
+        :param format: can be rxn, biopax2, or cmlreact
+        :Returns: an XML document containing the reactions with undefined
+            direction, with links to the corresponding bi-directional ones.
+            the format is easyXML.
+
         ::
 
             >>> print r.entry(10280)
 
+        The output is in XML format. This page from the Rhea web site explains 
+        what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of 
+        the XML file.
         """
         if format not in self.format_entry:
             raise ValueError("format is incorrect (%s). Must be one of\
                 %s" % (format, str(self.format_entry)))
-        url = self.baseurl + "/" + self.version + "/ws/reaction/%s/%s" % (format, id)
-        response = self.request(url)
+        url = self.url + "/" + self.version + "/ws/reaction/%s/%s" % (format, id)
+
+        if format=="rxn":
+            save = self.easyXMLConversion
+            try:
+                self.easyXMLConversion = False
+                response = self.request(url)
+            except:
+                pass
+            finally:
+                self.easyXMLConversion = save
+        else:
+            response = self.request(url)
         return response
 
 

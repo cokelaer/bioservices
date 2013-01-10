@@ -1,197 +1,91 @@
-"""
+"""Interface to some part of the UniProt web service
+
+.. topic:: What is UniProt ?
+
+    :URL: http://www.uniprot.org
+    :Citation:
+
+    .. highlights::
+
+    "The Universal Protein Resource (UniProt) is a comprehensive resource for protein
+    sequence and annotation data. The UniProt databases are the UniProt
+    Knowledgebase (UniProtKB), the UniProt Reference Clusters (UniRef), and the
+    UniProt Archive (UniParc). The UniProt Metagenomic and Environmental Sequences
+    (UniMES) database is a repository specifically developed for metagenomic and
+    environmental data."
 
 
+    -- From Uniprot web site (help/about) , Dec 2012
 
-mappiung betwenn uniprot and bench of other DBs.
 
-ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/
+.. mappiung betwenn uniprot and bench of other DBs.
+.. ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/
 
 
 """
 # Import SOAPpy WSDL package.
 #from SOAPpy import WSDL
-from services import WSDLService
+from services import Service
 import urllib2
 
 
-class UniProt(WSDLService):
+
+# this is not Uniprot but WSDBfetch
+
+
+class UniProt(Service):
     """Interface to the `UniProt <http://www.uniprot.org>`_ service
 
+    .. warning:: this class does not cover all UniProt services but a subset
+        (identifier mapping service for now).
 
-        >>> u = Uniprot()
-        >>> data = u.fetchBatch("uniprot" ,"zap70_human", "xml", "raw")
-        >>> import xml.etree.ElementTree as ET
-        >>> root = ET.fromstring(data)
+    Use the identifier mapping interface::
 
+    >>> u = Uniprot(verbose=False)
+    >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403')
+    ['FromACC', 'ToKEGG_ID', 'P43403', 'hsa:7535']
 
-    URL can also be wsdlUrl = 'http://www.ebi.ac.uk/ws/services/WSDbfetch?wsdl'
-    but it contains less methods
 
     """
     def __init__(self, name="UniProt",
-            url='http://www.ebi.ac.uk/ws/services/WSDbfetchDoclit?wsdl',
+            url='http://www.uniprot.org/',
             verbose=True, debug=False):
         super(UniProt, self).__init__(name=name, url=url, verbose=verbose)
-        self._supportedDBs = None
-        self._supportedFormats = None
 
-    def _check_db(self, db):
-        if db not in self.supportedDBs:
-            raise Exception("%s not a supportedDB. " %db)
+    def mapping(self, fr="ID", to="KEGG_ID", format="tab", query="P13368"):
+        """This is an interface to the UniProt mapping service
 
-
-    def fetchBatch(self, db, ids, format="default", style="default"):
-        """Fetch a set of entries in a defined format and style.
-
-        :param str db: the name of the database to obtain the entries from (e.g., 'uniprotkb')
-        :param list query: list of identifiers (e.g., 'wap_rat, wap_mouse')
-        :param str format: the name of the format required. 
-        :param str style: the name of the style required. 
-
-        :returns: the format of the response depends on the interface to the service used:
-
-            * WSDBFetchServerService and WSDBFetchDoclitServerService: the entries as a string.
-            * WSDBFetchServerLegacyService: an array of strings containing the entries. 
-
+        :URL: http://www.uniprot.org/mapping/
 
         ::
 
-            u = Uniprot()
-            u.fetchBatch("uniprot" ,"wap_mouse", "xml")
-
-        """
-        return self.serv.fetchBatch(db, ids, format, style)
-
-    def fetchData(self, query, format="default", style="default"):
-        """Fetch an entry in a defined format and style.
-
-        :param str query: the entry identifier in db:id format (e.g., 'UniProtKB:WAP_RAT')
-        :param str format: the name of the format required. 
-        :param str style: the name of the style required. 
-
-        :returns: the format of the response depends on the interface to the service used:
-
-            * WSDBFetchServerService and WSDBFetchDoclitServerService: the entries as a string.
-            * WSDBFetchServerLegacyService: an array of strings containing the entries. Generally 
-              this will contain only one item which contains the set of entries.
-
-        ::
-
-            u = Uniprot()
-            u.fetchData('uniprot:zap70_human')
-
-        """
-        return self.serv.fetchData(query, format, style)
+            res = u.mapping(fro="ACC", to="KEGG_ID", query='P43403')
+            ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535']
 
 
-    def getDatabaseInfo(self, db):
-        """Get details describing specific database (data formats, styles)
-
-        .. note:: WSDBFetchDoclitServerService (document/literal) only.
-
-        :param str db: a valid database 
-
-        :: 
-
-            u.getDatabseInfo("uniprotkb")
-
-        .. seealso:: For details about the output, see http://www.ebi.ac.uk/Tools/webservices/services/dbfetch
-
-        """
-        self._check_db(db)
-        return self.serv.getDatabaseInfo()
-
-    def getDatabaseInfoList(self):
-        """Get details of all available databases, includes formats and result styles.
-
-        :Returns: a list of data structures describing the databases. See
-            :meth:`getDatabaseInfo` for a description of the data structure.
-        """
-
-    def getDbFormats(self, db):
-        """Get list of format names for a given database
-
-
-        :param str db:
-
-        """
-        self._check_db(db)
-        return self.serv.getDbFormats(db)
-    
-
-    def getFormatStyles(self, db, format):
-        """Get a list of style names available for a given database and format.
-
-        :param str db: database name to get available styles for (e.g., uniprotkb)
-        :param str format: the data format to get available styles for (e.g., fasta)
-
-        :Returns: an array of strings containing the style names. 
-
-        ::
-
-            >>> u.getFormatStyles("uniprotkb", "fasta")
-            ['default', 'raw', 'html']
-        """
-
-        self._check_db(db)
-        return self.serv.getFormatStyles(db, format)
-
-    def getSupportedDBs(self):
-        """Get a list of database names usable with WSDbfetch. 
-
-
-
-        buffered in _supportedDB
-        """
-        if self._supportedDBs:
-            return self._supportedDBs
-        else:
-            self._supportedDBs = self.serv.getSupportedDBs()
-        return self._supportedDBs
-
-    supportedDBs = property(getSupportedDBs)
-
-    def getSupportedFormats(self):
-        """Get a list of database and format names usable with WSDbfetch.
-
-        .. deprecated:: use of getDbFormats(db), getDatabaseInfo(db) or  getDatabaseInfoList()
-
-
-
-        """
-        if self._supportedFormats == None:
-            self._supportedFormats = self.serv.getSupportedFormats()
-        return self._supportedFormats
-    supportedFormats = property(getSupportedFormats)
-
-    def getSupportedStyles(self):
-        """Get a list of database and style names usable with WSDbfetch.
-
-        .. deprecated:: use of getFormatStyles(db, format), getDatabaseInfo(db) or         getDatabaseInfoList() is recommended.
-
-        Returns: an array of strings containing the database and style names. For example: 
-        """
-        retur.serv.getSupportedStyles()
-
-
-
-    def mapping(self, fro="ID", to="KEGG_ID", format="tab", query="P13368"):
-        """
-
-        res = u.mapping(fro="ACC", to="KEGG_ID", query='P43403')
-        res.split()
-        ['From', 'To', 'P43403', 'hsa:7535']
-
+        There is a web page that gives the list of correct `database identifiers
+        <http://www.uniprot.org/faq/28>`_
 
         """
         import urllib
-        url = 'http://www.uniprot.org/mapping/'
-        params = {'from':fro, 'to':to, 'format':format, 'query':query}
+        url = self.url + '/mapping/'
+        params = {'from':fr, 'to':to, 'format':format, 'query':query}
         data = urllib.urlencode(params)
-        print data
+        if self.verbose: print data
         request = urllib2.Request(url, data)
-        contact = ""
-        request.add_header('User-Agent', 'Python contact')
+        # 2 following lines are optional
+        #contact = ""
+        #request.add_header('User-Agent', 'Python contact')
         response = urllib2.urlopen(request)
         result = response.read(200000)
+
+        # let us improvve the output a little bit using a list  instead of a
+        # string
+        try:
+            result = result.split()
+            result[0]+=':'+fr
+            result[1]+=':'+to
+        except:
+            pass
+
         return result
