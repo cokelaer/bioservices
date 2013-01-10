@@ -41,9 +41,9 @@ class UniProt(Service):
 
     Use the identifier mapping interface::
 
-    >>> u = Uniprot(verbose=False)
-    >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403')
-    ['FromACC', 'ToKEGG_ID', 'P43403', 'hsa:7535']
+        >>> u = Uniprot(verbose=False)
+        >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403')
+        ['FromACC', 'ToKEGG_ID', 'P43403', 'hsa:7535']
 
 
     """
@@ -55,7 +55,6 @@ class UniProt(Service):
     def mapping(self, fr="ID", to="KEGG_ID", format="tab", query="P13368"):
         """This is an interface to the UniProt mapping service
 
-        :URL: http://www.uniprot.org/mapping/
 
         ::
 
@@ -65,6 +64,8 @@ class UniProt(Service):
 
         There is a web page that gives the list of correct `database identifiers
         <http://www.uniprot.org/faq/28>`_
+
+        :URL: http://www.uniprot.org/mapping/
 
         """
         import urllib

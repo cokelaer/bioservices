@@ -26,7 +26,7 @@ rhea module
 .. automodule:: bioservices.rhea
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 Reactome module
 =====================
@@ -34,14 +34,14 @@ Reactome module
 .. automodule:: bioservices.reactome
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 biomodels module
 ====================
 .. automodule:: bioservices.biomodels
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 uniprot module
 ===================================================================
@@ -49,8 +49,15 @@ uniprot module
 .. automodule:: bioservices.uniprot
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
+wsdbfetch module
+===================================================================
+
+.. automodule:: bioservices.wsdbfetch
+    :members:
+    :undoc-members:
+    :synopsis:
 
 picr module
 ===================================================================
@@ -58,7 +65,7 @@ picr module
 .. automodule:: bioservices.picr
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 xmltools module
 ========================
@@ -66,7 +73,7 @@ xmltools module
 .. automodule:: bioservices.xmltools
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 
 
