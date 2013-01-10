@@ -15,3 +15,7 @@ from xmltools import *
 
 
 import wikipathway
+
+import uniprot
+
+import wsdbfetch
