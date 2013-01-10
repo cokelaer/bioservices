@@ -13,7 +13,23 @@
 #  website: http://www.ebi.ac.uk/~cokelaer/bioservices
 #
 ##############################################################################
-"""This module provides a class :class:`~Reactome` .
+"""Interface to the Reactome webs services
+
+.. topic:: What is Reactome?
+
+    :URL: http://www.reactome.org/ReactomeGWT/entrypoint.html
+    :Citation: http://www.reactome.org/citation.html
+
+    .. highlights:: 
+
+        "REACTOME is an open-source, open access, manually curated and peer-reviewed
+        pathway database. Pathway annotations are authored by expert biologists, in
+        collaboration with Reactome editorial staff and cross-referenced to many
+        bioinformatics databases. These include NCBI Entrez Gene, Ensembl and UniProt
+        databases, the UCSC and HapMap Genome Browsers, the KEGG Compound and ChEBI
+        small molecule databases, PubMed, and Gene Ontology. ... "
+
+        -- from Reactome web site
 
 """
 
