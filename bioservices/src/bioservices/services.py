@@ -8,10 +8,65 @@ import urllib2
 ##>>> server.getTemp('27502')                 4
 
 
-__all__ = ["WSDLService", "RESTService"]
+__all__ = ["Service", "WSDLService", "RESTService"]
 
 
-class WSDLService(object):
+
+class Service(object):
+    def __init__(self, name, url=None, verbose=True):
+        self.url = url
+        self.verbose = verbose
+        self.name = name
+        self._easyXMLConversion = True
+
+    def _get_easyXMLConversion(self):
+        return self._easyXMLConversion
+    def _set_easyXMLConversion(self, value):
+        if type(value) != bool:
+            raise TypeError("value must be a boolean value (True/False)")
+        self._easyXMLConversion = value
+    easyXMLConversion = property(_get_easyXMLConversion, 
+        _set_easyXMLConversion, doc=""""Output from request method are converted to
+easyXML object if this attribute is True (Default behaviour).""")
+
+
+    def easyXML(self, res):
+        """Use this method to convert a XML document into an easyXML object
+
+        The easyXML object provides utilities to ease access to the XML
+        tag/attributes.
+        """
+        import xmltools
+        return xmltools.easyXML(res)
+
+    def urlencode(self, params):
+        """Returns a string compatible with URL request.
+
+        The pair of key/value are converted into a single string by concatenated
+        the "&key=value" string for each key/value in the dictionary.
+
+        :param dict params: a dictionary. Keys are parameters.
+
+        ::
+
+            >>> params = {'a':1, 'b':2}
+            >>> urlencode(params)
+            "a=1&b=2"
+
+        returns "a=1&b=2" or "b=2&a=1" since dictionary are not ordered. Note
+        that the first parameter is not preceded by a & sign that you will need
+        to add. 
+
+        """
+        if isinstance(params, dict)==False:
+            raise TypeError("Params must be a dictionary.")
+        import urllib
+        postData = urllib.urlencode(params)
+        return postData
+
+
+
+class WSDLService(Service):
     """A common database class for service using WSDL
 
 
@@ -31,9 +86,8 @@ class WSDLService(object):
         * :attr:`Pathway.serv` 
         * :attr:`~pathway.pathway.Pathway.organism` default is 'hsa' for Human
         """
-        self.url = url
-        self.verbose = verbose
-        self.name = name
+        super(WSDLService, self).__init__(name, url, verbose)
+
         #self.serv = SOAPProxy(self.url) # what's that ? can we access to a method directly ?
         if self.verbose:
             print("Initialising %s database" % self.name)
@@ -68,23 +122,28 @@ class WSDLService(object):
 
 
 
-class RESTService(object):
+class RESTService(Service):
 
     def __init__(self, name, url=None, verbose=True):
-        self.name = name
-        self.url = url
-        self.verbose = verbose
+        super(RESTService, self).__init__(name, url, verbose)
 
     def _get_baseURL(self):
         return self.url
     baseURL = property(_get_baseURL)
 
     def request(self, url):
-        try:
-            if self.verbose: 
-                print("Fetching url=%s" % url)
-            res = urllib2.urlopen(url).read()
+        if self.verbose:
+            print("REST.bioservices.%s request begins" % self.name)
+            print("--Fetching url=%s" % url),
 
+        try:
+            res = urllib2.urlopen(url).read()
+            if self.verbose:
+                print("done")
+                if self.easyXMLConversion:
+                    print("--Conversion to easyXML"),
+                    res = self.easyXML(res)
+                    print("done")
             return res
         except Exception, e:
             print(e)
@@ -96,6 +155,8 @@ class RESTService(object):
 
     # Wrapper for a REST (HTTP GET) request
     def restRequest(self,url):
+        raise NotImplementedError
+        # need to be checked before using it.
         printDebugMessage('restRequest', 'Begin', 11)
         printDebugMessage('restRequest', 'url: ' + url, 11)
         try:
@@ -115,14 +176,4 @@ class RESTService(object):
         printDebugMessage('restRequest', 'End', 11)
         return result
 
-    def urlencode(self, params):
-        """
 
-        """
-        import urllib
-        postData = urllib.urlencode(params)
-        return postData
-
-    def easyXML(self,res):
-        import xmltools
-        return xmltools.easyXML(res)
