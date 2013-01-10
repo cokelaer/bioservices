@@ -1,4 +1,4 @@
-from bioservices.go import *
+from bioservices.quickgo import *
 
 
 

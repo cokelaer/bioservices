@@ -4,6 +4,8 @@ Whats' new, what has changed
 
 Revision 0.1
 ------------------- 
+* 0.4.3: add quickgo
+* 0.4.2: add wsdbfetch/uniprot
 * 0.4.1: add wikipathways module +test .
 * 0.4.0: add rhea service + test. Updating the documentation.
 * 0.3.0: add reactome + uniprot.
