@@ -18,10 +18,26 @@
 #$Id$
 """This module provides a class :class:`~BioModels` that allows an easy access to all the BioModel service.
 
-See http://www.ebi.ac.uk/biomodels-main/ for information about biomodels itself.
+
+.. topic:: What is BioModels ?
+
+    :URL: http://www.ebi.ac.uk/biomodels-main/
+    :Service: http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices?wsdl
+    
+
+    .. highlights::
+
+        "BioModels Database is a repository hosting computational models of biological
+        systems. A large number of the provided models are published in the
+        peer-reviewed literature and manually curated. This resource allows biologists
+        to store, search and retrieve mathematical models. In addition, those models can
+        be used to generate sub-models, can be simulated online, and can be converted
+        between different representational formats. "
+
+        -- From BioModels website, Dec. 2012
 
 
-Some keyword:
+Some keywords:
 
 ======================= ============================================================
 identifier              Description/example
@@ -33,8 +49,8 @@ uniprotIds              Uniprot identifier (e.g., P41000)
 taxonomyId              Taxonomy identifier (e.g. 9606)
 GOId                    Gene Ontology identifier (e.g. GO:0006915)
 publicationIdOrText     publication identifier (PMID or DOI) or text
-======================= ============================================================
                         which occurs in the publication's title or abstract
+======================= ============================================================
 
 """
 
@@ -56,18 +72,18 @@ def checkId(fn):
     Id provided is not a valid ID. See modelsId attribute.""")
     return wrapped
 
+
 class BioModels(WSDLService):
     """Interface to the `BioModels <http://www.ebi.ac.uk/biomodels>`_ service 
 
-    
+
 
 
     """
-    def __init__(self, verbose=True, debug=False, url=None):
-        """Constructor
+    def __init__(self, verbose=True, url=None):
+        """.. rubric:: Constructor
 
         :param bool verbose:
-        :param bool debug:
         :param str url: redefine the wsdl URL 
 
         """
@@ -421,11 +437,18 @@ records.
 
 
     def extra_getUniprotIds(self, start=10000, end=11000):
-        """Retrieve the Uniprot 
+        """Retrieve the Uniprot IDs  
 
+        :param int start: starting ID value used to scan the database
+        :param int end: ending ID value used to to scan the database
+        :return: list of uniprot IDs that have been found in the DB.
+
+        It may be useful to know the uniprot IDs that are available in all
+        models. Not all of them are indeed available. This function is slow and
+        you should use it with parcimony. This is why we set start and end IDs.
 
         ::
-        
+
             >>> res = b.extra_getUniprotIds(10000,11200)
             ['P10113',
              'P10415',
