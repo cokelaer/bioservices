@@ -1,18 +1,37 @@
+# -*- python -*-
+#
+#  This file is part of bioservices software
+#
+#  Copyright (c) 2011-2013 - EBI-EMBL
+#
+#  File author(s): 
+#      Thomas Cokelaer <cokelaer@ebi.ac.uk>
+#      https://www.assembla.com/spaces/bioservices/team
+#
+#  Distributed under the GPLv3 License.
+#  See accompanying file LICENSE.txt or copy at
+#      http://www.gnu.org/licenses/gpl-3.0.html
+#
+#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  documentation: http://packages.python.org/bioservices
+#
+##############################################################################
+#$Id$
 """Interface to WSDbfetch web service
 
 .. topic:: What is WSDbfetch
 
     :URL: http://www.ebi.ac.uk/Tools/webservices/services/dbfetch
-    :Citation:
+    :Service: http://www.ebi.ac.uk/Tools/webservices/services/dbfetch_rest
 
     .. highlights::
 
-    "WSDbfetch allows you to retrieve entries from various up-to-date biological
-    databases using entry identifiers or accession numbers. This is equivalent to
-    the CGI based dbfetch service. Like the CGI service a request can return a
-    maximum of 200 entries."
+        "WSDbfetch allows you to retrieve entries from various up-to-date biological
+        databases using entry identifiers or accession numbers. This is equivalent to
+        the CGI based dbfetch service. Like the CGI service a request can return a
+        maximum of 200 entries."
 
-    -- From http://www.ebi.ac.uk/Tools/webservices/services/dbfetch , Dec 2012
+        -- From http://www.ebi.ac.uk/Tools/webservices/services/dbfetch , Dec 2012
 
 
 """
@@ -23,27 +42,29 @@ import urllib2
 
 
 class WSDbfetch(WSDLService):
-    """Interface to the `UniProt <http://www.uniprot.org>`_ service
-
+    """Interface to `WSDbfetch <http://www.ebi.ac.uk/Tools/webservices/services/dbfetch_rest>`_ service
 
     ::
 
-        >>> u = WSDbfetch()
-        >>> data = u.fetchBatch("uniprot" ,"zap70_human", "xml", "raw")
-        >>> import xml.etree.ElementTree as ET
-        >>> root = ET.fromstring(data)
+        >>> w = WSDbfetch()
+        >>> data = w.fetchBatch("uniprot" ,"zap70_human", "xml", "raw")
 
-    The URL is http://www.ebi.ac.uk/ws/services/WSDbfetchDoclit?wsdl (from
+    The actual URL used is http://www.ebi.ac.uk/ws/services/WSDbfetchDoclit?wsdl (from
     biocatalogue (this one having let functionalities: 
     http://www.ebi.ac.uk/ws/services/WSDbfetch?wsdl')
 
     """
-    def __init__(self, name="WSDbfetch",
-            url='http://www.ebi.ac.uk/ws/services/WSDbfetchDoclit?wsdl',
-            verbose=True, debug=False):
-        super(WSDbfetch, self).__init__(name=name, url=url, verbose=verbose)
+    _url = 'http://www.ebi.ac.uk/ws/services/WSDbfetchDoclit?wsdl'
+    def __init__(self,  verbose=True):
+        """.. rubric:: Constructor
+
+        :param bool verbose: print informative messages
+        """
+        super(WSDbfetch, self).__init__(name="WSDbfetch", url=WSDbfetch._url, 
+            verbose=verbose)
         self._supportedDBs = None
         self._supportedFormats = None
+        self._supportedStyles = None
 
     def _check_db(self, db):
         if db not in self.supportedDBs:
@@ -70,7 +91,9 @@ class WSDbfetch(WSDLService):
             u.fetchBatch("uniprot" ,"wap_mouse", "xml")
 
         """
-        return self.serv.fetchBatch(db, ids, format, style)
+        res = self.serv.fetchBatch(db, ids, format, style)
+        res = self.easyXML(res)
+        return res
 
     def fetchData(self, query, format="default", style="default"):
         """Fetch an entry in a defined format and style.
@@ -91,7 +114,8 @@ class WSDbfetch(WSDLService):
             u.fetchData('uniprot:zap70_human')
 
         """
-        return self.serv.fetchData(query, format, style)
+        res = self.serv.fetchData(query, format, style)
+        return res
 
 
     def getDatabaseInfo(self, db):
@@ -106,6 +130,8 @@ class WSDbfetch(WSDLService):
             >>> res = u.getDatabaseInfo("uniprotkb")
             >>> res.displayName
             'UniProtKB'
+            >>> print(res.description.encode('utf-8')
+            u'The UniProt Knowledgebase (UniProtKB) is the central access point for extensive curated protein information, including function, classification, and cross-references. Search UniProtKB to retrieve \u201ceverything that is known\u201d about a particular sequence.'
 
         """
         self._check_db(db)
@@ -117,6 +143,7 @@ class WSDbfetch(WSDLService):
         :Returns: a list of data structures describing the databases. See
             :meth:`getDatabaseInfo` for a description of the data structure.
         """
+        return self.serv.getDatabaseInfoList()
 
     def getDbFormats(self, db):
         """Get list of format names for a given database
@@ -149,8 +176,6 @@ class WSDbfetch(WSDLService):
     def getSupportedDBs(self):
         """Get a list of database names usable with WSDbfetch. 
 
-
-
         buffered in _supportedDB
         """
         if self._supportedDBs:
@@ -159,7 +184,7 @@ class WSDbfetch(WSDLService):
             self._supportedDBs = self.serv.getSupportedDBs()
         return self._supportedDBs
 
-    supportedDBs = property(getSupportedDBs)
+    supportedDBs = property(getSupportedDBs, doc="alias to getSupportedDBs")
 
     def getSupportedFormats(self):
         """Get a list of database and format names usable with WSDbfetch.
@@ -181,7 +206,11 @@ class WSDbfetch(WSDLService):
 
         Returns: an array of strings containing the database and style names. For example: 
         """
-        retur.serv.getSupportedStyles()
+        if self._supportedStyles == None:
+            self._supportedStyles = self.serv.getSupportedStyles()
+        return self._supportedStyles
+    supportedStyles = property(getSupportedStyles)
+
 
 
 

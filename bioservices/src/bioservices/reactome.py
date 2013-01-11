@@ -2,17 +2,21 @@
 #
 #  This file is part of bioservices software
 #
-#  Copyright (c) 2011-2012 - EBI-EMBL
+#  Copyright (c) 2011-2013 - EBI-EMBL
 #
-#  File author(s): Thomas Cokelaer <cokelaer@ebi.ac.uk>
+#  File author(s): 
+#      Thomas Cokelaer <cokelaer@ebi.ac.uk>
+#      https://www.assembla.com/spaces/bioservices/team
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
 #      http://www.gnu.org/licenses/gpl-3.0.html
 #
-#  website: http://www.ebi.ac.uk/~cokelaer/bioservices
+#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
+#$Id: $
 """Interface to the Reactome webs services
 
 .. topic:: What is Reactome?
@@ -41,7 +45,7 @@ import copy
 
 
 class Reactome(WSDLService):
-    """Interface to the Reactome service
+    """Interface to the `Reactome <http://www.reactome.org>`_ service
 
     ::
 

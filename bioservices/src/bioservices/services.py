@@ -1,23 +1,92 @@
+# -*- python -*-
+#
+#  This file is part of bioservices software
+#
+#  Copyright (c) 2011-2013 - EBI-EMBL
+#
+#  File author(s): 
+#      https://www.assembla.com/spaces/bioservices/team
+#
+#  Distributed under the GPLv3 License.
+#  See accompanying file LICENSE.txt or copy at
+#      http://www.gnu.org/licenses/gpl-3.0.html
+#
+#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  documentation: http://packages.python.org/bioservices
+#
+##############################################################################
+#$Id$
+
+
 from SOAPpy import SOAPProxy, WSDL
 import urllib2
-
-#from SOAPpy import SOAPProxy            1
-#>>> url = 'http://services.xmethods.net:80/soap/servlet/rpcrouter'
-#>>> namespace = 'urn:xmethods-Temperature'  2
-#>>> server = SOAPProxy(url, namespace)      3
-##>>> server.getTemp('27502')                 4
-
+import platform
+import logging
 
 __all__ = ["Service", "WSDLService", "RESTService"]
 
 
 
 class Service(object):
+    """Base class for WSDL and REST classes
+
+
+    .. seealso:: :class:`RESTService`, :class:`WSDLService`
+
+    """
     def __init__(self, name, url=None, verbose=True):
+        """.. rubric:: Constructor
+
+
+        :param str name: a name for this service
+        :param str url: its URL
+        :param bool verbose: prints informative message if True (default is
+            True)
+
+        The attribute :attr:`debugLevel` can be used to further refine the
+        logging messages that uses the standard :mod:`logging` module. If
+        verbose is True, the debugLebel is set to INFO. If verbose if False, the
+        debugLevel is set to WARNING. However, you can use the
+        :attr:`debugLevel` attribute to change it to one of DEBUG, INFO,
+        WARNING, ERROR, CRITICAL. debugLevel=WARNING means that only WARNING,
+        ERROR and CRITICAL messages are shown/
+
+        """
+
+        self._url = None
         self.url = url
-        self.verbose = verbose
         self.name = name
         self._easyXMLConversion = True
+
+        self._debugLevel = None
+        if verbose:
+            self.debugLevel = "INFO"
+        else:
+            self.debugLevel = "WARNING"
+
+    
+    def _set_level(self, level):
+        valid_level = ["INFO", "DEBUG", "WARNING", "CRITIAL", "ERROR"]
+        if level in valid_level:
+            self._debugLevel = level
+        else:
+            raise ValueError("The level of debugging must be in %s " % valid_level)
+        # I'm not sure this is the best solution, but basicConfig can be called
+        # only once and populatse root.handlers list with one instance of
+        # logging.StreamHandler. So, I reset it before calling basicConfig so
+        # that it is effectively changing the logginh behaviour
+        logging.root.handlers = []
+        logging.basicConfig(level=self._debugLevel)
+    def _get_level(self):
+        return self._debugLevel
+    debugLevel = property(_get_level, _set_level)
+
+    def _get_url(self):
+        return self._url
+    def _set_url(self, url):
+        url = url.rstrip("/")
+        self._url = url
+    url = property(_get_url, _set_url, doc="URL of this service")
 
     def _get_easyXMLConversion(self):
         return self._easyXMLConversion
@@ -26,12 +95,13 @@ class Service(object):
             raise TypeError("value must be a boolean value (True/False)")
         self._easyXMLConversion = value
     easyXMLConversion = property(_get_easyXMLConversion, 
-        _set_easyXMLConversion, doc=""""Output from request method are converted to
-easyXML object if this attribute is True (Default behaviour).""")
+        _set_easyXMLConversion, doc="""If True, xml output from a request are converted to
+easyXML object (Default behaviour).""")
 
 
     def easyXML(self, res):
-        """Use this method to convert a XML document into an easyXML object
+        """Use this method to convert a XML document into an
+            :class:`~bioservices.xmltools.easyXML` object
 
         The easyXML object provides utilities to ease access to the XML
         tag/attributes.
@@ -67,97 +137,125 @@ easyXML object if this attribute is True (Default behaviour).""")
 
 
 class WSDLService(Service):
-    """A common database class for service using WSDL
-
-
-
-    """
+    """A common class to ease access to web services (WSDL protocol)"""
 
     def __init__(self, name, url, verbose=True):
-        """Constructor
+        """.. rubric:: Constructor
 
-        :param str name: a name e.g. Kegg
+        :param str name: a name e.g. Kegg, Reactome, ...
         :param str url: the URL of the WSDL service
-        :param bool verbose:
-
+        :param bool verbose: prints informative messages
 
         Attributes are:
 
         * :attr:`Pathway.serv` 
-        * :attr:`~pathway.pathway.Pathway.organism` default is 'hsa' for Human
+
         """
-        super(WSDLService, self).__init__(name, url, verbose)
+        super(WSDLService, self).__init__(name, url, verbose=verbose)
 
         #self.serv = SOAPProxy(self.url) # what's that ? can we access to a method directly ?
-        if self.verbose:
-            print("Initialising %s database" % self.name)
+        logging.info("Initialising %s service (WSDL)" % self.name)
 
         try:
-            #: attribute to access to the SWDL service
+            #: attribute to access to the methods provided by this WSDL service
             self.serv = WSDL.Proxy(self.url)
         except Exception, e:
             print "Could not connect to the service %s " % self.url
             raise Exception
 
-        #: default organism is 'hsa' for 'Human'
-        self._organism = 'hsa'
-
     def _get_methods(self):
         return sorted(self.serv.methods.keys())
-    methods = property(_get_methods, doc="returns methods of the WSDL service")
+    methods = property(_get_methods, doc="returns methods available in the WSDL service")
 
     def _get_dump_out(self):
         return self.serv.soapproxy.config.dumpSOAPOut
     def _set_dump_out(self, value):
         self.serv.soapproxy.config.dumpSOAPOut = value
     dumpOut = property(_get_dump_out, _set_dump_out, 
-        doc="set the dumpSOAPOut mode of the SOAP proxy")
+        doc="set the dumpSOAPOut mode of the SOAP proxy (0/1)")
 
     def _get_dump_in(self):
         return self.serv.soapproxy.config.dumpSOAPIn
     def _set_dump_in(self, value):
         self.serv.soapproxy.config.dumpSOAPIn = value
     dumpIn = property(_get_dump_in, _set_dump_in, 
-        doc="set the dumpSOAPIn mode of the SOAP proxy")
+        doc="set the dumpSOAPIn mode of the SOAP proxy (0/1)")
 
 
 
 class RESTService(Service):
+    """Class to manipulate REST service
+
+    You can request an URL with this class that also inherits from
+    :class:`Service`.
+
+    """
 
     def __init__(self, name, url=None, verbose=True):
-        super(RESTService, self).__init__(name, url, verbose)
+        """.. rubric:: Constructor
 
-    def _get_baseURL(self):
-        return self.url
-    baseURL = property(_get_baseURL)
+        :param str name: a name e.g. Kegg, Reactome, ...
+        :param str url: the URL of the REST service
+        :param str debugLevel: logging level. See :class:`Service`.
 
-    def request(self, url):
-        if self.verbose:
-            print("REST.bioservices.%s request begins" % self.name)
-            print("--Fetching url=%s" % url),
+        """
+        super(RESTService, self).__init__(name, url, verbose=verbose)
+        self.last_response = None
+        logging.info("Initialising %s service (REST)" % self.name)
+        try:
+            urllib.urlopen(self.url)
+        except:
+            logging.critical("The URL (%s) provided cannot be reached" % self.url)
+
+    def getUserAgent(self):
+        logging.info('getUserAgent: Begin')
+        urllib_agent = 'Python-urllib/%s' % urllib2.__version__
+        clientRevision = '$Id$'
+        clientVersion = '1'
+        user_agent = 'EBI-Sample-Client/%s (%s; Python %s; %s) %s' % (
+            clientVersion, os.path.basename( __file__ ), 
+            platform.python_version(), platform.system(),
+            urllib_agent
+        )
+        logging.info('getUserAgent: user_agent: ' + user_agent)
+        logging.info('getUserAgent: End')
+        return user_agent
+
+
+    def request(self, url, format="xml"):
+        """Send a request via an URL to a web service.
+
+        :param str url: the well formed URL
+        :param str format: If the expected output is in XML
+            format it will be converted with :meth:`easyXML`. If the returned document
+            is not in XML, format should be set to any other value.
+
+        """
+        logging.INFO("REST.bioservices.%s request begins" % self.name)
+        logging.INFO("--Fetching url=%s" % url)
 
         try:
             res = urllib2.urlopen(url).read()
-            if self.verbose:
-                print("done")
+            if format=="xml":
                 if self.easyXMLConversion:
-                    print("--Conversion to easyXML"),
+                    logging.WARNING("--Conversion to easyXML"),
                     try:
                         res = self.easyXML(res)
-                        print("done")
                     except:
-                         print("skipped")
+                        logging.ERROR("--Conversion to easyXML failed. returns the original XML file"),
+            self.last_response = res
             return res
         except Exception, e:
-            print(e)
-            print("An exception occured while reading the URL")
-            print(url)
-            print("Error caught within bioservices. Invalid requested URL ? ")
+            logging.ERROR(e)
+            logging.ERROR("An exception occured while reading the URL")
+            logging.ERROR(url)
+            logging.ERROR("Error caught within bioservices. Invalid requested URL ? ")
             raise
 
-
+"""
     # Wrapper for a REST (HTTP GET) request
     def restRequest(self,url):
+        # kept as an example.
         raise NotImplementedError
         # need to be checked before using it.
         printDebugMessage('restRequest', 'Begin', 11)
@@ -179,4 +277,4 @@ class RESTService(Service):
         printDebugMessage('restRequest', 'End', 11)
         return result
 
-
+"""

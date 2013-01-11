@@ -2,17 +2,20 @@
 #
 #  This file is part of bioservices software
 #
-#  Copyright (c) 2011-2012 - EBI-EMBL
+#  Copyright (c) 2011-2013 - EBI-EMBL
 #
-#  File author(s): Thomas Cokelaer <cokelaer@ebi.ac.uk>
+#  File author(s): 
+#      https://www.assembla.com/spaces/bioservices/team
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
 #      http://www.gnu.org/licenses/gpl-3.0.html
 #
-#  website: http://www.ebi.ac.uk/~cokelaer/bioservices
+#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
+#$Id$
 """This module provides a class :class:`~BioModels` that allows an easy access to all the BioModel service.
 
 See http://www.ebi.ac.uk/biomodels-main/ for information about biomodels itself.
@@ -216,7 +219,7 @@ class BioModels(WSDLService):
         .. doctest::
  
             >>> b = BioModel()
-            >>> b.getModelsIdByChEBIId('CHEBI:4978'')
+            >>> b.getModelsIdByChEBIId('CHEBI:4978')
             ['BIOMD0000000404']
 
         """

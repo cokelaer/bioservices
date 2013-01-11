@@ -1,16 +1,41 @@
+# -*- python -*-
+#
+#  This file is part of bioservices software
+#
+#  Copyright (c) 2011-2013 - EBI-EMBL
+#
+#  File author(s): 
+#      Thomas Cokelaer <cokelaer@ebi.ac.uk>
+#      https://www.assembla.com/spaces/bioservices/team
+#
+#  Distributed under the GPLv3 License.
+#  See accompanying file LICENSE.txt or copy at
+#      http://www.gnu.org/licenses/gpl-3.0.html
+#
+#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  documentation: http://packages.python.org/bioservices
+#
+##############################################################################
+#$Id$
 """This module will include common tools to manipulate XML files"""
 import xml.etree.ElementTree as ET
 import BeautifulSoup
+
+__all__ = ["easyXML"]
 
 
 class easyXML(object):
     """class to ease the introspection of XML document.
 
+    This class uses the standard xml module as well as the package BeautifulSoup
+    to help introspecting the XML programmatically.
+
+    :: 
 
         >>> import nciblast
         >>> n = nciblast.NCIBlast()
         >>> res = n.parameters() # res is an instance of easyXML
-	# You can retreive XML from this instance of easyXML and print the content
+	    # You can retreive XML from this instance of easyXML and print the content
         # in a more human-readable way.
         >>> print res
         >>> res.soup.findAll('id') # a Beautifulsoup instance is available
@@ -43,65 +68,3 @@ class easyXML(object):
         txt = self.soup.prettify()
         return txt
 
-
-class easyXML_RheaSearch(easyXML):
-    """
-
-    Here is an XML  strucutre returned by rhea.search method
-
-    resultset
-       rheaReaction
-          rheaid
-            id
-            idprefix
-            rheaUri
-
-    ex.root.getchildren()[0].getchildren()[0].getchildren()[0].getchildren()[0].text
-
-    """
-    def __init__(self, data):
-        super(easyXML_Rhea, self).__init__(data)
-
-    def get_reactions_elements(self):
-        reactions = self.getchildren()[0].getchildren()
-        return reactions
-
-    def get_reactions_ids(self):
-        reactions = self.get_reactions_elements()
-
-        ids = []
-        for reaction in reactions:
-            elements = reaction.getchildren()[0].getchildren()
-            for element in elements:
-                if element.tag == 'id':
-                    ids.append(element.text)
-        return ids
-
-    def get_reactions_idprefix(self):
-        reactions = self.get_reactions_elements()
-
-        ids = []
-        for reaction in reactions:
-            elements = reaction.getchildren()[0].getchildren()
-            for element in elements:
-                if element.tag == 'idprefix':
-                    ids.append(element.text)
-        return ids
-
-    def get_reactions_rheaUri(self):
-        reactions = self.get_reactions_elements()
-
-        rhea_elements = []
-        for reaction in reactions:
-            elements = reaction.getchildren()[0].getchildren()
-            for element in elements:
-                if element.tag == 'rheaUri':
-                    rhea_elements.append(element)
-
-        rheaUri = []
-        for rhea_element in rhea_elements:
-            elements = rhea_element.getchildren()
-            for element in elements:
-                if element.tag == 'uri':
-                    rheaUri.append(element.text)
-        return rheaUri

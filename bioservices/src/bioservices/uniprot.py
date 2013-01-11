@@ -1,3 +1,22 @@
+# -*- python -*-
+#
+#  This file is part of bioservices software
+#
+#  Copyright (c) 2011-2013 - EBI-EMBL
+#
+#  File author(s): 
+#      Thomas Cokelaer <cokelaer@ebi.ac.uk>
+#      https://www.assembla.com/spaces/bioservices/team
+#
+#  Distributed under the GPLv3 License.
+#  See accompanying file LICENSE.txt or copy at
+#      http://www.gnu.org/licenses/gpl-3.0.html
+#
+#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  documentation: http://packages.python.org/bioservices
+#
+##############################################################################
+#$Id$
 """Interface to some part of the UniProt web service
 
 .. topic:: What is UniProt ?
@@ -7,50 +26,54 @@
 
     .. highlights::
 
-    "The Universal Protein Resource (UniProt) is a comprehensive resource for protein
-    sequence and annotation data. The UniProt databases are the UniProt
-    Knowledgebase (UniProtKB), the UniProt Reference Clusters (UniRef), and the
-    UniProt Archive (UniParc). The UniProt Metagenomic and Environmental Sequences
-    (UniMES) database is a repository specifically developed for metagenomic and
-    environmental data."
+        "The Universal Protein Resource (UniProt) is a comprehensive resource for protein
+        sequence and annotation data. The UniProt databases are the UniProt
+        Knowledgebase (UniProtKB), the UniProt Reference Clusters (UniRef), and the
+        UniProt Archive (UniParc). The UniProt Metagenomic and Environmental Sequences
+        (UniMES) database is a repository specifically developed for metagenomic and
+        environmental data."
+
+        -- From Uniprot web site (help/about) , Dec 2012
 
 
-    -- From Uniprot web site (help/about) , Dec 2012
-
-
-.. mappiung betwenn uniprot and bench of other DBs.
+.. mapping betwenn uniprot and bench of other DBs.
 .. ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/
 
 
 """
-# Import SOAPpy WSDL package.
-#from SOAPpy import WSDL
-from services import Service
+from services import Service, RESTService
 import urllib2
 
+__all__ = ["UniProt"]
 
 
-# this is not Uniprot but WSDBfetch
 
-
-class UniProt(Service):
+class UniProt(RESTService):
     """Interface to the `UniProt <http://www.uniprot.org>`_ service
 
-    .. warning:: this class does not cover all UniProt services but a subset
-        (identifier mapping service for now).
+    .. warning:: for the time being, this class only provide interface to the 
+        identifier mapping service and search of uniprotKB identifier.
 
-    Use the identifier mapping interface::
+    Example::
 
         >>> u = Uniprot(verbose=False)
         >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403')
         ['FromACC', 'ToKEGG_ID', 'P43403', 'hsa:7535']
+        >>> res = u.search("P43403")
 
 
     """
     def __init__(self, name="UniProt",
-            url='http://www.uniprot.org/',
-            verbose=True, debug=False):
+            url='http://www.uniprot.org',
+            verbose=True):
+        """**Constructor**
+
+        :param url: no need to change the default URL
+        :param verbose: set to False to prevent informative messages
+        :param name: no need to change.
+        """
         super(UniProt, self).__init__(name=name, url=url, verbose=verbose)
+
 
     def mapping(self, fr="ID", to="KEGG_ID", format="tab", query="P13368"):
         """This is an interface to the UniProt mapping service
@@ -58,8 +81,10 @@ class UniProt(Service):
 
         ::
 
-            res = u.mapping(fro="ACC", to="KEGG_ID", query='P43403')
+            >>> u.mapping(fro="ACC", to="KEGG_ID", query='P43403')
             ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535']
+            >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403 P00958')
+            ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535', 'P00958', 'sce:YGR264C']
 
 
         There is a web page that gives the list of correct `database identifiers
@@ -75,10 +100,17 @@ class UniProt(Service):
         if self.verbose: print data
         request = urllib2.Request(url, data)
         # 2 following lines are optional
-        #contact = ""
-        #request.add_header('User-Agent', 'Python contact')
-        response = urllib2.urlopen(request)
-        result = response.read(200000)
+        contact = ""
+        request.add_header('User-Agent', 'Python contact')
+        try:
+            response = urllib2.urlopen(request)
+            result = response.read(200000)
+        except urllib2.HTTPError, e:
+            print e.code
+            print e.msg
+            print e.headers
+            print e.fp.read()
+            return "error 404. Try again"
 
         # let us improvve the output a little bit using a list  instead of a
         # string
@@ -90,3 +122,23 @@ class UniProt(Service):
             pass
 
         return result
+
+    def search(self, uniprot_id, format="xml"):
+        """Search for a uniprot ID in UniprotKB database
+
+        :param str uniprot: a valid uniprotKB ID
+        :param str format: expected output format amongst xml, txt, fasta, gff, rdf
+
+
+        ::
+
+            >>> u = UniProt()
+            >>> res = u.search("P09958", format="xml")
+
+        """
+        _valid_formats = ['txt', 'xml', 'rdf', 'gff', 'fasta']
+        if format not in _valid_formats:
+            raise ValueError("invalid format provided. Use one of %s" % _valid_formats)
+        url = self.url + "/uniprot/" + uniprot_id + '.' + format
+        res = self.request(url)
+        return res

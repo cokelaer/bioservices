@@ -1,39 +1,79 @@
-"""This module provides a class :class:`~bioservices.picr.PICR` that allows an 
+# -*- python -*-
+#
+#  This file is part of bioservices software
+#
+#  Copyright (c) 2011-2013 - EBI-EMBL
+#
+#  File author(s):
+#      Thomas Cokelaer <cokelaer@ebi.ac.uk>
+#      https://www.assembla.com/spaces/bioservices/team
+#
+#  Distributed under the GPLv3 License.
+#  See accompanying file LICENSE.txt or copy at
+#      http://www.gnu.org/licenses/gpl-3.0.html
+#
+#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  documentation: http://packages.python.org/bioservices
+#
+##############################################################################
+#$Id$
+"""This module provides a class :class:`~bioservices.picr.PICR` that allows an
 access to the REST interface of the PICR web service. There is also a SOAP web service but we implemented only the REST interface since they both provide access to the same functionalities.
 
-.. topic:: PICR description (from PICR website)
+.. topic:: What is PICR ?
 
-    The Protein Identifier Cross-Reference (PICR) service is a web application that provides interactive and programmatic (SOAP and REST) access to a mapping algorithm based on 100% sequence identity to proteins from over 98 distinct source databases. Mappings can be limited by source database, taxonomic ID and activity status in the source database. Users can copy/paste or upload files containing protein identifiers or sequences in FASTA format to obtain mappings using the interactive interface. Search results can be viewed in simple or detailed HTML tables or downloaded as comma-separated values (CSV) or Microsoft Excel (XLS) files suitable for use in a local database or a spreadsheet. Alternatively, a SOAP interface is available to integrate PICR functionality in other applications, as is a lightweight REST interface.
+    :URL: http://www.ebi.ac.uk/Tools/picr
+    :REST: http://www/ebi.ac.uk/Tools/picr/rest
+    :Citations: http://www.biomedcentral.com/1471-2105/8/401
+
+
+    .. highlights::
+
+        "The Protein Identifier Cross-Reference (PICR) service is a web application
+        that provides interactive and programmatic (SOAP and REST) access to a mapping
+        algorithm based on 100% sequence identity to proteins from over 98 distinct
+        source databases. Mappings can be limited by source database, taxonomic ID and
+        activity status in the source database. Users can copy/paste or upload files
+        containing protein identifiers or sequences in FASTA format to obtain mappings
+        using the interactive interface. Search results can be viewed in simple or
+        detailed HTML tables or downloaded as comma-separated values (CSV) or Microsoft
+        Excel (XLS) files suitable for use in a local database or a spreadsheet.
+        Alternatively, a SOAP interface is available to integrate PICR functionality in
+        other applications, as is a lightweight REST interface."
+
+        -- From the PICR home page, Dec 2012
+
 
 """
 from services import RESTService
 import xmltools
 
+
+__all__ = ["PICR"]
 #//the NEWT taxonomy ID to limit the mappings to
 #//can be null or a number. Do not specify 0 for null.
 #String taxonID = "9606";     //H. Sapiens
+
 
 class PICR(RESTService):
     """Interface to the `PICR (Protein Identifier Cross reference) <http://www.ebi.ac.uk/Tools/picr/>`_ service
 
     .. doctest::
 
-        p = PICR()
-        p.getMappedDatabaseNames()
-
-        sequence="MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS"
-        results = p.getUPIForSequence(self.sequence, ["IPI", "ENSEMBL", "SWISSPROT"])
-
+        >>> p = PICR()
+        >>> p.getMappedDatabaseNames()
+        >>> results = p.getUPIForSequence(self._sequence_eample, ["IPI", "ENSEMBL", "SWISSPROT"])
 
 
     """
     _sequence_example="MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS"
     _blastfrag_example="MSVMYKKILYPTDFSETAEIALKHVKAFKTLKAEEVILLHVIDEREIKKRDIFSLLLGVAGLNKSVEEFENELKNKLTEEAKNKMENIKKELEDVGFKVKDIIVVGIPHEEIVKIAEDEGVDIIIMGSHGKTNLKEILLGSVTENVIKKSNKPVLVVKRKNS"
     _accession_example = "P29375"
-    _url = "http://www.ebi.ac.uk/Tools/picr/rest/"
+    _url = "http://www.ebi.ac.uk/Tools/picr/rest"
 
     def __init__(self):
         super(PICR, self).__init__(name="PICR", url=PICR._url)
+        self._databases = None
 
     def getMappedDatabaseNames(self):
         """Return the valid database names
@@ -45,15 +85,16 @@ class PICR(RESTService):
         .. seealso:: :attr:`databases` to obtain a human readable list
         """
         url = self.url + "/getMappedDatabaseNames"
-	res = self.request(url)
+        res = self.request(url)
         #x = xmltools.easyXML(res)
         return res
 
     def _get_databases(self):
-        res = self.getMappedDatabaseNames()
-        databases = [a.text for a in res.getchildren()]
-        return databases
-    databases = property(_get_databases, doc="get the list of databases (from XML returned by :meth:`getMappedDatabaseNames`)")
+        if self._databases == None:
+            res = self.getMappedDatabaseNames()
+            self._databases = [a.text for a in res.getchildren()]
+        return self._databases
+    databases = property(_get_databases, doc="get a human-readable list of databases (from XML returned by :meth:`getMappedDatabaseNames`)")
 
     def getUPIForSequence(self, sequence, database, taxid=None,
         onlyactive=True, includeattributes=False):
@@ -62,31 +103,31 @@ class PICR(RESTService):
         :param sequence: the sequence to map [required]
         :param database: the database to map to. At least one database is required, but
             multiple databases can be queried at once.
-        :param taxid: the NEWT taxon ID to limit the mappings [optional] 
-        :param onlyactive: if true, only active mappings will be returned. 
+        :param taxid: the NEWT taxon ID to limit the mappings [optional]
+        :param onlyactive: if true, only active mappings will be returned.
             If false, results may include deleted mappings. [optional, default is true]
-        :param includeattributes: if true, extra attributes such as sequence and taxon 
-            IDs will be returned if available. If false, no extra information returned. 
+        :param includeattributes: if true, extra attributes such as sequence and taxon
+            IDs will be returned if available. If false, no extra information returned.
             [optional, default is false]
 
         .. note:: Parameter names are case sensitive.
 
-        Some servers, browsers and other clients may have restrictions on the length of
-        the query string, so long sequences might cause errors. If this is the case, use
-        a POST request rather than a GET.
+        .. note:: Some servers, browsers and other clients may have restrictions on the length of
+            the query string, so long sequences might cause errors. If this is the case, use
+            a POST request rather than a GET.
 
-        If a taxid is submitted, includeattributes will be true.
+        .. note:: If a taxid is submitted, includeattributes will be true.
 
         .. doctest::
 
             >>> from bioservices import picr
             >>> p = picr.PICR()
             >>> sequence="MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS"
-            >>> databases = ["IPI", "ENSEMBL", "SWISSPROT"] 
+            >>> databases = ["IPI", "ENSEMBL", "SWISSPROT"]
             >>> results = p.getUPIForSequence(sequence, databases)
 
         """
-        url = self._url + "getUPIForSequence"
+        url = self._url + "/getUPIForSequence"
 
         # check validity of the database provided
 
@@ -100,7 +141,7 @@ class PICR(RESTService):
                 url+="&database=" + d
         #if taxid!=None or onlyactive==False or includeattributes==False:
         #    raise NotImplementedError
-	if taxid:
+        if taxid:
             url += "&taxonid=" +taxid
         if includeattributes == False:
             url += "&includeattributes=false"
@@ -121,36 +162,40 @@ class PICR(RESTService):
 
     def getUPIForAccession(self, accession, database,
         taxid=None,
-        version=None, 
-        onlyactive=True, 
+        version=None,
+        onlyactive=True,
         includeattributes=True):
         """Get Protein identifier given an accession number
 
         :param str accession:  the accession to map [required]
         :param str version: the version of accession to map [optional]
-        :param database: the database to map to (string). At least one database is 
+        :param database: the database to map to (string). At least one database is
             required, but multiple databases can be queried at once using a list.
         :param taxid: the NEWT taxon ID to limit the mappings [optional]
-        :param bool onlyactive: if true, only active mappings will be returned. If false, 
+        :param bool onlyactive: if true, only active mappings will be returned. If false,
             results may include deleted mappings. [optional, default is true]
-        :param bool includeattributes: if true, extra attributes such as sequence 
-            and taxon IDs will be returned if available. If false, no extra 
+        :param bool includeattributes: if true, extra attributes such as sequence
+            and taxon IDs will be returned if available. If false, no extra
             information returned. [optional, default is false]
 
         .. note:: parameter names are case sensitive
 
-        If version is not specified but the accession is of the form P29375.1, 
-        the accession and version will automatically be split to accession=P29375 
-        and version-1.
+        .. note:: If version is not specified but the accession is of the form P29375.1,
+            the accession and version will automatically be split to accession=P29375
+            and version-1.
 
-        If a taxid is submitted, includeattributes will be true.
+        .. note:: If a taxid is submitted, includeattributes will be true.
 
-        #example:
-        url = "http://www.ebi.ac.uk/Tools/picr/rest/getUPIForAccession?accession=P29375&database=IPI&database=ENSEMBL&database=KEGG"
+        Example:
+
+        ::
+
+            >>> p = picr.PICR()
+            >>> p.getUPIForAccession("P29375", ["IPI", "ENSEMBL"])
+            >>> p.getUPIForAccession("P29375-1", ["IPI", "ENSEMBL"])
         """
-        url = "http://www.ebi.ac.uk/Tools/picr/rest/getUPIForAccession"
 
-        url += "?accession=" + accession
+        url = self.url + "/getUPIForAccession?accession=" + accession
         if isinstance(database,str):
             self._checkDBname(database)
             url+= "&database=" + database
@@ -158,7 +203,7 @@ class PICR(RESTService):
             for d in database:
                 self._checkDBname(d)
                 url+="&database=" + d
-	if taxid:
+        if taxid:
             url += "&taxonid=" +taxid
         if includeattributes == False:
             url += "&includeattributes=false"
@@ -170,36 +215,45 @@ class PICR(RESTService):
 
     def getUPIForBLAST(self, blasfrag, database,
         taxid=None,
-        version=None, 
-        onlyactive=True, 
+        version=None,
+        onlyactive=True,
         includeattributes=True, **kargs):
         """Get Protein identifier given a sequence similarity (BLAST)
 
         :param str blastfrag:  the AA fragment to map to map [required]
-        :param database: the database to map to (string). At least one database is 
+        :param database: the database to map to (string). At least one database is
             required, but multiple databases can be queried at once using a list.
         :param taxid: the NEWT taxon ID to limit the mappings [optional]
-        :param bool onlyactive: if true, only active mappings will be returned. If false, 
+        :param bool onlyactive: if true, only active mappings will be returned. If false,
             results may include deleted mappings. [optional, default is true]
-        :param bool includeattributes: if true, extra attributes such as sequence 
-            and taxon IDs will be returned if available. If false, no extra 
+        :param bool includeattributes: if true, extra attributes such as sequence
+            and taxon IDs will be returned if available. If false, no extra
             information returned. [optional, default is false]
 
 
-        Other options (related to BLAST analysis):
+        Other options (related to BLAST analysis) can be provided as optional
+        argument. See this link for details:
 
-        See http://www.ebi.ac.uk/Tools/sss/ncbiblast/ for values.
+            http://www.ebi.ac.uk/Tools/picr/RESTDocumentation.do
 
-        :param float scores: 
-        :param str matrix: -specifies which protein scoring matrix to use. [optional, defaults to BLOSUM62]
+        As an example, you can provide the matrix argument:
+
+        :param str matrix: specifies which protein scoring matrix to use. [optional, defaults to BLOSUM62]
 
         .. note:: parameter names are case sensitive
+        .. note:: If version is not specified but the accession is of the form P29375.1,
+            the accession and version will automatically be split to accession=P29375
+            and version-1.
+
+        .. note:: If a taxid is submitted, includeattributes will be true.
+
 
         ::
 
-            res = p.getUPIForBLAST(p._blastfrag_example, "SWISSPROT",program="blastp",matrix="BLOSUM80")
+            >>> res = p.getUPIForBLAST(p._blastfrag_example, "SWISSPROT")
+            >>> res = p.getUPIForBLAST(p._blastfrag_example, "SWISSPROT",i
+                   program="blastp",matrix="BLOSUM80")
 
-        .. warning:: no sanity check performed on the optinal parameters
         """
         url = "http://www.ebi.ac.uk/Tools/picr/rest/getUPIForBLAST"
         url += "?blastfrag=" + blasfrag
@@ -210,7 +264,7 @@ class PICR(RESTService):
             for d in database:
                 self._checkDBname(d)
                 url+="&database=" + d
-	if taxid:
+        if taxid:
             url += "&taxonid=" +taxid
         if includeattributes == False:
             url += "&includeattributes=false"

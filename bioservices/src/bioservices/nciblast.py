@@ -2,18 +2,19 @@
 
 .. topic:: What is NCIBLAST ?
 
-    :URL: 
+    :URL:
     :service: http://www.ebi.ac.uk/Tools/webservices/services/sss/ncbi_blast_rest
 
     NCBI BLAST - Protein Database Query
     The emphasis of this tool is to find regions of sequence similarity, 
     which will yield functional and evolutionary clues about the structure
-    and function of your novel sequence. 
+    and function of your novel sequence.
 
 """
 
 from bioservices.services import RESTService
 import xmltools
+
 
 class NCIBlast(RESTService):
     _url = "http://www.ebi.ac.uk/Tools/services/rest/ncbiblast"
@@ -33,8 +34,8 @@ class NCIBlast(RESTService):
 
         .. seealso:: :attr:`parameters` to get a list of the parameters.
         """
- 	request = self.baseURL + "/parameters/"
-	res = self.request(request)
+     	request = self.url + "/parameters/"
+	    res = self.request(request)
         import xmltools
         data = xmltools.easyXML(res)
         return data
@@ -47,7 +48,7 @@ class NCIBlast(RESTService):
             parameters = [x.text for x in res.getchildren()]
             self._parameters = parameters
         return self._parameters
-    parameters = property(_get_parameters, doc="return list of parameters")
+        parameters = property(_get_parameters, doc="return list of parameters")
 
     def parametersDetails(self, parameterId):
         """Get detailed information about a parameter. 
@@ -70,8 +71,8 @@ class NCIBlast(RESTService):
         """
         if parameterId not in self.parameters:
             raise ValueError("Invalid parameterId provided(%s). " % parameterId)
-        request = self.baseURL + "/parameterdetails/" + parameterId 
-	data = self.request(request)
+        request = self.url + "/parameterdetails/" + parameterId 
+	    data = self.request(request)
         import xmltools
         res = xmltools.easyXML(data)
 
@@ -90,26 +91,26 @@ class NCIBlast(RESTService):
         """
 
         email 	User e-mail address.
-	title 	an optional title for the job.
-	program 	BLAST program to use to perform the search.
-	matrix 	Scoring matrix to be used in the search.
-	alignments 	Maximum number of alignments displayed in the output.
-	scores 	Maximum number of scores displayed in the output.
-	exp 	E-value threshold.
-	dropoff 	Amount score must drop before extension of hits is halted.
-	match_scores 	Match/miss-match scores to generate a scoring matrix for for nucleotide searches.
-	gapopen 	Penalty for the initiation of a gap.
-	gapext 	Penalty for each base/residue in a gap.
-	filter 	Low complexity sequence filter to process the query sequence before performing the search.
-	:param seqrange: Region of the query sequence to use for the search. Default: whole sequence.
-	gapalign 	Perform gapped alignments.
-	align 	Alignment format to use in output.
-	stype 	Query sequence type. One of: dna, rna or protein.
-	sequence 	Query sequence. The use of fasta formatted sequence is recommended.
-	database 	List of database names for search. 
+    	title 	an optional title for the job.
+    	program 	BLAST program to use to perform the search.
+    	matrix 	Scoring matrix to be used in the search.
+    	alignments 	Maximum number of alignments displayed in the output.
+    	scores 	Maximum number of scores displayed in the output.
+    	exp 	E-value threshold.
+    	dropoff 	Amount score must drop before extension of hits is halted.
+    	match_scores 	Match/miss-match scores to generate a scoring matrix for for nucleotide searches.
+    	gapopen 	Penalty for the initiation of a gap.
+    	gapext 	Penalty for each base/residue in a gap.
+    	filter 	Low complexity sequence filter to process the query sequence before performing the search.
+    	:param seqrange: Region of the query sequence to use for the search. Default: whole sequence.
+    	gapalign 	Perform gapped alignments.
+    	align 	Alignment format to use in output.
+    	stype 	Query sequence type. One of: dna, rna or protein.
+    	sequence 	Query sequence. The use of fasta formatted sequence is recommended.
+    	database 	List of database names for search. 
         """
-        request = self.baseURL + "/run/"
-	data = self.request(request)
+        request = self.url + "/run/"
+    	data = self.request(request)
         import xmltools
         res = xmltools.easyXML(data)
 
