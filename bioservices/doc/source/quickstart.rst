@@ -10,6 +10,9 @@ There are two main technology involved in web services: the WSDL and the REST
 styles. The Kegg and Biomodels services presented uses WSDL whereas uniprot uses
 REST.
 
+.. contents::
+
+
 Kegg service
 =============
 
@@ -59,7 +62,11 @@ service method via the attribute :meth:`~bioservices.kegg.Kegg.serv`.
 In addition to the Kegg service, we implemented extra commands. 
 The tutorial links here below provides more examples.
 
-Uniprot service
+
+.. seealso:: Reference guide of :class:`bioservices.kegg.KEGG` for more details
+.. seealso:: Reference guide of :ref:`kegg_tutorial` for more details
+
+WSDbfetch service
 ==================
 
 There is a uniprot module that allows to access to the uniprot WSDL. However,
@@ -68,15 +75,70 @@ the user will need to scan. For instance::
 
 
 
-    >>> from bioservices import uniprot
-    >>> u = uniprot.Uniprot()
-    >>> data = u.fetchBatch("uniprot" ,"zap70_human", "xml", "raw")
+    >>> from bioservices import WSDbfetch
+    >>> w = WSDbfetch()
+    >>> data = w.fetchBatch("uniprot" ,"zap70_human", "xml", "raw")
 
 
-Then, you need to scan it with xml standard python module::
 
-    >>> import xml.etree.ElementTree as ET
-    >>> root = ET.fromstring(data)
+.. seealso:: Reference guide of :class:`bioservices.wsdbfetch.WSDbfetch` for more details
+
+
+UniProt service
+================
+
+With this module, you can map an ID from a database to another one. For instance
+to convert the uniprotKB ID into KEGG ID, use:
+
+.. doctest::
+
+    >>> from bioservices.uniprot import UniProt
+    >>> u = UniProt(verbose=False)
+    >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403')
+    ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535']
+
+Note that the returned response from uniprot web service is converted into a list.
+
+You can also search for a specific UniProtKB id to get exhaustive information
+about an ID::
+
+    >>> res = u.search("P09958", format="xml")
+    >>> u.search("P09958", format="fasta")
+    '>sp|P09958|FURIN_HUMAN Furin OS=Homo sapiens GN=FURIN PE=1SV=2\nMELRPWLLWVVAATGTLVLLAADAQGQKVFTNTWAVRIPGGPAVANSVARKHGFLNLGQI\nFGDYYHFWHRGVTKRSLSPHRPRHSRLQREPQVQWLEQQVAKRRTKRDVYQEPTDPKFPQ\nQWYLSGVTQRDLNVKAAWAQGYTGHGIVVSILDDGIEKNHPDLAGNYDPGASFDVNDQDP\nDPQPRYTQMNDNRHGTRCAGEVAAVANNGVCGVGVAYNARIGGVRMLDGEVTDAVEARSL\nGLNPNHIHIYSASWGPEDDGKTVDGPARLAEEAFFRGVSQGRGGLGSIFVWASGNGGREH\nDSCNCDGYTNSIYTLSISSATQFGNVPWYSEACSSTLATTYSSGNQNEKQIVTTDLRQKC\nTESHTGTSASAPLAAGIIALTLEANKNLTWRDMQHLVVQTSKPAHLNANDWATNGVGRKV\nSHSYGYGLLDAGAMVALAQNWTTVAPQRKCIIDILTEPKDIGKRLEVRKTVTACLGEPNH\nITRLEHAQARLTLSYNRRGDLAIHLVSPMGTRSTLLAARPHDYSADGFNDWAFMTTHSWD\nEDPSGEWVLEIENTSEANNYGTLTKFTLVLYGTAPEGLPVPPESSGCKTLTSSQACVVCE\nEGFSLHQKSCVQHCPPGFAPQVLDTHYSTENDVETIRASVCAPCHASCATCQGPALTDCL\nSCPSHASLDPVEQTCSRQSQSSRESPPQQQPPRLPPEVEAGQRLRAGLLPSHLPEVVAGL\nSCAFIVLVFVTVFLVLQLRSGFSFRGVKVYTMDRGLISYKGLPPEAWQEECPSDSEEDEG\nRGERTAFIKDQSAL\n'
+
+
+.. seealso:: Reference guide of :class:`bioservices.uniprot.UniProt` for more details
+
+QuickGO
+=========
+
+Quick access to the GO interface
+.. doctest::
+
+    >>> from bioservices import QuickGO
+    >>> g = QuickGO(verbose=False)
+    >>> res = g.Term("GO:0003824")
+
+PICR service
+=============
+
+
+PICR, the Protein Identifier Cross Reference service. It provides 2 serives 
+in WSDL and REST protocols. We implemented only the REST interface. The 
+methods available in the REST service are very similar to those available 
+via SOAP, save for one major difference: only one accession or sequence 
+can be mapped per request.
+
+
+The following example returns a XML document containing information about the
+protein P29375 found in two specific databases::
+
+    >>> from bioservices.picr import PICR
+    >>> p = PICR()
+    >>> res = p.getUPIForAccession("P29375", ["IPI", "ENSEMBL"])
+    
+
+.. seealso:: Reference guide of :class:`bioservices.picr.PICR` for more details
 
 
 Biomodels service
@@ -104,17 +166,19 @@ Create a :class:`~bioservices.rhea.Rhea` instance as follows:
 
 Rhea provides only 2 type of requests with a REST interface that are available with the :meth:`~bioservices.rhea.Rhea.search` and :meth:`~bioservices.rhea.Rhea.entry` methods. Let us first find information about the chemical product **caffein** using the :meth:`search` method::
 
-    xml_response = r.search("caffein")
+    xml_response = r.search("caffein*")
 
 The output is in XML format. Python provides lots of tools to deal with xml so
-you can surely found good tools. However, we provide a couple of tools for basic
-usage that are gathered in the :meth:`xmltools` module. As an example, we can
-extract the Ids found in the **xml_response** variable as follows::
+you can surely found good tools. 
 
-    >>> from bioservices import xmltools
-    >>> ex = xmltools.easyXML_RheaSearch(xml_response)
-    >>> ex.get_reactions_ids()
-    ['27902', '10280', '20944', '30447', '30319', '30315', '30311', '30307']
+
+Within bioservices, we wrap all returned XML document into a BeautifulSoup
+object that ease the manipulaiton of XML documents.
+
+As an example, we can extract all fields "id" as follows::
+
+    >>> ids = [x.getText() for x in xml_response.findAll("id")]
+    [u'27902', u'10280', u'20944', u'30447', u'30319', u'30315', u'30311', u'30307']
 
 The second method provided is the :meth:`entry` method. Given an Id, 
 you can query the Rhea database using Id found earlier (e.g., 10280)::

@@ -36,7 +36,7 @@ except Exception, e:
 import pkg_resources
 version = pkg_resources.require(pkg_name)[0].version
 release = version
-author = "Thomas Cokelaer, Dennis Pultz, Jordi Serra-Musach"
+author = "Thomas Cokelaer, Lea Harder, Jordi Serra-Musach, \nDennis Pultz"
 title = pkg_name
 copyright = author + ", 2012"
 project = pkg_name
@@ -255,7 +255,7 @@ latex_elements = { 'inputenc': '\\usepackage[utf8]{inputenc}' }
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
-#latex_use_parts = False
+latex_use_parts = False
 
 # If true, show page references after internal links.
 #latex_show_pagerefs = False

@@ -2,9 +2,10 @@
 
 
 
+Utilities
+##############
 
-
-Service interface module
+Service module (REST or WSDL)
 ===================================================================
 
 .. automodule:: bioservices.services
@@ -12,7 +13,21 @@ Service interface module
     :undoc-members:
     :synopsis: 
 
-kegg module
+xmltools module
+========================
+
+.. automodule:: bioservices.xmltools
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
+
+
+Services
+#############
+
+Kegg module
 ===================================================================
 
 .. automodule:: bioservices.kegg
@@ -20,7 +35,16 @@ kegg module
     :undoc-members:
     :synopsis: 
 
-rhea module
+QuickGO module
+================
+
+.. automodule:: bioservices.quickgo
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+
+Rhea module
 ==============
 
 .. automodule:: bioservices.rhea
@@ -66,14 +90,4 @@ picr module
     :members:
     :undoc-members:
     :synopsis:
-
-xmltools module
-========================
-
-.. automodule:: bioservices.xmltools
-    :members:
-    :undoc-members:
-    :synopsis:
-
-
 

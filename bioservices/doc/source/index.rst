@@ -16,13 +16,13 @@ Overview
 `bioservices <http://pypi.python.org/pypi/bioservices>`_  is a python package that provides 
 utilities to access biological databases that uses WSDL/SOAP or REST protocols.
 The primary goal is to obtain an easy programmatic access to pathways. However,
-by extension it allows access to other biological data if they are provided
-within the database. The philosophy of **bioservices** is to make use of the 
+by extension it allows access to other type of services (e.g., chemical
+reactions, protein identifier, ...). The philosophy of **bioservices** is to make use of the
 existing SOAP/WSDL facilities provided in biological databases, not to re-invent new databases.
 
-There are a lot of databases from many institutes;  some are free, some are not. The 
+There are a lot of databases from many institutes. Some are free, some are not. The
 main motivation of bioservices is to provide a glue interface using python to some
-of them (the free ones...). 
+of them (mostly the free ones...).
 
 Here is a list of services that you can access from **bioservices**:
 
@@ -31,11 +31,13 @@ Here is a list of services that you can access from **bioservices**:
 
     bioservices.biomodels.BioModels
     bioservices.kegg.Kegg
-    bioservices.uniprot.UniProt
-    bioservices.picr.PICR
     bioservices.reactome.Reactome
+    bioservices.chembldb.Chembl
+    bioservices.picr.PICR
+    bioservices.quickgo.QuickGO
     bioservices.rhea.Rhea
-    bioservices.chembl.chembldb
+    bioservices.uniprot.UniProt
+    bioservices.wsdbfetch.WSDbfetch
 
 The links above refers to the offical web site of each service (right column)
 and our reference guide (left column) that provides an exhaustive documentation.
@@ -89,3 +91,7 @@ References
 
     references
 
+
+TODO
+=====
+rename Chembl into ChEMBLdb
