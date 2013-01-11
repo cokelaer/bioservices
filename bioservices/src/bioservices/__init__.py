@@ -21,3 +21,4 @@ import uniprot
 import wsdbfetch
 
 import xmltools
+import reactome
