@@ -33,3 +33,6 @@ from quickgo import *
 
 import chembldb
 from chembldb import *
+
+import picr
+from picr import *

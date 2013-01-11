@@ -203,6 +203,7 @@ class RESTService(Service):
         self.last_response = None
         logging.info("Initialising %s service (REST)" % self.name)
         try:
+            import urllib
             urllib.urlopen(self.url)
         except:
             logging.critical("The URL (%s) provided cannot be reached" % self.url)
@@ -231,25 +232,27 @@ class RESTService(Service):
             is not in XML, format should be set to any other value.
 
         """
-        logging.INFO("REST.bioservices.%s request begins" % self.name)
-        logging.INFO("--Fetching url=%s" % url)
+	print self.name
+	print url
+        logging.info("REST.bioservices.%s request begins" % self.name)
+        logging.info("--Fetching url=%s" % url)
 
         try:
             res = urllib2.urlopen(url).read()
             if format=="xml":
                 if self.easyXMLConversion:
-                    logging.WARNING("--Conversion to easyXML"),
+                    logging.warning("--Conversion to easyXML"),
                     try:
                         res = self.easyXML(res)
                     except:
-                        logging.ERROR("--Conversion to easyXML failed. returns the original XML file"),
+                        logging.error("--Conversion to easyXML failed. returns the original XML file"),
             self.last_response = res
             return res
         except Exception, e:
-            logging.ERROR(e)
-            logging.ERROR("An exception occured while reading the URL")
-            logging.ERROR(url)
-            logging.ERROR("Error caught within bioservices. Invalid requested URL ? ")
+            logging.error(e)
+            logging.error("An exception occured while reading the URL")
+            logging.error(url)
+            logging.error("Error caught within bioservices. Invalid requested URL ? ")
             raise
 
 """
