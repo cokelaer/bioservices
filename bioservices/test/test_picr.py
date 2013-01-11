@@ -11,6 +11,7 @@ class TestPICR(picr.PICR):
     def test_getUPIForSequence(self):
         res = self.getUPIForSequence(self._sequence_example, ["IPI", "ENSEMBL", "SWISSPROT"])
         res = self.getUPIForSequence(self._sequence_example, "SWISSPROT")
+        res = self.getUPIForSequence(self._sequence_example, "SWISSPROT", onlyactive=False, includeattributes=False)
         print res
 
     def test_databases(self):
@@ -23,7 +24,9 @@ class TestPICR(picr.PICR):
     def test_getUPIForAccession(self):
         self.getUPIForAccession(self._accession_example, ["SWISSPROT"])
         self.getUPIForAccession(self._accession_example, "SWISSPROT")
+        res = self.getUPIForAccession(self._sequence_example, "SWISSPROT", onlyactive=False, includeattributes=False)
 
     def test_getUPIForBLAST(self):
         self.getUPIForBLAST(self._blastfrag_example, "SWISSPROT",program="blastp",matrix="BLOSUM62")
         self.getUPIForBLAST(self._blastfrag_example, "SWISSPROT")
+        self.getUPIForBLAST(self._blastfrag_example, ["SWISSPROT"])
