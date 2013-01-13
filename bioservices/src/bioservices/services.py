@@ -63,7 +63,7 @@ class Service(object):
             self.debugLevel = "INFO"
         else:
             self.debugLevel = "WARNING"
-
+        self.logging = logging
     
     def _set_level(self, level):
         valid_level = ["INFO", "DEBUG", "WARNING", "CRITIAL", "ERROR"]

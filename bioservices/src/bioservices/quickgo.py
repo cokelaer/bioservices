@@ -54,7 +54,7 @@ class QuickGO(RESTService):
 
         """
         super(QuickGO, self).__init__(url="http://www.ebi.ac.uk/QuickGO",
-            name="quickGO", verbose=True)
+            name="quickGO", verbose=verbose)
 
     def Term(self, GOid, format="oboxml"):
         """Obtain Term information

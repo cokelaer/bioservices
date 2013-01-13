@@ -67,8 +67,8 @@ class Wikipath(WSDLService):
             w.getPathwaysByOntologyTerm('DOID:344')
             w.findPathwaysByXref('P45985')
     """
-
-    def __init__(self, verbose = True, debug = False, url = None):
+    _url = 'http://www.wikipathways.org/wpi/webservice/webservice.php?wsdl' 
+    def __init__(self, verbose = True):
         """Constructor
 
         :param bool verbose:
@@ -77,18 +77,13 @@ class Wikipath(WSDLService):
 
         """
 
-        if url == None:
-            url = 'http://www.wikipathways.org/wpi/webservice/webservice.php?wsdl' 
-            # url = 'http://soap.genome.jp/KEGG.wsdl'
-        super(Wikipath, self).__init__(name="Wikipathway",url='http://www.wikipathways.org/wpi/webservice/webservice.php?wsdl' 
-, verbose = verbose)
+        super(Wikipath, self).__init__(name="Wikipathway", url=Wikipath._url, verbose = verbose)
 #        self._pathways = {}
 #        self.path
         self._keywords = '' 
 #        print self.methods[:]
         self._organism = 'Homo sapiens' ## This function is redundant (see class service)
-        if self.verbose:
-            print "Fetching organisms..."
+        self.logging.info("Fetching organisms...")
         self.organisms = self.serv.listOrganisms()
 
 #        self.recentChanges = Items2(self.serv.getRecentChanges(time

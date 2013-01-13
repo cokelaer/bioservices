@@ -63,16 +63,13 @@ class UniProt(RESTService):
 
 
     """
-    def __init__(self, name="UniProt",
-            url='http://www.uniprot.org',
-            verbose=True):
+    _url = "http://www.uniprot.org"
+    def __init__(self, verbose=True):
         """**Constructor**
 
-        :param url: no need to change the default URL
         :param verbose: set to False to prevent informative messages
-        :param name: no need to change.
         """
-        super(UniProt, self).__init__(name=name, url=url, verbose=verbose)
+        super(UniProt, self).__init__(name="UniProt", url=UniProt._url, verbose=verbose)
 
 
     def mapping(self, fr="ID", to="KEGG_ID", format="tab", query="P13368"):
@@ -97,7 +94,7 @@ class UniProt(RESTService):
         url = self.url + '/mapping/'
         params = {'from':fr, 'to':to, 'format':format, 'query':query}
         data = urllib.urlencode(params)
-        if self.verbose: print data
+        self.logging.info(data)
         request = urllib2.Request(url, data)
         # 2 following lines are optional
         contact = ""

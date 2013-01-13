@@ -71,8 +71,8 @@ class PICR(RESTService):
     _accession_example = "P29375"
     _url = "http://www.ebi.ac.uk/Tools/picr/rest"
 
-    def __init__(self):
-        super(PICR, self).__init__(name="PICR", url=PICR._url)
+    def __init__(self, verbose=True):
+        super(PICR, self).__init__(name="PICR", url=PICR._url, verbose=verbose)
         self._databases = None
 
     def getMappedDatabaseNames(self):
