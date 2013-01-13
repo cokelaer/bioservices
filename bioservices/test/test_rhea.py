@@ -4,7 +4,7 @@ from bioservices.rhea import Rhea
 
 class test_rhea(Rhea):
     def __init__(self):
-        super(test_rhea, self).__init__()
+        super(test_rhea, self).__init__(verbose=False)
 
     def test_search(self):
         r1 = self.search("caffeine")

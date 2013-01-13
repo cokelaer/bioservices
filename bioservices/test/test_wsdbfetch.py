@@ -4,7 +4,7 @@ from bioservices.wsdbfetch import *
 
 class test_WSDbfetch(WSDbfetch):
     def __init__(self):
-        super(test_WSDbfetch, self).__init__()
+        super(test_WSDbfetch, self).__init__(verbose=False)
 
     def test_getSupportedDBs(self):
         res = self.getSupportedDBs()

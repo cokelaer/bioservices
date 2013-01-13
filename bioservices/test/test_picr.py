@@ -5,7 +5,7 @@ from bioservices import picr
 class TestPICR(picr.PICR):
 
     def __init__(self):
-        super(TestPICR, self).__init__()
+        super(TestPICR, self).__init__(verbose=False)
 
 
     def test_getUPIForSequence(self):

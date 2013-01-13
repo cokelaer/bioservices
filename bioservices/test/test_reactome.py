@@ -2,7 +2,7 @@ from bioservices.reactome import Reactome
 
 class test_reactome(Reactome):
     def __init__(self):
-        super(test_reactome, self).__init__()
+        super(test_reactome, self).__init__(verbose=False)
 
     def test_queryPathwaysForReferenceIdentifiers(self):
         self.queryPathwaysForReferenceIdentifiers(["Q9Y266", "P17480", "P20248"])

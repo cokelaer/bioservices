@@ -153,6 +153,15 @@ You can access to the biomodels service and obtain a model as follows::
 
 Then you can play with the SBML file with your favorite tools.
 
+In order to get the model IDs, you can look at the full list::
+
+    >>> b.modelsId
+
+Of course it does not tell you anything about a model; there are more useful functions such as 
+:meth:`~bioservices.services.biomodels.getModelsIdByUniprotId` and other getModelsIdBy family.
+
+
+.. seealso:: Reference guide of :class:`bioservices.biomodels.BioModels` for more details
 
 Rhea service 
 ==============
@@ -194,3 +203,28 @@ output format can be found in ::
     ['cmlreact', 'biopax2', 'rxn']
 
 .. note:: Id may be in only a subset of the above formats
+
+
+Create your own wrapper around WSDL service
+==============================================
+
+If a web service interface is not provided within bioservices, you can still easily access to its functionalities. As an example, let us look at the `Ontology Lookup service <http://www.ebi.ac.uk/ontology-lookup/WSDLDocumentation.do>`_, which provides a WSDL service. In order to easily access to this service, use the :class:`WSDLService` class as follows::
+
+    >>> from bioservices import WSDLService
+    >>> ols = WSDLService("OLS", " http://www.ebi.ac.uk/ontology-lookup/OntologyQuery.wsdl")
+
+You can now see what methods are available::
+
+    >>> ols.methods
+
+and call one (getVersion) using the :meth:`bioservices.services.WSDLService.serv`::
+
+    >>> ols.serv.getVersion()
+
+You can then look at something more complex and extract relevant information::
+
+    >>> [x.value for x in ols.serv.getOntologyNames()[0]]
+
+Of course, you can add new method to ease te access to any functionalities::
+
+    >>> ols.getOnlogyNames() # returns the values

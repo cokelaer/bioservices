@@ -5,7 +5,7 @@ from bioservices.chembldb import *
 class test_Chembl(Chembl):
 
     def __init__(self):
-        super(test_Chembl, self).__init__()
+        super(test_Chembl, self).__init__(verbose=False)
 
 
     def test_api_status(self):

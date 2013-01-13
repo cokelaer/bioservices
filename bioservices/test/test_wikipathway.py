@@ -1,9 +1,9 @@
 from bioservices.wikipathway import  Wikipath
 
 
-class test_wiki(object):
+class test_wiki(Wikipath):
     def __init__(self):
-        self.test_init()
+        super(test_wiki, self).__init__()
 
     def test_init(self):
         self.serv = Wikipath()

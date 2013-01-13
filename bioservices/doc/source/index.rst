@@ -92,6 +92,5 @@ References
     references
 
 
-TODO
-=====
-rename Chembl into ChEMBLdb
+.. todo:: rename Chembl into ChEMBLdb
+.. todo:: in biomodels: doc difference betzeen CHEId qnd CHEIId

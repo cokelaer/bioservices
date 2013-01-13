@@ -5,7 +5,7 @@ from bioservices.quickgo import *
 class test_quickGO(QuickGO):
 
     def __init__(self):
-        super(test_quickGO, self).__init__()
+        super(test_quickGO, self).__init__(verbose=False)
 
     def test_annotation_wrong_limit(self):
         try:
