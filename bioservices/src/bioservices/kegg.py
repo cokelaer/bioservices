@@ -27,6 +27,8 @@ tutorial/quickstart :ref:`kegg_tutorial`.
 
     :URL: http://www.kegg.jp/
     :REST: http://www.kegg.jp/kegg/rest/keggapi.html
+    :REST: http://www.genome.jp/kegg/rest/weblink.html
+    :REST: http://www.genome.jp/kegg/rest/dbentry.html
 
 
 .. seealso:: `<http://www.kegg.jp/kegg/soap/doc/keggapi_manual.html>`_
@@ -171,7 +173,7 @@ class Kegg(RESTService):
     _valid_databases_base = ["module", "disease", "drug",
         "environ", "ko", "genome", "compound", "glycan", "reaction", "rpair",
         "rclass", "enzyme"]
-    _valid_databases_info = _valid_databases_base + ["brite", "genes", "ligand",
+    _valid_databases_info = _valid_databases_base + ["pathway", "brite", "genes", "ligand",
         "genomes", "kegg"]
     _valid_databases_list = _valid_databases_base + ["brite", "pathway", "organism"]
 
@@ -203,7 +205,7 @@ class Kegg(RESTService):
                 self.logging.error("database provided is not correct (mode=list)")
                 raise 
         elif mode == "find":
-            if database not in Kegg._valid_databases_list and\
+            if database not in Kegg._valid_databases_find and\
                 database not in self.organisms:
                 self.logging.error("database provided is not correct (mode=find)")
                 raise 
@@ -314,7 +316,9 @@ class Kegg(RESTService):
 
         .. note:: Keyword search against brite is not supported. Use /list/brite to retrieve a short list.
 
+        ::
 
+            k.find("pathway", "Viral")    # search for pathways that contain Viral in the definition
             k.find("genes", "shiga+toxin")             # for keywords "shiga" and "toxin"
             k.find("genes", ""shiga toxin")            # for keywords "shiga toxin"
             k.find("compound", "C7H10O5", "formula")   # for chemical formula "C7H10O5"
@@ -340,9 +344,132 @@ class Kegg(RESTService):
         return res
 
 
-    def get(self):pass
-    def conv(self):pass
-    def link(self):pass
+    def get(self, dbentries, option=None):
+        """retrieves given database entries 
+
+        :param str dbentries: KEGG database entries involving the following 
+            database: pathway, brite, module, disease, drug, environ, ko, genome
+            compound, glycan,  reaction, rpair, rclass, enzyme **or** any organism 
+            using the KEGG organism code (see :attr:`organisms`) or T number.
+        :param str option: one of: aaseq, ntseq, mol, kcf, image
+
+
+        ::
+
+            self.get("cpd:C01290+gl:G00092") # retrieves a compound entry and a glycan entry
+            self.get("C01290+G00092")        # same as above
+            self.get("hsa:10458+ece:Z5100")  # retrieves a human gene entry and an E.coli O157 gene entry
+            self.get("hsa:10458+ece:Z5100/aaseq") #retrieves amino acid sequences of a human 
+                                              #gene and an E.coli O157 gene
+            self.get("hsa05130/image")        # retrieves the image file of a pathway map 
+
+
+        Another is example here below show how to save the image of a given pathway::
+
+            res =  k.get("hsa05130/image")
+            f = open("test.png", "w")
+            f.write(res)
+            f.close()
+
+        .. note::  The input is limited up to 10 entries. 
+        """
+        _valid_options = ["aaseq", "ntseq", "mol", "kcf", "image"]
+        _valid_db_options = ["compound", "drug"]
+
+        #self._checkDB(database, mode="find") 
+        url = self.url + "/get/"+ dbentries
+
+        if option:
+            if option not in _valid_options:
+                raise ValueError("invalid option. Must be in %s " % _valid_options)
+            url +=  "/" + option
+
+        res = self.request(url)
+        return res
+
+
+    def conv(self, target, source):
+        """convert KEGG identifiers to/from outside identifiers 
+
+        :param str target: the target database.
+        :param str source: the source database. 
+
+        :return: Tries to return 2 objects (2 lists) with the 2 identifiers. Otherwise it 
+            returns the returned object itself
+
+        Here are the rules to set the target and source parameters.
+
+        First, the target and source are symmetric, therefore the following 
+        rules can be inversed. 
+
+        For gene identifiers, the source should be a kegg organism (or T 
+        number) and the target can be 'ncbi-gi', 'ncbi-geneid' or 
+        'uniprot' only.
+
+        For chemical substance identifiers, the source must be one of the 
+        following kegg database: drug, compound, glycan. If so, the source 
+        must be either 'drug' or 'chebi'.
+
+        Here are some examples::
+
+            conv("eco","ncbi-geneid") # conversion from NCBI GeneID to KEGG ID for E. coli genes
+            conv("ncbi-geneid","eco") #	opposite direction
+            conv("ncbi-gi","hsa:10458+ece:Z5100") #conversion from KEGG ID to NCBI GI 
+
+
+        You can also convert from uniprot to Kegg Id all human gene IDs:: 
+
+            kegg_ids, uniprot_ids = k.conv("hsa", "uniprot")
+
+
+        .. todo:: the dbentries case. 
+        """
+
+        if target in self.organisms:
+            if source not in ['ncbi-gi', 'ncbi-geneid', 'uniprot']:
+                raise ValueError
+        if target in ['ncbi-gi', 'ncbi-geneid', 'uniprot']:
+            if source not in self.organisms:
+                raise ValueError
+        if target in ['drug', 'compound', 'glycan']:
+            if source not in ['chebi', 'pubchem']:
+                raise ValueError
+        if target in ['chebi', 'pubchem']:
+            if source not in ['drug', 'compound', 'glycan']:
+                raise ValueError
+
+
+
+
+        url = self.url + "/conv/"+ target + '/' + source
+
+        res = self.request(url)
+
+        try:
+            t = [x.split("\t")[0] for x in res.strip().split("\n")]
+            s = [x.split("\t")[1] for x in res.strip().split("\n")]
+            return (t, s)
+        except:
+            return res
+
+    def link(self, target, source):
+        """find related entries by using database cross-references 
+
+
+	<target_db> = <database>
+	<source_db> = <database>
+
+	<database> = pathway | brite | module | disease | drug | environ | ko | genome |
+             <org> | compound | glycan | reaction | rpair | rclass | enzyme
+            res = k.link("hsa","pathway")
+
+	/link/pathway/hsa 	  	KEGG pathways linked from each of the human genes
+	/link/hsa/pathway 	  	human genes linked from each of the KEGG pathways
+	/link/pathway/hsa:10458+ece:Z5100 	  	KEGG pathways linked from a human gene and an E. coli O157 gene 
+        """
+        url = self.url + "/link/"+ target + '/' + source
+        res = self.request(url)
+        return res
 
 
     def _get_organisms(self):
@@ -352,6 +479,14 @@ class Kegg(RESTService):
             self._organisms = orgs[:]
         return self._organisms
     organisms = property(_get_organisms, doc="returns list of organisms")
+
+    def _get_glycans(self):
+        if self._glycans == None:
+            res = self.request(self.url + "/list/glycans")
+            orgs = [x.split()[1] for x in res.split("\n") if len(x)]
+            self._glycans = orgs[:]
+        return self._glycans
+    glycans = property(_get_glycans, doc="returns list of glycans")
 
 
     def _get_organism(self):

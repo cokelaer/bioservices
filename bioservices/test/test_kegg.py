@@ -67,3 +67,10 @@ class test_Kegg(Kegg):
         self.find("compound", "174.05","exact_mass")  # for 174.045 =<exact mass < 174.055
         self.find("compound", "300-310","mol_weight") # for 300 =<molecular weight =< 310 
 
+    def test_get(self):
+        self.get("cpd:C01290+gl:G00092")
+        self.get("C01290+G00092")
+        self.get("hsa:10458+ece:Z5100")
+        self.get("hsa:10458+ece:Z5100/aaseq") 
+        self.get("hsa05130/image")      
+
