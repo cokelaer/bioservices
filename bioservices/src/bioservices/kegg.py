@@ -22,6 +22,13 @@ WDSL Kegg interface as well as additional methods to obtain statistics about the
 Kegg database. See below for details about the functionalities available and the
 tutorial/quickstart :ref:`kegg_tutorial`.
 
+
+.. topic:: What is KEGG ?
+
+    :URL: http://www.kegg.jp/
+    :REST: http://www.kegg.jp/kegg/rest/keggapi.html
+
+
 .. seealso:: `<http://www.kegg.jp/kegg/soap/doc/keggapi_manual.html>`_
 
 Some terminology 
@@ -83,19 +90,60 @@ This list is taken from Kegg API page and slightly edited.
 
 
 
-.. autosummary::
-
-    bioservices.kegg.Kegg.analyse
-    bioservices.kegg.Kegg.lookfor_specy
-    bioservices.kegg.Kegg.lookfor_pathway
-    bioservices.kegg.Kegg.lookfor_organism
-    bioservices.kegg.Kegg.extra_pathway_summary
-    bioservices.kegg.Kegg.extra_get_all_relations
-    bioservices.kegg.Kegg.extra_get_pathway_types
-    bioservices.kegg.Kegg.extra_get_elements_by_pathway
 
 """
 
+"""
+
+
+Database    Name    Abbrev  kid     Remark
+KEGG PATHWAY    pathway     path    map number  
+KEGG BRITE  brite   br  br number   
+KEGG MODULE     module  md  M number    
+KEGG DISEASE    disease     ds  H number    Japanese version: disease_ja ds_ja
+KEGG DRUG   drug    dr  D number    Japanese version: drug_ja dr_ja
+KEGG ENVIRON    environ     ev  E number    Japanese version: environ_ja ev_ja
+KEGG ORTHOLOGY  orthology   ko  K number    
+KEGG GENOME     genome  genome  T number    
+KEGG GENOMES    genomes     gn  T number    Composite database: genome + egenome
++ mgenome
+KEGG GENES  genes   -   -   Composite database: consisting of KEGG organisms
+KEGG LIGAND     ligand  ligand  -   Composite database: compound + glycan +
+reaction + rpair + rclass + enzyme
+KEGG COMPOUND   compound    cpd     C number    Japanese version: compound_ja
+cpd_ja
+KEGG GLYCAN     glycan  gl  G number    
+KEGG REACTION   reaction    rn  R number    
+KEGG RPAIR  rpair   rp  RP number   
+KEGG RCLASS     rclass  rc  RC number   
+KEGG ENZYME     enzyme  ec  -   
+
+
+Database entry
+
+<dbentries> = <dbentry>1[+<dbentry>2...]
+<dbentry> = <db:entry> | <kid> | <org:gene>
+
+Each database entry is identified by:
+db:entry
+where
+"db" is the database name or its abbreviation shown above and
+"entry" is the entry name or the accession number that is uniquely assigned
+within the database.
+In reality "db" may be omitted, for the entry name called the KEGG object
+identifier (kid) is unique across KEGG.
+kid = database-dependent prefix + five-digit number
+In the KEGG GENES database the db:entry combination must be specified. This is
+more specifically written as:
+org:gene
+where
+"org" is the three- or four-letter KEGG organism code or the T number genome
+identifier and
+"gene" is the gene identifier, usually locus_tag or ncbi GeneID, or the primary
+gene name.
+
+
+"""
 
 from services import RESTService
 import webbrowser
@@ -114,20 +162,227 @@ class Kegg(RESTService):
 
         print len(k.pathways)
 
-        k.organism #hsa (homo sapiens by default)
+        k.organisms 
 
 
     """
-    def __init__(self, verbose=True, debug=False, url=None):
-        """Constructor
+
+    #: valida database 
+    _valid_databases_base = ["module", "disease", "drug",
+        "environ", "ko", "genome", "compound", "glycan", "reaction", "rpair",
+        "rclass", "enzyme"]
+    _valid_databases_info = _valid_databases_base + ["brite", "genes", "ligand",
+        "genomes", "kegg"]
+    _valid_databases_list = _valid_databases_base + ["brite", "pathway", "organism"]
+
+
+    _valid_databases_find = _valid_databases_base + ["pathway", "genes", "ligand"] 
+
+    def __init__(self, verbose=True):
+        """.. rubric:: Constructor
 
         :param bool verbose:
-        :param bool debug:
-        :param str url: redefine the wsdl URL 
 
         """
         super(Kegg, self).__init__(name="Kegg", url="http://rest.kegg.jp", verbose=verbose)
+        self.easyXMLConversion = False
+        self._organisms = None
+        self._organism = None
+        self._pathways = None
 
-    def info(self):
-        res = self.request(self.url+"/"+"info/kegg", format="txt")
+    def _checkDB(self, database=None, mode=None):
+        self.logging.info("checking database %s (mode=%s)" % (database, mode))
+        if mode == "info":
+            if database not in Kegg._valid_databases_info and\
+                database not in self.organisms:
+                self.logging.error("database or organism provided is not correct (mode=info)")
+                raise
+        elif mode == "list":
+            if database not in Kegg._valid_databases_list and\
+                database not in self.organisms:
+                self.logging.error("database provided is not correct (mode=list)")
+                raise 
+        elif mode == "find":
+            if database not in Kegg._valid_databases_list and\
+                database not in self.organisms:
+                self.logging.error("database provided is not correct (mode=find)")
+                raise 
+        else:
+            raise ValueError("mode can be only info, list, ")
+
+    def info(self, database="kegg"):
+        """Displays the current statistics of a given database
+
+        :param str database: can be one of: kegg (default), brite, module,
+            disease, drug, environ, ko, genome, compound, glycan, reaction,
+            rpair, rclass, enzyme, genomes, genes, ligand or any 
+            :attr:`organisms`. Right now T number for organism are not accepted.
+
+        ::
+
+            from bioservices import Kegg
+            k = Kegg()
+            k.info("hsa") # human organism
+            k.info("pathway")
+
+        """
+        url = self.url+"/"+"info"
+        self._checkDB(database, mode="info")
+
+        url = url + "/" + database
+        res = self.request(url)
         return res
+
+    def list(self, query, organism=None):
+        """returns a list of entry identifiers and associated definition for a given database or a given set of database entries 
+
+        :param str query: can be one of pathway, brite, module,
+            disease, drug, environ, ko, genome, compound,
+            glycan, reaction, rpair, rclass, enzyme, organism
+            **or** an organism from the :attr:`organisms` attribute **or** a valid
+            dbentry (see below). If a dbentry query is provided, organism
+            should not be used!
+        :param str organism: a valid organism identifier that can be 
+            provided. If so, database can be only "pathway" or "module"
+
+        There are convenient aliases to some of the databases. For instance,
+        organism database can also be retrieved as a list from the
+        :attr:`organisms` attribute. 
+
+
+        Here is an example that shows how to extract the pathways IDs related to
+        the hsa organism::
+
+            >>> k = Kegg()
+            >>> res = k.list("pathway", organism="hsa")
+            >>> pathways = [x.split()[0] for x in res.strip().split("\\n")]
+            >>> len(pathways)  # as of Dec 2012
+            261
+
+
+        .. note:: If you set the query to a valid organism, then the second
+               argument (organism is irrelevant and ignored.
+
+        .. note:: If the query is not a database or an organism, it is supposed
+            to be a valid dbentries string and the maximum number of entries is 100.
+
+        Other examples::
+
+            k.list("pathway")             # returns the list of reference pathways
+            k.list("pathway", "hsa")      # returns the list of human pathways
+            k.list("organism")            # returns the list of KEGG organisms with taxonomic classification
+            k.list("hsa")                 # returns the entire list of human genes
+            k.list("T01001")    # same as above
+            k.list("hsa:10458+ece:Z5100") # returns the list of a human gene and an E.coli O157 gene
+            k.list("cpd:C01290+gl:G00092")# returns the list of a compound entry and a glycan entry
+            k.list("C01290+G00092")       # same as above 
+        """
+        url = self.url+"/"+"list"
+        if query:
+            #can be something else than a database so we can not use checkDB
+            #self._checkDB(database, mode="list")
+            url = url + "/" + query
+
+        if organism:
+            if organism not in self.organisms:
+                self.logging.error("""Invalid organism provided (%s). See the organisms attribute""" % organism)
+                raise 
+            if query not in ["pathway", "module"]:
+                self.logging.error("""
+    If organism is set, then the first argument
+    (database) must be either 'pathway' or 'module'. You provided %s""" % query)
+                raise
+            url = url + "/" + organism
+
+
+        res = self.request(url)
+        return res
+
+    def find(self, database, query, option=None):
+        """finds entries with matching query keywords or other query data in a given database 
+
+        :param str database: can be one of pathway, module, disease, drug,
+            environ, ko, genome, compound, glycan, reaction, rpair, rclass, 
+            enzyme, genes, ligand or an organism (code see :attr:`organism`
+            attributes or T number)
+        :param str query:
+        :param str option: If option provided, database can be only 'compound' 
+            or 'drug'. Option can be 'formula', 'exact_mass' or 'mol_weight'
+
+
+
+
+        .. note:: Keyword search against brite is not supported. Use /list/brite to retrieve a short list.
+
+
+            k.find("genes", "shiga+toxin")             # for keywords "shiga" and "toxin"
+            k.find("genes", ""shiga toxin")            # for keywords "shiga toxin"
+            k.find("compound", "C7H10O5", "formula")   # for chemical formula "C7H10O5"
+            k.find("compound", "O5C7","formula")       # for chemical formula containing "O5" and "C7"
+            k.find("compound", "174.05","exact_mass")  # for 174.045 =< exact mass < 174.055
+            k.find("compound", "300-310","mol_weight") # for 300 =< molecular weight =< 310 
+
+        """
+        _valid_options = ["formula", "exact_mass", "mol_weight"]
+        _valid_db_options = ["compound", "drug"]
+
+        self._checkDB(database, mode="find") 
+        url = self.url + "/find/"+ database + "/" +  query
+
+        if option:
+            if database not in _valid_db_options:
+                raise ValueError("invalid database. Since option was provided, database must be in %s" % _valid_db_options)
+            if option not in _valid_options:
+                raise ValueError("invalid option. Must be in %s " % _valid_options)
+            url +=  "/" + option
+
+        res = self.request(url)
+        return res
+
+
+    def get(self):pass
+    def conv(self):pass
+    def link(self):pass
+
+
+    def _get_organisms(self):
+        if self._organisms == None:
+            res = self.request(self.url + "/list/organism")
+            orgs = [x.split()[1] for x in res.split("\n") if len(x)]
+            self._organisms = orgs[:]
+        return self._organisms
+    organisms = property(_get_organisms, doc="returns list of organisms")
+
+
+    def _get_organism(self):
+        return self._organism
+    def _set_organism(self, organism):
+        if organism in self.organisms:
+            self._organism = organism
+            self._pathways = None
+        else:
+            self.logging.error("Invalid organism. Check the list in :attr:`organisms` attribute")
+            raise 
+    organism = property(_get_organism, _set_organism, doc="returns the current default organism ")
+
+    def _get_pathways(self):
+
+        if self._organism == None:
+            self.logging.warning("You must set the organism first (e.g., self.organism = 'hsa')")
+            return
+
+        if self._pathways == None:
+            res = self.request(self.url + "/list/pathway/%s" % self.organism)
+            orgs = [x.split()[0] for x in res.split("\n") if len(x)]
+            self._pathways = orgs[:]
+        return self._pathways
+    pathwayIDs = property(_get_pathways, doc="""returns list of pathway IDs for the default organism. 
+        
+    :attr:`organism` must be set.
+    ::
+
+        k = Kegg()
+        k.organism = "hsa"
+        k.pathwayIDs
+
+    """)

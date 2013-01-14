@@ -205,8 +205,9 @@ class RESTService(Service):
         try:
             import urllib
             urllib.urlopen(self.url)
-        except:
+        except e:
             logging.critical("The URL (%s) provided cannot be reached" % self.url)
+            print e
 
     def getUserAgent(self):
         logging.info('getUserAgent: Begin')
@@ -232,8 +233,6 @@ class RESTService(Service):
             is not in XML, format should be set to any other value.
 
         """
-	print self.name
-	print url
         logging.info("REST.bioservices.%s request begins" % self.name)
         logging.info("--Fetching url=%s" % url)
 

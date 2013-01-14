@@ -99,15 +99,8 @@ class UniProt(RESTService):
         # 2 following lines are optional
         contact = ""
         request.add_header('User-Agent', 'Python contact')
-        try:
-            response = urllib2.urlopen(request)
-            result = response.read(200000)
-        except urllib2.HTTPError, e:
-            print e.code
-            print e.msg
-            print e.headers
-            print e.fp.read()
-            return "error 404. Try again"
+        response = urllib2.urlopen(request)
+        result = response.read(200000)
 
         # let us improvve the output a little bit using a list  instead of a
         # string

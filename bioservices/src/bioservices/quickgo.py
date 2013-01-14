@@ -89,8 +89,10 @@ class QuickGO(RESTService):
         postData = self.urlencode(params)
         url += "&" + postData
 
-
-        res = self.request(url, format="xml")
+        if format in ["oboxml"]:
+            res = self.request(url, format="xml")
+        else:
+            res = self.request(url, format=format)
 
         return res
 
@@ -227,7 +229,7 @@ or a string (e.g., 'IDA', 'IDA,IEA') """)
                 raise ValueError("""
 Invalid parameter: source parameters must be a list of strings ['UniProtKB']
 or a string (e.g., 'UniProtKB') """)
-            source['evidence'] = source
+            params['source'] = source
 
         if ref:
             if isinstance(ref, list):
@@ -259,7 +261,7 @@ or a string (e.g., 'PUBMED:*') """)
                 if c not in _valid_col:
                     raise ValueError("col parameter error: found %s, which is not a valid value." % c)
             params["col"] = col
-        else:
+        if format!="tsv":
             # col is provided but format is not appropriate
             if col!= None:
                 raise ValueError("You provided the 'col' parameter but the format is not correct. You should use the 'format=tsv")

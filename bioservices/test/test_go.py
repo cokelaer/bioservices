@@ -7,6 +7,21 @@ class test_quickGO(QuickGO):
     def __init__(self):
         super(test_quickGO, self).__init__(verbose=False)
 
+    def test_annotation_wrong_format(self):
+        try:
+            res = self.Annotation(tax='9606', format='tsddddddv')
+            assert False
+        except:
+            assert True
+
+    def test_annotation_format_col_compatibility(self):
+        # if col provided, format can be only tsv
+        try:
+            res = self.Annotation(tax='9606', format='fasta', col="evidence")
+            assert False
+        except:
+            assert True
+
     def test_annotation_wrong_limit(self):
         try:
             res = self.Annotation(tax='9606', format='tsv', limit=-1)
@@ -30,7 +45,7 @@ class test_quickGO(QuickGO):
         except ValueError:
             assert True
 
-    def test_evidence(self):
+    def test_annotation_evidence(self):
         self.Annotation(protein='P12345', format='tsv', col="ref,evidence", evidence="IDA")
         self.Annotation(protein='P12345', format='tsv', col="ref,evidence", evidence=["IDA"])
         try:
@@ -49,6 +64,19 @@ class test_quickGO(QuickGO):
         except:
             assert True
 
+
+    def test_annotation_source(self):
+        self.Annotation(protein='P12345', format='tsv',
+            col="ref,evidence",ref='PMID:*', source="UniProtKB")
+        self.Annotation(protein='P12345', format='tsv',
+            col="ref,evidence",ref='PMID:*', source=["UniProtKB"])
+        try:
+            self.Annotation(protein='P12345', format='tsv',
+                col="ref,evidence",ref='PMID:*', source=111)
+            assert False    
+        except:
+            assert True
+
     def test_annotation_protein(self):
         print self.Annotation(protein='P12345', format='tsv', col="ref,evidence",ref='PMID:*')
 
@@ -62,10 +90,27 @@ class test_quickGO(QuickGO):
         res = self.Annotation(tax='9606', format='tsv', 
             col="ref,evidence,proteinID,goID,proteinTaxon,qualifier",ref="PMID:*", 
             qualifier="NOT")
+        res = self.Annotation(tax='9606', format='tsv', 
+            col="ref,evidence,proteinID,goID,proteinTaxon,qualifier",ref="PMID:*", 
+            qualifier=["NOT"])
+        try:
+            res = self.Annotation(tax='9606', format='tsv', 
+                col="ref,evidence,proteinID,goID,proteinTaxon,qualifier",ref="PMID:*", 
+                qualifier=1)
+            assert False
+        except:assert True
 
-    def test_annotation_qualifier(self):
+    def test_annotation_qualifier2(self):
         res = set([ x for x in self.Annotation(tax='9606', format='tsv', col="qualifier",ref="PMID:*").split()])
         assert 'NOT' in res
+
+    def test_annotation_termUse(self):
+        try:
+            res = self.Annotation(tax='9606', format='tsv',
+                col="qualifier",ref="PMID:*", termUse="slimdummy")
+            assert False
+        except:
+            assert True
 
     def test_Term(self):
         self.Term("GO:0003824", format="obo")

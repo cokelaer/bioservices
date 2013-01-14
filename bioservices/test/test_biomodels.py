@@ -102,7 +102,7 @@ class test_biomodels(BioModels):
     def test_getModelsIdByName(self):
         return self.getModelsIdByName('2009')
 
-    def _test_getModelsIdByPublication(self):
+    def test_getModelsIdByPublication(self):
         res = self.getModelsIdByPublication(pubId)
         assert res == ['BIOMD0000000201']
 
@@ -112,7 +112,7 @@ class test_biomodels(BioModels):
     def test_getModelsIdByTaxonomy(self):
         return self.getModelsIdByTaxonomy("EGF")
 
-    def _test_getModelsIdByTaxonomyId(self, taxonomyId='9606'):
+    def test_getModelsIdByTaxonomyId(self, taxonomyId='9606'):
         return self.getModelsIdByTaxonomyId(taxonomyId)
 
     def _test_getSubModelSBML(self):
