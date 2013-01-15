@@ -10,6 +10,14 @@ There are two main technology involved in web services: the WSDL and the REST
 styles. The Kegg and Biomodels services presented uses WSDL whereas uniprot uses
 REST.
 
+
+#.  RESTful URLs are useful in that there is no need for any external
+    dependency. You simply need to build a well-formatted URL and you will retrieve
+    an XML docum    ent that you can consume with your preferred technology
+    platform. The XML document that is returned will contain elements defined in the
+    WSDL schema.
+
+
 .. contents::
 
 
@@ -20,47 +28,47 @@ Kegg service
 Start a kegg interface (default organism is human, that is called hsa)::
 
     from bioservices.kegg import Kegg
-    k = Kegg()
+    k = Kegg(verbose=False)
 
+There are 5-6 main functions (e.g., :meth:`~bioservices.kegg.Kegg.list`) 
+that allow access to the KEGG database. First, you can obtain information about
+the data base itself. Just type::
 
-By default, the organism is human (hsa) but you can change it::
+    print k
 
-    k.organism = "dosa"
-    k.organism = "hsa"
+to obtain statistics. You can refine your search by using the info method.::
+
+    >>> print k.info("pathway")
+    pathway          KEGG Pathway Database
+    path             Release 65.0+/01-15, Jan 13
+                     Kanehisa Laboratories
+                     218,277 entries
 
 In order to get the list of valid organisms, type::
 
-    print k.organisms
+    print k.organismIds
+
+The human organism is coded as "hsa". You can also get the T number instead of
+Ids::
+
+    print k.orgamisms_tnumbers
+
 
 Every elements is referred to with a Kegg ID, which may be difficult to handle
 at first. There are methods to retrieve the IDs though. For instance, get the list of 
 pathways ids for the current organism as follows::
 
-    k.pathways
-
-Now, you can various requests but let us first open a pathway in a browser::
-
-    k.color_pathway_by_elements('path:hsa04660')
-
-Genes within a pathway can be retrieved with the method::
-
-    k.get_genes_by_pathway("path:hsa04660")
+    k.pathwayIDs
 
 For a given gene, you can get the full information related to that gene by using
 the method :meth:`~bioservices.kegg.Kegg.bget`::
 
-    k.bget("hsa:3586")
+    print k.get("hsa:3586")
 
-Commands shown so far are part of the Kegg WSDL service. Most of the Kegg
-methods are directly available. To obtain all methods, type ::
+or a pathway::
 
-    k.methods
+    print k.get("path:hsa05416")
 
-If a method is not found, you can still directly access to the
-service method via the attribute :meth:`~bioservices.kegg.Kegg.serv`.
-
-In addition to the Kegg service, we implemented extra commands. 
-The tutorial links here below provides more examples.
 
 
 .. seealso:: Reference guide of :class:`bioservices.kegg.KEGG` for more details

@@ -66,7 +66,7 @@ class Service(object):
         self.logging = logging
     
     def _set_level(self, level):
-        valid_level = ["INFO", "DEBUG", "WARNING", "CRITIAL", "ERROR"]
+        valid_level = ["INFO", "DEBUG", "WARNING", "CRITICAL", "ERROR"]
         if level in valid_level:
             self._debugLevel = level
         else:

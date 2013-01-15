@@ -4,6 +4,7 @@ Whats' new, what has changed
 
 Revision 0.1
 ------------------- 
+* 0.4.6: finalise kegg module and test
 * 0.4.5: finalise biomodels. keff WSDL is not maintained anymore: started REST version. 
 * 0.4.4: finalise quickgo,rhea, picr, uniprot. Update servie to use logging module.
 * 0.4.3: add quickgo

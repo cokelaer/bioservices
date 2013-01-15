@@ -6,11 +6,19 @@ from nose import with_setup
 class test_Kegg(Kegg):
 
     def __init__(self):
-        super(test_Kegg, self).__init__()
+        super(test_Kegg, self).__init__(verbose=True)
+        #self.test_database_IDs()
 
-    def test_organisms(self):
-        self.organisms # will load once for all
-        self.organisms # try again (cost nothing)
+
+
+    def test_database_IDs(self):
+        self.organismIds
+        self.enzymeIds
+        self.koIds
+        self.compoundIds
+        self.glycanIds
+        self.reactionIds
+        self.drugIds
 
     def test_organism(self):
         self.organism = "hsa"
@@ -22,7 +30,7 @@ class test_Kegg(Kegg):
 
     def test_pathwayIDs(self):
         self.organism = "hsa"
-        self.pathwayIDs
+        self.pathwayIds
 
     def test_info(self):
         self.info()
@@ -71,6 +79,55 @@ class test_Kegg(Kegg):
         self.get("cpd:C01290+gl:G00092")
         self.get("C01290+G00092")
         self.get("hsa:10458+ece:Z5100")
-        self.get("hsa:10458+ece:Z5100/aaseq") 
-        self.get("hsa05130/image")      
+        self.get("hsa:10458+ece:Z5100", "aaseq") 
+        res = self.get("hsa05130", "image")      
+        try:
+            self.get("hsa05130", "imagffe")      
+            assert False
+        except:
+            assert True
 
+
+    def test_conv(self):
+
+        try:
+            self.conv("unipro", "hsa")
+            assert False
+        except:
+            assert True
+
+        try:
+            self.conv("uniprot", "hs")
+            assert False
+        except:
+            assert True
+
+        try:
+            self.conv("hs", "unipro")
+            assert False
+        except:
+            assert True
+
+        try:
+            self.conv("hsa", "unipr")
+            assert False
+        except:
+            assert True
+
+        # asc contains 1500. Try to get even samller to spped up tests.
+        self.conv("asc", "uniprot")
+
+
+    def test_show_pathwat(self):
+        self.www_bget("path:hsa05416")
+        self.show_pathway("path:hsa05416", scale=50)
+    def test_check_dentries(self):
+        assert True == self.check_dbentries("hsa:10458+ece:Z5100")
+        try:
+            self.check_dbentries("hsa:10458+ece:Z510", checkAll=False)
+            assert False
+        except:
+            assert True
+
+    def test_link(self):
+        self.link("pathway", "hsa:10458+ece:Z5100")
