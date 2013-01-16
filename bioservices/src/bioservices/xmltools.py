@@ -68,3 +68,7 @@ class easyXML(object):
         txt = self.soup.prettify()
         return txt
 
+    def __getitem__(self, i):
+        return self.findAll(i)
+        
+

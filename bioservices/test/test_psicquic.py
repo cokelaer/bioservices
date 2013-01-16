@@ -37,3 +37,7 @@ class test_psicquic(PSICQUIC):
 
  
         self.query("matrixdb", "*", "xml25", firstResult=10, maxResults=10)
+
+        # accessing the string DB
+        self.query("string", "species:10090", firstResult=0, maxResults=100, output="tab25")
+

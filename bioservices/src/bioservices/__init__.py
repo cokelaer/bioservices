@@ -39,3 +39,6 @@ from picr import *
 
 import psicquic
 from psicquic import *
+
+import nciblast
+from nciblast import *

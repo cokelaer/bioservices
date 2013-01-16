@@ -18,6 +18,10 @@ class PSICQUIC(RESTService):
         super(PSICQUIC, self).__init__("PSICQUIC", verbose=verbose, url=urlStr)
         self._registry = None
 
+    def _get_formats(self):
+        return PSICQUIC._formats
+    formats = property(_get_formats)
+
     def read_registry(self):
         """Reads and returns the active registry 
 
@@ -108,7 +112,7 @@ class PSICQUIC(RESTService):
         return  version
     registry_versions = property(_get_registry_version, doc="returns version of each service")
 
-    def query(self, service, query, output="xml25", version="current", firstResult=None, maxResults=None):
+    def query(self, service, query, output=None, version="current", firstResult=None, maxResults=None):
         """format = count; query = zap70, service intact returns 
 
         :param str service: a registered service. See :attr:`registry_names`.
@@ -122,25 +126,50 @@ class PSICQUIC(RESTService):
             r.query("intact", "zap70", "xml25")
             r.query("matrixdb", "*", "xml25")
 
+        This is the programmatic approach to this website:
+
+        http://www.ebi.ac.uk/Tools/webservices/psicquic/view/main.xhtml
+
+
+        another exqmple consist in accessing the string database for fetching protein-protein interaction data of a particular model organism:
+
+r.query("string", "species:10090", firstResult=0, maxResults=100, output="tab25")
+
         """
+        params = {}
+        if output!=None:
+            self.checkParam(output, self.formats)
+            params['format'] = output
+        else: output="none"
+
         names = [x.lower() for x in self.registry_names]
         try:
             index = names.index(service)
         except ValueError:
             print("The service you gave (%s) is not registered. See self.registery_names" % service)
             raise ValueError
+
+        # get the base url according to the service requested
         resturl = self.registry_resturls[index]
 
+        if firstResult != None:
+            params['firstResult'] = firstResult
+        if maxResults != None:
+            params['maxResults'] = maxResults
 
-        url = resturl  + 'query/' + query + "?format="+output
-        if firstResult:
-           url+="&firstResult=%s" % str(firstResult)
-        if maxResults:
-           url+="&maxResults=%s" % str(maxResults)
+        postData = self.urlencode(params)
+
+        url = resturl  + 'query/' + query 
+        if params:
+            url += "?" + postData
+        
+
         if "xml" in output:
             res = self.request(url, format="xml")
         else:
             res = self.request(url, format="txt")
+            res = res.strip().split("\n")
+
         return res
 
 

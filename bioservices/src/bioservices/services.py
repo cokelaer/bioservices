@@ -19,9 +19,12 @@
 
 
 from SOAPpy import SOAPProxy, WSDL
+import urllib
 import urllib2
 import platform
 import logging
+from  easydev import checkParam
+
 
 __all__ = ["Service", "WSDLService", "RESTService"]
 
@@ -134,6 +137,9 @@ easyXML object (Default behaviour).""")
         postData = urllib.urlencode(params)
         return postData
 
+    def checkParam(self, param, valid_values):
+        __doc__ = checkParam.__doc__
+        checkParam(param, valid_values)
 
 
 class WSDLService(Service):
@@ -210,10 +216,11 @@ class RESTService(Service):
             print e
 
     def getUserAgent(self):
+        import os
         logging.info('getUserAgent: Begin')
         urllib_agent = 'Python-urllib/%s' % urllib2.__version__
-        clientRevision = '$Id$'
-        clientVersion = '1'
+        clientRevision = ''
+        clientVersion = ''
         user_agent = 'EBI-Sample-Client/%s (%s; Python %s; %s) %s' % (
             clientVersion, os.path.basename( __file__ ), 
             platform.python_version(), platform.system(),
@@ -232,6 +239,8 @@ class RESTService(Service):
             format it will be converted with :meth:`easyXML`. If the returned document
             is not in XML, format should be set to any other value.
 
+
+        .. note:: this is a HTTP GET request 
         """
         logging.info("REST.bioservices.%s request begins" % self.name)
         logging.info("--Fetching url=%s" % url)
@@ -254,29 +263,29 @@ class RESTService(Service):
             logging.error("Error caught within bioservices. Invalid requested URL ? ")
             raise
 
-"""
-    # Wrapper for a REST (HTTP GET) request
-    def restRequest(self,url):
-        # kept as an example.
-        raise NotImplementedError
-        # need to be checked before using it.
-        printDebugMessage('restRequest', 'Begin', 11)
-        printDebugMessage('restRequest', 'url: ' + url, 11)
-        try:
-            # Set the User-agent.
-            user_agent = getUserAgent()
-            http_headers = { 'User-Agent' : user_agent }
-            req = urllib2.Request(url, None, http_headers)
-            # Make the request (HTTP GET).
-            reqH = urllib2.urlopen(req)
-            result = reqH.read()
-            reqH.close()
+    def requestPost(self, requestUrl, params):
+        """
+
+        .. note:: this is a HTTP POST request 
+        """
+        import sys
+        requestData = urllib.urlencode(params)
+        print requestData
+        # Concatenate the two parts.
         # Errors are indicated by HTTP status codes.
+        try:
+            # Set the HTTP User-agent.
+            user_agent = self.getUserAgent()
+            http_headers = { 'User-Agent' : user_agent }
+            req = urllib2.Request(requestUrl, None, http_headers)
+            # Make the submission (HTTP POST).
+            reqH = urllib2.urlopen(req, requestData)
+            jobId = reqH.read()
+            reqH.close()
         except urllib2.HTTPError, ex:
             # Trap exception and output the document to get error message.
             print >>sys.stderr, ex.read()
             raise
-        printDebugMessage('restRequest', 'End', 11)
-        return result
+        return jobId
 
-"""
+
