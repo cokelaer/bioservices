@@ -263,7 +263,7 @@ class RESTService(Service):
             logging.error("Error caught within bioservices. Invalid requested URL ? ")
             raise
 
-    def requestPost(self, requestUrl, params):
+    def requestPost(self, requestUrl, params, extra=None):
         """
 
         .. note:: this is a HTTP POST request 
@@ -271,6 +271,8 @@ class RESTService(Service):
         import sys
         requestData = urllib.urlencode(params)
         print requestData
+        if extra != None:
+            requestData += extra
         # Concatenate the two parts.
         # Errors are indicated by HTTP status codes.
         try:
@@ -279,12 +281,13 @@ class RESTService(Service):
             http_headers = { 'User-Agent' : user_agent }
             req = urllib2.Request(requestUrl, None, http_headers)
             # Make the submission (HTTP POST).
+            print req, requestData
             reqH = urllib2.urlopen(req, requestData)
             jobId = reqH.read()
             reqH.close()
         except urllib2.HTTPError, ex:
             # Trap exception and output the document to get error message.
-            print >>sys.stderr, ex.read()
+            print(sys.stderr, ex.read())
             raise
         return jobId
 
