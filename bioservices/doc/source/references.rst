@@ -27,13 +27,13 @@ xmltools module
 Services
 #############
 
-Kegg module
-===================================================================
+biomodels module
+====================
 
-.. automodule:: bioservices.kegg
+.. automodule:: bioservices.biomodels
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 QuickGO module
 ================
@@ -43,6 +43,30 @@ QuickGO module
     :undoc-members:
     :synopsis: 
 
+Kegg module
+===================================================================
+
+.. automodule:: bioservices.kegg
+    :members:
+    :undoc-members:
+    :synopsis: 
+
+NCIBlast module
+================
+
+.. automodule:: bioservices.nciblast
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
+PSICQUIC module
+================
+
+.. automodule:: bioservices.psicquic
+    :members:
+    :undoc-members:
+    :synopsis:
 
 Rhea module
 ==============
@@ -56,13 +80,6 @@ Reactome module
 =====================
 
 .. automodule:: bioservices.reactome
-    :members:
-    :undoc-members:
-    :synopsis:
-
-biomodels module
-====================
-.. automodule:: bioservices.biomodels
     :members:
     :undoc-members:
     :synopsis:
@@ -82,6 +99,15 @@ wsdbfetch module
     :members:
     :undoc-members:
     :synopsis:
+
+wikipath module
+===================================================================
+
+.. automodule:: bioservices.wikipathway
+    :members:
+    :undoc-members:
+    :synopsis:
+
 
 picr module
 ===================================================================

@@ -240,7 +240,7 @@ class RESTService(Service):
             res = urllib2.urlopen(url).read()
             if format=="xml":
                 if self.easyXMLConversion:
-                    logging.warning("--Conversion to easyXML"),
+                    #logging.warning("--Conversion to easyXML"),
                     try:
                         res = self.easyXML(res)
                     except:

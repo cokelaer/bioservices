@@ -23,6 +23,7 @@
 
     :URL: http://www.reactome.org/ReactomeGWT/entrypoint.html
     :Citation: http://www.reactome.org/citation.html
+    :WSDL: http://www.reactome.org:8080/caBIOWebApp/services/caBIOService?wsdl
 
     .. highlights:: 
 
@@ -38,9 +39,33 @@
 """
 
 
-from services import WSDLService
+from services import WSDLService, RESTService
 import webbrowser
 import copy
+
+
+
+class ReactomeURL(RESTService):
+
+    _url = "http://www.reactome.org/cgi-bin"
+    def __init__(self, verbose=True):
+        super(ReactomeURL, self).__init__("Reactome(URL)",url=ReactomeURL._url, 
+            verbose=verbose)
+
+    def link(self, source, identifier):
+        """Linking to Reactome 
+
+        This can be achieved by creating URLs containing the name of and 
+        an identifier from an "external" database in the following format::
+
+            r.link("COMPOUND", "C00002") #  COMPOUND identifiers, e.g. COMPOUND:C00002
+            r.link("UNIPROT", "P30304")  #  UniProt accession numbers and identifiers, e.g. UNIPROT:P30304
+            r.link("CHEBI", "15422")     #  ChEBI identifiers, e.g. CHEBI:15422
+
+        """
+        url = self.url + "/link?SOURCE" +  source + "&ID=" + identifier
+        res = self.request(url)
+        return reis
 
 
 
@@ -51,19 +76,19 @@ class Reactome(WSDLService):
 
 
     """
-    def __init__(self, verbose=True, debug=False, url=None):
+    _url = "http://www.reactome.org:8080/caBIOWebApp/services/caBIOService?wsdl"
+    def __init__(self, verbose=True):
         """Constructor
 
         :param bool verbose:
-        :param bool debug:
-        :param str url: redefine the wsdl URL 
 
         """
-        if url == None:
-            url = "http://www.reactome.org:8080/caBIOWebApp/services/caBIOService?wsdl"
+        super(Reactome, self).__init__(name="Reactome", url=Reactome._url, verbose=verbose)
 
-        super(Reactome, self).__init__(name="Reactome", url=url, verbose=verbose)
-
+    def version(self):
+        r = WSDLService("version", "http://www.reactome.org:8080/caBIOWebApp/services/Version?wsdl")
+        res = r.serv.getVersion()
+        print res
 
     def queryPathwaysForReferenceIdentifiers(self, list_ids):
         """
@@ -88,21 +113,23 @@ class Reactome(WSDLService):
         """
 
             res = r.listTopLevelPathways()
+            [x.id for x in res]
 
         """
 	return self.serv.listTopLevelPathways()
 
+    def getMaxSizeInListObjects(self):
+        res = self.serv.getMaxSizeInListObjects
+        return res
+
 """
 [u'generatePathwayDiagramInSVG',
  u'generatePathwayDiagramInSVGForId',
- u'getMaxSizeInListObjects',
-i
  u'listByQuery',
  u'listObjects',
  u'listPathwayParticipants',
  u'listPathwayParticipantsForId',
  u'listTopLevelPathways',
-
  u'loadPathwayForId',
  u'loadPathwayForObject',
 

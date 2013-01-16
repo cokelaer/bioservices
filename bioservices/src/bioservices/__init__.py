@@ -36,3 +36,6 @@ from chembldb import *
 
 import picr
 from picr import *
+
+import psicquic
+from psicquic import *

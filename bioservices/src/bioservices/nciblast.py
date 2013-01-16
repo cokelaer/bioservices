@@ -35,7 +35,7 @@ class NCIBlast(RESTService):
         .. seealso:: :attr:`parameters` to get a list of the parameters.
         """
      	request = self.url + "/parameters/"
-	    res = self.request(request)
+        res = self.request(request)
         import xmltools
         data = xmltools.easyXML(res)
         return data
@@ -72,7 +72,7 @@ class NCIBlast(RESTService):
         if parameterId not in self.parameters:
             raise ValueError("Invalid parameterId provided(%s). " % parameterId)
         request = self.url + "/parameterdetails/" + parameterId 
-	    data = self.request(request)
+        data = self.request(request)
         import xmltools
         res = xmltools.easyXML(data)
 

@@ -18,7 +18,13 @@ REST.
     WSDL schema.
 
 
-.. contents::
+Web services is an integration and inter-operation technology, to ensure client and server software from various sources will work well together, the technology is built on open standards:
+
+    Representational state transfer (REST): a software architecture style.
+    Simple Object Access Protocol (SOAP): a messaging protocol for transporting information.
+    Web Services Description Language (WSDL): a method for describing Web Services and their capabilities.
+
+
 
 
 Kegg service
