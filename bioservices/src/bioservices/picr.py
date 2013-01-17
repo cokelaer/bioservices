@@ -62,7 +62,7 @@ class PICR(RESTService):
 
         >>> p = PICR()
         >>> p.getMappedDatabaseNames()
-        >>> results = p.getUPIForSequence(self._sequence_eample, ["IPI", "ENSEMBL", "SWISSPROT"])
+        >>> results = p.getUPIForSequence(self._sequence_example, ["IPI", "ENSEMBL", "SWISSPROT"])
 
 
     """
@@ -251,7 +251,7 @@ class PICR(RESTService):
         ::
 
             >>> res = p.getUPIForBLAST(p._blastfrag_example, "SWISSPROT")
-            >>> res = p.getUPIForBLAST(p._blastfrag_example, "SWISSPROT",i
+            >>> res = p.getUPIForBLAST(p._blastfrag_example, "SWISSPROT",
                    program="blastp",matrix="BLOSUM80")
 
         """

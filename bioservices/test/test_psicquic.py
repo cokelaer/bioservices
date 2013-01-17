@@ -1,8 +1,3 @@
-"""
-
-
-
-"""
 from bioservices import *
 
 
@@ -23,7 +18,7 @@ class test_psicquic(PSICQUIC):
         N2 = len(self.registry_versions)
         N2 = len(self.registry_restricted)
         assert N1 == N2
-       
+
     def test_query(self):
 
         self.query("intact", "brca2", "tab27")
@@ -33,9 +28,9 @@ class test_psicquic(PSICQUIC):
             self.query("matxdb", "*", "xml25")
             assert False
         except:
-            assert True    
+            assert True
 
- 
+
         self.query("matrixdb", "*", "xml25", firstResult=10, maxResults=10)
 
         # accessing the string DB

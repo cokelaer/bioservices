@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: latin-1 -*-
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #

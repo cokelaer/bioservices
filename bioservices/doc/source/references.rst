@@ -54,7 +54,7 @@ Kegg module
 NCIBlast module
 ================
 
-.. automodule:: bioservices.nciblast
+.. automodule:: bioservices.ncbiblast
     :members:
     :undoc-members:
     :synopsis:

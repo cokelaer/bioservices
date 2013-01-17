@@ -1,18 +1,38 @@
+#!/usr/bin/python
+# -*- coding: latin-1 -*-
+#
+#  This file is part of bioservices software
+#
+#  Copyright (c) 2011-2013 - EMBL-EBI
+#
+#  File author(s): 
+#      https://www.assembla.com/spaces/bioservices/team
+#
+#  Distributed under the GPLv3 License.
+#  See accompanying file LICENSE.txt or copy at
+#      http://www.gnu.org/licenses/gpl-3.0.html
+#
+#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  documentation: http://packages.python.org/bioservices
+#
+##############################################################################
 """Interface to the NCBIBLAST web service
 
 .. topic:: What is NCBIBLAST ?
 
-    :URL:
+    :URL: http://blast.ncbi.nlm.nih.gov/
     :service: http://www.ebi.ac.uk/Tools/webservices/services/sss/ncbi_blast_rest
 
-    NCBI BLAST - Protein Database Query
+    .. highlights::
 
-    The emphasis of this tool is to find regions of sequence similarity, 
-    which will yield functional and evolutionary clues about the structure
-    and function of your novel sequence.
+        "NCBI BLAST - Protein Database Query
 
-    Rapid sequence database search programs utilizing the BLAST algorithm. For more information 
-    on NCBI BLAST refer to http://www.ebi.ac.uk/Tools/sss/ncbiblast
+        The emphasis of this tool is to find regions of sequence similarity,
+        which will yield functional and evolutionary clues about the structure
+        and function of your novel sequence."
+
+        -- from NCBIblast web page
+
 
 """
 
@@ -22,8 +42,30 @@ import xmltools
 
 __all__ = ["NCBIblast"]
 
+
 class NCBIblast(RESTService):
-    """
+    """Interface to the `NCBIblast <http://blast.ncbi.nlm.nih.gov/>`_ service.
+
+
+    ::
+
+        >>> from bioservices import *
+        >>> s = NCBIblast(verbose=False)
+        >>> jobid = n.run(program="blastp", sequence=n._sequence_example,
+            stype="protein", database="uniprotkb", email="name@provider")
+        >>> s.getResult(jobid, "out")
+
+    When running a blast request, a program is required. You can obtain the
+    list using::
+
+        >>> s.parametersDetails("program")
+        [u'blastp', u'blastx', u'blastn', u'tblastx', u'tblastn']
+
+    * blastn: Search a nucleotide database using a nucleotide query
+    * blastp: Search protein database using a protein query
+    * blastx: Search protein database using a translated nucleotide query
+    * tblastn     Search translated nucleotide database using a protein query
+    * tblastx     Search translated nucleotide database using a translated nucleotide query
 
 
     """
@@ -31,20 +73,26 @@ class NCBIblast(RESTService):
     _url = "http://www.ebi.ac.uk/Tools/services/rest/ncbiblast"
     _sequence_example = "MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS"
     def __init__(self, verbose=True):
-        """NCBIblast constructor"""
+        """.. rubric:: NCBIblast constructor
+
+        :param bool verbose: prints informative messages
+
+        """
         super(NCBIblast, self).__init__(name="NCBIblast", url=NCBIblast._url, verbose=verbose)
         self._parameters = None
         self._parametersDetails = {}
 
     def getParameters(self):
-        """List parameter names. 
+        """List parameter names.
 
          :returns: An XML document containing a list of parameter names.
 
             >>> n = ncbiblast.NCBIBlast()
             >>> res = n.getParameters()
+            >>> [x.text for x in res.findAll("id")]
 
-        .. seealso:: :attr:`parameters` to get a list of the parameters.
+        .. seealso:: :attr:`parameters` to get a list of the parameters without
+            need to process the XML output.
         """
         request = self.url + "/parameters/"
         res = self.request(request)
@@ -58,17 +106,19 @@ class NCBIblast(RESTService):
             parameters = [x.text for x in res.getchildren()]
             self._parameters = parameters
         return self._parameters
-    parameters = property(_get_parameters, doc="return list of parameters")
+    parameters = property(_get_parameters, doc=r"""Read-only attribute that
+returns a list of parameters.\n
+.. seealso:: :meth:`getParameters`""")
 
     def parametersDetails(self, parameterId):
-        """Get detailed information about a parameter. 
+        """Get detailed information about a parameter.
 
         :returns: An XML document providing details about the parameter or a list
-            of values that can take the parameters if the XML could be parsed. 
+            of values that can take the parameters if the XML could be parsed.
 
         For example::
 
-            >>> ivalues = n.parametersDetails("matrix") 
+            >>> n.parametersDetails("matrix")
             [u'BLOSUM45',
              u'BLOSUM50',
              u'BLOSUM62',
@@ -84,7 +134,7 @@ class NCBIblast(RESTService):
 
         if parameterId not in self._parametersDetails.keys():
 
-            request = self.url + "/parameterdetails/" + parameterId 
+            request = self.url + "/parameterdetails/" + parameterId
             res = self.request(request)
             self._parametersDetails[parameterId] = res
 
@@ -100,30 +150,31 @@ class NCBIblast(RESTService):
 
 
     def run(self, program=None, database=None, sequence=None,stype="protein", email=None, **kargs):
-        """
+        """ Submit a job with the specified parameters.
+
+        .. python ncbiblast_urllib2.py -D ENSEMBL --email "test@yahoo.com" --sequence
+        .. MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS
+        .. --program blastp --database uniprotkb
 
 
-
-python ncbiblast_urllib2.py -D ENSEMBL --email "test@yahoo.com" --sequence MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS --program blastp --database uniprotkb
-
-        email     User e-mail address.
-        title     an optional title for the job.
-
-        .. rubric:: Compulsary arguments
+        .. rubric:: compulsary arguments
 
         :param str program: BLAST program to use to perform the search (e.g., blastp)
-        :param str type: Query sequence type. One of: dna, rna or protein.
         :param str sequence: Query sequence. The use of fasta formatted sequence is recommended.
-        :param list database: List of database names for search. 
-        :param str email: a valid email address
+        :param list database: List of database names for search or possible a single string (for one database).
+            there are some mismatch between the output of parametersDetails("database") and
+            the accepted values. For instance UniProt Knowledgebase should be
+            given as "uniprotkb".
+        :param str email: a valid email address. Will be checked by the service itself.
 
         .. rubric:: optional arguments. If not provided, a default value will be used
 
+        :param str type: Query sequence type in 'dna', 'rna' or 'protein' (default is protein).
         :param str matrix: Scoring matrix to be used in the search. (e.g., BLOSUM45)
         :param bool gapalign:  Perform gapped alignments.
         :param int alignments:     Maximum number of alignments displayed in the output.
         :param exp:     E-value threshold.
-        :param bool filter:  Low complexity sequence filter to process the query 
+        :param bool filter:  Low complexity sequence filter to process the query
             sequence before performing the search.
         :param int scores:     Maximum number of scores displayed in the output.
         :param int dropoff:     Amount score must drop before extension of hits is halted.
@@ -132,48 +183,61 @@ python ncbiblast_urllib2.py -D ENSEMBL --email "test@yahoo.com" --sequence MDSTN
         :param int gapext:     Penalty for each base/residue in a gap.
         :param seqrange: Region of the query sequence to use for the search. Default: whole sequence.
 
-	The up to data values accepted for each of these parameters can be 
+
+        :return: a jobid that can be analysed with :meth:`getResult`,
+            :meth:`getStatus`, ...
+
+        The up to data values accepted for each of these parameters can be
         retrieved from the :meth:`parametersDetails`.
 
-        For instance,:: 
+        For instance,::
 
             n = NCBIblast()
             n.parameterDetails("program")
 
-            n.run(program="blastp", 
-                 sequence=n._sequence_example, 
-                 stype="protein", 
-                 database="uniprotkb", 
+        Example::
+
+            jobid = n.run(program="blastp",
+                 sequence=n._sequence_example,
+                 stype="protein",
+                 database="uniprotkb",
                  email="test@yahoo.fr")
+
+        database can be a list of databases::
 
             database=["uniprotkb", "uniprotkb_swissprot"]
 
-        Cases are not important. Spaces in the database case should be replaced by underscore.
+        The returned object is a jobid, which status can be checked. It must be
+        finished before analysing/geeting the results.
+
+        .. seealso:: :meth:`getResult`
+
+        .. warning:: Cases are not important. Spaces in the database case should be replaced by underscore.
 
         """
         # There are compulsary arguments:
-        if program==None or sequence==None or database==None:
-            raise ValueError("program, sequence and database must be provided")
+        if program==None or sequence==None or database==None or email==None:
+            raise ValueError("program, sequence, email  and database must be provided")
 
         from easydev import checkParam
 
         # Here, we will check the arguments values (not the type)
-        # Arguments will be checked by the service itself but if we can 
+        # Arguments will be checked by the service itself but if we can
         # catch some before, it is better
         checkParam(program, self.parametersDetails("program"))
         checkParam(stype, ["protein", "dna", "rna"])
 
         # So far, we have these parameters
         params = {
-            'program': program, 
-            'sequence': sequence, 
+            'program': program,
+            'sequence': sequence,
             'email': email,
             'stype': stype}
 
         # all others are optional (actually type is also optional)
         # We can check all of the optional argument provided automatically.
-        # this is fine for now but note for instance that stype could not be put 
-        # here because what is returned by parametersDetails is not exactly what 
+        # this is fine for now but note for instance that stype could not be put
+        # here because what is returned by parametersDetails is not exactly what
         # is expected.
         for k,v in kargs.iteritems():
              print k,v
@@ -183,7 +247,7 @@ python ncbiblast_urllib2.py -D ENSEMBL --email "test@yahoo.com" --sequence MDSTN
         # similarly for the database, we must process it by hand because ther
         # can be more than one database
         print params
-        #checkParam(database.lower(), [str(x.replace(" ", "_").lower()) 
+        #checkParam(database.lower(), [str(x.replace(" ", "_").lower())
         #    for x in self.parametersDetails("database")])
         if isinstance(database, list):
             databases = database[:]
@@ -194,15 +258,6 @@ python ncbiblast_urllib2.py -D ENSEMBL --email "test@yahoo.com" --sequence MDSTN
         DBs = "&database=" + "&database=".join(databases)
 
         """
-parser.add_option('-E', '--exp', help='E-value threshold')
-parser.add_option('-f', '--filter', action="store_true", help='low complexity sequence filter')
-parser.add_option('-n', '--alignments', type='int', help='maximum number of alignments')
-parser.add_option('-s', '--scores', type='int', help='maximum number of scores')
-parser.add_option('-d', '--dropoff', type='int', help='dropoff score')
-parser.add_option('--match_score', help='match/missmatch score')
-parser.add_option('-o', '--gapopen', type='int', help='open gap penalty')
-parser.add_option('-x', '--gapext', type='int', help='extend gap penalty')
-parser.add_option('-g', '--gapalign', action="store_true", help='optimise gap alignments')
 parser.add_option('--seqrange', help='region within input to use as query')
 # General options
 parser.add_option('--title', help='job title')
@@ -214,21 +269,28 @@ parser.add_option('--polljob', action="store_true", help='get job result')
 parser.add_option('--status', action="store_true", help='get job status')
 parser.add_option('--resultTypes', action='store_true', help='get result types')
     """
-       
-         
-
         print DBs
-        res = self.requestPost("http://www.ebi.ac.uk/Tools/services/rest/ncbiblast/run/", 
+        res = self.requestPost("http://www.ebi.ac.uk/Tools/services/rest/ncbiblast/run/",
             params, extra=DBs)
-        
+
         return res
 
 
     def getStatus(self, jobid):
-        """Return status of a nbciblast jobID 
+        """Get status of a submitted job
 
         :param str jobid:
-        :return: FINISHED, RUNNING, NOT_FOUND
+        :param str jobid: a job identifier returned by :meth:`run`.
+        :return: a string giving the jobid status (e.g. FINISHED).
+
+         The values for the status are:
+
+         *   RUNNING: the job is currently being processed.
+         *   FINISHED: job has finished, and the results can then be retrieved.
+         *   ERROR: an error occurred attempting to get the job status.
+         *   FAILURE: the job failed.
+         *   NOT_FOUND: the job cannot be found.
+
 
         """
         requestUrl = self.url + '/status/' + jobid
@@ -236,39 +298,62 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
         return res
 
 
-    def getResultTypes(self, jobid, verbose=True):
-        """
+    def getResultTypes(self, jobid):
+        """ Get available result types for a finished job.
 
+        :param str jobid: a job identifier returned by :meth:`run`.
+        :param bool verbose: print the identifiers together with their label,
+            mediaTypes, description, filesuffix
+
+        :return: a dictionary, which keys correspond to the identifiers. Each
+            identifier is itself a dictionary containing the label, description,
+            file suffix and media Type of the identifier.
         """
+        if self.getStatus(jobid)!='FINISHED':
+            self.logging.warning("waiting for the job to be finished. May take a while")
+            self.wait(jobid, verbose=False)
         requestUrl = self.url + '/resulttypes/' + jobid
         res = self.request(requestUrl, format="xml")
 
+        output = {}
+        def myf(x):
+            if len(x)==0: return ""
+            else: return x[0].text
 
-        identifiers = [x.findAll('identifier')[0].text for x in res['type']]
-        labels = [[y.text for y in x.findAll('label')] for x in res['type']]
-        mediaTypes = [[y.text for y in x.findAll('mediaTypes')] for x in res['type']]
-        descriptions = [[y.text for y in x.findAll('description')] for x in res['type']]
-        fileSuffix = [[y.text for y in x.findAll('fileSuffix')] for x in res['type']]
+        descriptions = [myf(x.findall("description")) for x in res.getchildren()]
+        identifiers = [myf(x.findall("identifier")) for x in res.getchildren()]
+        mediaTypes = [myf(x.findall("mediaType")) for x in res.getchildren()]
+        labels = [myf(x.findall("label")) for x in res.getchildren()]
+        suffixes = [myf(x.findall("fileSuffix")) for x in res.getchildren()]
 
-        if verbose==True:
-            for i, ident in enumerate(identifiers):
-                print(" ".join([ident, str(descriptions[i]), 
-                    str(labels[i]), str(mediaTypes[i]), str(fileSuffix[i])]))
-        return res
+        for i, ident in enumerate(identifiers):
+            output[ident] = {'label':labels[i], 'mediaType': mediaTypes[i],
+                'description':descriptions[i], 'fileSuffix':suffixes[i]}
+
+        return output
 
     #def save(self, jobId, identifier, fileSuffix):
-    #    filename = jobId + '.' + str(resultType['identifier']) + '.' + \ 
+    #    filename = jobId + '.' + str(resultType['identifier']) + '.' + \
     #        str(resultType['fileSuffix'])
 
 
 
 
     # TODO need to check that jobid is finished
-    def getResult(self, jobid, type):
+    def getResult(self, jobid, resultType):
+        """ Get the job result of the specified type.
+
+
+        :param str jobid: a job identifier returned by :meth:`run`.
+        :param str  resultType: type of result to retrieve. See :meth:`getResultTypes`.
         """
-        """
-        requestUrl = self.url + '/result/' + jobid + '/' + type
-        res = self.request(requestUrl, format=type)
+        if self.getStatus(jobid)!='FINISHED':
+            self.logging.warning("waiting for the job to be finished. May take a while")
+            self.wait(jobid, verbose=False)
+        if self.getStatus(jobid) != "FINISHED":
+            raise ValueError("job is not finished")
+        requestUrl = self.url + '/result/' + jobid + '/' + resultType
+        res = self.request(requestUrl, format=resultType)
 
         #todo
         #create filename and save
@@ -279,14 +364,30 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
         return res
 
 
-    def clientPoll(self, jobId, checkInterval=1):
+    def wait(self, jobId, checkInterval=2, verbose=True):
+        """This function checks the status of a jobid while it is running
+
+        :param str jobid: a job identifier returned by :meth:`run`.
+        :param int checkInterval: interval between requests in seconds.
+
+        """
         import sys
+        import time
+
+        if checkInterval<1:
+            raise ValueError("checkInterval must be positive and less than minute")
         result = 'PENDING'
         while result == 'RUNNING' or result == 'PENDING':
             result = self.getStatus(jobId)
-            print >> sys.stderr, result
+            if verbose:
+                print >> sys.stderr, jobId, " is ", result
             if result == 'RUNNING' or result == 'PENDING':
                 time.sleep(checkInterval)
+        return result
 
 
+    def _get_database(self):
+        return self.parametersDetails
+    databases = property(_get_database,
+        doc=r"""Returns accepted databases. Alias to *parametersDetails('database')*""")
 

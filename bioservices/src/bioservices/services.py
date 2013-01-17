@@ -231,17 +231,28 @@ class RESTService(Service):
         return user_agent
 
 
-    def request(self, url, format="xml"):
+    def request(self, url, format="xml", baseUrl=True):
         """Send a request via an URL to a web service.
 
-        :param str url: the well formed URL
+        :param str url: a well formed URL. 
         :param str format: If the expected output is in XML
             format it will be converted with :meth:`easyXML`. If the returned document
             is not in XML, format should be set to any other value.
+        :param str baseUrl: append the url parameter to the :attr:`url`
+            attribute, which is the default URL of the service. Sometimes, you
+            do not want since you already provided the entire URL. If so, set this 
+            parameter to False. 
 
 
         .. note:: this is a HTTP GET request 
         """
+        if url.startswith(self.url):
+            pass
+        elif baseUrl == False:
+            pass
+        else:
+            url = self.url + "/" +  url
+
         logging.info("REST.bioservices.%s request begins" % self.name)
         logging.info("--Fetching url=%s" % url)
 
@@ -264,7 +275,9 @@ class RESTService(Service):
             raise
 
     def requestPost(self, requestUrl, params, extra=None):
-        """
+        """request with a POST method.
+
+        Use by ncbiblast service.
 
         .. note:: this is a HTTP POST request 
         """

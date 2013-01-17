@@ -38,7 +38,7 @@ Here is a list of services that you can access from **bioservices**:
     bioservices.rhea.Rhea
     bioservices.uniprot.UniProt
     bioservices.wsdbfetch.WSDbfetch
-    bioservices.nciblast.NCIBlast
+    bioservices.ncbiblast.NCBIblast
     bioservices.psicquic.PSICQUIC
     bioservices.wikipathway.Wikipath
 

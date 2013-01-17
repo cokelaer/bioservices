@@ -56,7 +56,7 @@ setup(
     classifiers      = metainfo['classifiers'],
 
     # package installation
-    package_dir = {'bioservices':'src'},
+    package_dir = {'':'src'},
     packages = ['bioservices'],
     #package_dir  = package_dir,
     install_requires = ["easydev>=0.5.5", "BeautifulSoup"],

@@ -1,11 +1,11 @@
-# -*- python -*-
+#!/usr/bin/python
+# -*- coding: latin-1 -*-
 #
 #  This file is part of bioservices software
 #
-#  Copyright (c) 2011-2013 - EBI-EMBL
+#  Copyright (c) 2011-2013 - EMBL-EBI
 #
 #  File author(s): 
-#      Thomas Cokelaer <cokelaer@ebi.ac.uk>
 #      https://www.assembla.com/spaces/bioservices/team
 #
 #  Distributed under the GPLv3 License.
