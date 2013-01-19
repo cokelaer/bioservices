@@ -13,4 +13,5 @@ xmldata = """
 
 def test_easyXML():
     res = easyXML(xmldata)
-
+    print res
+    res['parameter']

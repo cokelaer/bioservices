@@ -18,6 +18,7 @@ class TestPICR(picr.PICR):
         assert len(self.databases)>0
 
     def test_MappedDB(self):
+        #res = xmltools.easyXML(res)
         self.getMappedDatabaseNames()
 
     def test_checkDB(self):
@@ -31,9 +32,9 @@ class TestPICR(picr.PICR):
     def test_getUPIForAccession(self):
         self.getUPIForAccession(self._accession_example, ["SWISSPROT"])
         self.getUPIForAccession(self._accession_example, "SWISSPROT", taxid="9606")
-        res = self.getUPIForAccession(self._sequence_example, "SWISSPROT", onlyactive=False, includeattributes=False)
+        res = self.getUPIForAccession(self._accession_example, "SWISSPROT", onlyactive=False, includeattributes=False)
 
     def test_getUPIForBLAST(self):
-        self.getUPIForBLAST(self._blastfrag_example, "ENSEMBL_HUMAN", taxid="9606")
-        self.getUPIForBLAST(self._blastfrag_example, ["ENSEMBL_HUMAN"], taxid="9606", includeattributes=False)
-        self.getUPIForBLAST(self._blastfrag_example, ["ENSEMBL_HUMAN"], taxid="9606", program="blastp",matrix="BLOSUM62")
+        self.getUPIForBLAST(self._blastfrag_example, "SWISSPROT", taxid="9606")
+        self.getUPIForBLAST(self._blastfrag_example, ["SWISSPROT"], taxid="9606", includeattributes=False)
+        self.getUPIForBLAST(self._blastfrag_example, ["SWISSPROT"], taxid="9606", program="blastp",matrix="BLOSUM62")
