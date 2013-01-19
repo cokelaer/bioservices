@@ -82,14 +82,14 @@ class BioModels(WSDLService):
 
     ::
 
-        >>> from bioservices import biomodels
-        >>> b = biomodels.BioModels()
-        >>> model = b.getModelSBMLById('BIOMD0000000299')
+        >>> from bioservices import *
+        >>> s = BioModels()
+        >>> model = s.getModelSBMLById('BIOMD0000000299')
 
     The number of models available can be retrieved easily as well as the model IDs::
 
-        >>> len(b)
-        >>> b.modelsID
+        >>> len(s)
+        >>> s.modelsId
 
 
     """
@@ -264,6 +264,7 @@ class BioModels(WSDLService):
 
         ::
 
+            >>> from bioservices import *
             >>> b = BioModels()
             >>> b.getModelSBMLById('MODEL1006230101')
 
@@ -292,8 +293,9 @@ class BioModels(WSDLService):
 
         .. doctest::
  
-            >>> b = BioModel()
-            >>> b.getModelsIdByChEBIId('CHEBI:4978')
+            >>> from bioservices import *
+            >>> s = BioModels()
+            >>> s.getModelsIdByChEBIId('CHEBI:4978')
             ['BIOMD0000000404']
 
         """
@@ -398,12 +400,12 @@ records.
 
 
             >>> ID = 'BIOMD0000000033'
-            >>> b.serv.getSimpleModelsByIds(ID)
+            >>> res = s.serv.getSimpleModelsByIds(ID)
 
         Working Uniprot Id returns the same Model (sameId) but note the
         reference. It is now a uniprot reference::
 
-            >>> b.serv.getSimpleModelsByUniprotIds('P10113')
+            >>> res = b.serv.getSimpleModelsByUniprotIds('P10113')
 
         The issue is to figure out the uniprot Id from the model... similarly to        the search with Reactome Id, we provide a function to retrieve Uniprot 
         Id found in the models.
@@ -421,7 +423,7 @@ records.
 
         ::
 
-            >>> b.getModelsIdByName("2009")
+            >>> res = b.getModelsIdByName("2009")
 
         """
         

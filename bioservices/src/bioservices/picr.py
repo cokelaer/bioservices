@@ -35,11 +35,7 @@ access to the REST interface of the PICR web service. There is also a SOAP web s
         source databases. Mappings can be limited by source database, taxonomic ID and
         activity status in the source database. Users can copy/paste or upload files
         containing protein identifiers or sequences in FASTA format to obtain mappings
-        using the interactive interface. Search results can be viewed in simple or
-        detailed HTML tables or downloaded as comma-separated values (CSV) or Microsoft
-        Excel (XLS) files suitable for use in a local database or a spreadsheet.
-        Alternatively, a SOAP interface is available to integrate PICR functionality in
-        other applications, as is a lightweight REST interface."
+        using the interactive interface. "
 
         -- From the PICR home page, Dec 2012
 
@@ -61,8 +57,9 @@ class PICR(RESTService):
     .. doctest::
 
         >>> p = PICR()
-        >>> p.getMappedDatabaseNames()
-        >>> results = p.getUPIForSequence(self._sequence_example, ["IPI", "ENSEMBL", "SWISSPROT"])
+        >>> res = p.getMappedDatabaseNames() # get list of valid database
+        >>> results = p.getUPIForSequence(p._sequence_example, \
+                ["IPI", "ENSEMBL", "SWISSPROT"])
 
 
     """
@@ -86,7 +83,6 @@ class PICR(RESTService):
         """
         url = self.url + "/getMappedDatabaseNames"
         res = self.request(url)
-        #x = xmltools.easyXML(res)
         return res
 
     def _get_databases(self):
@@ -120,9 +116,9 @@ class PICR(RESTService):
 
         .. doctest::
 
-            >>> from bioservices import picr
-            >>> p = picr.PICR()
-            >>> sequence="MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS"
+            >>> from bioservices import PICR
+            >>> p = PICR()
+            >>> sequence = p._sequence_example
             >>> databases = ["IPI", "ENSEMBL", "SWISSPROT"]
             >>> results = p.getUPIForSequence(sequence, databases)
 
@@ -147,13 +143,9 @@ class PICR(RESTService):
             url += "&includeattributes=false"
         if onlyactive == False:
             url += "&onlyactive=false"
-        #if onlyactive
 
-        #print url
 
-        #res = urllib2.urlopen(url).read()
         res = self.request(url)
-        #res = xmltools.easyXML(res)
         return res
 
     def _checkDBname(self, db):
@@ -190,9 +182,10 @@ class PICR(RESTService):
 
         ::
 
-            >>> p = picr.PICR()
-            >>> p.getUPIForAccession("P29375", ["IPI", "ENSEMBL"])
-            >>> p.getUPIForAccession("P29375-1", ["IPI", "ENSEMBL"])
+            >>> from bioservices import *
+            >>> s = PICR()
+            >>> s.getUPIForAccession("P29375", ["IPI", "ENSEMBL"])
+            >>> s.getUPIForAccession("P29375-1", ["IPI", "ENSEMBL"])
         """
 
         url = self.url + "/getUPIForAccession?accession=" + accession
@@ -210,7 +203,6 @@ class PICR(RESTService):
         if onlyactive == False:
             url += "&onlyactive=false"
         res = self.request(url)
-        #res = xmltools.easyXML(res)
         return res
 
     def getUPIForBLAST(self, blasfrag, database,
@@ -277,7 +269,6 @@ class PICR(RESTService):
         else:
             res = self.request(url)
 
-        #res = xmltools.easyXML(res)
         return res
 
 

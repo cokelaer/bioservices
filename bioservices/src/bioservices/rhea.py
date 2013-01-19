@@ -22,15 +22,25 @@
 .. topic:: What is Rhea ?
 
     :URL: http://www.ebi.ac.uk/rhea/
+    :Citations: See http://www.ebi.ac.uk/rhea/about.xhtml
 
     .. highlights::
 
-        Rhea is a freely available, manually annotated database of chemical
-        reactions created in collaboration with the Swiss Institute of Bioinformatics
-        (SIB). All data in Rhea is freely accessible and available for anyone to
-        use. 
+        Rhea is a reaction database, where all reaction participants (reactants
+        and products) are linked to the ChEBI database (Chemical Entities of 
+        Biological Interest) which provides detailed information about structure,
+        formula and charge. Rhea provides built-in validations that ensure both 
+        elemental and charge balance of the reactions... While the main focus of 
+        Rhea is enzyme-catalysed reactions, other biochemical reactions are also 
+        are included.
 
-        -- from Rhea Home page, Dec 2012
+        The database is extensively cross-referenced. Reactions are currently linked 
+        to the EC list, KEGG and MetaCyc, and the reactions will be used in the 
+        IntEnz database and in all relevant UniProtKB entries. Furthermore, the 
+        reactions will also be used in the UniPathway database to generate 
+        pathways and metabolic networks.
+
+        -- from Rhea Home page, Dec 2012 (http://www.ebi.ac.uk/rhea/about.xhtml)
 
 """
 from services import RESTService
@@ -43,7 +53,7 @@ class Rhea(RESTService):
     """Interface to the `Rhea <http://www.ebi.ac.uk/rhea/rest/1.0/>`_ service
 
     You can search by compound name, ChEBI ID, reaction ID, cross reference
-    (e.g. EC number) or citation (author name, title, abstract text, publication ID).
+    (e.g., EC number) or citation (author name, title, abstract text, publication ID).
     You can use double quotes - to match an exact phrase - and the following
     wildcards: 
 
@@ -67,12 +77,10 @@ class Rhea(RESTService):
     See :meth:`search` :meth:`entry` methods for more information about format.
 
     """
-    def __init__(self, version="1.0",  verbose=True,
-        url="http://www.ebi.ac.uk/rhea/rest"):
-
+    _url = "http://www.ebi.ac.uk/rhea/rest"
+    def __init__(self, version="1.0",  verbose=True):
         """.. rubric:: Rhea constructor
 
-        :param str url: should not be used in principle.
         :param str version: the current version of the interface (1.0)
         :param bool verbose: True by default
 
@@ -81,8 +89,7 @@ class Rhea(RESTService):
             >>> from bioservices import Rhea
             >>> r = Rhea()
         """
-
-        super(Rhea, self).__init__(name="Rhea", url=url, 
+        super(Rhea, self).__init__(name="Rhea", url=Rhea._url, 
             verbose=verbose)
         self.version = version
         self.format_entry = ["cmlreact", "biopax2", "rxn"]
@@ -135,25 +142,17 @@ class Rhea(RESTService):
         ::
 
             >>> print r.entry(10280)
+            >>> print r.entry(10281,format="rxn")
 
         The output is in XML format. This page from the Rhea web site explains 
         what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of 
         the XML file.
         """
-        if format not in self.format_entry:
-            raise ValueError("format is incorrect (%s). Must be one of\
-                %s" % (format, str(self.format_entry)))
+        self.checkParam(format, self.format_entry)
         url = self.url + "/" + self.version + "/ws/reaction/%s/%s" % (format, id)
 
         if format=="rxn":
-            save = self.easyXMLConversion
-            try:
-                self.easyXMLConversion = False
-                response = self.request(url)
-            except:
-                pass
-            finally:
-                self.easyXMLConversion = save
+            response = self.request(url, format)
         else:
             response = self.request(url)
         return response

@@ -18,10 +18,11 @@
 ##############################################################################
 #$Id$
 """This module provides a class :class:`~Kegg` that allows an easy access to all the
-WDSL Kegg interface as well as additional methods to obtain statistics about the
+REST Kegg interface as well as additional methods to obtain statistics about the
 Kegg database. See below for details about the functionalities available and the
 tutorial/quickstart :ref:`kegg_tutorial`.
 
+A previous imterface to the KEGG WSDL service is available but 
 
 .. topic:: What is KEGG ?
 
@@ -45,28 +46,31 @@ tutorial/quickstart :ref:`kegg_tutorial`.
 Some terminology 
 --------------------
 
-This list is taken from Kegg API page and slightly edited.
+The following list is a simplified taken from Kegg API page.
 
 
 * organisms (**org**) are made of a three-letter (or four-letter) code (e.g., hsa
-  stands for Human Sapiens) used in KEGG (see
-  :meth:`~bioservices.kegg.Kegg.organisms`). 
+  stands for Human Sapiens) used in KEGG (see  :attr:`~bioservices.kegg.Kegg.organismIds`). 
 * **db** is a database name used in GenomeNet service. See
-  :meth:`~bioservices.kegg.Kegg.databases`
+  :attr:`~bioservices.kegg.Kegg.databases`
 * **entry_id** is a unique identifier that is a combination of the database name
   and the identifier of an entry joined by a colon sign (e.g. 'embl:J00231'
   means an EMBL entry 'J00231').
   **entry_id** includes:
 
     * **genes_id**: identifier consisting of 'keggorg' and a gene name (e.g. 'eco:b0001' means an E. coli gene 'b0001').
-    * **enzyme_id**: identifier consisting of database name 'ec' and an enzyme code used in KEGG/LIGAND ENZYME database. (e.g. 'ec:1.1.1.1' means an alcohol dehydrogenase enzyme)
+    * **enzyme_id**: identifier consisting of database name 'ec' and an 
+      enzyme code used in KEGG/LIGAND ENZYME database. (e.g. 
+      'ec:1.1.1.1' means an alcohol dehydrogenase enzyme). See 
+      :attr:`~bioservices.kegg.Kegg.enzymeIds`.
     * **compound_id**: identifier consisting of database name 'cpd' and a
       compound number used in KEGG COMPOUND / LIGAND database (e.g. 'cpd:C00158'
       means a citric acid). Some compounds also have 'glycan_id' and
       both IDs are accepted and converted internally.
+      See :attr:`~bioservices.kegg.Kegg.compoundIds`.
     * **drug_id**: identifier consisting of database name 'dr' and a compound
       number used in KEGG DRUG / LIGAND database (e.g. 'dr:D00201' means a
-      tetracycline).
+      tetracycline). See :attr:`~bioservices.kegg.Kegg.drugIds`.
     * **glycan_id**: identifier consisting of database name 'gl' and a glycan
       number used in KEGG GLYCAN database (e.g. 'gl:G00050' means a
       Paragloboside). Some glycans also have 'compound_id' and both
@@ -75,6 +79,7 @@ This list is taken from Kegg API page and slightly edited.
     * **reaction_id**:  identifier consisting of database name 'rn' and a
       reaction number used in KEGG/REACTION (e.g. 'rn:R00959' is a reaction
       which catalyze cpd:C00103 into cpd:C00668).
+      See :attr:`~bioservices.kegg.Kegg.reactionIds` attribute.
     * **pathway_id**: identifier consisting of 'path' and a pathway number used
       in KEGG/PATHWAY. Pathway numbers prefixed by 'map' specify the reference
       pathway and pathways prefixed by the 'keggorg' specify pathways specific
@@ -89,6 +94,7 @@ This list is taken from Kegg API page and slightly edited.
       KO (KEGG Orthology) is an classification of orthologous genes defined by
       KEGG (e.g. 'ko:K02598' means a KO group for nitrite transporter NirC
       genes).
+      See :attr:`~bioservices.kegg.Kegg.koIds` attribute.
     * **ko_class_id**: identifier which is used to classify 'ko_id' hierarchically 
       (e.g. '01110' means a 'Carbohydrate Metabolism' class).
       `URL:http://www.genome.jp/dbget-bin/get_htext?KO`   
@@ -173,17 +179,17 @@ class Kegg(RESTService):
     _valid_DB_base = ["module", "disease", "drug","environ", "ko", 
         "genome", "compound", "glycan", "reaction", "rpair", "rclass", 
         "enzyme"]
-
-    _valid_databases_info = _valid_DB_base + ["pathway", "brite", "genes", "ligand", "genomes", "kegg"]
+    _valid_DB = _valid_DB_base + ["pathway", "brite", "genes", "ligand", \
+        "organism", "genomes", "orthology"]
+    _valid_databases_info = _valid_DB_base + ["pathway", "brite", "genes",\
+        "ligand", "genomes", "kegg"]
     _valid_databases_list = _valid_DB_base + ["pathway", "brite", "organism"]
     _valid_databases_find = _valid_DB_base + ["pathway", "genes", "ligand"] 
     _valid_databases_link = _valid_DB_base + ["pathway", "brite"] 
-
-
     def __init__(self, verbose=True):
         """.. rubric:: Constructor
 
-        :param bool verbose:
+        :param bool verbose: prints informative messages
 
         """
         super(Kegg, self).__init__(name="Kegg", url="http://rest.kegg.jp", verbose=verbose)
@@ -631,6 +637,10 @@ class Kegg(RESTService):
         return allStatus
 
     # wrapper of all databases to ease access to them (buffered)
+
+    def _get_db(self):
+        return Kegg._valid_DB
+    databases = property(_get_db, doc="returns list of databases")
 
     def _get_database(self, dbname, mode=0):
         res = self.request(self.url + "/list/%s" % dbname)

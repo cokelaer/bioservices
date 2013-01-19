@@ -39,10 +39,11 @@ __all__ = ["QuickGO"]
 class QuickGO(RESTService):
     """Interface to the `QuickGO <http://www.ebi.ac.uk/QuickGO/WebServices.html>`_ service
 
+    .. doctest::
 
-    >>> from bioservices import QuickGO
-    >>> g = QuickGO()
-    >>> g.Term("GO:0003824")
+        >>> from bioservices import QuickGO
+        >>> s = QuickGO()
+        >>> res = s.Term("GO:0003824")
 
     """
     _goid_example = "GO:0003824"
@@ -71,8 +72,8 @@ class QuickGO(RESTService):
         ::
 
             from bioservices import QuickGO
-            g = QuickGO()
-            g.Term("GO:0003824")
+            s = QuickGO()
+            s.Term("GO:0003824")
 
 
         """
@@ -199,8 +200,7 @@ class QuickGO(RESTService):
 
         # aspect parameter
         if termUse != None:
-            if termUse != 'slim':
-                 raise ValueError("Invalid aspect (%s) must be in %s" % (aspect, ['slim']))
+            self.checkParam(termUse, ["slim"])
             params['termUse'] = termUse
 
         if relType:

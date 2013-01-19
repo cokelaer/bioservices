@@ -23,6 +23,7 @@ import urllib
 import urllib2
 import platform
 import logging
+import easydev
 from  easydev import checkParam
 
 
@@ -43,19 +44,25 @@ class Service(object):
 
         :param str name: a name for this service
         :param str url: its URL
-        :param bool verbose: prints informative message if True (default is
+        :param bool verbose: prints informative messages if True (default is
             True)
 
-        The attribute :attr:`debugLevel` can be used to further refine the
-        logging messages that uses the standard :mod:`logging` module. If
-        verbose is True, the debugLebel is set to INFO. If verbose if False, the
-        debugLevel is set to WARNING. However, you can use the
-        :attr:`debugLevel` attribute to change it to one of DEBUG, INFO,
-        WARNING, ERROR, CRITICAL. debugLevel=WARNING means that only WARNING,
-        ERROR and CRITICAL messages are shown/
+        All instances have an attribute called :attr:`~Service.logging` that is an instance 
+        of the :mod:`logging` module. It can be used to print information, warning, 
+        error messages::
+
+            self.logging.info("informative message")
+            self.logging.warning("warning message")
+            self.logging.error("error message")
+ 
+        The attribute :attr:`~Service.debugLevel`  can be used to set the behaviour 
+        of the logging messages. If the argument verbose is True, the debugLebel 
+        is set to INFO. If verbose if False, the debugLevel is set to WARNING. 
+        However, you can use the :attr:`debugLevel` attribute to change it to 
+        one of DEBUG, INFO, WARNING, ERROR, CRITICAL. debugLevel=WARNING means 
+        that only WARNING, ERROR and CRITICAL messages are shown.
 
         """
-
         self._url = None
         self.url = url
         self.name = name
@@ -82,13 +89,16 @@ class Service(object):
         logging.basicConfig(level=self._debugLevel)
     def _get_level(self):
         return self._debugLevel
-    debugLevel = property(_get_level, _set_level)
+    debugLevel = property(_get_level, _set_level, 
+        doc="One of INFO, DEBUG, WARNING, CRITICAL, ERROR")
 
     def _get_url(self):
         return self._url
     def _set_url(self, url):
-        url = url.rstrip("/")
-        self._url = url
+        # something more clever here to check the URL e.g. starts with http
+        if url!= None:
+            url = url.rstrip("/")
+            self._url = url
     url = property(_get_url, _set_url, doc="URL of this service")
 
     def _get_easyXMLConversion(self):
@@ -108,17 +118,29 @@ easyXML object (Default behaviour).""")
 
         The easyXML object provides utilities to ease access to the XML
         tag/attributes.
+
+        Here is a simple example starting from the following XML
+
+        .. doctest::
+
+            >>> from bioservices import *
+            >>> doc = "<xml> <id>1</id> <id>2</id> </xml>"
+            >>> s = Service("name")
+            >>> res = s.easyXML(doc)
+            >>> res.findAll("id")
+            [<id>1</id>, <id>2</id>]
+
         """
         import xmltools
         return xmltools.easyXML(res)
 
     def urlencode(self, params):
-        """Returns a string compatible with URL request.
-
-        The pair of key/value are converted into a single string by concatenated
-        the "&key=value" string for each key/value in the dictionary.
+        """Returns a string compatible with a URL request.
 
         :param dict params: a dictionary. Keys are parameters.
+
+        The pair of key/value are converted into a single string by concatenated
+        the "&key=value" string for each key/value in the dictionary. 
 
         ::
 
@@ -126,9 +148,9 @@ easyXML object (Default behaviour).""")
             >>> urlencode(params)
             "a=1&b=2"
 
-        returns "a=1&b=2" or "b=2&a=1" since dictionary are not ordered. Note
-        that the first parameter is not preceded by a & sign that you will need
-        to add. 
+        .. note:: returns "a=1&b=2" or "b=2&a=1" since dictionary are not ordered. Note
+            that the first parameter is not preceded by a & sign that you will need
+            to add. 
 
         """
         if isinstance(params, dict)==False:
@@ -138,12 +160,31 @@ easyXML object (Default behaviour).""")
         return postData
 
     def checkParam(self, param, valid_values):
-        __doc__ = checkParam.__doc__
-        checkParam(param, valid_values)
+        """Simple utility to check that a parameter has a valid value 
+
+        :param param:
+        :param valid_values:
+
+        Calls :func:`easydev.tools.checkParam`
+
+        ::
+
+            checkParam(aboolean, [True, False])
+            checkParam(mode, ["mean", "std", "skew"])
+        """        
+        easydev.tools.checkParam(param, valid_values)
+
+    def __str__(self):
+        txt = "This is an instance of %s service" % self.name
+        return txt
 
 
 class WSDLService(Service):
-    """A common class to ease access to web services (WSDL protocol)"""
+    """Class dedicated to the web services based on WSDL/SOAP protocol.
+
+    .. seealso:: :class:`RESTService`, :class:`Service`
+
+    """
 
     def __init__(self, name, url, verbose=True):
         """.. rubric:: Constructor
@@ -152,9 +193,10 @@ class WSDLService(Service):
         :param str url: the URL of the WSDL service
         :param bool verbose: prints informative messages
 
-        Attributes are:
+        The :attr:`serv` give  access to all WSDL functionalities of the service.
 
-        * :attr:`Pathway.serv` 
+        The :attr:`methods` is an alias to self.serv.methods and returns 
+        the list of functionalities.
 
         """
         super(WSDLService, self).__init__(name, url, verbose=verbose)
@@ -231,27 +273,28 @@ class RESTService(Service):
         return user_agent
 
 
-    def request(self, url, format="xml", baseUrl=True):
-        """Send a request via an URL to a web service.
+    def request(self, path, format="xml", baseUrl=True):
+        """Send a request via an URL to the web service.
 
-        :param str url: a well formed URL. 
+        :param str path: the request will be formed as self.url+/+path 
         :param str format: If the expected output is in XML
-            format it will be converted with :meth:`easyXML`. If the returned document
-            is not in XML, format should be set to any other value.
-        :param str baseUrl: append the url parameter to the :attr:`url`
-            attribute, which is the default URL of the service. Sometimes, you
-            do not want since you already provided the entire URL. If so, set this 
-            parameter to False. 
+            format then it will be converted with :meth:`easyXML`. If the 
+            returned document is not in XML, format should be set to any other 
+            value.
+        :param str baseUrl: By default, the path argument is appended to the 
+            :attr:`url` attribute (the main REST URL). However, sometimes, you
+            would prefer to provide the entire URL yourself (e.g. in psicquic service)
+            If so, set this baseUrl argument to False. 
 
 
         .. note:: this is a HTTP GET request 
         """
-        if url.startswith(self.url):
-            pass
+        if path.startswith(self.url):
+            url = path
         elif baseUrl == False:
-            pass
+            url = path
         else:
-            url = self.url + "/" +  url
+            url = self.url + "/" +  path
 
         logging.info("REST.bioservices.%s request begins" % self.name)
         logging.info("--Fetching url=%s" % url)
@@ -277,7 +320,7 @@ class RESTService(Service):
     def requestPost(self, requestUrl, params, extra=None):
         """request with a POST method.
 
-        Use by ncbiblast service.
+        Use by ::`ncbiblast` service.
 
         .. note:: this is a HTTP POST request 
         """

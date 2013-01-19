@@ -85,8 +85,10 @@ class NCBIblast(RESTService):
     def getParameters(self):
         """List parameter names.
 
-         :returns: An XML document containing a list of parameter names.
+        :returns: An XML document containing a list of parameter names.
 
+        ::
+ 
             >>> n = ncbiblast.NCBIBlast()
             >>> res = n.getParameters()
             >>> [x.text for x in res.findAll("id")]

@@ -17,7 +17,7 @@
 #
 ##############################################################################
 #$Id$
-"""This module will include common tools to manipulate XML files"""
+"""This module includes common tools to manipulate XML files"""
 import xml.etree.ElementTree as ET
 import BeautifulSoup
 
@@ -25,27 +25,36 @@ __all__ = ["easyXML"]
 
 
 class easyXML(object):
-    """class to ease the introspection of XML document.
+    """class to ease the introspection of XML documents.
 
     This class uses the standard xml module as well as the package BeautifulSoup
-    to help introspecting the XML programmatically.
+    to help introspecting the XML documents.
 
     :: 
 
-        >>> import nciblast
-        >>> n = nciblast.NCIBlast()
-        >>> res = n.parameters() # res is an instance of easyXML
-	    # You can retreive XML from this instance of easyXML and print the content
-        # in a more human-readable way.
-        >>> print res
+        >>> from bioservices import *
+        >>> n = ncbiblast.NCBIblast()
+        >>> res = n.getParameters() # res is an instance of easyXML
+	>>> # You can retreive XML from this instance of easyXML and print the content
+        >>> # in a more human-readable way.
         >>> res.soup.findAll('id') # a Beautifulsoup instance is available
         >>> res.root # and the root using xml.etree.ElementTree
 
+    There is a getitem so you can type::
+
+        res['id']
+
+    which is equivalent to::
+        
+        res.soup.findAll('id')
+
+    There is also aliases findAll and prettify.
+
     """
     def __init__(self, data):
-        """Constructor
+        """.. rubric:: Constructor
 
-        :param data: a document in XML format
+        :param data: an XML document format
 
         """
         self.data = data[:]
@@ -55,14 +64,17 @@ class easyXML(object):
         self.findAll = self.soup.findAll
 
     def getchildren(self):
-        """returns all children of the root XML document"""
+        """returns all children of the root XML document
+
+        This is just an alias to self.soup.getchildren()
+        """
         return self.root.getchildren()
 
     def _get_soup(self):
         if self._soup == None:
             self._soup = BeautifulSoup.BeautifulSoup(self.data)
         return self._soup
-    soup = property(_get_soup)
+    soup = property(_get_soup, doc="Returns the beautiful soup instance")
 
     def __str__(self):
         txt = self.soup.prettify()

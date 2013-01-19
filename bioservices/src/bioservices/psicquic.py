@@ -131,7 +131,7 @@ class PSICQUIC(RESTService):
     This service provides a common interface to more than 25 other services
     related to protein. So, we won't detail all the possiblity of this service.
     Here is an example that consists in looking for interaction between the
-    protein called ZAP70 within the 
+    protein called ZAP70 within the ::
 
         >>> from bioservices import *
         >>> s = psicquic.PSICQUIC()
@@ -140,7 +140,7 @@ class PSICQUIC(RESTService):
         11
         >>> # Let us look at the second one in particular:
         >>> for x in res[1].split("\t"): 
-        ... print x
+        ...     print x
         uniprotkb:O95169
         uniprotkb:P43403
         intact:EBI-716238
@@ -148,6 +148,10 @@ class PSICQUIC(RESTService):
         psi-mi:ndub8_human(display_long)|uniprotkb:NADH-ubiquinone oxidoreductase ASHI
         .
         .
+
+    Another reaction with reactome::
+
+        res = s.query("reactome", "Q9Y266")
 
     """
 
