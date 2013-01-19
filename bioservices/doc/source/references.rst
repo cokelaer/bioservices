@@ -27,7 +27,7 @@ xmltools module
 Services
 #############
 
-biomodels module
+BioModels
 ====================
 
 .. automodule:: bioservices.biomodels
@@ -35,7 +35,7 @@ biomodels module
     :undoc-members:
     :synopsis:
 
-QuickGO module
+QuickGO
 ================
 
 .. automodule:: bioservices.quickgo
@@ -43,7 +43,7 @@ QuickGO module
     :undoc-members:
     :synopsis: 
 
-Kegg module
+Kegg
 ===================================================================
 
 .. automodule:: bioservices.kegg
@@ -51,7 +51,7 @@ Kegg module
     :undoc-members:
     :synopsis: 
 
-NCIBlast module
+NCBIblast
 ================
 
 .. automodule:: bioservices.ncbiblast
@@ -59,8 +59,15 @@ NCIBlast module
     :undoc-members:
     :synopsis:
 
+PICR module
+===================================================================
 
-PSICQUIC module
+.. automodule:: bioservices.picr
+    :members:
+    :undoc-members:
+    :synopsis:
+
+PSICQUIC
 ================
 
 .. automodule:: bioservices.psicquic
@@ -68,7 +75,7 @@ PSICQUIC module
     :undoc-members:
     :synopsis:
 
-Rhea module
+Rhea
 ==============
 
 .. automodule:: bioservices.rhea
@@ -76,7 +83,7 @@ Rhea module
     :undoc-members:
     :synopsis:
 
-Reactome module
+Reactome
 =====================
 
 .. automodule:: bioservices.reactome
@@ -84,7 +91,7 @@ Reactome module
     :undoc-members:
     :synopsis:
 
-uniprot module
+Uniprot
 ===================================================================
 
 .. automodule:: bioservices.uniprot
@@ -92,7 +99,7 @@ uniprot module
     :undoc-members:
     :synopsis:
 
-wsdbfetch module
+wsdbfetch
 ===================================================================
 
 .. automodule:: bioservices.wsdbfetch
@@ -100,7 +107,7 @@ wsdbfetch module
     :undoc-members:
     :synopsis:
 
-wikipath module
+Wikipathway
 ===================================================================
 
 .. automodule:: bioservices.wikipathway
@@ -109,11 +116,4 @@ wikipath module
     :synopsis:
 
 
-picr module
-===================================================================
-
-.. automodule:: bioservices.picr
-    :members:
-    :undoc-members:
-    :synopsis:
 
