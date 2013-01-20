@@ -48,7 +48,7 @@ based on Lucene's syntax.
   be searched together) or terms containing special characters that may otherwise
   be interpreted by our query engine (eg. ':' in a GO term)
 * Use parenthesis for complex queries (e.g. '(XXX OR YYY) AND ZZZ')
-* Wildcards (*,?) can be used between letters in a term or at the end of terms to do fuzzy queries,
+* Wildcards (`*`,?) can be used between letters in a term or at the end of terms to do fuzzy queries,
    but never at the beginning of a term. 
 * Optionally, you can prepend a symbol in from of your term.
     *  + (plus): include this term. Equivalent to AND. e.g. +P12345

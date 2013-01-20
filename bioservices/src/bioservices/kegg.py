@@ -474,6 +474,7 @@ class Kegg(RESTService):
                ncbi-geneid, uniprot or any KEGG organism
             #. chemical substance identifiers. The database used can be one of
                drug, compound, glycan, pubchem or chebi only.
+
         .. note:: if the second argument is a dbentries, target and dbentries
             cannot be swapped.
 

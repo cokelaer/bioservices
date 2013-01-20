@@ -72,7 +72,6 @@ class ReactomeURL(RESTService):
 class Reactome(WSDLService):
     """Interface to the `Reactome <http://www.reactome.org>`_ service
 
-    ::
 
 
     """
