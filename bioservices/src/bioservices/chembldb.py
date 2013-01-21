@@ -170,25 +170,25 @@ class Chembl(RESTService):
         pass
 
         def __get_image_of_compound_by_ChEMBLID(self, k, dimension=None, file_out=None):
-        """
-        Description: Get the image of a given compound.
-        Input: Compound ChEMBLID
-        Output: Byte array image data
-        Example URL: http://www.ebi.ac.uk/chemblws/compounds/CHEMBL192/image
-        Example URL with dimensions parameter: http://www.ebi.ac.uk/chemblws/compounds/CHEMBL192/image?dimensions=200
-        """
-        url='http://www.ebi.ac.uk/chemblws/compounds/%s/image'%k
-        if dimension is not None:
-            url += '?dimension=%s'%dimension
-        target_data = urllib2.urlopen(url).read()
-        if file_out is None:
-            file_out = os.getcwd()
-            file_out += '/%s.png'%k
-        FILE = open(file_out,'w')
-        FILE.write(target_data)
-        FILE.close()
-        print "saved to %s"%file_out
-        webbrowser.open(file_out)
+            """
+            Description: Get the image of a given compound.
+            Input: Compound ChEMBLID
+            Output: Byte array image data
+            Example URL: http://www.ebi.ac.uk/chemblws/compounds/CHEMBL192/image
+            Example URL with dimensions parameter: http://www.ebi.ac.uk/chemblws/compounds/CHEMBL192/image?dimensions=200
+            """
+            url='http://www.ebi.ac.uk/chemblws/compounds/%s/image'%k
+            if dimension is not None:
+                url += '?dimension=%s'%dimension
+            target_data = urllib2.urlopen(url).read()
+            if file_out is None:
+                file_out = os.getcwd()
+                file_out += '/%s.png'%k
+            FILE = open(file_out,'w')
+            FILE.write(target_data)
+            FILE.close()
+            print "saved to %s"%file_out
+            webbrowser.open(file_out)
 
 
 
