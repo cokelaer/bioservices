@@ -203,7 +203,7 @@ class Chembl(RESTService):
         pass
 
 
-    def get_target_by_uniprotId()
+    def get_target_by_uniprotId():
         """
         Description: Get individual target by UniProt Accession Id
         Input: UniProt Accession Id
@@ -263,4 +263,6 @@ class Chembl(RESTService):
         Input: Assay ChEMBLID
         Output: List of all bioactivity records in ChEMBLdb for a given assay ChEMBLID
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/assays/CHEMBL1217643/bioactivities
-        Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/assays/CHEMBL1217643/bioactivities.json 
+        Example URL (JSON Output):
+http://www.ebi.ac.uk/chemblws/assays/CHEMBL1217643/bioactivities.json """
+        pass
