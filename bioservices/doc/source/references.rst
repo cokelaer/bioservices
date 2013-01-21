@@ -35,6 +35,14 @@ BioModels
     :undoc-members:
     :synopsis:
 
+ChEMBL
+==========
+
+.. automodule:: bioservices.chembldb
+    :members:
+    :undoc-members:
+    :synopsis:
+
 QuickGO
 ================
 

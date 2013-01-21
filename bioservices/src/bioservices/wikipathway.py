@@ -34,7 +34,6 @@
         -- From WikiPathway web site. Dec 2012
 
 
- u'getColoredPathway',
 
 """
 from services import WSDLService, RESTService
@@ -95,7 +94,6 @@ class Wikipath(WSDLService):
     Not implemented at all:
 
       * getXrefList netheir WSDL or REST seemed to work
-      * u'getColoredPathway',
       * u'getCurationTagHistory' (no API found in Wikipathway web page)
       * u'getRelations' (no API found in WikiPathway web page)
     """
@@ -182,7 +180,7 @@ class Wikipath(WSDLService):
         :param str organism:  The name of the organism to refine the search
             (default is self.organism)
         :param bool raw: if True, returns the output of the request without post processing
-        .param bool interactionOnly: returns only the interactions (default). If
+        :param bool interactionOnly: returns only the interactions (default). If
             true, returns also scores, revision, pathways
         :returns: depends on the parameters **raw** and **interactionOnly**. By default, 
             the output from wikipathway is processed and only the interactions
@@ -327,7 +325,8 @@ class Wikipath(WSDLService):
 
         """
         self.checkParam(filetype, ['gpml','png','svg','pdf','txt','pwf', 'owl'])
-        res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, revision = revisionNumb)
+        res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, 
+             revision = revisionNumb)
         return base64.b64decode(res)
 
     def savePathwayAs(self, pathwayId, filename, revisionNumb = 0, display = True):
@@ -358,7 +357,7 @@ class Wikipath(WSDLService):
         """
         webbrowser.open(filename)
 
-    def updatePathway(self, pathwayId, describeChanges, gpmlCode, revisionNumb, authInfo):
+    def updatePathway(self, pathwayId, describeChanges, gpmlCode, revision=0):
         """Update a pathway on the wiki with the given GPML code.
 
         .. warning:: interface not exposed in bioservices.
@@ -377,6 +376,7 @@ class Wikipath(WSDLService):
 
         :returns: boolean True if the pathway was updated successfully.
         """
+        #self.authInfo
         raise NotImplementedError
         #return self.serv.updatePathway(pwId = pathwayId,
         #description = describeChanges, gpml = gpmlCode, revision = revisionNumb, auth = authInfo)
@@ -399,25 +399,29 @@ class Wikipath(WSDLService):
         raise NotImplementedError
         #return self.serv.createPathway(gpml = gpmlCode, auth = authInfo)
 
-    def saveCurationTag(self, pathwayId, name, revisionNumb, authInfo, text = None):
+    #def saveCurationTag(self, pathwayId, name, revisionNumb, authInfo, text = None):
+    def saveCurationTag(self, pathwayId, name, revisionNumb):
         """Apply a curation tag to a pathway. This operation will overwrite any existing tag with the same name.
 
         .. warning:: interface not exposed in bioservices.
 
         :param str pathwayId: the pathway identifier.
         """
-        if text == None:
-           res = self.serv.saveCurationTag(pwId = pathwayId, tagName = name, revision = revisionNumb, auth = authInfo)
-        else:
-           res =  self.serv.saveCurationTag(pwId = pathwayId, tagName = name, tagText = text, revision = revisionNumb, auth = authInfo)
-        return res
+        raise NotImplementedError
+        # use the login function to store the authInfo argument
+        #if text == None:
+        #   res = self.serv.saveCurationTag(pwId = pathwayId, tagName = name, revision = revisionNumb, auth = authInfo)
+        #else:
+        #   res =  self.serv.saveCurationTag(pwId = pathwayId, tagName = name, tagText = text, revision = revisionNumb, auth = authInfo)
+        #return res
 
-    def removeCurationTag(self, pathwayId, name, authInfo):
+    def removeCurationTag(self, pathwayId, name):
         """Remove a curation tag from a pathway.
 
         .. warning:: interface not exposed in bioservices.
 
         """
+        #self.authInfo
         raise NotImplementedError
         #return self.serv.removeCurationTag(pwId = pathwayId, tagName = name, auth = authInfo)
 

@@ -1,22 +1,34 @@
-"""
-For more help go to https://www.ebi.ac.uk/chembldb/index.php/ws
+"""This module provides a class :class:`Chembl` 
 
-ChEMBL REST API Methods
------------------------
+.. topic:: What is ChEMBL 
 
-Using the ChEMBL web service API users can retrieve data from the ChEMBL
-database in a programmatic fashion. The following list defines the currently
-supported functionality and defines the expected inputs and outputs of each
-method.
+    :URL:  https://www.ebi.ac.uk/chembldb/index.php/
+
+    .. highlights::
+
+        "Using the ChEMBL web service API users can retrieve data from the ChEMBL
+        database in a programmatic fashion. The following list defines the currently
+        supported functionality and defines the expected inputs and outputs of each
+        method."
+
+       -- From ChEMBL web page Dec 2012
+
+
+
 
 """
 from services import RESTService
 import urllib2, json, re
 
+
 class Chembl(RESTService):
-    def __init__(self):
-        super(Chembl, self).__init__(url="http://www.ebi.ac.uk/chemblws/status/", 
-            name="Chembl")
+    """Interface to `<http://www.ebi.ac.uk/chembldb/index.php>`_ 
+
+    """
+    _url = "http://www.ebi.ac.uk/chemblws/"
+    def __init__(self, verbose=True):
+        super(Chembl, self).__init__(url=Chembl._url, 
+            name="Chembl", verbose=verbose)
 
 
     # wrapper for functions
@@ -37,15 +49,14 @@ class Chembl(RESTService):
 
     
     def api_status(self):
+        """ Check API status
+
+        :return: Response is the string 'UP' if services are running
         """
-        Description: Check API status
-        Input: N.A.
-        Output: Response is the string 'UP' if services are running
-        Example URL: http://www.ebi.ac.uk/chemblws/status/
-        """
-        url = "http://www.ebi.ac.uk/chemblws/status/"
-        target_data = urllib2.urlopen(url).read()
-        return target_data
+        "http://www.ebi.ac.uk/chemblws/status/"
+        #target_data = urllib2.urlopen(url).read()
+        res = self.request("status/", format="txt")
+        return res
 
 
     def get_compound_by_ChemblId(url='http://www.ebi.ac.uk/chemblws/compounds/%s.json'):
