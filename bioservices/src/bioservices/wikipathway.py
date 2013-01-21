@@ -4,7 +4,7 @@
 #
 #  Copyright (c) 2011-2013 - EBI-EMBL
 #
-#  File author(s): 
+#  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
 #      https://www.assembla.com/spaces/bioservices/team
 #
@@ -17,19 +17,40 @@
 #
 ##############################################################################
 #$Id: $
+"""Interface to the WikiPathway service
+
+.. topic:: What is WikiPathway ?
 
 
-from services import WSDLService
+    :URL: http://www.wikipathways.org/index.php/WikiPathways
+    :WSDL: http://www.wikipathways.org/index.php/Help:WikiPathways_Webservice/API
+    :Citation: `doi:10.1371/journal.pone.0006447 <http://www.plosone.org/article/info:doi/10.1371/journal.pone.0006447>`_
 
+    .. highlights::
+
+        " WikiPathways is an open, public platform dedicated to the curation of
+        biological pathways by and for the scientific community."
+
+        -- From WikiPathway web site. Dec 2012
+
+
+ u'getColoredPathway',
+
+"""
+from services import WSDLService, RESTService
 import copy, webbrowser, xmltools, base64
 
 
-class Items2(object):
+__all__ = ["Wikipath"]
+
+
+# this is useless but let us keep for now
+class _Items2(object):
     def __init__(self, data, name = 'item', verbose = True):
         self.data = data
-        
+
         self._items = copy.deepcopy(data)
-        self.definitions = self._items  ## Consider replace self_items with this variable 
+        self.definitions = self._items  ## Consider replace self_items with this variable
 #    def _get_entry_ids(self):
 #    def _get_definitions(self):
 #        ids = [x[
@@ -45,91 +66,144 @@ class Items2(object):
     name = property(_get_names, doc = "return list of names")
 
     def _get_items(self):
-        return self._items    
+        return self._items
     items = property(_get_items,doc=_get_items.__doc__)
     #def _get_entry_ids(self):
 
 
 class Wikipath(WSDLService):
-    """Interface to the WikiPathways database
-    
-    ::
-    
-       import wikipathway
-       w = wikipathway.WikiPath()
-       w.methods
-       
-       w.organism #'Homo sapiens', by default
+    """Interface to `Pathway <http://www.wikipathways.org/index.php>`_ service
 
-      Examples:
-            w.findPathwaysByText('MTOR')
-            w.getPathway('WP1471')
-            w.getPathwaysByOntologyTerm('DOID:344')
-            w.findPathwaysByXref('P45985')
+    .. doctest::
+
+       >>> from bioservices import *
+       >>> s = Wikipath()
+       >>> s.organism  # default organism
+       'Homo sapiens'
+
+    Examples::
+
+        s.findPathwaysByText('MTOR')
+        s.getPathway('WP1471')
+        s.getPathwaysByOntologyTerm('DOID:344')
+        s.findPathwaysByXref('P45985')
+
+    The methods that require a login are not implemented (:meth:`login`,
+    :meth:`updatePathway`, :meth:`removeCurationTag`, :meth:`saveCurationTag`,
+    :meth:`createPathway`)
+
+    Not implemented at all:
+
+      * getXrefList netheir WSDL or REST seemed to work
+      * u'getColoredPathway',
+      * u'getCurationTagHistory' (no API found in Wikipathway web page)
+      * u'getRelations' (no API found in WikiPathway web page)
     """
-    _url = 'http://www.wikipathways.org/wpi/webservice/webservice.php?wsdl' 
+    _url = 'http://www.wikipathways.org/wpi/webservice/webservice.php?wsdl'
     def __init__(self, verbose = True):
-        """Constructor
+        """.. rubric:: Constructor
 
         :param bool verbose:
-        :param bool debug:
-        :param str url: redefine the wsdl URL 
 
         """
 
         super(Wikipath, self).__init__(name="Wikipathway", url=Wikipath._url, verbose = verbose)
-#        self._pathways = {}
-#        self.path
-        self._keywords = '' 
-#        print self.methods[:]
         self._organism = 'Homo sapiens' ## This function is redundant (see class service)
         self.logging.info("Fetching organisms...")
+
+        #: Get a list of all available organisms.
         self.organisms = self.serv.listOrganisms()
 
 #        self.recentChanges = Items2(self.serv.getRecentChanges(time
 
     def _set_organism(self, organism):
-        if organism in self.organisms.items:
-            self._organism = organism         
+        if organism in self.organisms:
+            self._organism = organism
         else:
-            print "'%s' is not supported in Wikipathways" % organism
+            raise ValueError("'%s' is not supported in Wikipathways. See :attr:`organisms`" % organism)
 
     def _get_organism(self):
         return self._organism
     organism = property(_get_organism, _set_organism, doc = "read/write attribute for the organism")
 
-    def _set_keywords(self, keywords):
-        self._keywords = keywords    
+    # REST /findPathwaysByLiterature?query=18651794
+    def findPathwaysByLiterature(self, query):
+        """Find pathways by their literature references.
 
-    def _get_keywords(self):
-        return self._keywords
-    keywords = property(_get_keywords, _set_keywords, doc = "read/write attribute for the organism")
+        :param str query: The query, can be a pubmed id, author name or title keyword.
+        :return:  array of WSSearchResult descr=The search results. {{{descr}}}
 
-    def findPathwaysByText(self, keywords, organism = None): 
-        """Set "organism == ''" to search on all organisms
-           Find a nice way to implemen the AND/OR"""
-        if organism == None:
-            organism = self.organism
-            res = self.serv.findPathwaysByText(query = keywords, species = organism)
-        else: 
-            res = self.serv.findPathwaysByText(query = keywords, species = organism)
+        ::
+
+            s.findPathwaysByLiterature(18651794)
+        """
+        res = self.serv.findPathwaysByLiterature(query=query)
         return res
 
     def findPathwaysByXref(self, id_list):
-        if isinstance(id_list,str):
-            res = self.serv.findPathwaysByXref(ids = id_list)
-        return res 
+        """Find pathways by searching on the external references of DataNodes
 
-    def findInteractions(self, id_list, organism = None, raw = False, verbose = False):
+
+        This function suppots only 1 ids and 1 code at a time. To specify 
+        multiple ids and codes parameters to query for multiple xrefs at once,
+        the REST syntax should be used. In that case, the number of ids and 
+        codes parameters should match, they will be paired to form xrefs, 
+        e.g.::
+
+            s = RESTService("test", url=self.url[:-5])
+            s.request('/findPathwaysByXref?ids=1234&ids=ENSG00000130164&codes=L&codes=EnHs')
+            s.request('/findPathwaysByXref?ids=1234&codes=L')
+
+        :param str string ids: One DataNode identifier(s) (e.g. 'P45985').
+            Datanodes can be (gene/protein/metabolite identifiers). 
+        :param str codes: One code of the database system to limit the search
+            to. **Not implemented**
+        :return:  list of WSSearchResult An array of search results with DataNode GraphId stored in the 'field' hash.
+
+
+        ::
+
+            s.findPathwaysByXref(ids="P45985")
+
+
+        .. warning:: code is not available. Does not see to work in WSDLinterface
+        """
+        # codes=code but does not see to work
+        res = self.serv.findPathwaysByXref(ids=id_list)
+        return res
+
+    #REST: s.url[:-5] + ?query=P53
+    def findInteractions(self, query, organism=None, raw=False,
+        interactionOnly=True):
+        """Find interactions defined in WikiPathways pathways.
+
+
+        :param str query:  The name of an entity to find interactions for (e.g. 'P53')
+        :param str organism:  The name of the organism to refine the search
+            (default is self.organism)
+        :param bool raw: if True, returns the output of the request without post processing
+        .param bool interactionOnly: returns only the interactions (default). If
+            true, returns also scores, revision, pathways
+        :returns: depends on the parameters **raw** and **interactionOnly**. By default, 
+            the output from wikipathway is processed and only the interactions
+            are returned for the default organism. You can change this behaviour
+            by changing the default arguments (raw, organism, interactionOnly)
+
+        .. warning:: interface different from the service. The organism
+            parameter allow to refine the search to a specific organism.  to return a
+            formatted output, set raw to True
+        """
         if raw:
-            return self.serv.findInteractions(query = id_list)
+            return self.serv.findInteractions(query=query)
         else:
             output = {'interactions':[],'scores':[],'pathway_ids':[],'revision':[],}
             intA = []
             intB = []
             if organism == None:
                 organism = self.organism
-            for x in self.serv.findInteractions(query = id_list):
+            for x in self.serv.findInteractions(query=query):
+                if 'species' not in x._keyord:
+                    continue
                 if x['species'] == organism:
                     intA.append(x['fields'][1]['values'])
                     intB.append(x['fields'][2]['values'])
@@ -137,43 +211,137 @@ class Wikipath(WSDLService):
                     output['pathway_ids'].append(x['id'])
                     output['revision'].append(x['revision'])
             output['interactions'] = zip(intA,intB)
-            if verbose:
-                return output 
+            if interactionOnly==True:
+                return output
             else:
                 return output['interactions']
 
     def listPathways(self, organism = None):
+        """Get a list of all available pathways.
+
+        :param str organism: a valid organism (default is the :attr:`organism` attribute)
+        :return: Only return list of pathways for this organism
+
+        """
         if organism == None:
             return self.serv.listPathways(organism = self.organism)
         else:
+            self.checkParam(organism, self.organisms)
             return self.serv.listPathways(organism = organism)
-#    def lookfor_pathway(
 
-    def getPathway(self, pathwayId, revisionNumb = 0):
-        return self.serv.getPathway(pwId = pathwayId, revision = revisionNumb) 
+    def getPathway(self, pathwayId, revision=0):
+        """Download the pathway from WikiPathways.
+
+        :param str pathwayId: the pathway identifier.
+        :param int revision: the revision number of the pathway (use '0'
+            for most recent version).
+        :Returns: the pathway.
+
+        ::
+
+            s.getPathway("WP2320")
+        """
+        return self.serv.getPathway(pwId=pathwayId, revision=revision)
 
     def getPathwayInfo(self, pathwayId):
-        return self.serv.getPathwayInfo(pwId = pathwayId)
+        """Get some general info about the pathway
+
+        :param str pathwayId: the pathway identifier.
+           Info can be the name, species, without downloading the GPML.
+
+        ::
+
+            >>> from bioservices import *
+            >>> s= Wikipath(verbose=False)
+            >>> s.getPathwayInfo("WP2320")
+        """
+        return self.serv.getPathwayInfo(pwId=pathwayId)
 
     def getPathwayHistory(self, pathwayId, date):
-        return self.serv.getPathwayHistory(pwId = pathwayId, timestamp = date)
+        """Get the revision history of a pathway.
 
-    def getRecentChanges(self, dateNtime):
-        return self.serv.getRecentChanges(timestamp = dateNtime)
+        :param str pathwayId: the pathway identifier.
+        :param str date: limit the results by date, only history items after
+            the given date (timestamp format) will be included. can be a string
+            or number of the form YYYYMMDDHHMMSS.
+        :return: the revision history
 
-#    def login(self, usrname, password):
-#        return self.serv.login(name = usrname, pass = password)
+        .. warning:: does not seem to work with WSDL. Replace REST version but
+            unstable: does not return the results systematically.
 
-    def getPathwayAs(self, pathwayId, filetype = 'owl', revisionNumb = 0, verbose = False):
+        ::
+
+            s.getPathwayHistory("WP4", 20110101000000)
+        """
+        s = RESTService("WP", url=self.url[:-5], verbose=False)
+        res = s.request("getPathwayHistory?pwId=%s&timestamp=%s" % (pathwayId, str(date)))
+        return res
+        # does not seem to work
+        #return self.serv.getPathwayHistory(pwId=pathwayId, timestamp=date)
+
+    def getRecentChanges(self, timestamp):
+        """Get the recently changed pathways.
+
+        :param str timestamp: Only get changes from after this time. Timestamp
+            format: yyyymmddMMHHSS (string or number)
+        :return: the changed pathways
+
+        ::
+
+            s.getRecentChanges(20110101000000)
+        """
+        return self.serv.getRecentChanges(timestamp=timestamp)
+
+    def login(self, usrname, password):
+        """Start a logged in session using an existing WikiPathways account.
+
+        .. warning:: interface not exposed in bioservices.
+
+        This function will return an authentication code that can
+        be used to excecute methods that need authentication (e.g.
+        updatePathway).
+
+        :param str name: The username of the WikiPathways account.
+        :param str password: The password of the WikiPathways account.
+
+
+        :Returns:  string The authentication code for this session.
+
+        """
+        raise NotImplementedError
+        # for future usage. pass is a python keyword so we must use a dictionary
+        #d = {"name":usrname, "pass":password}
+        #return self.serv.login(**d)
+
+    def getPathwayAs(self, pathwayId, filetype='owl', revisionNumb=0):
+        """Download a pathway in the specified file format.
+
+        :param str pathwayId: the pathway identifier.
+        :param str filetypei: Download a pathway in the specified file format.
+        :param int revision: The revision number of the pathway (use '0' for most recent version).
+        :return: The file contents
+
+        .. warning:: argument pathwayId and filetype are inversed as compared to the
+            WSDL prototype (if you want to call it directly)
+
+
+        """
+        self.checkParam(filetype, ['gpml','png','svg','pdf','txt','pwf', 'owl'])
         res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, revision = revisionNumb)
-        if verbose:
-            return res
-        else:
-            return base64.b64decode(res)
+        return base64.b64decode(res)
 
     def savePathwayAs(self, pathwayId, filename, revisionNumb = 0, display = True):
+        """Save a pathway
+
+        :param str pathwayId: the pathway identifier.
+        :param str filename:
+        :param int revisionNumb:
+        :param bool display:
+
+        .. note:: method from bioservices. Not a wikiPathway function
+        """
         if filename.find('.') == -1:
-            filename = "%s.%s" %(filename,'pdf')  
+            filename = "%s.%s" %(filename,'pdf')
         filetype = filename.split('.')[-1]
         res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, revision = revisionNumb)
         f = open(filename,'w')
@@ -183,61 +351,227 @@ class Wikipath(WSDLService):
         f.close()
 
     def displaySavedPathwayInBrowser(self, filename):
+        """Show a document in a browser
+
+        :param str filename:
+        :return: nothing
+        """
         webbrowser.open(filename)
-        
+
     def updatePathway(self, pathwayId, describeChanges, gpmlCode, revisionNumb, authInfo):
-        return self.serv.updatePathway(pwId = pathwayId, description = describeChanges, gpml = gpmlCode, revision = revisionNumb, auth = authInfo) 
+        """Update a pathway on the wiki with the given GPML code.
+
+        .. warning:: interface not exposed in bioservices.
+
+        .. note:: To create/modify pathways via the web service, you need to
+            have an account with web service write permissions. Please contact
+            us to request write access for the web service.
+
+        :param str pwId:  The pathway identifier.
+        :param str description:  A description of the modifications.
+        :param str gpml: The updated GPML code.
+        :param int revision: The revision number of the version this GPML
+            code was based on. This is used to prevent edit conflicts in
+            case another client edited the pathway after this client downloaded it.
+        :param object WSAuth_auth:  The authentication info.
+
+        :returns: boolean True if the pathway was updated successfully.
+        """
+        raise NotImplementedError
+        #return self.serv.updatePathway(pwId = pathwayId,
+        #description = describeChanges, gpml = gpmlCode, revision = revisionNumb, auth = authInfo)
 
     def createPathway(self, gpmlCode, authInfo):
-        return self.serv.createPathway(gpml = gpmlCode, auth = authInfo) 
+        """Create a new pathway on the wiki with the given GPML code.
+
+        .. warning:: interface not exposed in bioservices.
+
+        .. note:: To create/modify pathways via the web service, you need to
+            have an account with web service write permissions. Please
+            contact us to request write access for the web service.
+
+        :param str gpml: The GPML code.
+        :param object WSAuth auth: The authentication info.
+        :returns: WSPathwayInfo The pathway info for the created pathway
+            (containing identifier, revision, etc.).
+
+        """
+        raise NotImplementedError
+        #return self.serv.createPathway(gpml = gpmlCode, auth = authInfo)
 
     def saveCurationTag(self, pathwayId, name, revisionNumb, authInfo, text = None):
+        """Apply a curation tag to a pathway. This operation will overwrite any existing tag with the same name.
+
+        .. warning:: interface not exposed in bioservices.
+
+        :param str pathwayId: the pathway identifier.
+        """
         if text == None:
            res = self.serv.saveCurationTag(pwId = pathwayId, tagName = name, revision = revisionNumb, auth = authInfo)
         else:
-           res =  self.serv.saveCurationTag(pwId = pathwayId, tagName = name, tagText = text, revision = revisionNumb, auth = authInfo) 
+           res =  self.serv.saveCurationTag(pwId = pathwayId, tagName = name, tagText = text, revision = revisionNumb, auth = authInfo)
         return res
 
     def removeCurationTag(self, pathwayId, name, authInfo):
-        return self.serv.removeCurationTag(pwId = pathwayId, tagName = name, auth = authInfo)
+        """Remove a curation tag from a pathway.
 
+        .. warning:: interface not exposed in bioservices.
+
+        """
+        raise NotImplementedError
+        #return self.serv.removeCurationTag(pwId = pathwayId, tagName = name, auth = authInfo)
+
+    #REST getCurationTags?pwId=WP4
     def getCurationTags(self, pathwayId):
+        """Get all curation tags for the given pathway.
+
+        :param str pathwayId: the pathway identifier.
+        :returns: array of WSCurationTag The curation tags.
+
+        ::
+
+            s.getCurationTags("WP4")
+        """
         return self.serv.getCurationTags(pwId = pathwayId)
 
+    # REST getCurationTagsByName?tagName=Curation:FeaturedPathway
     def getCurationTagsByName(self, name):
+        """Get all curation tags for the given tag name.
+
+        Use this method if you want to find all pathways that are tagged with a specific curation tag.
+
+
+        :param str tagName: The tag name (see Special:SpecialCurationTags for an overview of available tag names).
+        :return: array of WSCurationTag The curation tags (one instance for each pathway that has been tagged).
+
+        ::
+
+            s.getCurationTagsByName("Curation:FeaturedPathway")
+        """
         return self.serv.getCurationTagsByName(tagName = name)
 
-#    def getColoredPathway(self, pathwayId, graphIds, revisionNumb = 0, colors = None, filetype = 'pdf', verbose = False):
-#        if colors == None:
-#            colors = 'FF0000' 
-#        res = self.serv.getColoredPathway(pwId = pathwayId, revision = revisionNumb, graphId = graphIds, color = colors, fileType = filetype)
-#        if verbose:
-#            return res
-#        else:
-#            return base64.b64decode(res)
+    def getColoredPathway(self, pathwayId, filetype="png", revision=0):
+        """Get a colored image version of the pathway. 
 
-#    def getXrefList(self, pathwayId, sysCode):
-#        return self.serv.getXrefList(pwId = pathwayId, code = sysCode)  
 
-    def findPathwaysByLiterature(self, refQuery):
-        return self.serv.findPathwaysByLiterature(query = refQuery)
+        :param str pwId: The pathway identifier.
+        :param int revision: The revision number of the pathway (use '0' for most recent version). 
+        :param str fileType:  The image type (One of 'svg', 'pdf' or 'png'). Not
+            yet implemented. svg is returned
+        :returns: binary form of the image.
+
+
+        .. todo:: graphId, color parameters
+        """
+        #graphIds, revisionNumb = 0, colors = None, filetype = 'pdf', verbose = False):
+        #if colors == None:
+        #    colors = 'FF0000'
+        #res = self.serv.getColoredPathway(pwId = pathwayId, revision = revisionNumb, graphId = graphIds, color = colors, fileType = filetype)
+        res = self.serv.getColoredPathway(pwId=pathwayId, revision=revision)
+        #if verbose:
+        #    return res
+        #else:
+        return base64.b64decode(res)
+
+    #def getXrefList(self, pathwayId, sysCode):
+    #    """http://www.pathvisio.org/wiki/DatabasesMapps#Supporteddatabasesystems"""
+    #    return self.serv.getXrefList(pwId = pathwayId, code = sysCode)
+
+    def findPathwaysByText(self, query, species=None):
+        """Find pathways using a textual search on the description and text labels of the pathway objects.
+
+        The query syntax offers several options:
+
+        * Combine terms with AND and OR. Combining terms with a space is equal
+          to using OR ('p53 OR apoptosis' gives the same result as 'p53 apoptosis').
+        * Group terms with parentheses, e.g. '(apoptosis OR mapk) AND p53'
+        * You can use wildcards * and ?. * searches for one or more
+          characters, ? searchers for only one character.
+        * Use quotes to escape special characters. E.g. '"apoptosis*"' will
+          include the * in the search and not use it as wildcard.
+
+        This function supports REST-style invocation.
+        Example: http://www.wikipathways.org/wpi/webservice/webservice.php/findPathwaysByText?query=apoptosis
+
+        :param str query: The search query (e.g. 'apoptosis' or 'p53').
+        :param str species:  The species to limit the search to (leave blank to search on all species).
+        :return: array of WSSearchResult An array of search results.
+
+        ::
+
+            s.findPathwaysByText(query="p53 OR mapk",species='Homo sapiens')
+        """
+        if species == None:
+            return self.serv.findPathwaysByText(query=query)
+        else:
+            return self.serv.findPathwaysByText(query=query,species=species)
 
     def getOntologyTermsByPathway(self, pathwayId):
-        return self.serv.getOntologyTermsByPathway(pwId = pathwayId) 
+        """Get a list of ontology terms for a given pathway.
 
+
+        :param str pathwayId: the pathway identifier.
+        :return:      array of WSOntologyTerm The ontology terms.
+
+        ::
+
+            s.getOntologyTermsByPathway("WP4")
+        """
+        return self.serv.getOntologyTermsByPathway(pwId=pathwayId)
+
+    # REST getOntologyTermsByOntology?ontology=Disease
     def getOntologyTermsByOntology(self, ontologyTerm):
-        return self.serv.getOntologyTermsByOntology(ontology = ontologyTerm) 
+        """Get a list of ontology terms from a given ontology.
 
+
+        :param str ontology: The ontology term (for possible values, see the Ontology Tags section on the pathway page.
+        :return: list of WSOntologyTerm The ontology terms.
+
+        ::
+
+            >>> s.getOntologyTermsByOntology("Disease")
+
+        """
+        return self.serv.getOntologyTermsByOntology(ontology = ontologyTerm)
+
+    #REST getPathwaysByOntologyTerm?term=DOID:344
     def getPathwaysByOntologyTerm(self, ontologyTermId):
-        return self.serv.getPathwaysByOntologyTerm(term = ontologyTermId)
+        """Get a list of pathways tagged with a given ontology term.
 
+
+        :param str ontologyTermId: the ontology term identifier.
+        :returns: list of WSPathwayInfo The pathway information.
+
+        ::
+
+            >>> from bioservices import *
+            >>> s = Wikipath()
+            >>> s.getPathwaysByOntologyTerm('DOID:344')
+
+        """
+        return self.serv.getPathwaysByOntologyTerm(term=ontologyTermId)
+
+    #REST getPathwaysByParentOntologyTerm?term=DOID:344
     def getPathwaysByParentOntologyTerm(self, ontologyTermId):
+        """Get a list of pathways tagged with any ontology term that is the child of the given Ontology term.
+
+
+        :param str ontologyTermId: the ontology term identifier.
+        :returns: list of WSPathwayInfo The pathway information.
+
+
+        """
         return self.serv.getPathwaysByParentOntologyTerm(term = ontologyTermId)
 
     def showPathwayInBrowser(self, pathwayId):
+        """Show a given Pathway into your favorite browser.
+
+        :param str pathwayId: the pathway identifier.
+
+        .. note: this is a additional bioservices functionality (not a
+            wikipathway one) showing a wikipathway URL.
+
+        """
         url = self.serv.getPathwayInfo(pwId=pathwayId).url
         webbrowser.open(url)
 
-#    def get_genes_by_pathway(self, pathwayId):
-#        
-        

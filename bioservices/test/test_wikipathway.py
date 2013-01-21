@@ -1,86 +1,108 @@
 from bioservices.wikipathway import  Wikipath
+import unittest
 
 
-class test_wiki(Wikipath):
-    def __init__(self):
-        super(test_wiki, self).__init__()
+class TestRepGen(unittest.TestCase, Wikipath):
+    @classmethod
+    def setUpClass(self):
+        self.s = Wikipath()
+
+
+
+
+class test_wiki(TestRepGen):
+    @classmethod
+    def setUpClass(self):
+        super(test_wiki, self).setUpClass()
+
 
     def test_organism(self):
-        assert len(self.organisms)
-        self.organism = 'Homo sapiens'
-        assert self.organism == 'Homo sapiens'
+        assert len(self.s.organisms)
+        self.s.organism = 'Homo sapiens'
+        assert self.s.organism == 'Homo sapiens'
 
         try:
-            self.organism = 'Homo sapi'
+            self.s.organism = 'Homo sapi'
             assert False
         except ValueError:
             assert True
-            
+
+    #@unittest.skip("test")
     def test_listPathways(self): 
-        l = self.listPathways()
+        l = self.s.listPathways()
         len(l) > 40
-        l = self.listPathways("Homo sapiens")
+        l = self.s.listPathways("Homo sapiens")
         len(l) > 40
 
+    def test_getPathway(self):
+        self.s.getPathway("WP2320")
     def test_getPathwayInfo(self):
-        self.getPathwayInfo("WP2320")
+        self.s.getPathwayInfo("WP2320")
 
-    def test_getPathwayAs(self):
-        res = self.getPathwayAs("WP4", "txt")
+    def _test_getPathwayAs(self):
+        res = self.s.getPathwayAs("WP4", "txt")
         assert len(res)>0
 
+
     def test_findPathwaysByText(self):
-        res = self.findPathwaysByText(query="p53",species='Homo sapiens')
+        res = self.s.findPathwaysByText(query="p53",species='Homo sapiens')
         len([x.score for x in res]) == len(res)
-        assert len(self.findPathwaysByText(query="p53 OR mapk",species='Homo sapiens'))>0
+        assert len(self.s.findPathwaysByText(query="p53 OR mapk",species='Homo sapiens'))>0
 
     def test_getOntologyTersmByPathway(self):
-        res = self.getOntologyTermsByPathway("WP4")
+        res = self.s.getOntologyTermsByPathway("WP4")
         res[0].ontology
 
     def test_getOntologyTermsByOntology(self):
-        self.getOntologyTermsByOntology("Disease")
+        self.s.getOntologyTermsByOntology("Disease")
 
     def test_getPathwaysByOntologyTerm(self):
-        self.getPathwaysByOntologyTerm('DOID:344')
+        self.s.getPathwaysByOntologyTerm('DOID:344')
 
 
     def test_getPathwaysByParentOntologyTerm(self):
-        self.getPathwaysByParentOntologyTerm("DOID:344")
+        self.s.getPathwaysByParentOntologyTerm("DOID:344")
 
 
     def test_getCurationTags(self):
-        self.getCurationTags("WP4")
+        self.s.getCurationTags("WP4")
 
     def test_getcurationTagByNames(self):
-        self.getCurationTagsByName("Curation:Tutorial")
+        self.s.getCurationTagsByName("Curation:Tutorial")
 
     def test_findInteractions(self):
-        self.findInteractions("P53")
+        self.s.findInteractions("P53")
 
     def test_getRecentChanges(self):
-        self.getRecentChanges(20120101000000)
+        self.s.getRecentChanges(20120101000000)
 
     def test_findPathwayByXref(self):
-        self.findPathwaysByXref('P45985')
+        self.s.findPathwaysByXref('P45985')
 
 
     def test_findPathwaysByLitterature(self):
-        self.findPathwaysByLiterature(18651794)
+        self.s.findPathwaysByLiterature(18651794)
 
     def test_savePathwayAs(self):
-        self.savePathwayAs("WP4", "test.pdf", display=False)
+        self.s.savePathwayAs("WP4", "test.pdf", display=False)
         import os
         try:os.remove("test.pdf")
         except:pass
     def test_getPathwaysByParentOntologyTerm(self):
-        self.getPathwaysByParentOntologyTerm("DOID:344")
+        self.s.getPathwaysByParentOntologyTerm("DOID:344")
 
 
     def test_remoceCurationTag(self):
         try:
-            self.removeCurationTag("dummy", "dummy", "dummy")
+            self.s.removeCurationTag("dummy", "dummy", "dummy")
             assert False
         except NotImplementedError:
             assert True
-        
+
+    def test_getPathwayHistory(self):
+        res = self.s.getPathwayHistory("WP455", "20100101000000")
+
+    def test_coloredPathway(self):
+        res = self.getColoredPathway("WP4",revision=0)
+
+

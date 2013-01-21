@@ -4,6 +4,7 @@ Whats' new, what has changed
 
 Revision 0.1
 ------------------- 
+* 0.4.9: finalise wikipathway
 * 0.4.8: finalise doc of half of the services.
 * 0.4.7: add psicquic service and carry on reactome
 * 0.4.6: finalise kegg module and test
