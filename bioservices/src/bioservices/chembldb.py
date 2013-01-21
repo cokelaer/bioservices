@@ -17,6 +17,8 @@ class Chembl(RESTService):
     def __init__(self):
         super(Chembl, self).__init__(url="http://www.ebi.ac.uk/chemblws/status/", 
             name="Chembl")
+
+
     # wrapper for functions
     def __f1(func):
         def f2(self,k):
@@ -30,10 +32,10 @@ class Chembl(RESTService):
                 return f3(k)
             elif isinstance(k,list) or isinstance(k,tuple):
                 return map(f3,k)
-        f2.__doc__=func.__doc__
+        f2.__doc__ = func.__doc__
         return f2
 
-
+    
     def api_status(self):
         """
         Description: Check API status
@@ -167,8 +169,7 @@ class Chembl(RESTService):
         """
         pass
 
-
-    def get_image_of_compound_by_ChEMBLID(self,k,dimension=None):
+        def __get_image_of_compound_by_ChEMBLID(self, k, dimension=None, file_out=None):
         """
         Description: Get the image of a given compound.
         Input: Compound ChEMBLID
@@ -177,12 +178,43 @@ class Chembl(RESTService):
         Example URL with dimensions parameter: http://www.ebi.ac.uk/chemblws/compounds/CHEMBL192/image?dimensions=200
         """
         url='http://www.ebi.ac.uk/chemblws/compounds/%s/image'%k
+        if dimension is not None:
+            url += '?dimension=%s'%dimension
         target_data = urllib2.urlopen(url).read()
-        return target_data
+        if file_out is None:
+            file_out = os.getcwd()
+            file_out += '/%s.png'%k
+        FILE = open(file_out,'w')
+        FILE.write(target_data)
+        FILE.close()
+        print "saved to %s"%file_out
+        webbrowser.open(file_out)
 
 
 
-    def get_compound_activities(url):
+    def get_image_of_compound_by_ChEMBLID(self, k, dimension=None, file_out=None):
+        """
+        Description: Get the image of a given compound.
+        Input: Compound ChEMBLID
+        Output: Byte array image data
+        Example URL: http://www.ebi.ac.uk/chemblws/compounds/CHEMBL192/image
+        Example URL with dimensions parameter: http://www.ebi.ac.uk/chemblws/compounds/CHEMBL192/image?dimensions=200
+        """
+        url='http://www.ebi.ac.uk/chemblws/compounds/%s/image'%k
+        if dimension is not None:
+            url += '?dimension=%s'%dimension
+        target_data = urllib2.urlopen(url).read()
+        if file_out is None:
+            file_out = os.getcwd()
+            file_out += '/%s.png'%k
+        FILE = open(file_out,'w')
+        FILE.write(target_data)
+        FILE.close()
+        print "saved to %s"%file_out
+        webbrowser.open(file_out)
+
+
+    def get_compound_activities(url='http://www.ebi.ac.uk/chemblws/compounds/%s/bioactivities.json'):
         """
         Description: Get individual compound bioactivities
         Input: Compound ChEMBLID
@@ -190,9 +222,11 @@ class Chembl(RESTService):
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/compounds/CHEMBL2/bioactivities
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/compounds/CHEMBL2/bioactivities.json
         """
-        pass
+        return url
+    get_compound_activities = __f1(get_compound_activities)
 
-    def get_target_by_chemblId(url):
+
+    def get_target_by_chemblId(url='http://www.ebi.ac.uk/chemblws/targets/%s.json'):
         """
         Description: Get target by ChEMBLID
         Input: Target ChEMBLID
@@ -200,10 +234,11 @@ class Chembl(RESTService):
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/targets/CHEMBL2477
         Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/targets/CHEMBL2477.json
         """
-        pass
+        return url
+    get_target_by_chemblId = __f1(get_target_by_chemblId)
 
-
-    def get_target_by_uniprotId():
+'''
+    def get_target_by_uniprotId()
         """
         Description: Get individual target by UniProt Accession Id
         Input: UniProt Accession Id
@@ -214,7 +249,7 @@ class Chembl(RESTService):
         pass
 
 
-    def get_target_by_refSeqId(url):
+    def get_target_by_refSeqId(url=):
         """
         Description: Get individual target by RefSeq Accession Id
         Input: RefSeq Accession Id
@@ -224,7 +259,7 @@ class Chembl(RESTService):
         """
 
 
-    def get_target_bioactivities(url):
+    def get_target_bioactivities(url=):
         """        
         Description: Get individual target bioactivities
         Input: Target ChEMBLID
@@ -235,7 +270,7 @@ class Chembl(RESTService):
         pass
 
 
-    def get_all_targets(url):
+    def get_all_targets(url=):
         """
         Description: Get all targets
         Input: N/A
@@ -246,7 +281,7 @@ class Chembl(RESTService):
         pass
 
 
-    def get_assay_by_chemblId(url):
+    def get_assay_by_chemblId(url=):
         """
         Description: Get assay by ChEMBLID
         Input: Assay ChEMBLID
@@ -257,12 +292,11 @@ class Chembl(RESTService):
         pass
 
 
-    def get_assay_bioactivities(url):
+    def get_assay_bioactivities(url=):
         """
         Description: Get individual assay bioactivities
         Input: Assay ChEMBLID
         Output: List of all bioactivity records in ChEMBLdb for a given assay ChEMBLID
         Example URL (XML Output): http://www.ebi.ac.uk/chemblws/assays/CHEMBL1217643/bioactivities
-        Example URL (JSON Output):
-http://www.ebi.ac.uk/chemblws/assays/CHEMBL1217643/bioactivities.json """
-        pass
+        Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/assays/CHEMBL1217643/bioactivities.json 
+'''
