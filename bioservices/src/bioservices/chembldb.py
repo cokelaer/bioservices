@@ -182,7 +182,7 @@ class Chembl(RESTService):
 
 
 
-    def get_compound_activities(url=):
+    def get_compound_activities(url):
         """
         Description: Get individual compound bioactivities
         Input: Compound ChEMBLID
@@ -192,7 +192,7 @@ class Chembl(RESTService):
         """
         pass
 
-    def get_target_by_chemblId(url=):
+    def get_target_by_chemblId(url):
         """
         Description: Get target by ChEMBLID
         Input: Target ChEMBLID
@@ -203,7 +203,7 @@ class Chembl(RESTService):
         pass
 
 
-    def get_target_by_uniprotId(
+    def get_target_by_uniprotId()
         """
         Description: Get individual target by UniProt Accession Id
         Input: UniProt Accession Id
@@ -214,7 +214,7 @@ class Chembl(RESTService):
         pass
 
 
-    def get_target_by_refSeqId(url=):
+    def get_target_by_refSeqId(url):
         """
         Description: Get individual target by RefSeq Accession Id
         Input: RefSeq Accession Id
@@ -224,7 +224,7 @@ class Chembl(RESTService):
         """
 
 
-    def get_target_bioactivities(url=):
+    def get_target_bioactivities(url):
         """        
         Description: Get individual target bioactivities
         Input: Target ChEMBLID
@@ -235,7 +235,7 @@ class Chembl(RESTService):
         pass
 
 
-    def get_all_targets(url=):
+    def get_all_targets(url):
         """
         Description: Get all targets
         Input: N/A
@@ -246,7 +246,7 @@ class Chembl(RESTService):
         pass
 
 
-    def get_assay_by_chemblId(url=):
+    def get_assay_by_chemblId(url):
         """
         Description: Get assay by ChEMBLID
         Input: Assay ChEMBLID
@@ -257,7 +257,7 @@ class Chembl(RESTService):
         pass
 
 
-    def get_assay_bioactivities(url=):
+    def get_assay_bioactivities(url):
         """
         Description: Get individual assay bioactivities
         Input: Assay ChEMBLID
