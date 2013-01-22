@@ -122,7 +122,7 @@ __all__ = ["PSICQUIC"]
 
 
 class PSICQUIC(RESTService):
-    """Interface to the PSICQUIC service
+    """Interface to the `PSICQUIC <http://code.google.com/p/psicquic/>`_ service
 
     There are 2 interfaces to the PSICQUIC service (REST and WSDL) but we used
     the REST only.

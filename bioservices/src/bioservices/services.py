@@ -27,9 +27,14 @@ import easydev
 from  easydev import checkParam
 
 
-__all__ = ["Service", "WSDLService", "RESTService"]
+__all__ = ["Service", "WSDLService", "RESTService", "BioServicesError"]
 
 
+class BioServicesError(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
 
 class Service(object):
     """Base class for WSDL and REST classes
@@ -307,7 +312,7 @@ class RESTService(Service):
                     try:
                         res = self.easyXML(res)
                     except:
-                        logging.error("--Conversion to easyXML failed. returns the original XML file"),
+                        logging.error("--Conversion to easyXML failed. returns the raw response"),
             self.last_response = res
             return res
         except Exception, e:
@@ -320,9 +325,17 @@ class RESTService(Service):
     def requestPost(self, requestUrl, params, extra=None):
         """request with a POST method.
 
-        Use by ::`ncbiblast` service.
+        :param str requestUrl: the entire URL to request
+        :param dict params: the dictionary of parameter/value pairs
+        :param str extra: an additional string to add after the params if
+            needed. Could be usefule if a parameter/value can not be added to the
+            dictionary. For instance is a parameter has several values
+
+        .. todo:: parameter paranName with a list of values [v1,v2] can be interpreted as
+            paramName=v1&paramName=v2
 
         .. note:: this is a HTTP POST request 
+        .. note:: use only by ::`ncbiblast` service so far.
         """
         import sys
         requestData = urllib.urlencode(params)
@@ -337,7 +350,7 @@ class RESTService(Service):
             http_headers = { 'User-Agent' : user_agent }
             req = urllib2.Request(requestUrl, None, http_headers)
             # Make the submission (HTTP POST).
-            print req, requestData
+            print req
             reqH = urllib2.urlopen(req, requestData)
             jobId = reqH.read()
             reqH.close()
