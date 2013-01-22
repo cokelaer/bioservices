@@ -18,7 +18,7 @@
 
 """
 from services import RESTService
-import urllib2, json, re, os
+import urllib2, json, re, os, webbrowser
 
 
 class Chembl(RESTService):
@@ -181,16 +181,7 @@ class Chembl(RESTService):
         pass
 
 
-
-    def __get_image_of_compound_by_ChEMBLID(self, url):
-        url='http://www.ebi.ac.uk/chemblws/compounds/%s/image'%k
-        if dimension is not None:
-            url += '?dimension=%s'%dimension
-        target_data = urllib2.urlopen(url).read()
-        return target_data
-
-
-    def get_image_of_compound_by_ChEMBLID(self, k, dimension=None, file_out=None):
+    def get_image_of_compound_by_ChEMBLID(self, k, dimensions=None, file_out=None):
         """
         Description: Get the image of a given compound.
         Input: Compound ChEMBLID
@@ -206,9 +197,10 @@ class Chembl(RESTService):
             
         if isinstance(k,str):
             url='http://www.ebi.ac.uk/chemblws/compounds/%s/image'%k
-            if dimension is not None:
-                url += '?dimension=%s'%dimension
-            target_data = self.__get_iamge_of_compound_by_ChEMBLID(url)
+            if dimensions is not None:
+                url += '?dimensions=%s'%dimensions
+            target_data = urllib2.urlopen(url).read()
+            print url
             if file_out is None:
                 file_out = os.getcwd()
                 file_out += '/%s.png'%k
@@ -218,9 +210,9 @@ class Chembl(RESTService):
         elif isinstance(k,tuple) or isinstance(k,list):
             for item in k:
                 url='http://www.ebi.ac.uk/chemblws/compounds/%s/image'%item
-                if dimension is not None:
-                    url += '?dimension=%s'%dimension
-                target_data = self.__get_iamge_of_compound_by_ChEMBLID(url)
+                if dimensions is not None:
+                    url += '?dimensions=%s'%dimensions
+                target_data = urllib2.urlopen(url).read()
                 if file_out is None:
                     file_out = os.getcwd()
                     file_out += '/%s.png'%item
