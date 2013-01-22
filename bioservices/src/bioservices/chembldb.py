@@ -18,7 +18,7 @@
 
 """
 from services import RESTService
-import urllib2, json, re
+import urllib2, json, re, os
 
 
 class Chembl(RESTService):
@@ -225,18 +225,6 @@ class Chembl(RESTService):
                     file_out = os.getcwd()
                     file_out += '/%s.png'%item
                 __f_save(target_data,file_out)
-
-
-            
-        target_data = urllib2.urlopen(url).read()
-        if file_out is None:
-            file_out = os.getcwd()
-            file_out += '/%s.png'%k
-        FILE = open(file_out,'w')
-        FILE.write(target_data)
-        FILE.close()
-        print "saved to %s"%file_out
-        webbrowser.open(file_out)
 
 
     def get_compound_activities(url='http://www.ebi.ac.uk/chemblws/compounds/%s/bioactivities.json'):
