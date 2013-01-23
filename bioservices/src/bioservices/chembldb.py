@@ -19,7 +19,7 @@
 
 
 """
-import urllib2, json, re, os
+import urllib2, urllib, json, re, os
 from bioservices.services import *
 import webbrowser
 
@@ -251,8 +251,11 @@ prevented us from fulfilling your request. """)
         # Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/compounds/smiles.json
         # POST parameter: smiles (Required)
         # Example parameter value: COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56
-        
-        pass
+        params = {'smiles':'COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56 '}
+        params = params = urllib.urlencode(params)
+        url = 'http://www.ebi.ac.uk/chemblws/compounds/smiles'
+        target_data = urllib.urlopen(url,params)
+        target_data = target_data.read()
 
 
 
