@@ -77,22 +77,6 @@ prevented us from fulfilling your request. """)
         except Exception,e:
             raise(e)
 
-    # wrapper for functions. replaced by process decorator. Can be removed
-    def __f1(func):
-        def f2(self,k):
-            def f3(k):
-                url = func()
-                k = url%k
-                target_data = urllib2.urlopen(k).read()
-                target_data = json.loads(target_data)
-                return target_data
-            if isinstance(k,str):
-                return f3(k)
-            elif isinstance(k,list) or isinstance(k,tuple):
-                return map(f3,k)
-        f2.__doc__ = func.__doc__
-        return f2
-
 
     def api_status(self):
         """ Check API status
