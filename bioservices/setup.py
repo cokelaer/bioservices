@@ -8,7 +8,7 @@ import glob
 
 _MAJOR               = 0
 _MINOR               = 9
-_MICRO               = 0
+_MICRO               = 2
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -19,10 +19,10 @@ metainfo = {
     'version': version,
     'license' : 'GPL',
     'download_url' : ['http://pypi.python.org/pypi/bioservices'],
-    'url' : ['http://www.ebi.ac.uk/~cokelaer/'],
+    'url' : ['http://pypi.python.org/pypi/bioservices'],
     'description':'utilities to ease manipulation of R packages using rpy2.' ,
     'platforms' : ['Linux', 'Unix', 'MacOsX', 'Windows'],
-    'keywords' : ["bioservices", "signalling", "signalling pathways", "biological databases", "kegg"],
+    'keywords' : ["BioServices", "Web Services", "Kegg", "BioModels", "UniProt"],
     'classifiers' : [
           'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Developers',
