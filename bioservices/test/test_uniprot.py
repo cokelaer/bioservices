@@ -14,15 +14,15 @@ class test_UniProt(UniProt):
         except:
             assert True
 
-    def test_search(self):
-        self.search("P09958", format="rdf")
-        self.search("P09958", format="xml")
-        self.search("P09958", format="txt")
-        self.search("P09958", format="fasta")
-        self.search("P09958", format="gff")
+    def test_searchUniProtId(self):
+        self.searchUniProtId("P09958", format="rdf")
+        self.searchUniProtId("P09958", format="xml")
+        self.searchUniProtId("P09958", format="txt")
+        self.searchUniProtId("P09958", format="fasta")
+        self.searchUniProtId("P09958", format="gff")
 
         try:
-            self.search("P09958", format="dummy")
+            self.searchUniProtId("P09958", format="dummy")
             assert False
         except:
             assert True
