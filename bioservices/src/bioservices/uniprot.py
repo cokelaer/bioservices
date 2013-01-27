@@ -51,8 +51,10 @@ __all__ = ["UniProt"]
 class UniProt(RESTService):
     """Interface to the `UniProt <http://www.uniprot.org>`_ service
 
-    .. warning:: for the time being, this class only provide interface to the 
-        identifier mapping service and search of uniprotKB identifier.
+    .. warning:: for the time being, this class only provide interface to 
+        * the identifier mapping service
+        * search of a uniprotKB identifier
+        * some experimental interface to the full search 
 
     Example::
 
@@ -113,7 +115,7 @@ class UniProt(RESTService):
 
         return result
 
-    def search(self, uniprot_id, format="xml"):
+    def searchUniProtId(self, uniprot_id, format="xml"):
         """Search for a uniprot ID in UniprotKB database
 
         :param str uniprot: a valid uniprotKB ID
@@ -123,12 +125,85 @@ class UniProt(RESTService):
         ::
 
             >>> u = UniProt()
-            >>> res = u.search("P09958", format="xml")
+            >>> res = u.searchUniProtId("P09958", format="xml")
 
         """
         _valid_formats = ['txt', 'xml', 'rdf', 'gff', 'fasta']
-        if format not in _valid_formats:
-            raise ValueError("invalid format provided. Use one of %s" % _valid_formats)
+        self.checkParam(format, _valid_formats)
+        #if format not in _valid_formats:
+        #    raise ValueError("invalid format provided. Use one of %s" % _valid_formats)
         url = self.url + "/uniprot/" + uniprot_id + '.' + format
         res = self.request(url)
         return res
+
+
+    def search(self, query, format="html", columns=None, include=False, 
+        	compress=False, limit=None, offset=None):
+        """Provide some interface to the uniprot search interface.
+
+        :param str query: query must be a valid uniprot query.
+            See http://www.uniprot.org/help/text-search, http://www.uniprot.org/help/query-fields 
+        :param str format: a valid format amongst html, tab, xls, asta, gff,
+            txt, xml, rdf, list, rss. If tab or xls, you can also provide the 
+            columns argument. 
+        :param str columns: comma-separated list of values. Works only if fomat 
+            is tab or xlsFor UnitProtKB, the possible columns are:
+            citation, clusters, comments, database, domains, domain, ec, id, entry name
+            existence, families, features, genes, go, go-id, interpro, interactor,
+            keywords, keyword-id, last-modified, length, organism, organism-id, 
+            pathway, protein names, reviewed, score, sequence, 3d, 
+            subcellular locations, taxon, tools, version, virus hosts
+        :param bool include:  include isoform sequences when the format parameter is fasta. Include description when format is rdf.
+        :param bool compress: gzip the results
+        :param int limit: Maximum number of results to retrieve.
+        :param int offset:  Offset of the first result, typically used together with the limit parameter. 
+
+        To obtain the list of uniprot ID returned by the search of zap70 can be retrieved as follows
+        ::
+
+            >>> u.search('zap70+AND+organism:9606', format='list')
+        """
+        params = {}
+
+        if format!=None:
+            _valid_formats = ['tab', 'xls', 'fasta', 'gff', 'txt', 'xml', 'rss', 'list', 'rss', 'html']
+            self.checkParam(format, _valid_formats)
+            params['format'] = format
+
+        if columns!=None:
+            self.checkParam(format, ["tab","xls"])
+            _valid_columns = ['citation', 'clusters', 'comments','database',
+                'domains','domain', 'ec','id','entry name','existence',
+		'families', 'features', 'genes', 'go', 'go-id', 'interpro', 
+                'interactor', 'keywords', 'keyword-id', 'last-modified', 
+                'length', 'organism', 'organism-id', 'pathway', 'protein names', 
+                'reviewed', 'score', 'sequence', '3d', 'subcellular locations', 
+                'taxon', 'tools', 'version', 'virus hosts']
+            # remove unneeded spaces before/after commas if any
+            columns = ",".join([x.strip() for x in columns.split(",")]) 
+            for xol in columns:
+                self.checkParam(col, _valid_columns)
+            params['columns'] = columns
+
+        if include == True and format in ["fasta", "rdf"]:
+            params['include'] = 'yes'
+
+        if compress == True:
+            params['compress'] = 'yes'
+ 
+        if offset != None:
+            if isinstance(offset, int):
+                params['offset'] = offset
+
+        if limit != None:
+            if isinstance(limit, int):
+                params['limit'] = limit
+
+        params = self.urlencode(params)
+        
+        #res = s.request("/uniprot/?query=zap70+AND+organism:9606&format=xml", params)
+        res = self.request("/uniprot/?query=%s" % query + "&" + params, "txt")
+        return res
+
+
+#[x for x in [res.getchildren()[i].getchildren()[0].text for i in range(0,32)] if x.startswith('P43')]
