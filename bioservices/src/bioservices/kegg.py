@@ -742,3 +742,117 @@ class Kegg(RESTService):
     def __str__(self):
         txt = self.info()
         return txt
+
+
+class KeggParser(Kegg):
+    """This is an example of application to convert a pathway from Kegg Ids to Uniprot Ids
+
+        res = s.get("hsa04150")
+        ss = s.parseEntry(res)
+        kegg_geneIds = [x.keys()[0] for x in ss['gene']]
+        db_up, db_kegg = s.conv("hsa", "uniprot")
+        indices = [db_kegg.index("hsa:%s" % x ) for x in kegg_geneIds]
+        uniprot_geneIds = [db_up[x] for x in indices]
+
+
+    """
+    def __init__(self):
+        super(KeggParser, self).__init__()
+
+    def parseEntry(self, res):
+        """kegg_ids, uniprot_ids = s.conv("hsa", "uniprot")"""
+        output = {}
+        output['references'] = []
+
+        lines = res.split("\n")
+
+        current = None
+        for line in lines:
+            if line.startswith("NAME"):
+                key = "NAME"
+                output[key.lower()] = line.split(key)[1].strip()
+            elif line.startswith("KO_PATHWAY"):
+                key = "KO_PATHWAY"
+                output[key.lower()] = line.split(key)[1].strip()
+            elif line.startswith("ENTRY"):
+                key = "ENTRY"
+                output[key.lower()] = line.split(key)[1].strip()
+            elif line.startswith("ORGANISM"):
+                key = "ORGANISM"
+                output[key.lower()] = line.split(key)[1].strip()
+            elif line.startswith("CLASS"):
+                key = "CLASS"
+                output[key.lower()] = line.split(key)[1].strip()
+            elif line.startswith("PATHWAY_MAP"):
+                key = "PATHWAY_MAP"
+                output[key.lower()] = line.split(key)[1].strip()
+            elif line.startswith("GENE"):
+                output['gene'] = []
+		key, value = line.split("GENE")[1].strip().split(" ",1)
+		output['gene'] = [{key.strip():value.strip()}]
+                current = "gene"
+            elif line.startswith("DRUG"):
+                output['drug'] = []
+		key, value = line.split("DRUG")[1].strip().split(" ",1)
+		output['drug'] = [{key.strip():value.strip()}]
+                current = "drug"
+            elif line.startswith("DISEASE"):
+                output['disease'] = []
+		key, value = line.split("DISEASE")[1].strip().split(" ",1)
+		output['disease'] = [{key.strip():value.strip()}]
+                current = "disease"
+            elif line.startswith("COMPOUND"):
+                output['compound'] = []
+		key, value = line.split("COMPOUND")[1].strip().split(" ",1)
+		output['compound'] = [{key.strip():value.strip()}]
+                current = "compound"
+            elif line.startswith("REL_PATHWAY"):
+                output['rel_pathway'] = []
+		key, value = line.split("REL_PATHWAY")[1].strip().split(" ",1)
+		output['rel_pathway'] = [{key.strip():value.strip()}]
+                current = "rel_pathway"
+            elif line.startswith("    ") and current:
+		key, value = line.strip().split(" ",1)
+		output[current].append({key.strip():value.strip()})
+            elif line.startswith("///"):
+                pass
+            elif line.startswith("REFERENCE"):
+                """REFERENCE   PMID:15624019
+  AUTHORS   Inoki K, Corradetti MN, Guan KL.
+  TITLE     Dysregulation of the TSC-mTOR pathway in human disease.
+  JOURNA"""
+                pass
+            else:
+                current = None
+                print line
+        return output
+
+
+
+
+""" def _analyse_gene(self, data):
+        output = {}
+        try:
+            names = [x for x in data.split("\n") if x.startswith("NAME")][0]
+            names = names.split("NAME")[1].strip()
+            names = [x.strip() for x in names.split(",")]
+            output['NAME'] = names
+        except:
+            pass
+
+        try:
+            # we can also use get_pathways_by_gene()
+            output['PATHWAY'] = [x.strip() for x in data.split("PATHWAY")[1].split("\n") if x.strip().startswith("hsa")]
+        except:
+            pass
+
+        try:
+            defi = [x.strip() for x in data.split("\n") if x.startswith("DEFINITION")]
+            defi = defi[0].split("DEFINITION")[1].strip()
+
+            output['DEFINITION'] = defi
+        except:
+            pass
+
+        return output
+"""
