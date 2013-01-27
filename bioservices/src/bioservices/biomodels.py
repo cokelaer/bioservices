@@ -24,7 +24,7 @@
 
     :URL: http://www.ebi.ac.uk/biomodels-main/
     :Service: http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices?wsdl
-    
+    :Citations: http://www.ncbi.nlm.nih.gov/pubmed/20587024    
 
     .. highlights::
 
@@ -358,7 +358,6 @@ class BioModels(WSDLService):
             
         """
         res = self.serv.getSimpleModelsByIds(Id)
-        res = self.easyXML(res) 
         return res
 
 
@@ -546,7 +545,7 @@ records.
              'P10815',
              'P11071']
         """
-
+        self.logging.info("Retrieving the uniprot ID from %s to %s" %(start,end))
         Ids = []
         for i in range(start, end):
             if i%100 == 0 and i>0:
