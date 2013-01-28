@@ -1,6 +1,6 @@
-"""This module provides a class :class:`Chembl` 
+"""This module provides a class :class:`ChEMBLdb` 
 
-.. topic:: What is ChEMBL 
+.. topic:: What is ChEMBLdb
 
     :URL:  https://www.ebi.ac.uk/chembldb/index.php/
     :REST: https://www.ebi.ac.uk/chembldb/index.php/ws
@@ -8,12 +8,12 @@
 
     .. highlights::
 
-        "Using the ChEMBL web service API users can retrieve data from the ChEMBL
+        "Using the ChEMBLdb web service API users can retrieve data from the ChEMBL
         database in a programmatic fashion. The following list defines the currently
         supported functionality and defines the expected inputs and outputs of each
         method."
 
-        -- From ChEMBL web page Dec 2012
+        -- From ChEMBLdb web page Dec 2012
 
 
 
@@ -25,7 +25,7 @@ import webbrowser
 
 
 class ChEMBLdb(RESTService):
-    """Interface to `ChEMBL <http://www.ebi.ac.uk/chembldb/index.php>`_ 
+    """Interface to `ChEMBLdb <http://www.ebi.ac.uk/chembldb/index.php>`_ 
 
     """
     _url = "http://www.ebi.ac.uk/chemblws/"
@@ -56,7 +56,7 @@ class ChEMBLdb(RESTService):
         returned.
         """
         try:
-            res = super(Chembl, self).request(query, format, baseUrl)
+            res = super(ChEMBLdb, self).request(query, format, baseUrl)
             return res
         except urllib2.HTTPError,e:
             if e.code == 400:
@@ -161,7 +161,7 @@ prevented us from fulfilling your request. """)
         :: 
 
             >>> from bioservices import *   
-            >>> s = Chembl(verbose=False)
+            >>> s = ChEMBLdb(verbose=False)
             >>> resxml = s.get_compounds_by_ChemblId("CHEMBL1")
             >>> resjson = s.get_compounds_by_ChemblId("CHEMBL1.json")
         """
@@ -181,7 +181,7 @@ prevented us from fulfilling your request. """)
         :: 
 
             >>> from bioservices import *   
-            >>> s = Chembl(verbose=False)
+            >>> s = ChEMBLdb(verbose=False)
             >>> resxml = s.get_compounds_by_ChemblId(s._inChiKey_example)
             >>> resjson = s.get_compounds_by_ChemblId(s._inChiKey_example + "json")
              # key example: QFFGVLORLPOAEC-SNVBAGLBSA-N
@@ -211,7 +211,7 @@ prevented us from fulfilling your request. """)
         :: 
 
             >>> from bioservices import *   
-            >>> s = Chembl(verbose=False)
+            >>> s = ChEMBLdb(verbose=False)
             >>> resxml = s.get_compounds_by_SMILES(s._smiles)
             >>> resjson = s.get_compounds_by_SMILES(s._smiles + "json")
             >>> # ex: COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56.json
@@ -254,7 +254,7 @@ prevented us from fulfilling your request. """)
         :: 
 
             >>> from bioservices import *   
-            >>> s = Chembl(verbose=False)
+            >>> s = ChEMBLdb(verbose=False)
             >>> resxml = s.get_compounds_containing_SMILES(s._smiles)
             >>> resjson = s.get_compounds_containing_SMILES(s._smiles + "json")
 
@@ -496,7 +496,7 @@ prevented us from fulfilling your request. """)
         .. doctest::
 
             >>> from bioservices import *
-            >>> s = Chembl()
+            >>> s = ChEMBLdb()
             >>> res = s.get_all_targets()
             >>> sorted(set([x['targetType'] for x in res['targets']]))
             [u'ADMET', u'CELL-LINE', u'NUCLEIC-ACID', u'ORGANISM', u'PROTEIN', u'SUBCELLULAR', u'TISSUE', u'UNCHECKED', u'UNKNOWN']
