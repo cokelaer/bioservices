@@ -34,8 +34,8 @@ class ChEMBLdb(RESTService):
 
 
     def __init__(self, verbose=True):
-        super(ChEMBLdb, self).__init__(url=Chembl._url, 
-            name="Chembl", verbose=verbose)
+        super(ChEMBLdb, self).__init__(url=ChEMBLdb._url, 
+            name="ChEMBLdb", verbose=verbose)
         self._default_extension="json"
 
     # just a get/set to the default extension
