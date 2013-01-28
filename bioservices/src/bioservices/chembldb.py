@@ -24,7 +24,7 @@ from bioservices.services import *
 import webbrowser
 
 
-class Chembl(RESTService):
+class ChEMBLdb(RESTService):
     """Interface to `ChEMBL <http://www.ebi.ac.uk/chembldb/index.php>`_ 
 
     """
