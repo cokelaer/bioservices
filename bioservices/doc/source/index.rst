@@ -32,7 +32,7 @@ Here is a list of services that you can access from **bioservices**:
     bioservices.biomodels.BioModels
     bioservices.kegg.Kegg
     bioservices.reactome.Reactome
-    bioservices.chembldb.Chembl
+    bioservices.chembldb.ChEMBLdb
     bioservices.picr.PICR
     bioservices.quickgo.QuickGO
     bioservices.rhea.Rhea
@@ -96,5 +96,4 @@ References
     references
 
 
-.. todo:: rename Chembl into ChEMBLdb
 .. todo:: in biomodels: doc difference betzeen CHEId qnd CHEIId
