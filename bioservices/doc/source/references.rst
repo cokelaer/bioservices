@@ -35,7 +35,7 @@ BioModels
     :undoc-members:
     :synopsis:
 
-ChEMBL
+ChEMBLdb
 ==========
 
 .. automodule:: bioservices.chembldb
