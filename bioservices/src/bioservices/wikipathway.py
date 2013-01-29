@@ -171,259 +171,259 @@ class Wikipath(WSDLService):
         return res
 
     #REST: s.url[:-5] + ?query=P53
-	    def findInteractions(self, query, organism=None, raw=False,
-		interactionOnly=True):
-		"""Find interactions defined in WikiPathways pathways.
+    def findInteractions(self, query, organism=None, raw=False,
+        interactionOnly=True):
+        """Find interactions defined in WikiPathways pathways.
 
 
-		:param str query:  The name of an entity to find interactions for (e.g. 'P53')
-		:param str organism:  The name of the organism to refine the search
-		    (default is self.organism)
-		:param bool raw: if True, returns the output of the request without post processing
-		:param bool interactionOnly: returns only the interactions (default). If
-		    false, returns also scores, revision, pathways
-		:returns: depends on the parameters **raw** and **interactionOnly**. By default, 
-		    the output from wikipathway is processed and only the interactions
-		    are returned for the default organism. You can change this behaviour
-		    by changing the default arguments (raw, organism, interactionOnly)
+        :param str query:  The name of an entity to find interactions for (e.g. 'P53')
+        :param str organism:  The name of the organism to refine the search
+            (default is self.organism)
+        :param bool raw: if True, returns the output of the request without post processing
+        :param bool interactionOnly: returns only the interactions (default). If
+            false, returns also scores, revision, pathways
+        :returns: depends on the parameters **raw** and **interactionOnly**. By default, 
+            the output from wikipathway is processed and only the interactions
+            are returned for the default organism. You can change this behaviour
+            by changing the default arguments (raw, organism, interactionOnly)
 
-		.. warning:: interface different from the service. The organism
-		    parameter allow to refine the search to a specific organism.  to return a
-		    formatted output, set raw to True
-		"""
-		if raw:
-		    return self.serv.findInteractions(query=query)
-		else:
-		    output = {'interactions':[],'scores':[],'pathway_ids':[],'revision':[],}
-		    intA = []
-		    intB = []
-		    if organism == None:
-			organism = self.organism
-		    for x in self.serv.findInteractions(query=query):
-			if 'species' not in x._keyord:
-			    continue
-			if x['species'] == organism:
-			    intA.append(x['fields'][1]['values'])
-			    intB.append(x['fields'][2]['values'])
-			    output['scores'].append(x['score'])
-			    output['pathway_ids'].append(x['id'])
-			    output['revision'].append(x['revision'])
-		    output['interactions'] = zip(intA,intB)
-		    if interactionOnly==False:
-			return output
-		    else:
-			return output['interactions']
+        .. warning:: interface different from the service. The organism
+            parameter allow to refine the search to a specific organism.  to return a
+            formatted output, set raw to True
+        """
+        if raw:
+            return self.serv.findInteractions(query=query)
+        else:
+            output = {'interactions':[],'scores':[],'pathway_ids':[],'revision':[],}
+            intA = []
+            intB = []
+            if organism == None:
+                organism = self.organism
+            for x in self.serv.findInteractions(query=query):
+                if 'species' not in x._keyord:
+                    continue
+                if x['species'] == organism:
+                    intA.append(x['fields'][1]['values'])
+                    intB.append(x['fields'][2]['values'])
+                    output['scores'].append(x['score'])
+                    output['pathway_ids'].append(x['id'])
+                    output['revision'].append(x['revision'])
+            output['interactions'] = zip(intA,intB)
+            if interactionOnly==False:
+                return output
+            else:
+                return output['interactions']
 
-	    def listPathways(self, organism = None):
-		"""Get a list of all available pathways.
+    def listPathways(self, organism = None):
+        """Get a list of all available pathways.
 
-		:param str organism: a valid organism (default is the :attr:`organism` attribute)
-		:return: Only return list of pathways for this organism
+        :param str organism: a valid organism (default is the :attr:`organism` attribute)
+        :return: Only return list of pathways for this organism
 
-		"""
-		if organism == None:
-		    return self.serv.listPathways(organism = self.organism)
-		else:
-		    self.checkParam(organism, self.organisms)
-		    return self.serv.listPathways(organism = organism)
+        """
+        if organism == None:
+            return self.serv.listPathways(organism = self.organism)
+        else:
+            self.checkParam(organism, self.organisms)
+            return self.serv.listPathways(organism = organism)
 
-	    def getPathway(self, pathwayId, revision=0):
-		"""Download the pathway from WikiPathways.
+    def getPathway(self, pathwayId, revision=0):
+        """Download the pathway from WikiPathways.
 
-		:param str pathwayId: the pathway identifier.
-		:param int revision: the revision number of the pathway (use '0'
-		    for most recent version).
-		:Returns: the pathway.
+        :param str pathwayId: the pathway identifier.
+        :param int revision: the revision number of the pathway (use '0'
+            for most recent version).
+        :Returns: the pathway.
 
-		::
+        ::
 
-		    s.getPathway("WP2320")
-		"""
-		return self.serv.getPathway(pwId=pathwayId, revision=revision)
+            s.getPathway("WP2320")
+        """
+        return self.serv.getPathway(pwId=pathwayId, revision=revision)
 
-	    def getPathwayInfo(self, pathwayId):
-		"""Get some general info about the pathway
+    def getPathwayInfo(self, pathwayId):
+        """Get some general info about the pathway
 
-		:param str pathwayId: the pathway identifier.
-		   Info can be the name, species, without downloading the GPML.
+        :param str pathwayId: the pathway identifier.
+           Info can be the name, species, without downloading the GPML.
 
-		::
+        ::
 
-		    >>> from bioservices import *
-		    >>> s= Wikipath(verbose=False)
-		    >>> s.getPathwayInfo("WP2320")
-		"""
-		return self.serv.getPathwayInfo(pwId=pathwayId)
+            >>> from bioservices import *
+            >>> s= Wikipath(verbose=False)
+            >>> s.getPathwayInfo("WP2320")
+        """
+        return self.serv.getPathwayInfo(pwId=pathwayId)
 
-	    def getPathwayHistory(self, pathwayId, date):
-		"""Get the revision history of a pathway.
+    def getPathwayHistory(self, pathwayId, date):
+        """Get the revision history of a pathway.
 
-		:param str pathwayId: the pathway identifier.
-		:param str date: limit the results by date, only history items after
-		    the given date (timestamp format) will be included. can be a string
-		    or number of the form YYYYMMDDHHMMSS.
-		:return: the revision history
+        :param str pathwayId: the pathway identifier.
+        :param str date: limit the results by date, only history items after
+            the given date (timestamp format) will be included. can be a string
+            or number of the form YYYYMMDDHHMMSS.
+        :return: the revision history
 
-		.. warning:: does not seem to work with WSDL. Replace REST version but
-		    unstable: does not return the results systematically.
+        .. warning:: does not seem to work with WSDL. Replace REST version but
+            unstable: does not return the results systematically.
 
-		::
+        ::
 
-		    s.getPathwayHistory("WP4", 20110101000000)
-		"""
-		s = RESTService("WP", url=self.url[:-5], verbose=False)
-		res = s.request("getPathwayHistory?pwId=%s&timestamp=%s" % (pathwayId, str(date)))
-		return res
-		# does not seem to work
-		#return self.serv.getPathwayHistory(pwId=pathwayId, timestamp=date)
+            s.getPathwayHistory("WP4", 20110101000000)
+        """
+        s = RESTService("WP", url=self.url[:-5], verbose=False)
+        res = s.request("getPathwayHistory?pwId=%s&timestamp=%s" % (pathwayId, str(date)))
+        return res
+        # does not seem to work
+        #return self.serv.getPathwayHistory(pwId=pathwayId, timestamp=date)
 
-	    def getRecentChanges(self, timestamp):
-		"""Get the recently changed pathways.
+    def getRecentChanges(self, timestamp):
+        """Get the recently changed pathways.
 
-		:param str timestamp: Only get changes from after this time. Timestamp
-		    format: yyyymmddMMHHSS (string or number)
-		:return: the changed pathways
+        :param str timestamp: Only get changes from after this time. Timestamp
+            format: yyyymmddMMHHSS (string or number)
+        :return: the changed pathways
 
-		::
+        ::
 
-		    s.getRecentChanges(20110101000000)
-		"""
-		return self.serv.getRecentChanges(timestamp=timestamp)
+            s.getRecentChanges(20110101000000)
+        """
+        return self.serv.getRecentChanges(timestamp=timestamp)
 
-	    def login(self, usrname, password):
-		"""Start a logged in session using an existing WikiPathways account.
+    def login(self, usrname, password):
+        """Start a logged in session using an existing WikiPathways account.
 
-		.. warning:: interface not exposed in bioservices.
+        .. warning:: interface not exposed in bioservices.
 
-		This function will return an authentication code that can
-		be used to excecute methods that need authentication (e.g.
-		updatePathway).
+        This function will return an authentication code that can
+        be used to excecute methods that need authentication (e.g.
+        updatePathway).
 
-		:param str name: The username of the WikiPathways account.
-		:param str password: The password of the WikiPathways account.
-
-
-		:Returns:  string The authentication code for this session.
-
-		"""
-		raise NotImplementedError
-		# for future usage. pass is a python keyword so we must use a dictionary
-		#d = {"name":usrname, "pass":password}
-		#return self.serv.login(**d)
-
-	    def getPathwayAs(self, pathwayId, filetype='owl', revisionNumb=0):
-		"""Download a pathway in the specified file format.
-
-		:param str pathwayId: the pathway identifier.
-		:param str filetypei: Download a pathway in the specified file format.
-		:param int revision: The revision number of the pathway (use '0' for most recent version).
-		:return: The file contents
-
-		.. warning:: argument pathwayId and filetype are inversed as compared to the
-		    WSDL prototype (if you want to call it directly)
+        :param str name: The username of the WikiPathways account.
+        :param str password: The password of the WikiPathways account.
 
 
-		"""
-		self.checkParam(filetype, ['gpml','png','svg','pdf','txt','pwf', 'owl'])
-		res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, 
-		     revision = revisionNumb)
-		return base64.b64decode(res)
+        :Returns:  string The authentication code for this session.
 
-	    def savePathwayAs(self, pathwayId, filename, revisionNumb = 0, display = True):
-		"""Save a pathway
+        """
+        raise NotImplementedError
+        # for future usage. pass is a python keyword so we must use a dictionary
+        #d = {"name":usrname, "pass":password}
+        #return self.serv.login(**d)
 
-		:param str pathwayId: the pathway identifier.
-		:param str filename:
-		:param int revisionNumb:
-		:param bool display:
+    def getPathwayAs(self, pathwayId, filetype='owl', revisionNumb=0):
+        """Download a pathway in the specified file format.
 
-		.. note:: method from bioservices. Not a wikiPathway function
-		"""
-		if filename.find('.') == -1:
-		    filename = "%s.%s" %(filename,'pdf')
-		filetype = filename.split('.')[-1]
-		res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, revision = revisionNumb)
-		f = open(filename,'w')
-		f.write(base64.b64decode(res))
-		if display:
-		    webbrowser.open(filename)
-		f.close()
+        :param str pathwayId: the pathway identifier.
+        :param str filetypei: Download a pathway in the specified file format.
+        :param int revision: The revision number of the pathway (use '0' for most recent version).
+        :return: The file contents
 
-	    def displaySavedPathwayInBrowser(self, filename):
-		"""Show a document in a browser
+        .. warning:: argument pathwayId and filetype are inversed as compared to the
+            WSDL prototype (if you want to call it directly)
 
-		:param str filename:
-		:return: nothing
-		"""
-		webbrowser.open(filename)
 
-	    def updatePathway(self, pathwayId, describeChanges, gpmlCode, revision=0):
-		"""Update a pathway on the wiki with the given GPML code.
+        """
+        self.checkParam(filetype, ['gpml','png','svg','pdf','txt','pwf', 'owl'])
+        res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, 
+             revision = revisionNumb)
+        return base64.b64decode(res)
 
-		.. warning:: interface not exposed in bioservices.
+    def savePathwayAs(self, pathwayId, filename, revisionNumb = 0, display = True):
+        """Save a pathway
 
-		.. note:: To create/modify pathways via the web service, you need to
-		    have an account with web service write permissions. Please contact
-		    us to request write access for the web service.
+        :param str pathwayId: the pathway identifier.
+        :param str filename:
+        :param int revisionNumb:
+        :param bool display:
 
-		:param str pwId:  The pathway identifier.
-		:param str description:  A description of the modifications.
-		:param str gpml: The updated GPML code.
-		:param int revision: The revision number of the version this GPML
-		    code was based on. This is used to prevent edit conflicts in
-		    case another client edited the pathway after this client downloaded it.
-		:param object WSAuth_auth:  The authentication info.
+        .. note:: method from bioservices. Not a wikiPathway function
+        """
+        if filename.find('.') == -1:
+            filename = "%s.%s" %(filename,'pdf')
+        filetype = filename.split('.')[-1]
+        res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, revision = revisionNumb)
+        f = open(filename,'w')
+        f.write(base64.b64decode(res))
+        if display:
+            webbrowser.open(filename)
+        f.close()
 
-		:returns: boolean True if the pathway was updated successfully.
-		"""
-		#self.authInfo
-		raise NotImplementedError
-		#return self.serv.updatePathway(pwId = pathwayId,
-		#description = describeChanges, gpml = gpmlCode, revision = revisionNumb, auth = authInfo)
+    def displaySavedPathwayInBrowser(self, filename):
+        """Show a document in a browser
 
-	    def createPathway(self, gpmlCode, authInfo):
-		"""Create a new pathway on the wiki with the given GPML code.
+        :param str filename:
+        :return: nothing
+        """
+        webbrowser.open(filename)
 
-		.. warning:: interface not exposed in bioservices.
+    def updatePathway(self, pathwayId, describeChanges, gpmlCode, revision=0):
+        """Update a pathway on the wiki with the given GPML code.
 
-		.. note:: To create/modify pathways via the web service, you need to
-		    have an account with web service write permissions. Please
-		    contact us to request write access for the web service.
+        .. warning:: interface not exposed in bioservices.
 
-		:param str gpml: The GPML code.
-		:param object WSAuth auth: The authentication info.
-		:returns: WSPathwayInfo The pathway info for the created pathway
-		    (containing identifier, revision, etc.).
+        .. note:: To create/modify pathways via the web service, you need to
+            have an account with web service write permissions. Please contact
+            us to request write access for the web service.
 
-		"""
-		raise NotImplementedError
-		#return self.serv.createPathway(gpml = gpmlCode, auth = authInfo)
+        :param str pwId:  The pathway identifier.
+        :param str description:  A description of the modifications.
+        :param str gpml: The updated GPML code.
+        :param int revision: The revision number of the version this GPML
+            code was based on. This is used to prevent edit conflicts in
+            case another client edited the pathway after this client downloaded it.
+        :param object WSAuth_auth:  The authentication info.
 
-	    #def saveCurationTag(self, pathwayId, name, revisionNumb, authInfo, text = None):
-	    def saveCurationTag(self, pathwayId, name, revisionNumb):
-		"""Apply a curation tag to a pathway. This operation will overwrite any existing tag with the same name.
+        :returns: boolean True if the pathway was updated successfully.
+        """
+        #self.authInfo
+        raise NotImplementedError
+        #return self.serv.updatePathway(pwId = pathwayId,
+        #description = describeChanges, gpml = gpmlCode, revision = revisionNumb, auth = authInfo)
 
-		.. warning:: interface not exposed in bioservices.
+    def createPathway(self, gpmlCode, authInfo):
+        """Create a new pathway on the wiki with the given GPML code.
 
-		:param str pathwayId: the pathway identifier.
-		"""
-		raise NotImplementedError
-		# use the login function to store the authInfo argument
-		#if text == None:
-		#   res = self.serv.saveCurationTag(pwId = pathwayId, tagName = name, revision = revisionNumb, auth = authInfo)
-		#else:
-		#   res =  self.serv.saveCurationTag(pwId = pathwayId, tagName = name, tagText = text, revision = revisionNumb, auth = authInfo)
-		#return res
+        .. warning:: interface not exposed in bioservices.
 
-	    def removeCurationTag(self, pathwayId, name):
-		"""Remove a curation tag from a pathway.
+        .. note:: To create/modify pathways via the web service, you need to
+            have an account with web service write permissions. Please
+            contact us to request write access for the web service.
 
-		.. warning:: interface not exposed in bioservices.
+        :param str gpml: The GPML code.
+        :param object WSAuth auth: The authentication info.
+        :returns: WSPathwayInfo The pathway info for the created pathway
+            (containing identifier, revision, etc.).
 
-		"""
-		#self.authInfo
-		raise NotImplementedError
-		#return self.serv.removeCurationTag(pwId = pathwayId, tagName = name, auth = authInfo)
+        """
+        raise NotImplementedError
+        #return self.serv.createPathway(gpml = gpmlCode, auth = authInfo)
+
+    #def saveCurationTag(self, pathwayId, name, revisionNumb, authInfo, text = None):
+    def saveCurationTag(self, pathwayId, name, revisionNumb):
+        """Apply a curation tag to a pathway. This operation will overwrite any existing tag with the same name.
+
+        .. warning:: interface not exposed in bioservices.
+
+        :param str pathwayId: the pathway identifier.
+        """
+        raise NotImplementedError
+        # use the login function to store the authInfo argument
+        #if text == None:
+        #   res = self.serv.saveCurationTag(pwId = pathwayId, tagName = name, revision = revisionNumb, auth = authInfo)
+        #else:
+        #   res =  self.serv.saveCurationTag(pwId = pathwayId, tagName = name, tagText = text, revision = revisionNumb, auth = authInfo)
+        #return res
+
+    def removeCurationTag(self, pathwayId, name):
+        """Remove a curation tag from a pathway.
+
+        .. warning:: interface not exposed in bioservices.
+
+        """
+        #self.authInfo
+        raise NotImplementedError
+        #return self.serv.removeCurationTag(pwId = pathwayId, tagName = name, auth = authInfo)
 
     #REST getCurationTags?pwId=WP4
     def getCurationTags(self, pathwayId):
