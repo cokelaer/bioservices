@@ -137,7 +137,7 @@ PICR service
 =============
 
 
-PICR, the Protein Identifier Cross Reference service. It provides 2 serives 
+PICR, the Protein Identifier Cross Reference service. It provides 2 services 
 in WSDL and REST protocols. We implemented only the REST interface. The 
 methods available in the REST service are very similar to those available 
 via SOAP, save for one major difference: only one accession or sequence 
@@ -158,7 +158,7 @@ protein P29375 found in two specific databases::
 Biomodels service
 ===================
 
-You can access to the biomodels service and obtain a model as follows::
+You can access the biomodels service and obtain a model as follows::
 
 
     >>> from bioservices import biomodels
@@ -172,7 +172,7 @@ In order to get the model IDs, you can look at the full list::
     >>> b.modelsId
 
 Of course it does not tell you anything about a model; there are more useful functions such as 
-:meth:`~bioservices.services.biomodels.getModelsIdByUniprotId` and other getModelsIdBy family.
+:meth:`~bioservices.services.biomodels.getModelsIdByUniprotId` and others from the getModelsIdBy family.
 
 
 .. seealso:: Reference guide of :class:`bioservices.biomodels.BioModels` for more details
@@ -222,12 +222,12 @@ output format can be found in ::
 Create your own wrapper around WSDL service
 ==============================================
 
-If a web service interface is not provided within bioservices, you can still easily access to its functionalities. As an example, let us look at the `Ontology Lookup service <http://www.ebi.ac.uk/ontology-lookup/WSDLDocumentation.do>`_, which provides a WSDL service. In order to easily access to this service, use the :class:`WSDLService` class as follows::
+If a web service interface is not provided within bioservices, you can still easily access its functionalities. As an example, let us look at the `Ontology Lookup service <http://www.ebi.ac.uk/ontology-lookup/WSDLDocumentation.do>`_, which provides a WSDL service. In order to easily access this service, use the :class:`WSDLService` class as follows::
 
     >>> from bioservices import WSDLService
     >>> ols = WSDLService("OLS", " http://www.ebi.ac.uk/ontology-lookup/OntologyQuery.wsdl")
 
-You can now see what methods are available::
+You can now see which methods are available::
 
     >>> ols.methods
 
@@ -239,6 +239,6 @@ You can then look at something more complex and extract relevant information::
 
     >>> [x.value for x in ols.serv.getOntologyNames()[0]]
 
-Of course, you can add new method to ease te access to any functionalities::
+Of course, you can add new methods to ease the access to any functionalities::
 
     >>> ols.getOnlogyNames() # returns the values
