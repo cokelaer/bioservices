@@ -53,12 +53,13 @@ class UniProt(RESTService):
 
     .. warning:: for the time being, this class only provide interface to 
         * the identifier mapping service
-        * search of a uniprotKB identifier
+        * search of a UniProtKB identifier
         * some experimental interface to the full search 
 
     Example::
 
-        >>> u = Uniprot(verbose=False)
+        >>> from bioservices import UniProt
+        >>> u = UniProt(verbose=False)
         >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403')
         ['FromACC', 'ToKEGG_ID', 'P43403', 'hsa:7535']
         >>> res = u.search("P43403")
@@ -80,7 +81,7 @@ class UniProt(RESTService):
 
         ::
 
-            >>> u.mapping(fro="ACC", to="KEGG_ID", query='P43403')
+            >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403')
             ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535']
             >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403 P00958')
             ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535', 'P00958', 'sce:YGR264C']
