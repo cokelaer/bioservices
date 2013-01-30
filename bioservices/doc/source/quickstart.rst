@@ -6,14 +6,14 @@ Quick Start
 Bioservices provides several services. Each service requires some expertise so
 we will neither cover all the services nor all their functionalities in this quickstart. However by the end of this tutorials you should be able to play with all services provided in bioservices. 
 
-There are two main technology involved in web services: the WSDL and the REST
-styles. The Kegg and Biomodels services presented uses WSDL whereas uniprot uses
+There are two main technologies involved in web services: the WSDL and the REST
+styles. The Kegg and Biomodels services presented use WSDL whereas uniprot uses
 REST.
 
 
 #.  RESTful URLs are useful in that there is no need for any external
     dependency. You simply need to build a well-formatted URL and you will retrieve
-    an XML docum    ent that you can consume with your preferred technology
+    an XML document that you can consume with your preferred technology
     platform. The XML document that is returned will contain elements defined in the
     WSDL schema.
 
@@ -57,17 +57,17 @@ In order to get the list of valid organisms, type::
 The human organism is coded as "hsa". You can also get the T number instead of
 Ids::
 
-    print k.orgamisms_tnumbers
+    print k.organisms_tnumbers
 
 
 Every elements is referred to with a Kegg ID, which may be difficult to handle
 at first. There are methods to retrieve the IDs though. For instance, get the list of 
 pathways ids for the current organism as follows::
 
-    k.pathwayIDs
+    k.pathwayIds
 
 For a given gene, you can get the full information related to that gene by using
-the method :meth:`~bioservices.kegg.Kegg.bget`::
+the method :meth:`~bioservices.kegg.Kegg.get`::
 
     print k.get("hsa:3586")
 
@@ -77,21 +77,21 @@ or a pathway::
 
 
 
-.. seealso:: Reference guide of :class:`bioservices.kegg.KEGG` for more details
+.. seealso:: Reference guide of :class:`bioservices.kegg.Kegg` for more details
 .. seealso:: Reference guide of :ref:`kegg_tutorial` for more details
 
 WSDbfetch service
 ==================
 
 There is a uniprot module that allows to access to the uniprot WSDL. However,
-there are really few service and the only relevant method returns raw data that
+there are really few services and the only relevant method returns raw data that
 the user will need to scan. For instance::
 
 
 
     >>> from bioservices import WSDbfetch
     >>> w = WSDbfetch()
-    >>> data = w.fetchBatch("uniprot" ,"zap70_human", "xml", "raw")
+    >>> data = w.fetchBatch("uniprot", "zap70_human", "xml", "raw")
 
 
 
@@ -102,7 +102,7 @@ UniProt service
 ================
 
 With this module, you can map an ID from a database to another one. For instance
-to convert the uniprotKB ID into KEGG ID, use:
+to convert the UniProtKB ID into KEGG ID, use:
 
 .. doctest::
 
@@ -192,15 +192,15 @@ Rhea provides only 2 type of requests with a REST interface that are available w
     xml_response = r.search("caffein*")
 
 The output is in XML format. Python provides lots of tools to deal with xml so
-you can surely found good tools. 
+you can surely find good tools. 
 
 
-Within bioservices, we wrap all returned XML document into a BeautifulSoup
-object that ease the manipulaiton of XML documents.
+Within bioservices, we wrap all returned XML documents into a BeautifulSoup
+object that ease the manipulation of XML documents.
 
 As an example, we can extract all fields "id" as follows::
 
-    >>> ids = [x.getText() for x in xml_response.findAll("id")]
+    >>> [x.getText() for x in xml_response.findAll("id")]
     [u'27902', u'10280', u'20944', u'30447', u'30319', u'30315', u'30311', u'30307']
 
 The second method provided is the :meth:`entry` method. Given an Id, 
