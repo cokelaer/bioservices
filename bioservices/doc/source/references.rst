@@ -91,10 +91,10 @@ Rhea
     :undoc-members:
     :synopsis:
 
-Reactome
-=====================
+.. Reactome
+.. =====================
 
-.. automodule:: bioservices.reactome
+.. .. automodule:: bioservices.reactome
     :members:
     :undoc-members:
     :synopsis:
