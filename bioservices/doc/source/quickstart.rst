@@ -127,6 +127,7 @@ QuickGO
 =========
 
 Quick access to the GO interface
+
 .. doctest::
 
     >>> from bioservices import QuickGO
