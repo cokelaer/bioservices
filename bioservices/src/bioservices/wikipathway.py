@@ -40,7 +40,7 @@ from services import WSDLService, RESTService
 import copy, webbrowser, xmltools, base64
 
 
-__all__ = ["Wikipath"]
+__all__ = ["Wikipathway"]
 
 
 # this is useless but let us keep for now
@@ -70,13 +70,13 @@ class _Items2(object):
     #def _get_entry_ids(self):
 
 
-class Wikipath(WSDLService):
+class Wikipathway(WSDLService):
     """Interface to `Pathway <http://www.wikipathways.org/index.php>`_ service
 
     .. doctest::
 
        >>> from bioservices import *
-       >>> s = Wikipath()
+       >>> s = Wikipathway()
        >>> s.organism  # default organism
        'Homo sapiens'
 
@@ -105,7 +105,7 @@ class Wikipath(WSDLService):
 
         """
 
-        super(Wikipath, self).__init__(name="Wikipathway", url=Wikipath._url, verbose = verbose)
+        super(Wikipathway, self).__init__(name="Wikipathway", url=Wikipathway._url, verbose = verbose)
         self._organism = 'Homo sapiens' ## This function is redundant (see class service)
         self.logging.info("Fetching organisms...")
 
@@ -250,7 +250,7 @@ class Wikipath(WSDLService):
         ::
 
             >>> from bioservices import *
-            >>> s= Wikipath(verbose=False)
+            >>> s= Wikipathway(verbose=False)
             >>> s.getPathwayInfo("WP2320")
         """
         return self.serv.getPathwayInfo(pwId=pathwayId)
@@ -549,7 +549,7 @@ class Wikipath(WSDLService):
         ::
 
             >>> from bioservices import *
-            >>> s = Wikipath()
+            >>> s = Wikipathway()
             >>> s.getPathwaysByOntologyTerm('DOID:344')
 
         """
