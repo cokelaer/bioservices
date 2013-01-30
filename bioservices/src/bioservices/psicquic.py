@@ -50,7 +50,7 @@ based on Lucene's syntax.
 * Use parenthesis for complex queries (e.g. '(XXX OR YYY) AND ZZZ')
 * Wildcards (`*`,?) can be used between letters in a term or at the end of terms to do fuzzy queries,
    but never at the beginning of a term. 
-* Optionally, you can prepend a symbol in from of your term.
+* Optionally, you can prepend a symbol in front of your term.
     *  + (plus): include this term. Equivalent to AND. e.g. +P12345
     *  - (minus): do not include this term. Equivalent to NOT. e.g. -P12345
     *    Nothing in front of the term. Equivalent to OR. e.g. P12345
@@ -130,8 +130,8 @@ class PSICQUIC(RESTService):
 
     This service provides a common interface to more than 25 other services
     related to protein. So, we won't detail all the possiblity of this service.
-    Here is an example that consists in looking for interaction between the
-    protein called ZAP70 within the ::
+    Here is an example that consists of looking for interactors of the
+    protein ZAP70 within the IntAct database::
 
         >>> from bioservices import *
         >>> s = psicquic.PSICQUIC()
@@ -166,7 +166,7 @@ class PSICQUIC(RESTService):
         .. doctest:: 
 
             >>> from bioservices import PSICQUIC
-            >>> s = psicquic.PSICQUIC()
+            >>> s = PSICQUIC()
 
         """
         urlStr = 'http://www.ebi.ac.uk/Tools/webservices/psicquic'
@@ -175,7 +175,7 @@ class PSICQUIC(RESTService):
 
     def _get_formats(self):
         return PSICQUIC._formats
-    formats = property(_get_formats, doc="returns the possible output formats")
+    formats = property(_get_formats, doc="Returns the possible output formats")
 
     def read_registry(self):
         """Reads and returns the active registry 
@@ -188,7 +188,7 @@ class PSICQUIC(RESTService):
     def print_status(self):
         """Prints the services that are available
 
-        :return: nothing
+        :return: Nothing
 
         The output is tabulated. The columns are:
 
@@ -201,7 +201,7 @@ class PSICQUIC(RESTService):
         * rest example
         * restricted
 
-        .. seealso:: if you want the data into lists, see all attributes
+        .. seealso:: If you want the data into lists, see all attributes
             starting with registry such as :meth:`registry_names`
         """
         url = self.url +  '/registry/registry?action=STATUS&format=xml'
@@ -289,13 +289,13 @@ class PSICQUIC(RESTService):
 
         :param str service: a registered service. See :attr:`registry_names`.
         :param str query: a valid query. Can be `*` or a protein name.
-        :param str output: a valid format. See r._formats
+        :param str output: a valid format. See s._formats
 
         ::
 
-            r.query("intact", "brca2", "tab27")
-            r.query("intact", "zap70", "xml25")
-            r.query("matrixdb", "*", "xml25")
+            s.query("intact", "brca2", "tab27")
+            s.query("intact", "zap70", "xml25")
+            s.query("matrixdb", "*", "xml25")
 
         This is the programmatic approach to this website:
 
@@ -306,7 +306,7 @@ class PSICQUIC(RESTService):
         protein-protein interaction data of a particular model organism. Here we
         restrict the query to 100 results::
 
-            r.query("string", "species:10090", firstResult=0, maxResults=100, output="tab25")
+            s.query("string", "species:10090", firstResult=0, maxResults=100, output="tab25")
 
         """
         params = {}
