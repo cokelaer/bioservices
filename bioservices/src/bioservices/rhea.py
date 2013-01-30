@@ -101,9 +101,9 @@ class Rhea(RESTService):
         :param str format: the biopax2 or cmlreact format (default)
 
 
-        :Returns: an XML document containing the reactions with undefined
+        :Returns: An XML document containing the reactions with undefined
             direction, with links to the corresponding bi-directional ones.
-            the format is easyXML.
+            The format is easyXML.
 
         ::
 
@@ -135,14 +135,13 @@ class Rhea(RESTService):
 
         :param int id: the id of a reaction
         :param format: can be rxn, biopax2, or cmlreact
-        :Returns: an XML document containing the reactions with undefined
+        :Returns: An XML document containing the reactions with undefined
             direction, with links to the corresponding bi-directional ones.
-            the format is easyXML.
+            The format is easyXML.
 
         ::
 
-            >>> print r.entry(10280)
-            >>> print r.entry(10281,format="rxn")
+            >>> print r.entry(10281, format="rxn")
 
         The output is in XML format. This page from the Rhea web site explains 
         what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of 
