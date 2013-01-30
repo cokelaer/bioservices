@@ -56,6 +56,7 @@ class PICR(RESTService):
 
     .. doctest::
 
+        >>> from bioservices import PICR
         >>> p = PICR()
         >>> res = p.getMappedDatabaseNames() # get list of valid database
         >>> results = p.getUPIForSequence(p._sequence_example, \
@@ -77,7 +78,7 @@ class PICR(RESTService):
 
         This method calls the getMappedDatabaseNames REST services from PICR website.
 
-        :returns: a XML containing the databases available.
+        :returns: An XML containing the databases available.
 
         .. seealso:: :attr:`databases` to obtain a human readable list
         """
@@ -90,7 +91,7 @@ class PICR(RESTService):
             res = self.getMappedDatabaseNames()
             self._databases = [a.text for a in res.getchildren()]
         return self._databases
-    databases = property(_get_databases, doc="get a human-readable list of databases (from XML returned by :meth:`getMappedDatabaseNames`)")
+    databases = property(_get_databases, doc="Get a human-readable list of databases (from XML returned by :meth:`getMappedDatabaseNames`)")
 
     def getUPIForSequence(self, sequence, database, taxid=None,
         onlyactive=True, includeattributes=False):
@@ -205,15 +206,15 @@ class PICR(RESTService):
         res = self.request(url)
         return res
 
-    def getUPIForBLAST(self, blasfrag, database,
+    def getUPIForBLAST(self, blastfrag, database,
         taxid=None,
         version=None,
         onlyactive=True,
-        includeattributes=True, **kargs):
+        includeattributes=False, **kargs):
         """Get Protein identifier given a sequence similarity (BLAST)
 
-        :param str blastfrag:  the AA fragment to map to map [required]
-        :param database: the database to map to (string). At least one database is
+        :param str blastfrag:  the AA fragment to map [required]
+        :param str database: the database to map to. At least one database is
             required, but multiple databases can be queried at once using a list.
         :param taxid: the NEWT taxon ID to limit the mappings [optional]
         :param bool onlyactive: if true, only active mappings will be returned. If false,
@@ -232,7 +233,7 @@ class PICR(RESTService):
 
         :param str matrix: specifies which protein scoring matrix to use. [optional, defaults to BLOSUM62]
 
-        .. note:: parameter names are case sensitive
+        .. note:: Parameter names are case sensitive.
         .. note:: If version is not specified but the accession is of the form P29375.1,
             the accession and version will automatically be split to accession=P29375
             and version-1.
@@ -242,13 +243,13 @@ class PICR(RESTService):
 
         ::
 
-            >>> res = p.getUPIForBLAST(p._blastfrag_example, "SWISSPROT")
-            >>> res = p.getUPIForBLAST(p._blastfrag_example, "SWISSPROT",
-                   program="blastp",matrix="BLOSUM80")
+            >>> res = s.getUPIForBLAST(s._blastfrag_example, "SWISSPROT")
+            >>> res = s.getUPIForBLAST(s._blastfrag_example, "SWISSPROT",
+                   program="blastp", matrix="BLOSUM80")
 
         """
         url = "http://www.ebi.ac.uk/Tools/picr/rest/getUPIForBLAST"
-        url += "?blastfrag=" + blasfrag
+        url += "?blastfrag=" + blastfrag
         if isinstance(database,str):
             self._checkDBname(database)
             url+= "&database=" + database
