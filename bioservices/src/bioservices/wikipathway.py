@@ -138,25 +138,26 @@ class Wikipathway(WSDLService):
         res = self.serv.findPathwaysByLiterature(query=query)
         return res
 
-    def findPathwaysByXref(self, id_list):
-        """Find pathways by searching on the external references of DataNodes
+    def findPathwaysByXref(self, ids):
+        """Find pathways by searching on the external references of DataNodes.
 
 
-        This function suppots only 1 ids and 1 code at a time. To specify 
+        This function supports only 1 ids and 1 code at a time. To specify 
         multiple ids and codes parameters to query for multiple xrefs at once,
         the REST syntax should be used. In that case, the number of ids and 
         codes parameters should match, they will be paired to form xrefs, 
         e.g.::
 
-            s = RESTService("test", url=self.url[:-5])
-            s.request('/findPathwaysByXref?ids=1234&ids=ENSG00000130164&codes=L&codes=EnHs')
-            s.request('/findPathwaysByXref?ids=1234&codes=L')
+            from bioservices import RESTService
+            r = RESTService("test", url=s.url[:-5])
+            r.request('/findPathwaysByXref?ids=1234&ids=ENSG00000130164&codes=L&codes=EnHs')
+            r.request('/findPathwaysByXref?ids=1234&codes=L')
 
         :param str string ids: One DataNode identifier(s) (e.g. 'P45985').
             Datanodes can be (gene/protein/metabolite identifiers). 
         :param str codes: One code of the database system to limit the search
-            to. **Not implemented**
-        :return:  List of WSSearchResult An array of search results with DataNode GraphId stored in the 'field' hash.
+            to. **Not implemented**.
+        :return:  List of WSSearchResult. An array of search results with DataNode GraphId stored in the 'field' hash.
 
 
         ::
@@ -164,10 +165,10 @@ class Wikipathway(WSDLService):
             s.findPathwaysByXref(ids="P45985")
 
 
-        .. warning:: code is not available. Does not see to work in WSDLinterface
+        .. warning:: **codes** is not available. Does not seem to work in WSDLinterface.
         """
-        # codes=code but does not see to work
-        res = self.serv.findPathwaysByXref(ids=id_list)
+        # codes=code but does not seem to work
+        res = self.serv.findPathwaysByXref(ids=ids)
         return res
 
     #REST: s.url[:-5] + ?query=P53
@@ -186,6 +187,9 @@ class Wikipathway(WSDLService):
             the output from WikiPathways is processed and only the interactions
             are returned (for the default organism). You can change this behaviour
             by changing the default arguments (raw, organism, interactionOnly)
+
+        .. warning:: Interface different from the service, unless raw is set to True
+
         """
         if raw:
             return self.serv.findInteractions(query=query)
@@ -224,12 +228,12 @@ class Wikipathway(WSDLService):
             return self.serv.listPathways(organism = organism)
 
     def getPathway(self, pathwayId, revision=0):
-        """Download the pathway from WikiPathways.
+        """Download a pathway from WikiPathways.
 
         :param str pathwayId: the pathway identifier.
         :param int revision: the revision number of the pathway (use '0'
             for most recent version).
-        :Returns: the pathway.
+        :Returns: The pathway.
 
         ::
 
@@ -238,10 +242,10 @@ class Wikipathway(WSDLService):
         return self.serv.getPathway(pwId=pathwayId, revision=revision)
 
     def getPathwayInfo(self, pathwayId):
-        """Get some general info about the pathway
+        """Get some general info about the pathway.
 
         :param str pathwayId: the pathway identifier.
-           Info can be the name, species, without downloading the GPML.
+        :return: The pathway info.
 
         ::
 
@@ -256,12 +260,12 @@ class Wikipathway(WSDLService):
 
         :param str pathwayId: the pathway identifier.
         :param str date: limit the results by date, only history items after
-            the given date (timestamp format) will be included. can be a string
+            the given date (timestamp format) will be included. Can be a string
             or number of the form YYYYMMDDHHMMSS.
-        :return: The revision history
+        :return: The revision history.
 
-        .. warning:: does not seem to work with WSDL. Replace REST version but
-            unstable: does not return the results systematically.
+        .. warning:: Does not seem to work with WSDL. Replaced by a REST version but
+            unstable: Does not return the results systematically.
 
         ::
 
@@ -289,7 +293,7 @@ class Wikipathway(WSDLService):
     def login(self, usrname, password):
         """Start a logged in session using an existing WikiPathways account.
 
-        .. warning:: interface not exposed in bioservices.
+        .. warning:: Interface not exposed in bioservices.
 
         This function will return an authentication code that can
         be used to excecute methods that need authentication (e.g.
@@ -311,11 +315,11 @@ class Wikipathway(WSDLService):
         """Download a pathway in the specified file format.
 
         :param str pathwayId: the pathway identifier.
-        :param str filetypei: Download a pathway in the specified file format.
-        :param int revision: The revision number of the pathway (use '0' for most recent version).
+        :param str filetype: the file format.
+        :param int revision: the revision number of the pathway (use '0' for most recent version).
         :return: The file contents
 
-        .. warning:: argument pathwayId and filetype are inversed as compared to the
+        .. warning:: Argument pathwayId and filetype are inversed as compared to the
             WSDL prototype (if you want to call it directly)
 
 
@@ -326,14 +330,14 @@ class Wikipathway(WSDLService):
         return base64.b64decode(res)
 
     def savePathwayAs(self, pathwayId, filename, revisionNumb = 0, display = True):
-        """Save a pathway
+        """Save a pathway.
 
         :param str pathwayId: the pathway identifier.
         :param str filename:
         :param int revisionNumb:
         :param bool display:
 
-        .. note:: method from bioservices. Not a wikiPathway function
+        .. note:: Method from bioservices. Not a wikiPathway function
         """
         if filename.find('.') == -1:
             filename = "%s.%s" %(filename,'pdf')
@@ -356,7 +360,7 @@ class Wikipathway(WSDLService):
     def updatePathway(self, pathwayId, describeChanges, gpmlCode, revision=0):
         """Update a pathway on the wiki with the given GPML code.
 
-        .. warning:: interface not exposed in bioservices.
+        .. warning:: Interface not exposed in bioservices.
 
         .. note:: To create/modify pathways via the web service, you need to
             have an account with web service write permissions. Please contact
@@ -380,7 +384,7 @@ class Wikipathway(WSDLService):
     def createPathway(self, gpmlCode, authInfo):
         """Create a new pathway on the WikiPathways website with a given GPML code.
 
-        .. warning:: Not yet implemented.
+        .. warning:: Interface not exposed in bioservices.
 
         .. note:: To create/modify pathways via the web service, you need to
             have an account with web service write permissions. Please
@@ -399,7 +403,7 @@ class Wikipathway(WSDLService):
     def saveCurationTag(self, pathwayId, name, revisionNumb):
         """Apply a curation tag to a pathway. This operation will overwrite any existing tag with the same name.
 
-        .. warning:: interface not exposed in bioservices.
+        .. warning:: Interface not exposed in bioservices.
 
         :param str pathwayId: the pathway identifier.
         """
@@ -414,7 +418,7 @@ class Wikipathway(WSDLService):
     def removeCurationTag(self, pathwayId, name):
         """Remove a curation tag from a pathway.
 
-        .. warning:: interface not exposed in bioservices.
+        .. warning:: Interface not exposed in bioservices.
 
         """
         #self.authInfo
@@ -426,7 +430,7 @@ class Wikipathway(WSDLService):
         """Get all curation tags for the given pathway.
 
         :param str pathwayId: the pathway identifier.
-        :returns: array of WSCurationTag The curation tags.
+        :returns: Array of WSCurationTag. The curation tags.
 
         ::
 
@@ -441,8 +445,8 @@ class Wikipathway(WSDLService):
         Use this method if you want to find all pathways that are tagged with a specific curation tag.
 
 
-        :param str tagName: The tag name (see Special:SpecialCurationTags for an overview of available tag names).
-        :return: Array of WSCurationTag The curation tags (one instance for each pathway that has been tagged).
+        :param str tagName: The tag name (see 'Special:SpecialCurationTags <http://www.wikipathways.org/index.php/Special:SpecialCurationTags>'_ for an overview of available tag names).
+        :return: Array of WSCurationTag. The curation tags (one instance for each pathway that has been tagged).
 
         ::
 
@@ -457,7 +461,7 @@ class Wikipathway(WSDLService):
         :param str pwId: The pathway identifier.
         :param int revision: The revision number of the pathway (use '0' for most recent version). 
         :param str fileType:  The image type (One of 'svg', 'pdf' or 'png'). Not
-            yet implemented. svg is returned
+            yet implemented. svg is returned.
         :returns: binary form of the image.
 
 
@@ -486,7 +490,7 @@ class Wikipathway(WSDLService):
           to using OR ('p53 OR apoptosis' gives the same result as 'p53 apoptosis').
         * Group terms with parentheses, e.g. '(apoptosis OR mapk) AND p53'
         * You can use wildcards * and ?. * searches for one or more
-          characters, ? searchers for only one character.
+          characters, ? searches for only one character.
         * Use quotes to escape special characters. E.g. '"apoptosis*"' will
           include the * in the search and not use it as wildcard.
 
@@ -511,7 +515,7 @@ class Wikipathway(WSDLService):
 
 
         :param str pathwayId: the pathway identifier.
-        :return:      Array of WSOntologyTerm The ontology terms.
+        :return: Array of WSOntologyTerm. The ontology terms.
 
         ::
 
@@ -524,7 +528,7 @@ class Wikipathway(WSDLService):
         """Get a list of ontology terms from a given ontology.
 
 
-        :param str ontology: The ontology term (for possible values, see the Ontology Tags section on the pathway page.
+        :param str ontology: The ontology term (for possible values, see the Ontology Tags section on the pathway page at WikiPathways website.
         :return: List of WSOntologyTerm The ontology terms.
 
         ::
@@ -540,7 +544,7 @@ class Wikipathway(WSDLService):
 
 
         :param str ontologyTermId: the ontology term identifier.
-        :returns: list of WSPathwayInfo The pathway information.
+        :returns: List of WSPathwayInfo. The pathway information.
 
         ::
 
@@ -568,7 +572,7 @@ class Wikipathway(WSDLService):
 
         :param str pathwayId: the pathway identifier.
 
-        .. note: this is a additional bioservices functionality (not a
+        .. note: This is an additional bioservices functionality (not a
             wikipathway one) showing a wikipathway URL.
 
         """
