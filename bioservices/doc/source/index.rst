@@ -41,7 +41,7 @@ Here is a list of services that you can access from **bioservices**:
     bioservices.wsdbfetch.WSDbfetch
     bioservices.ncbiblast.NCBIblast
     bioservices.psicquic.PSICQUIC
-    bioservices.wikipathway.Wikipath
+    bioservices.wikipathway.Wikipathway
 
 
 
