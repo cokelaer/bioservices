@@ -91,11 +91,11 @@ class Wikipathway(WSDLService):
     :meth:`updatePathway`, :meth:`removeCurationTag`, :meth:`saveCurationTag`,
     :meth:`createPathway`)
 
-    Not implemented at all:
+    Methods not implemented at all:
 
-      * getXrefList netheir WSDL or REST seemed to work
-      * u'getCurationTagHistory' (no API found in Wikipathway web page)
-      * u'getRelations' (no API found in WikiPathway web page)
+      * getXrefList: Neither WSDL or REST seemed to work
+      * u'getCurationTagHistory': No API found in Wikipathway web page
+      * u'getRelations': No API found in WikiPathway web page
     """
     _url = 'http://www.wikipathways.org/wpi/webservice/webservice.php?wsdl'
     def __init__(self, verbose = True):
@@ -129,7 +129,7 @@ class Wikipathway(WSDLService):
         """Find pathways by their literature references.
 
         :param str query: The query, can be a pubmed id, author name or title keyword.
-        :return:  array of WSSearchResult descr=The search results. {{{descr}}}
+        :return:  Array of WSSearchResult descr=The search results. {{{descr}}}
 
         ::
 
@@ -156,7 +156,7 @@ class Wikipathway(WSDLService):
             Datanodes can be (gene/protein/metabolite identifiers). 
         :param str codes: One code of the database system to limit the search
             to. **Not implemented**
-        :return:  list of WSSearchResult An array of search results with DataNode GraphId stored in the 'field' hash.
+        :return:  List of WSSearchResult An array of search results with DataNode GraphId stored in the 'field' hash.
 
 
         ::
@@ -171,25 +171,21 @@ class Wikipathway(WSDLService):
         return res
 
     #REST: s.url[:-5] + ?query=P53
-    def findInteractions(self, query, organism=None, raw=False,
-        interactionOnly=True):
+    def findInteractions(self, query, organism=None,interactionOnly=True, 
+        raw = False):
         """Find interactions defined in WikiPathways pathways.
 
 
         :param str query:  The name of an entity to find interactions for (e.g. 'P53')
-        :param str organism:  The name of the organism to refine the search
-            (default is self.organism)
-        :param bool raw: if True, returns the output of the request without post processing
-        :param bool interactionOnly: returns only the interactions (default). If
+        :param str organism:  The name of the organism to refine the search.
+            If None, self.organism is used (default)
+        :param bool interactionOnly: Returns only the interactions (default). If
             false, returns also scores, revision, pathways
-        :returns: depends on the parameters **raw** and **interactionOnly**. By default, 
-            the output from wikipathway is processed and only the interactions
-            are returned for the default organism. You can change this behaviour
+        :param bool raw: If True, returns the output of the request without post processing (also ignoring organism)
+        :returns: Depends on the parameters **raw** and **interactionOnly**. By default, 
+            the output from WikiPathways is processed and only the interactions
+            are returned (for the default organism). You can change this behaviour
             by changing the default arguments (raw, organism, interactionOnly)
-
-        .. warning:: interface different from the service. The organism
-            parameter allow to refine the search to a specific organism.  to return a
-            formatted output, set raw to True
         """
         if raw:
             return self.serv.findInteractions(query=query)
@@ -262,7 +258,7 @@ class Wikipathway(WSDLService):
         :param str date: limit the results by date, only history items after
             the given date (timestamp format) will be included. can be a string
             or number of the form YYYYMMDDHHMMSS.
-        :return: the revision history
+        :return: The revision history
 
         .. warning:: does not seem to work with WSDL. Replace REST version but
             unstable: does not return the results systematically.
@@ -282,7 +278,7 @@ class Wikipathway(WSDLService):
 
         :param str timestamp: Only get changes from after this time. Timestamp
             format: yyyymmddMMHHSS (string or number)
-        :return: the changed pathways
+        :return: The changed pathways
 
         ::
 
@@ -350,10 +346,10 @@ class Wikipathway(WSDLService):
         f.close()
 
     def displaySavedPathwayInBrowser(self, filename):
-        """Show a document in a browser
+        """Show a saved document in a browser
 
         :param str filename:
-        :return: nothing
+        :return: Nothing
         """
         webbrowser.open(filename)
 
@@ -382,9 +378,9 @@ class Wikipathway(WSDLService):
         #description = describeChanges, gpml = gpmlCode, revision = revisionNumb, auth = authInfo)
 
     def createPathway(self, gpmlCode, authInfo):
-        """Create a new pathway on the wiki with the given GPML code.
+        """Create a new pathway on the WikiPathways website with a given GPML code.
 
-        .. warning:: interface not exposed in bioservices.
+        .. warning:: Not yet implemented.
 
         .. note:: To create/modify pathways via the web service, you need to
             have an account with web service write permissions. Please
@@ -446,7 +442,7 @@ class Wikipathway(WSDLService):
 
 
         :param str tagName: The tag name (see Special:SpecialCurationTags for an overview of available tag names).
-        :return: array of WSCurationTag The curation tags (one instance for each pathway that has been tagged).
+        :return: Array of WSCurationTag The curation tags (one instance for each pathway that has been tagged).
 
         ::
 
@@ -499,7 +495,7 @@ class Wikipathway(WSDLService):
 
         :param str query: The search query (e.g. 'apoptosis' or 'p53').
         :param str species:  The species to limit the search to (leave blank to search on all species).
-        :return: array of WSSearchResult An array of search results.
+        :return: Array of WSSearchResult An array of search results.
 
         ::
 
@@ -515,7 +511,7 @@ class Wikipathway(WSDLService):
 
 
         :param str pathwayId: the pathway identifier.
-        :return:      array of WSOntologyTerm The ontology terms.
+        :return:      Array of WSOntologyTerm The ontology terms.
 
         ::
 
@@ -529,7 +525,7 @@ class Wikipathway(WSDLService):
 
 
         :param str ontology: The ontology term (for possible values, see the Ontology Tags section on the pathway page.
-        :return: list of WSOntologyTerm The ontology terms.
+        :return: List of WSOntologyTerm The ontology terms.
 
         ::
 
