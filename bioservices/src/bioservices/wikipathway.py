@@ -128,7 +128,7 @@ class Wikipathway(WSDLService):
     def findPathwaysByLiterature(self, query):
         """Find pathways by their literature references.
 
-        :param str query: The query, can be a pubmed id, author name or title keyword.
+        :param str or int query: The query, can be a pubmed id, author name or title keyword.
         :return:  Array of WSSearchResult descr=The search results. {{{descr}}}
 
         ::
@@ -447,7 +447,7 @@ class Wikipathway(WSDLService):
         Use this method if you want to find all pathways that are tagged with a specific curation tag.
 
 
-        :param str tagName: The tag name (see 'SpecialCurationTags <http://www.wikipathways.org/index.php/Special:SpecialCurationTags>'_ for an overview of available tag names).
+        :param str tagName: The tag name.
         :return: Array of WSCurationTag. The curation tags (one instance for each pathway that has been tagged).
 
         ::
