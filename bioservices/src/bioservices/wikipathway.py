@@ -122,7 +122,7 @@ class Wikipathway(WSDLService):
 
     def _get_organism(self):
         return self._organism
-    organism = property(_get_organism, _set_organism, doc = "read/write attribute for the organism")
+    organism = property(_get_organism, _set_organism, doc = "Read/write attribute for the organism")
 
     # REST /findPathwaysByLiterature?query=18651794
     def findPathwaysByLiterature(self, query):
@@ -178,8 +178,8 @@ class Wikipathway(WSDLService):
 
 
         :param str query:  The name of an entity to find interactions for (e.g. 'P53')
-        :param str organism:  The name of the organism to refine the search.
-            If None, self.organism is used (default)
+        :param str organism:  The name of the organism to refine the search
+            (default is the :attr: 'organism' attribute).
         :param bool interactionOnly: Returns only the interactions (default). If
             false, returns also scores, revision, pathways
         :param bool raw: If True, returns the output of the request without post processing (also ignoring organism)
@@ -218,7 +218,7 @@ class Wikipathway(WSDLService):
         """Get a list of all available pathways.
 
         :param str organism: a valid organism (default is the :attr:`organism` attribute)
-        :return: Only return list of pathways for this organism
+        :return: List of pathways for the selected organism.
 
         """
         if organism == None:
@@ -303,7 +303,7 @@ class Wikipathway(WSDLService):
         :param str password: The password of the WikiPathways account.
 
 
-        :Returns:  string The authentication code for this session.
+        :Returns: The authentication code for this session.
 
         """
         raise NotImplementedError
@@ -315,8 +315,8 @@ class Wikipathway(WSDLService):
         """Download a pathway in the specified file format.
 
         :param str pathwayId: the pathway identifier.
-        :param str filetype: the file format.
-        :param int revision: the revision number of the pathway (use '0' for most recent version).
+        :param str filetype: the file format (default is .owl).
+        :param int revision: the revision number of the pathway (use '0' for most recent version - this is default).
         :return: The file contents
 
         .. warning:: Argument pathwayId and filetype are inversed as compared to the
@@ -333,11 +333,11 @@ class Wikipathway(WSDLService):
         """Save a pathway.
 
         :param str pathwayId: the pathway identifier.
-        :param str filename:
-        :param int revisionNumb:
-        :param bool display:
+        :param str filename: the name of the file. If a filename extension is not provided the pathway will be saved as a pdf (default).
+        :param int revisionNumb: the revision number of the pathway (use '0 for most recent version).
+        :param bool display: if True the pathway will be displayed in your browser.
 
-        .. note:: Method from bioservices. Not a wikiPathway function
+        .. note:: Method from bioservices. Not a WikiPathways function
         """
         if filename.find('.') == -1:
             filename = "%s.%s" %(filename,'pdf')
@@ -350,15 +350,17 @@ class Wikipathway(WSDLService):
         f.close()
 
     def displaySavedPathwayInBrowser(self, filename):
-        """Show a saved document in a browser
+        """Show a saved document in a browser.
 
         :param str filename:
         :return: Nothing
+        
+        .. note:: Method from Bioservices. Not a WikiPathways function.
         """
         webbrowser.open(filename)
 
     def updatePathway(self, pathwayId, describeChanges, gpmlCode, revision=0):
-        """Update a pathway on the wiki with the given GPML code.
+        """Update a pathway on WikiPathways website with a given GPML code.
 
         .. warning:: Interface not exposed in bioservices.
 
@@ -374,7 +376,7 @@ class Wikipathway(WSDLService):
             case another client edited the pathway after this client downloaded it.
         :param object WSAuth_auth:  The authentication info.
 
-        :returns: boolean True if the pathway was updated successfully.
+        :returns: Boolean. True if the pathway was updated successfully.
         """
         #self.authInfo
         raise NotImplementedError
@@ -454,7 +456,7 @@ class Wikipathway(WSDLService):
         """
         return self.serv.getCurationTagsByName(tagName = name)
 
-    def getColoredPathway(self, pathwayId, filetype="png", revision=0):
+    def getColoredPathway(self, pathwayId, filetype="svg", revision=0):
         """Get a colored image version of the pathway. 
 
 
@@ -462,7 +464,7 @@ class Wikipathway(WSDLService):
         :param int revision: The revision number of the pathway (use '0' for most recent version). 
         :param str fileType:  The image type (One of 'svg', 'pdf' or 'png'). Not
             yet implemented. svg is returned.
-        :returns: binary form of the image.
+        :returns: Binary form of the image.
 
 
         .. todo:: graphId, color parameters
@@ -561,7 +563,7 @@ class Wikipathway(WSDLService):
 
 
         :param str ontologyTermId: the ontology term identifier.
-        :returns: list of WSPathwayInfo The pathway information.
+        :returns: List of WSPathwayInfo The pathway information.
 
 
         """
