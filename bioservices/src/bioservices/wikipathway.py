@@ -128,7 +128,7 @@ class Wikipathway(WSDLService):
     def findPathwaysByLiterature(self, query):
         """Find pathways by their literature references.
 
-        :param str or int query: The query, can be a pubmed id, author name or title keyword.
+        :param str query: The query, can be a pubmed id, author name or title keyword.
         :return:  Array of WSSearchResult descr=The search results. {{{descr}}}
 
         ::
