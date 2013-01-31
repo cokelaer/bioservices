@@ -55,6 +55,10 @@ class NCBIblast(RESTService):
             stype="protein", database="uniprotkb", email="name@provider")
         >>> s.getResult(jobid, "out")
 
+    .. warning:: It is very important to provide a real e-mail address as your
+        job otherwise very likely will be killed and your IP, Organisation or
+        entire domain black-listed.
+
     When running a blast request, a program is required. You can obtain the
     list using::
 
@@ -88,8 +92,9 @@ class NCBIblast(RESTService):
         :returns: An XML document containing a list of parameter names.
 
         ::
- 
-            >>> n = ncbiblast.NCBIBlast()
+
+            >>> from bioservices import ncbiblast 
+            >>> n = ncbiblast.NCBIblast()
             >>> res = n.getParameters()
             >>> [x.text for x in res.findAll("id")]
 
@@ -109,8 +114,7 @@ class NCBIblast(RESTService):
             self._parameters = parameters
         return self._parameters
     parameters = property(_get_parameters, doc=r"""Read-only attribute that
-returns a list of parameters.\n
-.. seealso:: :meth:`getParameters`""")
+returns a list of parameters. See :meth:`getParameters`.""")
 
     def parametersDetails(self, parameterId):
         """Get detailed information about a parameter.
@@ -159,34 +163,34 @@ returns a list of parameters.\n
         .. --program blastp --database uniprotkb
 
 
-        .. rubric:: compulsary arguments
+        .. rubric:: Compulsary arguments
 
         :param str program: BLAST program to use to perform the search (e.g., blastp)
-        :param str sequence: Query sequence. The use of fasta formatted sequence is recommended.
-        :param list database: List of database names for search or possible a single string (for one database).
-            there are some mismatch between the output of parametersDetails("database") and
+        :param str sequence: query sequence. The use of fasta formatted sequence is recommended.
+        :param list database: list of database names for search or possible a single string (for one database).
+            There are some mismatch between the output of parametersDetails("database") and
             the accepted values. For instance UniProt Knowledgebase should be
             given as "uniprotkb".
         :param str email: a valid email address. Will be checked by the service itself.
 
-        .. rubric:: optional arguments. If not provided, a default value will be used
+        .. rubric:: Optional arguments. If not provided, a default value will be used
 
-        :param str type: Query sequence type in 'dna', 'rna' or 'protein' (default is protein).
-        :param str matrix: Scoring matrix to be used in the search. (e.g., BLOSUM45)
-        :param bool gapalign:  Perform gapped alignments.
-        :param int alignments:     Maximum number of alignments displayed in the output.
+        :param str type: query sequence type in 'dna', 'rna' or 'protein' (default is protein).
+        :param str matrix: scoring matrix to be used in the search (e.g., BLOSUM45).
+        :param bool gapalign:  perform gapped alignments.
+        :param int alignments:     maximum number of alignments displayed in the output.
         :param exp:     E-value threshold.
-        :param bool filter:  Low complexity sequence filter to process the query
+        :param bool filter:  low complexity sequence filter to process the query
             sequence before performing the search.
-        :param int scores:     Maximum number of scores displayed in the output.
-        :param int dropoff:     Amount score must drop before extension of hits is halted.
-        :param match_scores:     Match/miss-match scores to generate a scoring matrix for nucleotide searches.
-        :param int gapopen:     Penalty for the initiation of a gap.
-        :param int gapext:     Penalty for each base/residue in a gap.
-        :param seqrange: Region of the query sequence to use for the search. Default: whole sequence.
+        :param int scores:     maximum number of scores displayed in the output.
+        :param int dropoff:     amount score must drop before extension of hits is halted.
+        :param match_scores:     match/miss-match scores to generate a scoring matrix for nucleotide searches.
+        :param int gapopen:     penalty for the initiation of a gap.
+        :param int gapext:     penalty for each base/residue in a gap.
+        :param seqrange: region of the query sequence to use for the search. Default: whole sequence.
 
 
-        :return: a jobid that can be analysed with :meth:`getResult`,
+        :return: A jobid that can be analysed with :meth:`getResult`,
             :meth:`getStatus`, ...
 
         The up to data values accepted for each of these parameters can be
@@ -194,6 +198,7 @@ returns a list of parameters.\n
 
         For instance,::
 
+            from bioservices import NCBIblast
             n = NCBIblast()
             n.parameterDetails("program")
 
@@ -205,7 +210,7 @@ returns a list of parameters.\n
                  database="uniprotkb",
                  email="test@yahoo.fr")
 
-        database can be a list of databases::
+        Database can be a list of databases::
 
             database=["uniprotkb", "uniprotkb_swissprot"]
 
@@ -283,7 +288,7 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
 
         :param str jobid:
         :param str jobid: a job identifier returned by :meth:`run`.
-        :return: a string giving the jobid status (e.g. FINISHED).
+        :return: A string giving the jobid status (e.g. FINISHED).
 
          The values for the status are:
 
@@ -305,11 +310,11 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
 
         :param str jobid: a job identifier returned by :meth:`run`.
         :param bool verbose: print the identifiers together with their label,
-            mediaTypes, description, filesuffix
+            mediaTypes, description and filesuffix.
 
-        :return: a dictionary, which keys correspond to the identifiers. Each
+        :return: A dictionary, which keys correspond to the identifiers. Each
             identifier is itself a dictionary containing the label, description,
-            file suffix and media Type of the identifier.
+            file suffix and mediaType of the identifier.
         """
         if self.getStatus(jobid)!='FINISHED':
             self.logging.warning("waiting for the job to be finished. May take a while")
