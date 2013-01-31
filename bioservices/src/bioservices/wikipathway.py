@@ -447,7 +447,7 @@ class Wikipathway(WSDLService):
         Use this method if you want to find all pathways that are tagged with a specific curation tag.
 
 
-        :param str tagName: The tag name (see 'Special:SpecialCurationTags <http://www.wikipathways.org/index.php/Special:SpecialCurationTags>'_ for an overview of available tag names).
+        :param str tagName: The tag name (see 'SpecialCurationTags <http://www.wikipathways.org/index.php/Special:SpecialCurationTags>'_ for an overview of available tag names).
         :return: Array of WSCurationTag. The curation tags (one instance for each pathway that has been tagged).
 
         ::
