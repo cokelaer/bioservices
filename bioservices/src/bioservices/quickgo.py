@@ -51,7 +51,7 @@ class QuickGO(RESTService):
     def __init__(self, verbose=True):
         """.. rubric:: Constructor
 
-        :param bool verbose: print informative messages
+        :param bool verbose: print informative messages.
 
         """
         super(QuickGO, self).__init__(url="http://www.ebi.ac.uk/QuickGO",
@@ -61,13 +61,13 @@ class QuickGO(RESTService):
         """Obtain Term information
 
 
-        :param str format: the output format (mini, obo, oboxml)
+        :param str format: the output format (mini, obo, oboxml).
 
         The format can be:
 
-        * mini:    Mini HTML, suitable for dynamically embedding in popup boxes
-        * obo:    OBO format snippet
-        * oboxml: OBO XML format snippet
+        * mini:   Mini HTML, suitable for dynamically embedding in popup boxes.
+        * obo:    OBO format snippet.
+        * oboxml: OBO XML format snippet.
 
         ::
 
@@ -109,38 +109,38 @@ class QuickGO(RESTService):
         :param int limit: download limit (number of lines) (default 10,000 rows,
             which may not be sufficient for the data set that you are
             downloading. To bypass this default, and return the entire data set,
-            specify a limit of -1.)
-        :param bool gz: gzips the downloaded file
+            specify a limit of -1).
+        :param bool gz: gzips the downloaded file.
         :param str goid: GO identifiers either directly or indirectly
-            (descendant GO identifiers) applied in annotations
-        :param char aspect: Use this to limit the annotations returned to a
+            (descendant GO identifiers) applied in annotations.
+        :param char aspect: use this to limit the annotations returned to a
             specific ontology or ontologies (Molecular Function, Biological
-            Process or Cellular Component). The valid character can be F,P,C
-        :param relType: Not Implemented. by default, QuickGO will display annotations to GO terms
+            Process or Cellular Component). The valid character can be F,P,C.
+        :param relType: not Implemented. By default, QuickGO will display annotations to GO terms
             that are related to that specified in the goid parameter by is_a,
             part_of and occurs_in relations; this parameter allows you to
             override that behaviour. See `details <http://www.ebi.ac.uk/QuickGO/reference.html#slim_custom>`_
-        :param termUse:  If you set this parameter to slim, then QuickGO will
+        :param termUse:  if you set this parameter to slim, then QuickGO will
             use the supplied set of GO identifiers as a slim and will map the
-            annotations up to these terms. See here for more details.
+            annotations up to these terms. See here for more details:
             http://www.ebi.ac.uk/QuickGO/GMultiTerm
-        :param str db: Protein database (identifier type). Can be UniProtKB, UniGene, Ensembl.
-        :param evidence: Annotation evidence code category (Ev). Example of
+        :param str db: protein database (identifier type). Can be UniProtKB, UniGene, Ensembl.
+        :param evidence: annotation evidence code category (Ev). Example of
             valid evidence are: be IDA, IC, ISS, IEA, IPI, ND, IMP, ISO, IGI
             should be either a string with comma separated values (e.g.,
-            IEA,IDA) or a list of strings (e,g. ["IEA","IDA"])
-        :param source: Annotation provider. Examples are 'InterPro', 'UniPathway',
+            IEA,IDA) or a list of strings (e.g. ["IEA","IDA"]).
+        :param source: annotation provider. Examples are 'InterPro', 'UniPathway',
             'MGI', 'FlyBase', 'GOC', 'Source', 'UniProtKB', 'RGD', 'ENSEMBL',
             'ZFIN', 'IntAct'.
         :param ref: PubMed or GO reference supporting annotation. Can refer to a
             specific reference identifier or category (for category level, use
-            `*`  after ref type). can be 'PUBMED:`*`', 'GO_REF:0000002'
-        :param with: Additional supporting information supplied in IEA, ISS, IPI, IC
-            evidenced annotations; see: GO documentation. Can refer to a specific
+            `*`  after ref type). Can be 'PUBMED:`*`', 'GO_REF:0000002'.
+        :param with: additional supporting information supplied in IEA, ISS, IPI, IC
+            evidenced annotations; see GO documentation. Can refer to a specific
             identifier or category (for category level, use * after with type).
             Examples are: EC:2.5.1.30, IPR000092, HAMAP:*
-        :param str qualifier: Tags that modify the interpretation of an annotation
-             Examples are NOT, colocalizes_with, contributes_to
+        :param str qualifier: tags that modify the interpretation of an annotation.
+             Examples are NOT, colocalizes_with, contributes_to.
 
         .. note::
             * Any number of fields can be specified; they will be AND'ed together.
@@ -152,9 +152,9 @@ class QuickGO(RESTService):
 
         ::
 
-            >>> print g.Annotation(protein='P12345', format='tsv', col="ref,evidence",
+            >>> print s.Annotation(protein='P12345', format='tsv', col="ref,evidence",
             ... ref='PMID:*')
-            >>> print g.Annotation(protein='P12345,Q4VCS5', format='tsv', 
+            >>> print s.Annotation(protein='P12345,Q4VCS5', format='tsv', 
             ...     col="ref,evidence",ref='PMID:,Reactome:')
 
 
