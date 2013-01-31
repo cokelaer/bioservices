@@ -46,12 +46,13 @@ class WSDbfetch(WSDLService):
 
     ::
 
+        >>> from bioservices import WSDbfetch
         >>> w = WSDbfetch()
         >>> data = w.fetchBatch("uniprot" ,"zap70_human", "xml", "raw")
 
-    The actual URL used is http://www.ebi.ac.uk/ws/services/WSDbfetchDoclit?wsdl (from
+    The actual URL used is http://www.ebi.ac.uk/ws/services/WSDbfetchDoclit?wsdl from
     biocatalogue (this one having let functionalities: 
-    http://www.ebi.ac.uk/ws/services/WSDbfetch?wsdl')
+    http://www.ebi.ac.uk/ws/services/WSDbfetch?wsdl).
 
     """
     _url = 'http://www.ebi.ac.uk/ws/services/WSDbfetchDoclit?wsdl'
@@ -74,19 +75,20 @@ class WSDbfetch(WSDLService):
     def fetchBatch(self, db, ids, format="default", style="default"):
         """Fetch a set of entries in a defined format and style.
 
-        :param str db: the name of the database to obtain the entries from (e.g., 'uniprotkb')
-        :param list query: list of identifiers (e.g., 'wap_rat, wap_mouse')
+        :param str db: the name of the database to obtain the entries from (e.g. 'uniprotkb').
+        :param list query: list of identifiers (e.g. 'wap_rat, wap_mouse').
         :param str format: the name of the format required. 
         :param str style: the name of the style required. 
 
-        :returns: the format of the response depends on the interface to the service used:
+        :returns: The format of the response depends on the interface to the service used:
 
-            * WSDBFetchServerService and WSDBFetchDoclitServerService: the entries as a string.
-            * WSDBFetchServerLegacyService: an array of strings containing the entries. 
+            * WSDBFetchServerService and WSDBFetchDoclitServerService: The entries as a string.
+            * WSDBFetchServerLegacyService: An array of strings containing the entries. 
 
 
         ::
 
+            from bioservices import WSDbfetch
             u = WSDbfetch()
             u.fetchBatch("uniprot" ,"wap_mouse", "xml")
 
@@ -98,18 +100,19 @@ class WSDbfetch(WSDLService):
     def fetchData(self, query, format="default", style="default"):
         """Fetch an entry in a defined format and style.
 
-        :param str query: the entry identifier in db:id format (e.g., 'UniProtKB:WAP_RAT')
+        :param str query: the entry identifier in db:id format (e.g. 'UniProtKB:WAP_RAT').
         :param str format: the name of the format required. 
         :param str style: the name of the style required. 
 
-        :returns: the format of the response depends on the interface to the service used:
+        :returns: The format of the response depends on the interface to the service used:
 
-            * WSDBFetchServerService and WSDBFetchDoclitServerService: the entries as a string.
-            * WSDBFetchServerLegacyService: an array of strings containing the entries. Generally 
+            * WSDBFetchServerService and WSDBFetchDoclitServerService: The entries as a string.
+            * WSDBFetchServerLegacyService: An array of strings containing the entries. Generally 
               this will contain only one item which contains the set of entries.
 
         ::
 
+            from bioservices import WSDbfetch
             u = WSDbfetch()
             u.fetchData('uniprot:zap70_human')
 
@@ -121,16 +124,16 @@ class WSDbfetch(WSDLService):
     def getDatabaseInfo(self, db):
         """Get details describing specific database (data formats, styles)
 
-        :param str db: a valid database 
-        :return: the output can be introspected and contains several attributes
-            (e.g., displayName)
+        :param str db: a valid database. 
+        :return: The output can be introspected and contains several attributes
+            (e.g., displayName).
 
         :: 
 
             >>> res = u.getDatabaseInfo("uniprotkb")
             >>> res.displayName
             'UniProtKB'
-            >>> print(res.description.encode('utf-8')
+            >>> print(res.description.encode('utf-8'))
             u'The UniProt Knowledgebase (UniProtKB) is the central access point for extensive curated protein information, including function, classification, and cross-references. Search UniProtKB to retrieve \u201ceverything that is known\u201d about a particular sequence.'
 
         """
@@ -140,13 +143,13 @@ class WSDbfetch(WSDLService):
     def getDatabaseInfoList(self):
         """Get details of all available databases, includes formats and result styles.
 
-        :Returns: a list of data structures describing the databases. See
+        :Returns: A list of data structures describing the databases. See
             :meth:`getDatabaseInfo` for a description of the data structure.
         """
         return self.serv.getDatabaseInfoList()
 
     def getDbFormats(self, db):
-        """Get list of format names for a given database
+        """Get list of format names for a given database.
 
 
         :param str db:
@@ -159,10 +162,10 @@ class WSDbfetch(WSDLService):
     def getFormatStyles(self, db, format):
         """Get a list of style names available for a given database and format.
 
-        :param str db: database name to get available styles for (e.g., uniprotkb)
-        :param str format: the data format to get available styles for (e.g., fasta)
+        :param str db: database name to get available styles for (e.g. uniprotkb).
+        :param str format: the data format to get available styles for (e.g. fasta).
 
-        :Returns: an array of strings containing the style names. 
+        :Returns: An array of strings containing the style names. 
 
         ::
 
@@ -176,7 +179,7 @@ class WSDbfetch(WSDLService):
     def getSupportedDBs(self):
         """Get a list of database names usable with WSDbfetch. 
 
-        buffered in _supportedDB
+        Buffered in _supportedDB.
         """
         if self._supportedDBs:
             return self._supportedDBs
@@ -184,12 +187,12 @@ class WSDbfetch(WSDLService):
             self._supportedDBs = self.serv.getSupportedDBs()
         return self._supportedDBs
 
-    supportedDBs = property(getSupportedDBs, doc="alias to getSupportedDBs")
+    supportedDBs = property(getSupportedDBs, doc="Alias to getSupportedDBs.")
 
     def getSupportedFormats(self):
         """Get a list of database and format names usable with WSDbfetch.
 
-        .. deprecated:: use of getDbFormats(db), getDatabaseInfo(db) or  getDatabaseInfoList()
+        .. deprecated:: use Of getDbFormats(db), getDatabaseInfo(db) or  getDatabaseInfoList().
 
 
 
@@ -202,9 +205,9 @@ class WSDbfetch(WSDLService):
     def getSupportedStyles(self):
         """Get a list of database and style names usable with WSDbfetch.
 
-        .. deprecated:: use of getFormatStyles(db, format), getDatabaseInfo(db) or         getDatabaseInfoList() is recommended.
+        .. deprecated:: use Of getFormatStyles(db, format), getDatabaseInfo(db) or         getDatabaseInfoList() is recommended.
 
-        Returns: an array of strings containing the database and style names. For example: 
+        Returns: An array of strings containing the database and style names. 
         """
         if self._supportedStyles == None:
             self._supportedStyles = self.serv.getSupportedStyles()
