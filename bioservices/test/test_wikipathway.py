@@ -1,4 +1,4 @@
-from bioservices.wikipathway import  Wikipath
+from bioservices.wikipathway import  Wikipathway
 import unittest
 
 
