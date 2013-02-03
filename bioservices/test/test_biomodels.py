@@ -99,6 +99,9 @@ class test_biomodels(BioModels):
     def test_getModelsIdByUniprotId(self):
         return self.getModelsIdByUniprotId(uniprotId)
 
+    def test_getModelsIdByUniprotIds(self):
+        self.getModelsIdByUniprotIds(["P10113", "P10415"])
+
     def test_getModelsIdByName(self):
         return self.getModelsIdByName('2009')
 
@@ -122,11 +125,34 @@ class test_biomodels(BioModels):
     def test_getModelsIdByGOId(self):
         self.getModelsIdByGOId(GOId)
 
+    def test_extra_getChEBIIds(self):
+        self.extra_getChEBIIds(99, 101)
+        try:
+            self.extra_getChEBIIds(1000,101)
+            assert False
+        except:
+            assert True
 
     def test_extra_getReactomeIds(self):
-        self.extra_getReactomeIds(0,101)
+        self.extra_getReactomeIds(99,101)  # just to cross the 100 Ids
+        self.extra_getReactomeIds(89,90)  # just to get one output REACT_89
+        try:
+            self.extra_getReactomeIds(1000,101)
+            assert False
+        except:
+            assert True
 
     def test_extra_getUniprotIds(self):
-        self.extra_getUniprotIds(11000,11100)
+        self.extra_getUniprotIds(11099,11101)
+        self.extra_getUniprotIds(10113,10114)
+
+        try:
+            self.extra_getUniprotIds(1000,101)
+            assert False
+        except ValueError:
+            assert True
 
 
+
+    def test_getModelsIdByUniprot(self):
+        self.getModelsIdByUniprot("P10113")

@@ -10,15 +10,14 @@ class test_Kegg(Kegg):
         #self.test_database_IDs()
 
 
-
     def test_database_IDs(self):
         self.organismIds
-        self.enzymeIds
-        self.koIds
-        self.compoundIds
-        self.glycanIds
-        self.reactionIds
-        self.drugIds
+        assert self.enzymeIds[0].startswith("ec")
+        assert self.compoundIds[0].startswith("cpd")
+        assert self.glycandIds[0].startswith("gl")
+        assert self.reactionsIds[0].startswith("rn")
+        assert self.drugIds[0].startswith("dr")
+        assert self.koIds[0].startswith("ko")
 
     def test_organism(self):
         self.organism = "hsa"
@@ -27,6 +26,11 @@ class test_Kegg(Kegg):
             assert False
         except:
             assert True
+
+    def test_isOrganism(self):
+        assert self.isOrganism('T01440') == True
+        assert self.isOrganism('hsa') == True
+        assert self.isOrganism('dummy') == False
 
     def test_pathwayIDs(self):
         self.organism = "hsa"
