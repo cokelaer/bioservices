@@ -22,7 +22,8 @@ REST Kegg interface as well as additional methods to obtain statistics about the
 Kegg database. See below for details about the functionalities available and the
 tutorial/quickstart :ref:`kegg_tutorial`.
 
-A previous imterface to the KEGG WSDL service is available but 
+A previous imterface to the KEGG WSDL service was designed but the WSDL closed in 
+Dec 2012. So, the KEGG interface is based on the REST service only.
 
 .. topic:: What is KEGG ?
 
@@ -46,7 +47,8 @@ A previous imterface to the KEGG WSDL service is available but
 Some terminology 
 --------------------
 
-The following list is a simplified taken from Kegg API page.
+The following list is a simplified list of terminology taken from Kegg API page with
+links to the class provided here below.
 
 
 * organisms (**org**) are made of a three-letter (or four-letter) code (e.g., hsa
@@ -99,58 +101,66 @@ The following list is a simplified taken from Kegg API page.
       (e.g. '01110' means a 'Carbohydrate Metabolism' class).
       `URL:http://www.genome.jp/dbget-bin/get_htext?KO`   
 
+.. _kegg_database:
+
+Kegg Databases Names and Abbreviations
+-------------------------------------------
+
+Here is a list of databases used in KEGG API with their name and abbreviation
+(second and third columns):
+
+=============== =============== ======= ============= ================================================
+Database        Name            Abbrev  kid           Remark
+=============== =============== ======= ============= ================================================
+KEGG PATHWAY    pathway         path    map number  
+KEGG BRITE      brite           br      br number   
+KEGG MODULE     module          md      M number    
+KEGG DISEASE    disease         ds      H number       Japanese version: disease_ja ds_ja
+KEGG DRUG       drug            dr      D number      Japanese version: drug_ja dr_ja
+KEGG ENVIRON    environ         ev      E number      Japanese version: environ_ja ev_ja
+KEGG ORTHOLOGY  orthology       ko      K number    
+KEGG GENOME     genome          genome  T number    
+KEGG GENOMES    genomes         gn      T number      Composite database: genome + egenome + mgenome
+KEGG GENES      genes           -       -             Composite database: consisting of KEGG organisms
+KEGG LIGAND     ligand          ligand  -             Composite database: compound + glycan + 
+                                                      reaction + rpair + rclass + enzyme
+KEGG COMPOUND   compound        cpd     C number      Japanese version: compound_ja cpd_ja
+KEGG GLYCAN     glycan          gl      G number    
+KEGG REACTION   reaction        rn      R number    
+KEGG RPAIR      rpair           rp      RP number   
+KEGG RCLASS     rclass          rc      RC number   
+KEGG ENZYME     enzyme          ec      -   
+=============== =============== ======= ============= ================================================
 
 
+.. _db_entries:
 
-"""
+Database Entries
+-------------------
 
-"""
+Database entries can be written in on of the following ways::
 
+    <dbentries> = <dbentry>1[+<dbentry>2...]
+    <dbentry> = <db:entry> | <kid> | <org:gene>
 
-Database    Name    Abbrev  kid     Remark
-KEGG PATHWAY    pathway     path    map number  
-KEGG BRITE  brite   br  br number   
-KEGG MODULE     module  md  M number    
-KEGG DISEASE    disease     ds  H number    Japanese version: disease_ja ds_ja
-KEGG DRUG   drug    dr  D number    Japanese version: drug_ja dr_ja
-KEGG ENVIRON    environ     ev  E number    Japanese version: environ_ja ev_ja
-KEGG ORTHOLOGY  orthology   ko  K number    
-KEGG GENOME     genome  genome  T number    
-KEGG GENOMES    genomes     gn  T number    Composite database: genome + egenome
-+ mgenome
-KEGG GENES  genes   -   -   Composite database: consisting of KEGG organisms
-KEGG LIGAND     ligand  ligand  -   Composite database: compound + glycan +
-reaction + rpair + rclass + enzyme
-KEGG COMPOUND   compound    cpd     C number    Japanese version: compound_ja
-cpd_ja
-KEGG GLYCAN     glycan  gl  G number    
-KEGG REACTION   reaction    rn  R number    
-KEGG RPAIR  rpair   rp  RP number   
-KEGG RCLASS     rclass  rc  RC number   
-KEGG ENZYME     enzyme  ec  -   
+Each database entry is identified by::
 
+    db:entry 
 
-Database entry
+where "db" is the database name or its abbreviation shown above and  "entry" is the entry name or the accession number that is uniquely assigned within the database.
 
-<dbentries> = <dbentry>1[+<dbentry>2...]
-<dbentry> = <db:entry> | <kid> | <org:gene>
-
-Each database entry is identified by:
-db:entry
-where
-"db" is the database name or its abbreviation shown above and
-"entry" is the entry name or the accession number that is uniquely assigned
-within the database.
 In reality "db" may be omitted, for the entry name called the KEGG object
-identifier (kid) is unique across KEGG.
-kid = database-dependent prefix + five-digit number
+identifier (kid) is unique across KEGG.::
+
+    kid = database-dependent prefix + five-digit number
+
 In the KEGG GENES database the db:entry combination must be specified. This is
-more specifically written as:
-org:gene
-where
-"org" is the three- or four-letter KEGG organism code or the T number genome
-identifier and
-"gene" is the gene identifier, usually locus_tag or ncbi GeneID, or the primary
+more specifically written as::
+
+    org:gene 
+
+where "org" is the three- or four-letter KEGG organism code or the T number genome
+identifier and "gene" is the gene identifier, usually locus_tag or ncbi GeneID, or the primary
 gene name.
 
 
@@ -164,14 +174,35 @@ import copy
 class Kegg(RESTService):
     """Interface to the `KEGG <http://www.genome.jp/kegg/pathway.html>`_ database
 
-    ::
+    This class provides an interface to the KEGG REST API. Most of the functionalities
+    are available. In addition, there are quite a few aliases. 
 
-        import kegg
-        k = kegg.Kegg()
-        print k.get("hsa:7535")
-        print len(k.pathways)
-        k.organismIds
+    Here is an example on how to use the **get** URL from KEGG API to retrieve
+    the entry of the gene identifier 7535 of the **hsa** organism::
 
+        from bioservices import Kegg
+        s = Kegg()
+        print s.get("hsa:7535")
+    
+    .. seealso:: The :ref:`db_entries` to know more about the db entries format.
+ 
+    Another example here below shows how to print the list of pathways Ids of 
+    the human organism::
+
+        print s.list("pathway", organism="hsa")
+
+    This class provides additional functions to the KEGG API (mostly aliases). 
+    You can get all organism Ids as follows::
+
+        s.organismIds
+
+    and similarly you can get all :meth:`databases` output and database Ids easily. 
+    For example, for the reaction database::
+
+        s.reaction   # equivalent to s.list("reaction")
+        s.reactionIds
+
+    .. seealso:: :ref:`kegg_database`
 
     """
 
@@ -205,6 +236,7 @@ class Kegg(RESTService):
         self._reaction = None
         self._drug = None
 
+        # shall we add thoses as well for buffering ??
         """      brite        70,811 entries
                  module      161,771 entries
                  disease       1,301 entries
@@ -217,10 +249,19 @@ class Kegg(RESTService):
                  rclass        2,773 entries
         """
 
+    def __getattr__(self, req):
+        if req.endswith("Ids"):
+            res = self.list(req[0:-3])
+            Ids = [x.split()[0] for x in res.split("\n") if len(x)]
+            return Ids
+        elif req in self.databases:
+            res = self.list(req)
+            return res
+
     def isOrganism(self, data):
         if data in self.organismIds:
             return True
-        if data in self.organisms_tnumbers:
+        if data in self.organismsTnumbers:
             return True
         else:
             return False
@@ -558,8 +599,8 @@ class Kegg(RESTService):
         ::
 
             k.link("pathway", "hsa")    # KEGG pathways linked from each of the human genes
-	        k.link("hsa", "pathway")    # human genes linked from each of the KEGG pathways
-	        k.link("pathway", "hsa:10458+ece:Z5100") 	# KEGG pathways linked
+            k.link("hsa", "pathway")    # human genes linked from each of the KEGG pathways
+            k.link("pathway", "hsa:10458+ece:Z5100")     # KEGG pathways linked
                                         # from a human gene and an E. coli O157 gene. 
         """
 
@@ -656,7 +697,7 @@ class Kegg(RESTService):
 
     def _get_reactions(self):
         if self._reaction == None:
-            self._reaction = self._get_database("reaction", 1)
+            self._reaction = self._get_database("reaction", 0)
         return self._reaction
     reactionIds = property(_get_reactions, doc="returns list of reactions")
 
@@ -670,11 +711,11 @@ class Kegg(RESTService):
         if self._organisms_tnumbers == None:
             self._organisms_tnumbers = self._get_database("organism", 0)
         return self._organisms_tnumbers
-    organisms_tnumbers = property(_get_organisms_tnumbers, doc="returns list of organisms (T numbers)")
+    organismsTnumbers = property(_get_organisms_tnumbers, doc="returns list of organisms (T numbers)")
 
     def _get_glycans(self):
         if self._glycan == None:
-            self._glycans = self._get_database("glycan", 1)
+            self._glycan = self._get_database("glycan", 0)
         return self._glycan
     glycanIds = property(_get_glycans, doc="returns list of glycans")
 
@@ -690,12 +731,11 @@ class Kegg(RESTService):
         return self._compound
     compoundIds = property(_get_compound, doc="returns list of compounds")
 
-
     def _get_drug(self):
         if self._drug == None:
             self._drug =  self._get_database("drug", 0)
         return self._drug
-    drugIds = property(_get_compound, doc="returns list of drugs")
+    drugIds = property(_get_drug, doc="returns list of drugs")
 
     # set the default organism used by pathways retrieval
     def _get_organism(self):
@@ -788,32 +828,32 @@ class KeggParser(Kegg):
                 output[key.lower()] = line.split(key)[1].strip()
             elif line.startswith("GENE"):
                 output['gene'] = []
-		key, value = line.split("GENE")[1].strip().split(" ",1)
-		output['gene'] = [{key.strip():value.strip()}]
+                key, value = line.split("GENE")[1].strip().split(" ",1)
+                output['gene'] = [{key.strip():value.strip()}]
                 current = "gene"
             elif line.startswith("DRUG"):
                 output['drug'] = []
-		key, value = line.split("DRUG")[1].strip().split(" ",1)
-		output['drug'] = [{key.strip():value.strip()}]
+                key, value = line.split("DRUG")[1].strip().split(" ",1)
+                output['drug'] = [{key.strip():value.strip()}]
                 current = "drug"
             elif line.startswith("DISEASE"):
                 output['disease'] = []
-		key, value = line.split("DISEASE")[1].strip().split(" ",1)
-		output['disease'] = [{key.strip():value.strip()}]
+                key, value = line.split("DISEASE")[1].strip().split(" ",1)
+                output['disease'] = [{key.strip():value.strip()}]
                 current = "disease"
             elif line.startswith("COMPOUND"):
                 output['compound'] = []
-		key, value = line.split("COMPOUND")[1].strip().split(" ",1)
-		output['compound'] = [{key.strip():value.strip()}]
+                key, value = line.split("COMPOUND")[1].strip().split(" ",1)
+                output['compound'] = [{key.strip():value.strip()}]
                 current = "compound"
             elif line.startswith("REL_PATHWAY"):
                 output['rel_pathway'] = []
-		key, value = line.split("REL_PATHWAY")[1].strip().split(" ",1)
-		output['rel_pathway'] = [{key.strip():value.strip()}]
+                key, value = line.split("REL_PATHWAY")[1].strip().split(" ",1)
+                output['rel_pathway'] = [{key.strip():value.strip()}]
                 current = "rel_pathway"
             elif line.startswith("    ") and current:
-		key, value = line.strip().split(" ",1)
-		output[current].append({key.strip():value.strip()})
+                key, value = line.strip().split(" ",1)
+                output[current].append({key.strip():value.strip()})
             elif line.startswith("///"):
                 pass
             elif line.startswith("REFERENCE"):
