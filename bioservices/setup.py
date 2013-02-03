@@ -8,7 +8,7 @@ import glob
 
 _MAJOR               = 0
 _MINOR               = 9
-_MICRO               = 2
+_MICRO               = 3
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -59,7 +59,7 @@ setup(
     package_dir = {'':'src'},
     packages = ['bioservices'],
     #package_dir  = package_dir,
-    install_requires = ["easydev>=0.5.5", "BeautifulSoup"],
+    install_requires = ["easydev>=0.5.6", "BeautifulSoup"],
     )
 
 
