@@ -183,6 +183,19 @@ easyXML object (Default behaviour).""")
         txt = "This is an instance of %s service" % self.name
         return txt
 
+    def pubmed(self, Id):
+        """Open a pubmed Id into a browser tab
+
+        :param Id: a valid pubmed Id in string or integer format.
+
+        The URL is a concatenation of the pubmed URL
+        http://www.ncbi.nlm.nih.gov/pubmed/ and the provided Id.
+
+        """
+        url = "http://www.ncbi.nlm.nih.gov/pubmed/"
+        import webbrowser
+        webbrowser.open(url + str(Id))
+
 
 class WSDLService(Service):
     """Class dedicated to the web services based on WSDL/SOAP protocol.
