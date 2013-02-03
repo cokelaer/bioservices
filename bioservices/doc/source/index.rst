@@ -32,7 +32,6 @@ Here is a list of services that you can access from **bioservices**:
 
     bioservices.biomodels.BioModels
     bioservices.kegg.Kegg
-    bioservices.reactome.Reactome
     bioservices.chembldb.ChEMBLdb
     bioservices.picr.PICR
     bioservices.quickgo.QuickGO
