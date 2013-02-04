@@ -37,6 +37,7 @@ class ChEMBLdb(RESTService):
     _target_chemblId_example = 'CHEMBL2477'
     _target_uniprotId_example = "Q13936"
     _target_biactivities_example = "CHEMBL240"
+    _assay_example = "CHEMBL1217643"
 
     def __init__(self, verbose=True):
         super(ChEMBLdb, self).__init__(url=ChEMBLdb._url, 
@@ -501,7 +502,7 @@ prevented us from fulfilling your request. """)
 
         :param str query: a valid assay ChEMBLID. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
-        :return: Assay Record
+        :return: Assay record in XML or dictionary (if json requested)
 
         If json format is requested, a dictionary is returned. The dictionary
         has a unique key 'assay'. The value of that key is another dictionary
@@ -519,7 +520,9 @@ prevented us from fulfilling your request. """)
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
-            >>> res = s.get_assay_bioactivities("CHEMBL1217643")   
+            >>> print(s._assay_example)
+            >>> resxml = s.get_assay_by_chemblId(s._assay_example + '.xml')
+            >>> resjson = s.get_assay_by_chemblId(s._assay_example)
 
         """
         pass
@@ -532,34 +535,16 @@ prevented us from fulfilling your request. """)
 
         :param str query: a valid assay ChEMBLID. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
-        :return: List of all bioactivity records in ChEMBLdb for a given assay ChEMBLID
-
-        If json format is requested, a dictionary is returned. The dictionary
-        has a unique key 'bioactivities'. The value of that key is another dictionary
-        keyed by:
-
-         * activity_comment
-         * assay_chemblid
-         * assay_description
-         * assay_type
-         * bioactivity_type
-         * ingredient_cmpd_chemblid
-         * name_in_reference
-         * operator
-         * organism
-         * parent_cmpd_chemblid
-         * reference
-         * target_chemblid
-         * target_confidence
-         * target_name
-         * units
-         * value
+        :return: Bioactivity records for a given assay in XML or dictionary
+            (if json requested). see :meth:`get_compounds_activities`
 
         ::
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
-            >>> res = s.get_assay_bioactivities("CHEMBL1217643")   
+            >>> print(s._assay_example)
+            >>> resxml = s.get_assay_bioactivities(s._assay_example + '.xml')
+            >>> resjson = s.get_assay_bioactivities(s._assay_example)
         """
         pass
     #    return url
