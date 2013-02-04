@@ -119,8 +119,10 @@ class test_Kegg(Kegg):
             assert True
 
         # asc contains 1500. Try to get even samller to spped up tests.
-        self.conv("asc", "uniprot")
+        #self.conv("asc", "uniprot")
 
+
+        self.conv("hsa","up:Q9BV86+")
 
     def test_show_pathwat(self):
         self.www_bget("path:hsa05416")
