@@ -33,8 +33,10 @@ class ChEMBLdb(RESTService):
     _inChiKey_example = "QFFGVLORLPOAEC-SNVBAGLBSA-N"
     _smiles_example = "COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56"
     _smiles_similar_example = _smiles_example + '/98'
+    _bioactivities_example = "CHEMBL2"
     _target_chemblId_example = 'CHEMBL2477'
     _target_uniprotId_example = "Q13936"
+    _target_biactivities_example = "CHEMBL240"
 
     def __init__(self, verbose=True):
         super(ChEMBLdb, self).__init__(url=ChEMBLdb._url, 
@@ -111,7 +113,6 @@ prevented us from fulfilling your request. """)
                     output = self.default_extension
                     query += "." +  self.default_extension
 
-
                 if service_extra:
                     # used for example by get_compounds_activities
                     url = self.url + "/" + service + "/" + query.split('.')[0]
@@ -165,8 +166,9 @@ prevented us from fulfilling your request. """)
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
-            >>> resxml = s.get_compounds_by_ChemblId(s._chemblId_example)
-            >>> resjson = s.get_compounds_by_ChemblId(s._chemblId_example)
+            >>> print (s._chemblId_example)
+            >>> resxml = s.get_compounds_by_chemblId(s._chemblId_example)
+            >>> resjson = s.get_compounds_by_chemblId(s._chemblId_example)
         """
         # the decorator is taking care of the checking and processing
         pass
@@ -193,9 +195,9 @@ prevented us from fulfilling your request. """)
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
-            >>> resxml = s.get_compounds_by_ChemblId(s._inChiKey_example)
-            >>> resjson = s.get_compounds_by_ChemblId(s._inChiKey_example + "json")
-             # key example: QFFGVLORLPOAEC-SNVBAGLBSA-N
+            >>> print(s._inChiKey_example)
+            >>> resxml = s.get_individual_compounds_by_inChiKey(s._inChiKey_example + ".xml")
+            >>> resjson = s.get_individual_compounds_by_inChiKey(s._inChiKey_example + ".json")
         """
         # the decorator is taking care of the checking and processing
         pass
@@ -217,9 +219,9 @@ prevented us from fulfilling your request. """)
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
-            >>> resxml = s.get_compounds_by_SMILES(s._smiles_example)
-            >>> resjson = s.get_compounds_by_SMILES(s._smiles_example + "json")
-            >>> # ex: COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56.json
+            >>> print(s._smiles_example)
+            >>> resxml = s.get_compounds_by_SMILES(s._smiles_example + ".xml")
+            >>> resjson = s.get_compounds_by_SMILES(s._smiles_example + ".json")
         """
         pass
 
@@ -230,16 +232,16 @@ prevented us from fulfilling your request. """)
 
         :param str query: a valid SMILES string. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
-        :return: a dictionary with a unique key 'compounds'. The value of that key is
-        a list of compound records
+        :return: see :meth:`get_compounds_by_SMILES`
 
 
         :: 
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
-            >>> resxml = s.get_compounds_containing_SMILES(s._smiles_example)
-            >>> resjson = s.get_compounds_containing_SMILES(s._smiles_example + "json")
+            >>> print(s._smiles_example)
+            >>> resxml = s.get_compounds_containing_SMILES(s._smiles_example + ".xml")
+            >>> resjson = s.get_compounds_containing_SMILES(s._smiles_example + ".json")
 
         """
         pass
@@ -270,6 +272,7 @@ prevented us from fulfilling your request. """)
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
+            >>> print(s._smiles_example)
             >>> s.get_compounds_similar_to_SMILES(s._smiles_example + "/100") 
             >>> s.get_compounds_similar_to_SMILES(s._smiles_example + "/98.json")
         """
@@ -337,7 +340,7 @@ prevented us from fulfilling your request. """)
 
         If json format is requested, a dictionary is returned. The dictionary
         has a unique key 'bioactivities'. The value of that key is a lsit of bioactivity
-        recprds. Each bioactivity record is a dictionary keyed by:
+        records. Each bioactivity record is a dictionary keyed by:
 
          * activity_comment
          * assay_chemblid
@@ -360,8 +363,9 @@ prevented us from fulfilling your request. """)
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
-            >>> s.get_compounds_activities("CHEMBL2")
-            >>> s.get_compounds_activities("CHEMBL2.json")
+            >>> print(s._bioactivities_example)
+            >>> resxmls.get_compounds_activities(s._bioactivities_example + '.xml')
+            >>> resjson = s.get_compounds_activities(s._bioactivities_example)
         """
         pass
     #    return url
@@ -375,9 +379,11 @@ prevented us from fulfilling your request. """)
         :param str query: a target ChEMBLID. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
         :param str query: target ChEMBLID
-        :return: Target Record
+        :return: Target Record in XML or dictionary (if json requested)
 
-        The JSON output is a dictionary containing the following keys:
+        If json format is requested, a dictionary is returned. The dictionary
+        has a unique key 'target'. The value of that key is another dictionary
+        keyed by:
 
          * target
          * description
@@ -387,10 +393,14 @@ prevented us from fulfilling your request. """)
          * proteinAccession
          * synonyms
          * targetType
+        
+        ::
 
-
-        Example URL (XML Output): http://www.ebi.ac.uk/chemblws/targets/CHEMBL2477
-        Example URL (JSON Output): http://www.ebi.ac.uk/chemblws/targets/CHEMBL2477.json
+            >>> from bioservices import *
+            >>> s = ChEMBLdb(verbose=False)
+            >>> print(s._target_chemblId_example)
+            >>> resxml = s.get_target_by_chemblId(s._target_chemblId_example + '.xml')
+            >>> resjson = s.get_target_by_chemblId(s._target_chemblId_example)
         """
         pass
     #i    return url
@@ -404,11 +414,15 @@ prevented us from fulfilling your request. """)
 
         :param str query: a valid uniprot accession Id. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
-        :return: Target Record
+        :return: see :meth:get_target_by_chemblId
 
         ::
 
-            s.get_target_by_uniprotId("Q13936")
+            >>> from bioservices import *
+            >>> s = ChEMBLdb(verbose=False)
+            >>> print(s._target_chemblId_example)
+            >>> resxmls = s.get_target_by_uniprotId(s._target_uniprotId_example + '.xml')
+            >>> resjson = s.get_target_by_uniprotId(s._target_uniprotId_example)
         """
         pass
     #return url        
@@ -435,16 +449,15 @@ prevented us from fulfilling your request. """)
 
         :param str query: a valid target ChEMBLID. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
-        :return: List of all bioactivity records in ChEMBLdb for a given target ChEMBLID
-
+        :return:see:meth:`get_compounds_activities`
 
         ::
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
-            >>> res = s.get_target_bioactivities("CHEMBL240")
-            >>> res = s.get_target_bioactivities("CHEMBL240.json")
-            >>> res = s.get_target_bioactivities("CHEMBL240.xml")
+            >>> print(s._target_biactivities_example)
+            >>> resxml = s.get_target_bioactivities(s._target_biactivities_example + '.xml')
+            >>> resjson = s.get_target_bioactivities(s._target_biactivities_example)
         """
         pass
     #    return url
@@ -454,10 +467,12 @@ prevented us from fulfilling your request. """)
     def get_all_targets(self):
         """Get all targets
 
-        :return: List of all target records in ChEMBLdb
+        :return: Target Record in XML or dictionary (if json requested)
 
-        The JSON output is a dictionary of dictionaries. Each of them having the
-        following keys:
+        If json format is requested, a dictionary is returned. The dictionary
+        has a unique key 'targets'. The value of that key is a list of dictionaries
+        keyed by:
+
 
           * chemblId
           * description
@@ -468,15 +483,11 @@ prevented us from fulfilling your request. """)
           * synonyms
           * targetType
 
-
-        .. doctest::
+        ::
 
             >>> from bioservices import *
             >>> s = ChEMBLdb()
             >>> res = s.get_all_targets()
-            >>> sorted(set([x['targetType'] for x in res['targets']]))
-            [u'ADMET', u'CELL-LINE', u'NUCLEIC-ACID', u'ORGANISM', u'PROTEIN', u'SUBCELLULAR', u'TISSUE', u'UNCHECKED', u'UNKNOWN']
-
         """
         res = self.request(self.url + "/targets." + self.default_extension)
         if self.default_extension == "json":
