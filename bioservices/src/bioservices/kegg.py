@@ -41,7 +41,7 @@ REST Kegg interface. There are additional methods and functionalities added by
 
         -- Kegg home page, Jan 2013
 
-
+.. _terminology:
 
 Some terminology
 --------------------
@@ -51,79 +51,68 @@ pages.
 
 
 * organisms (**org**) are made of a three-letter (or four-letter) code (e.g.,
-* **hsa** stands for Human Sapiens) used in KEGG (see  :attr:`~bioservices.kegg.Kegg.organismIds`). 
-* **db** is a database name used See :attr:`~bioservices.kegg.Kegg.databases`
+  **hsa** stands for Human Sapiens) used in KEGG (see  :attr:`~bioservices.kegg.Kegg.organismIds`). 
+* **db** is a database name. See :attr:`~bioservices.kegg.Kegg.databases`
   attribute and :ref:`kegg_database` section.
 * **entry_id** is a unique identifier. It is a combination of the database name
   and the identifier of an entry joined by a colon sign (e.g. 'embl:J00231').
 
-  **entry_id** includes:
+  Here are some examples of entry Ids:
 
-    * **genes_id**: A 'keggorg' and a gene name (e.g. 'eco:b0001' means an E. coli gene 'b0001').
-    * **enzyme_id**: 'ec' and an enzyme code used in LIGAND ENZYME database. (e.g. 
-      'ec:1.1.1.1' See :attr:`~bioservices.kegg.Kegg.enzymeIds`.
-    * **compound_id**: 'cpd' and a compound number used in COMPOUND/LIGAND
-      database (e.g. 'cpd:C00158'). Some compounds also have 'glycan_id' and
+    * **genes_id**: A KEGG organism and a gene name (e.g. 'eco:b0001').
+    * **enzyme_id**: 'ec' and an enzyme code. (e.g. 'ec:1.1.1.1'). See :attr:`~bioservices.kegg.Kegg.enzymeIds`.
+    * **compound_id**: 'cpd' and a compound number (e.g. 'cpd:C00158'). 
+      Some compounds also have 'glycan_id' and
       both IDs are accepted and converted internally.
       See :attr:`~bioservices.kegg.Kegg.compoundIds`.
-    * **drug_id**: 'dr' and a compound number used in DRUG/LIGAND database 
-      (e.g. 'dr:D00201' means a tetracycline). See
+    * **drug_id**: 'dr' and a drug number (e.g. 'dr:D00201'). See
       :attr:`~bioservices.kegg.Kegg.drugIds`.
-    * **glycan_id**: 'gl' and a glycan number used in GLYCAN database (e.g.
+    * **glycan_id**: 'gl' and a glycan number (e.g.
     * 'gl:G00050'). Some glycans also have 'compound_id' and both
       IDs are accepted and converted internally. see
       :attr:`~bioservices.kegg.Kegg.glycanIds` attribute.
-    * **reaction_id**:  'rn' and a reaction number used in KEGG/REACTION (e.g.
+    * **reaction_id**:  'rn' and a reaction number (e.g.
     * 'rn:R00959' is a reaction which catalyze cpd:C00103 into cpd:C00668).
       See :attr:`~bioservices.kegg.Kegg.reactionIds` attribute.
-    * **pathway_id**: 'path' and a pathway number used
-      in KEGG/PATHWAY. Pathway numbers prefixed by 'map' specify the reference
-      pathway and pathways prefixed by the 'keggorg' specify pathways specific
-      to the organism (e.g. 'path:map00020' means a reference pathway for the
-      cytrate cycle and 'path:eco00020' means a same pathway of which E. coli
-      genes are marked). See :attr:`~bioservices.kegg.Kegg.pathwayIds` attribute.
+    * **pathway_id**: 'path' and a pathway number. Pathway numbers prefixed 
+      by 'map' specify the reference pathway and pathways prefixed by 
+      a KEGG organism specify pathways specific to the organism (e.g. 
+      'path:map00020', 'path:eco00020'). See :attr:`~bioservices.kegg.Kegg.pathwayIds` attribute.
     * **motif_id**: a motif database names ('ps' for prosite, 'bl' for blocks, 
       'pr' for prints, 'pd' for prodom, and 'pf' for pfam) and a motif entry
       name. (e.g. 'pf:DnaJ' means a Pfam  database entry 'DnaJ').
-    * **ko_id**: identifier made of 'ko' and a ko number used in KEGG/KO.
-      KO (KEGG Orthology) is an classification of orthologous genes defined by
-      KEGG (e.g. 'ko:K02598' means a KO group for nitrite transporter NirC
-      genes).
+    * **ko_id**: identifier made of 'ko' and a ko number (e.g. 'ko:K02598').
       See :attr:`~bioservices.kegg.Kegg.koIds` attribute.
-    * **ko_class_id**: identifier which is used to classify 'ko_id' hierarchically 
-      (e.g. '01110' means a 'Carbohydrate Metabolism' class).
-      `URL:http://www.genome.jp/dbget-bin/get_htext?KO`   
+
 
 .. _kegg_database:
 
 Kegg Databases Names and Abbreviations
 -------------------------------------------
 
-Here is a list of databases used in KEGG API with their name and abbreviation
-(second and third columns):
+Here is a list of databases used in KEGG API with their name and abbreviation:
 
-=============== =========== ========== ==========================================================
-Database Name   Abbrev      kid           Remark
-=============== =========== ========== ==========================================================
+=============== =========== ==========
+Database Name   Abbrev      kid       
+=============== =========== ==========
 pathway         path        map number  
 brite           br          br number   
 module          md          M number    
-disease         ds          H number   Japanese version: disease_ja ds_ja
-drug            dr          D number   Japanese version: drug_ja dr_ja
-environ         ev          E number   Japanese version: environ_ja ev_ja
+disease         ds          H number  
+drug            dr          D number  
+environ         ev          E number 
 orthology       ko          K number    
 genome          genome      T number    
-genomes         gn          T number   Composite database: genome + egenome + mgenome
-genes           -           -          Composite database: consisting of KEGG organisms
-ligand          ligand      -          Composite database: compound + glycan + 
-                                                      reaction + rpair + rclass + enzyme
-compound        cpd         C number   Japanese version: compound_ja cpd_ja
+genomes         gn          T number
+genes           -           -      
+ligand          ligand      -     
+compound        cpd         C number 
 glycan          gl          G number    
 reaction        rn          R number    
 rpair           rp          RP number   
 rclass          rc          RC number   
 enzyme          ec          -   
-=============== =========== ========== ==========================================================
+=============== =========== ========== 
 
 
 .. _db_entries:
@@ -140,10 +129,7 @@ Each database entry is identified by::
 
     db:entry 
 
-where "db" is the database name or its abbreviation shown above and  "entry" is the entry name or the accession number that is uniquely assigned within the database.
-
-In reality "db" may be omitted, for the entry name called the KEGG object
-identifier (kid) is unique across KEGG.::
+where "db" is the database name or its abbreviation shown above and  "entry" is the entry name or the accession number that is uniquely assigned within the database. In reality "db" may be omitted, for the entry name called the KEGG object identifier (kid) is unique across KEGG.::
 
     kid = database-dependent prefix + five-digit number
 
@@ -164,19 +150,25 @@ import webbrowser
 import copy
 
 
+__all__ = ["Kegg", "KeggParser"]
+
 class Kegg(RESTService):
     """Interface to the `KEGG <http://www.genome.jp/kegg/pathway.html>`_ database
 
-    This class provides an interface to the KEGG REST API. Most of the functionalities
-    are available. In addition, there are quite a few aliases. 
+    This class provides an interface to the KEGG REST API. The weblink tools 
+    are partially accesible. All dbentries can be parsed into dictionaries using
+    the :class:`KeggParser`
 
-    For example, to retrieve the entry of the gene identifier 7535 of the 
+    Here are some examples. In order to retrieve the entry of the gene identifier 7535 of the 
     **hsa** organism, type::
 
         from bioservices import Kegg
         s = Kegg()
         print s.get("hsa:7535")
-    
+   
+    The output is the raw ouput sent by KEGG API. See :class:`KeggParser` to 
+    parse this output.
+ 
     .. seealso:: The :ref:`db_entries` to know more about the db entries format.
  
     Another example here below shows how to print the list of pathways of 
@@ -186,7 +178,7 @@ class Kegg(RESTService):
 
     Further post processing would allow you to retrieve the pathway Ids. However,
     we provide additional functions to the KEGG API so the previous code and post 
-    processing to extract the pathway Ids can be written::
+    processing to extract the pathway Ids can be written as::
 
         s.organism = "hsa"
         s.pathwayIds
@@ -197,7 +189,10 @@ class Kegg(RESTService):
         s.reaction   # equivalent to s.list("reaction")
         s.reactionIds
 
-    .. seealso:: :ref:`kegg_database`
+    Other methods of interest are :meth:`conv`, :meth:`find`, :meth:`get`. We also provide 
+    a :meth:`check_dbentries` to check validity of an entry Id.
+
+    .. seealso:: :ref:`kegg_database`, :ref:`db_entries`, :ref:`terminology`.
 
     """
 
@@ -250,10 +245,43 @@ class Kegg(RESTService):
             res = self.list(req)
             return res
 
-    def isOrganism(self, data):
-        if data in self.organismIds:
+    def code2Tnumber(self, code):
+        """Converts organism code to its T number
+
+        .. doctest::
+
+            >>> s.code2Tnumber("hsa")
+            'T01101'
+        """
+        index = self.organismIds.index(code)
+        return self.organismsTnumbers[index]
+
+    def Tnumber2code(self, Tnumber):
+        """Converts organism T number to its code
+
+        .. doctest::
+
+            >>> s.Tnumber2code("hsa")
+            'T01101'
+        """
+        index = self.organismsTnumbers.index(Tnumber)
+        return self.organismIds[index]
+
+    def isOrganism(self, org):
+        """Checks if org is a KEGG organism
+
+        :param str org:
+        :return: True if org is in the KEGG organism list (code or Tnumber)
+
+        ::
+
+            >>> s.isOrganism("hsa")
+            True
+
+        """
+        if org in self.organismIds:
             return True
-        if data in self.organismsTnumbers:
+        if org in self.organismsTnumbers:
             return True
         else:
             return False
@@ -307,7 +335,7 @@ class Kegg(RESTService):
         return res
 
     def list(self, query, organism=None):
-        """returns a list of entry identifiers and associated definition for a given database or a given set of database entries 
+        """Returns a list of entry identifiers and associated definition for a given database or a given set of database entries 
 
         :param str query: can be one of pathway, brite, module,
             disease, drug, environ, ko, genome, compound,
@@ -325,8 +353,8 @@ class Kegg(RESTService):
         Here is an example that shows how to extract the pathways IDs related to
         the hsa organism::
 
-            >>> k = Kegg()
-            >>> res = k.list("pathway", organism="hsa")
+            >>> s = Kegg()
+            >>> res = s.list("pathway", organism="hsa")
             >>> pathways = [x.split()[0] for x in res.strip().split("\\n")]
             >>> len(pathways)  # as of Dec 2012
             261
@@ -343,14 +371,14 @@ class Kegg(RESTService):
 
         Other examples::
 
-            k.list("pathway")             # returns the list of reference pathways
-            k.list("pathway", "hsa")      # returns the list of human pathways
-            k.list("organism")            # returns the list of KEGG organisms with taxonomic classification
-            k.list("hsa")                 # returns the entire list of human genes
-            k.list("T01001")              # same as above
-            k.list("hsa:10458+ece:Z5100") # returns the list of a human gene and an E.coli O157 gene
-            k.list("cpd:C01290+gl:G00092")# returns the list of a compound entry and a glycan entry
-            k.list("C01290+G00092")       # same as above 
+            s.list("pathway")             # returns the list of reference pathways
+            s.list("pathway", "hsa")      # returns the list of human pathways
+            s.list("organism")            # returns the list of KEGG organisms with taxonomic classification
+            s.list("hsa")                 # returns the entire list of human genes
+            s.list("T01001")              # same as above
+            s.list("hsa:10458+ece:Z5100") # returns the list of a human gene and an E.coli O157 gene
+            s.list("cpd:C01290+gl:G00092")# returns the list of a compound entry and a glycan entry
+            s.list("C01290+G00092")       # same as above 
         """
         url = self.url+"/"+"list"
         if query:
@@ -391,19 +419,19 @@ class Kegg(RESTService):
         ::
 
             # search for pathways that contain Viral in the definition
-            k.find("pathway", "Viral")
+            s.find("pathway", "Viral")
             # for keywords "shiga" and "toxin"
-            k.find("genes", "shiga+toxin") 
+            s.find("genes", "shiga+toxin") 
             # for keywords "shiga toxin"
-            k.find("genes", ""shiga toxin")  
+            s.find("genes", ""shiga toxin")  
             # for chemical formula "C7H10O5"
-            k.find("compound", "C7H10O5", "formula") 
+            s.find("compound", "C7H10O5", "formula") 
             # for chemical formula containing "O5" and "C7"
-            k.find("compound", "O5C7","formula")     
+            s.find("compound", "O5C7","formula")     
             # for 174.045 =< exact mass < 174.055
-            k.find("compound", "174.05","exact_mass") 
+            s.find("compound", "174.05","exact_mass") 
             # for 300 =< molecular weight =< 310 
-            k.find("compound", "300-310","mol_weight") 
+            s.find("compound", "300-310","mol_weight") 
 
         """
         _valid_options = ["formula", "exact_mass", "mol_weight"]
@@ -422,13 +450,12 @@ class Kegg(RESTService):
         res = self.request(url)
         return res
 
-
-    def www_bget(self, entry):
-        """Experimental: open the entry in a web browser
+    def show_entry(self, entry):
+        """Opens URL corresponding to a valid entry
 
         ::
 
-            self.www_bget("path:hsa05416")
+            s.www_bget("path:hsa05416")
 
         """
         url = "http://www.kegg.jp/dbget-bin/www_bget?" + entry
@@ -437,7 +464,7 @@ class Kegg(RESTService):
         webbrowser.open(url)
 
     def get(self, dbentries, option=None):
-        """retrieves given database entries 
+        """Retrieves given database entries 
 
         :param str dbentries: KEGG database entries involving the following 
             database: pathway, brite, module, disease, drug, environ, ko, genome
@@ -451,24 +478,26 @@ class Kegg(RESTService):
 
         ::
 
+            from bioservices import Kegg
+            s = Kegg()
             # retrieves a compound entry and a glycan entry
-            self.get("cpd:C01290+gl:G00092") 
+            s.get("cpd:C01290+gl:G00092") 
             # same as above
-            self.get("C01290+G00092")  
+            s.get("C01290+G00092")  
             # retrieves a human gene entry and an E.coli O157 gene entry
-            self.get("hsa:10458+ece:Z5100")  
-            #retrieves amino acid sequences of a human gene and an E.coli O157 gene
-            self.get("hsa:10458+ece:Z5100/aaseq") 
+            s.get("hsa:10458+ece:Z5100")  
+            # retrieves amino acid sequences of a human gene and an E.coli O157 gene
+            s.get("hsa:10458+ece:Z5100/aaseq") 
             # retrieves the image file of a pathway map 
-            self.get("hsa05130/image") 
+            s.get("hsa05130/image") 
             # same as above
-            self.get("hsa05130", "image")
+            s.get("hsa05130", "image")
 
 
         Another example here below shows how to save the image of a given pathway::
 
-            res =  k.get("hsa05130/image")
-            # same as : res =  k.get("hsa05130","image")
+            res =  s.get("hsa05130/image")
+            # same as : res =  s.get("hsa05130","image")
             f = open("test.png", "w")
             f.write(res)
             f.close()
@@ -539,11 +568,11 @@ class Kegg(RESTService):
         entire database to another (e.g., from uniprot to Kegg Id all human gene
         IDs):: 
 
-            kegg_ids, uniprot_ids = k.conv("hsa", "uniprot")
+            kegg_ids, uniprot_ids = s.conv("hsa", "uniprot")
 
         or a subset by providing a valid **dbentries**::
 
-            k.conv("hsa","up:Q9BV86+")
+            s.conv("hsa","up:Q9BV86+")
 
 
         .. warning:: dbentries are not check and are supposed to be correct. 
@@ -596,14 +625,14 @@ class Kegg(RESTService):
 
 
     def link(self, target, source):
-        """find related entries by using database cross-references 
+        """Find related entries by using database cross-references 
 
         :param str target: the target KEGG database or organism (see below for the list).
         :param str source: the source KEGG database or organism (see below for
             the list) or a valid dbentries involving one of the database; see
             below for details.
 
-        The list of database is pathway, brite, module, disease, drug, environ,
+        The valid list of databases is pathway, brite, module, disease, drug, environ,
         ko, genome, compound, glycan, reaction, rpair, rclass, enzyme
 
         ::
@@ -633,11 +662,30 @@ class Kegg(RESTService):
 
 
     def show_pathway(self, pathId, scale=None, dcolor="pink", keggid={}):
-        """Experimental: open a pathway in a web browser
+        """Show a given pathway inside a web browser
+
+        :param str pathId: a valid pathway Id. See :meth:`pathwayIds`
+        :param int scale: you can scale the image with a value between 0 and 100
+        :param str dcolor: set the default background color of nodes
+        :param dict keggid: set color of entries contained in the pathway as 
+            key/value pairs; can also be a list, in which case all nodes have 
+            the same default color (red)
+
+        .. note:: if scale is provided, dcolor and keggid are ignored.
 
         ::
 
+            # show a pathway in the browser
             s.show_pathway("path:hsa05416", scale=50)
+
+            # Same as above but also highlights some KEGG Ids (red for all)
+            s.show_pathway("path:hsa05416", dcolor="white", 
+                keggid=['1525', '1604', '2534'])
+
+            # You can refine the colors using a dictionary:
+            s.show_pathway("path:hsa05416", dcolor="white", 
+                keggid={'1525':'yellow,red', '1604':'blue,green', '2534':"blue"})
+
 
         """
         if pathId.startswith("path:"):
@@ -656,7 +704,10 @@ class Kegg(RESTService):
             if isinstance(keggid, dict):
                 if len(keggid.keys())>0:
                     for k,v in keggid.iteritems():
-                        url += "/%s%%09,%s/" % (k,v)
+                        if "," in v:
+                            url += "/%s%%09%s/" % (k,v)
+                        else:
+                            url += "/%s%%09,%s/" % (k,v)
             elif isinstance(keggid, list):
                 for k in keggid:
                     url += "/%s%%09,%s/" % (k,"red")
@@ -666,8 +717,17 @@ class Kegg(RESTService):
         res = webbrowser.open(url)
         return res
 
-    def show_module(self, modid):
-        url = "http://www.kegg.jp/module/" + modid
+    def show_module(self, modId):
+        """Show a given module inside a web browser
+
+        :param str modId: a valid module Id. See :meth:`moduleIds`
+
+        Validity of modId is not checked but if wrong the URL will not open a 
+        proper web page.
+        """
+        if modId.startswith("md:"):
+            modId = modId.split(":")[1]
+        url = "http://www.kegg.jp/module/" + modId
         self.logging.info(url)
         import webbrowser
         res = webbrowser.open(url)
@@ -858,10 +918,13 @@ class Kegg(RESTService):
 
 
 class KeggParser(Kegg):
-    """This is an example of application to convert a pathway from Kegg Ids to Uniprot Ids
+    """This is an extension of the :class:`Kegg` class to ease parsing of dbentries
 
-    :Status: develop
+    This class provides a generic method :meth:`parse` that will read the output 
+    of a dbentry returned by :meth:`Kegg.get` and converts it into a dictionary ready to use.
 
+    The :meth:`parse` method is a dispatcher so you do not have to worry about the 
+    type of entry you are using. It can be a pathway, a gene, a compound...
     ::
 
         from bioservices import *
@@ -871,10 +934,13 @@ class KeggParser(Kegg):
         res = s.get("hsa04150")
 
         # parse it
-        ss = s.parseEntry(res)
+        d = s.parse(res)
+
+    As a pedagogical example, you can then further process this dictionary. Here below, we convert
+    the gene Ids found in the pathway into UniProt Ids::
 
         # Get the KEGG Ids in the pathway
-        kegg_geneIds = [x.keys()[0] for x in ss['gene']]
+        kegg_geneIds = [x for x in d['gene']]
 
         # Convert them
         db_up, db_kegg = s.conv("hsa", "uniprot")
@@ -883,21 +949,32 @@ class KeggParser(Kegg):
         indices = [db_kegg.index("hsa:%s" % x ) for x in kegg_geneIds]
         uniprot_geneIds = [db_up[x] for x in indices]
 
+    However, you could also have done it simply as follows::
+
+        kegg_geneIds = [x for x in d['gene']]
+        uprot_geneIds = [s.parse(s.get("hsa:"+str(e)))['dblinks']["UniProt:"] for e in d['gene']]
+
+    .. note:: The 2 outputs are slightly different. 
 
     """
-    def __init__(self):
-        super(KeggParser, self).__init__()
+    def __init__(self, verbose=False):
+        super(KeggParser, self).__init__(verbose=verbose)
 
     def parse(self, res):
-        """
+        """A dispatcher to parse all outputs returned by :meth:`Kegg.get`
+
+	:param str res: output of a :meth:`Kegg.get`.
+        :return: a dictionary
+
+        ::
+        
             res = s.get("md:hsa_M00554")
-            s.parse(res)
+            d = s.parse(res)
         """
         entry = res.split("\n")[0].split()[0]
         if entry == "ENTRY":
             dbentry = res.split("\n")[0].split(None, 2)[2]
-            print dbentry
-        if dbentry == "Pathway":
+        if "Pathway" in dbentry and "Module" not in dbentry:
             parser = self.parsePathway(res)
         elif dbentry.lower() == "pathway   module":
             parser = self.parseModule(res)
@@ -930,10 +1007,12 @@ class KeggParser(Kegg):
         return parser
 
     def parseDrug(self, res):
-        """
+        """Parses a drug entry
 
-            res = s.get("dr:D00001")
-            s.parseDrug(res)
+        ::
+
+            >>> res = s.get("dr:D00001")
+            >>> d = s.parseDrug(res)
         """
         flatfile = ["ENTRY", "NAME", "PRODUCTS", "FORMULA", "EXACT_MASS",
             "MOL_WEIGHT", "COMPONENT", "SEQUENCE", "SOURCE", "ACTIVITY",
@@ -943,9 +1022,13 @@ class KeggParser(Kegg):
         return parser
 
     def parsePathway(self, res):
-        """
+        """Parses a pathway entry
 
-        .. warning the api pages says GENES but it should be GENE
+        ::
+
+            >>> res = s.get("path:hsa10584")
+            >>> d = s.parsePathway(res)
+
         """
         flatfile = ["ENTRY", "NAME", "DESCRIPTION", "CLASS", "PATHWAY_MAP", 
             "MODULE", "DISEASE", "DRUG", "DBLINKS", "ORGANISM", "ORTHOLOGY", 
@@ -955,10 +1038,12 @@ class KeggParser(Kegg):
         return parser
 
     def parseModule(self, res):
-        """
+        """Parses a module entry
 
-            res = s.get("md:hsa_M00554")
-            s.parseModule(res)
+        ::
+
+            >>> res = s.get("md:hsa_M00554")
+            >>> d = s.parseModule(res)
         """
         flatfile = ["ENTRY", "NAME", "DEFINITION",  "PATHWAY",
             "ORTHOLOGY", "CLASS", "BRITE", "ORGANISM", "GENE", "REACTION",
@@ -967,8 +1052,12 @@ class KeggParser(Kegg):
         return parser
 
     def parseDisease(self, res):
-        """
-        res = s.get("ds:H00001")
+        """Parses a disease entry
+
+        ::
+
+            >>> res = s.get("ds:H00001")
+            >>> d = s.parseDisease(res)
         """
         flatfile = ["ENTRY", "NAME", "DESCRIPTION", "CATEGORY", "PATHWAY", "GENE",
             "ENV_FACTOR", "MARKER", "DRUG", "COMMENT", "DBLINKS", "REFERENCE"]
@@ -976,9 +1065,11 @@ class KeggParser(Kegg):
         return parser
 
     def parseEnviron(self, res):
-        """
+        """Parses a environ entry
+        ::
 
-        res = s.get("ev:E00001")
+            >>> res = s.get("ev:E00001")
+            >>> d = s.parseEnviron(res)
         """
         flatfile = ['ENTRY', "NAME", "CATEGORY", "COMPONENT", "SOURCE", 
             "REMARK", "COMMENT", "BRITE", "DBLINKS"]
@@ -986,9 +1077,13 @@ class KeggParser(Kegg):
         return parser
 
     def parseOrthology(self, res):
-        """
+        """Parses Orthology entry
 
-        res = s.get("ev:E00001")
+        ::
+        
+            >>> res = s.get("ko:K00001")
+            >>> d = s.parseOrthology(res)
+
         .. note:: in other case genes key is "gene". Here it is "genes".
         """
         flatfile = ['ENTRY', "NAME", "DEFINITION", "PATHWAY", "MODULE", 
@@ -997,7 +1092,14 @@ class KeggParser(Kegg):
         return parser
 
     def parseGenome(self, res):
-        """'genome:T00001'"""
+        """Parses a Genome entry
+
+        ::
+
+            >>> res = s.get('genome:T00001')
+            >>> d = s.parseGenome(res)
+
+        """
 
         flatfile = ["ENTRY", "NAME", "DEFINITION", "ANNOTATION", "TAXONOMY", 
             "DATA_SOURCE", "ORIGINAL_DB", "KEYWORDS", "DISEASE", "COMMENT", 
@@ -1006,10 +1108,12 @@ class KeggParser(Kegg):
         return parser
 
     def parseGene(self, res):
-        """'
+        """Parses a gene entry
 
+        ::
 
-        res = s.get("hsa:1525")
+            >>> res = s.get("hsa:1525")
+            >>> d = s.parseGene(res)
 
         """
 
@@ -1021,8 +1125,12 @@ class KeggParser(Kegg):
 
 
     def parseCompound(self, res):
-        """
-        s.get("cpd:C00001")
+        """Parses a compound entry
+
+        ::
+
+            >>> s.get("cpd:C00001")
+            >>> d = s.parseCompound(res)
         """
         flatfile = ["ENTRY", "NAME", "FORMULA", "EXACT_MASS", "MOL_WEIGHT",
             "SEQUENCE", "REMARK", "COMMENT", "REACTION", "PATHWAY", "ENZYME", "BRITE",
@@ -1031,7 +1139,13 @@ class KeggParser(Kegg):
         return parser
 
     def parseGlycan(self, res):
-        """res = s.get("gl:G00001")"""
+        """Parses a glycan entry
+
+        ::
+
+            >>> res = s.get("gl:G00001")
+            >>> d = s.parseGlycan(res)
+        """
         flatfile = ["ENTRY", "NAME", "COMPOSITION", "MASS", "CLASS", "REMARK",
             "COMMENT", "REACTION", "PATHWAY", "ENZYME", "ORTHOLOGY", 
             "REFERENCE", "DBLINKS", "NODE", "EDGE", "BRACKET"]
@@ -1039,14 +1153,25 @@ class KeggParser(Kegg):
         return parser
 
     def parseReaction(self, res):
-        """res = s.get("rn:R00001")"""
+        """Parses a reaction entry
+
+        ::
+
+            >>> res = s.get("rn:R00001")
+            >>> d = s.parseReaction(res)
+        """
         flatfile = ["ENTRY", "NAME", "DEFINITION", "EQUATION", "REMARK",
             "COMMENT", "RPAIR", "ENZYME", "PATHWAY", "ORTHOLOGY", "REFERENCE"]
         parser = self._parse(res, flatfile)
         return parser
 
     def parseRpair(self, res):
-        """res = s.get("rp:RP00001")
+        """Parses a rpair entry
+
+        ::
+
+            >>> res = s.get("rp:RP00001")
+            >>> d = s.parseRpair(res)
 
 
         .. todo:: a better parsing
@@ -1058,7 +1183,13 @@ class KeggParser(Kegg):
 
 
     def parseRclass(self, res):
-        """res = s.get("rc:RC00001")
+        """Parses a rclass entry
+
+        ::
+
+            >>> res = s.get("rc:RC00001")
+            >>> d = s.parseRclass(res)
+
         .. todo:: a better parsing
         """
         flatfile = ["ENTRY", "DEFINITION", "RPAIR", "REACTION",
@@ -1067,18 +1198,18 @@ class KeggParser(Kegg):
         return parser
 
     def parseEnzyme(self, res):
-        """
-        'ec:1.1.1.1'
-            res = s.get("rp:RP00001")
+        """Parses an enzyme entry
+
+        ::
+
+            >>> res = s.get('ec:1.1.1.1')
+            >>> d = s.parseEnzyme(res)
         """
         flatfile = ["ENTRY", "NAME", "CLASS", "SYSNAME", "REACTION", "ALL_REAC",
             "SUBSTRATE", "PRODUCT", "COMMENT", "PATHWAY", "ORTHOLOGY", "GENES", 
             "REFERENCE"]
         parser = self._parse(res, flatfile)
         return parser
-
-
-
 
     def _parse(self, res, flatfile):
         """Reaction is currently a dictionary if more than one line maybe we
@@ -1092,7 +1223,7 @@ class KeggParser(Kegg):
         # scanning res and searching for flatfile keywords; keep track of
         # current one. Should be an entry first.
         current = None
-
+        countref = 1 # reference counter for reference without a value
         for line in lines:
             line = line.strip()
             if line == "///" or len(line)==0:
@@ -1141,11 +1272,19 @@ class KeggParser(Kegg):
 
                 # For references only
                 if current == "reference":
-                    key, value = line.strip().split(" ",1)
+                    try:
+                        key, value = line.strip().split(" ",1)
+                    except:
+                        key = line.strip()
+                        countref += 1
+                        value = str(countref)
                     if key.upper() in ["AUTHORS", "TITLE", "JOURNAL"]:
                         output[current][pubmed][key] = value
                     elif key.upper() == "REFERENCE":
                         pubmed = value.strip()
+                        if pubmed in output[current].keys():
+                            pubmed += "_" + str(countref)
+                            countref += 1
                         output[current][pubmed] = {}
                 else: # and all others
                     if mode == "dict":
@@ -1165,7 +1304,6 @@ class KeggParser(Kegg):
         if "aaseq" in output.keys():
             data = output['aaseq']
             output['aaseq'] = {data[0]: reduce(lambda x,y:x+y, data[1:])}
-
         return output
 
 

@@ -2,7 +2,7 @@ from bioservices.chembldb import *
 import unittest
 
 
-class test_Chembl(Chembl):
+class test_Chembl(chEMBLdb):
 
     def __init__(self):
         super(test_Chembl, self).__init__(verbose=False)

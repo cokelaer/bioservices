@@ -1,4 +1,4 @@
-from bioservices import Kegg
+from bioservices import Kegg, KeggParser
 from nose import with_setup
 
 
@@ -14,8 +14,8 @@ class test_Kegg(Kegg):
         self.organismIds
         assert self.enzymeIds[0].startswith("ec")
         assert self.compoundIds[0].startswith("cpd")
-        assert self.glycandIds[0].startswith("gl")
-        assert self.reactionsIds[0].startswith("rn")
+        assert self.glycanIds[0].startswith("gl")
+        assert self.reactionIds[0].startswith("rn")
         assert self.drugIds[0].startswith("dr")
         assert self.koIds[0].startswith("ko")
 
@@ -48,11 +48,11 @@ class test_Kegg(Kegg):
 
 
     def test_list(self):
-        self.list("pathway")             # returns the list of reference pathways
+        #self.list("pathway")             # returns the list of reference pathways
         self.list("pathway", "hsa")      # returns the list of human pathways
         self.list("organism")            # returns the list of KEGG organisms with taxonomic classification
-        self.list("hsa")                 # returns the entire list of human genes
-        self.list("T01001")              # same as above
+        #self.list("hsa")                 # returns the entire list of human genes
+        #self.list("T01001")              # same as above
         self.list("hsa:10458+ece:Z5100") # returns the list of a human gene and an E.coli O157 gene
         self.list("cpd:C01290+gl:G00092")# returns the list of a compound entry and a glycan entry
         self.list("C01290+G00092")       # same as above 
@@ -124,9 +124,10 @@ class test_Kegg(Kegg):
 
         self.conv("hsa","up:Q9BV86+")
 
-    def test_show_pathwat(self):
-        self.www_bget("path:hsa05416")
+    def _test_show_pathway(self):
+        self.show_entry("path:hsa05416")
         self.show_pathway("path:hsa05416", scale=50)
+
     def test_check_dentries(self):
         assert True == self.check_dbentries("hsa:10458+ece:Z5100")
         try:
@@ -137,3 +138,14 @@ class test_Kegg(Kegg):
 
     def test_link(self):
         self.link("pathway", "hsa:10458+ece:Z5100")
+
+
+    def test_org_conv(self):
+        assert 'hsa' == self.Tnumber2code("T01001")
+        assert 'T01001' == self.code2Tnumber("hsa")
+
+
+def test_KeggParser():
+    s = KeggParser()
+    res = s.get("rp:RP00001")
+    d = s.parseRpair(res)

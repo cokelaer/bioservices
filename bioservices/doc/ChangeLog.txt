@@ -5,6 +5,8 @@ Whats' new, what has changed
 Revision 0.9
 ------------------
 
+* 0.9.6:
+    * Finalising the Kegg module
 * 0.9.5: 
     * add parser for all KEGG entries (enzyme, genome, pathway, ...) 
 	* add a show_pathway to highlight element in a pathway
