@@ -2,7 +2,7 @@ from bioservices.wikipathway import  Wikipathway
 import unittest
 
 
-class TestRepGen(unittest.TestCase, Wikipath):
+class TestRepGen(unittest.TestCase, Wikipathway):
     @classmethod
     def setUpClass(self):
         self.s = Wikipath()
