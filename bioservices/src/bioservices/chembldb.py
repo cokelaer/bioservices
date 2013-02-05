@@ -281,11 +281,10 @@ prevented us from fulfilling your request. """)
 
         
     def get_image_of_compounds_by_chemblId(self, query, dimensions=None, file_out=None):
-        """Get the image of a given compound.
+        r"""Get the image of a given compound.
 
         :param str query: a valid compound ChEMBLID or a list/tuple of valid compound ChEMBLIDs.
-        :param int dimensions: optional argument. An integer z such that
-                        1 \leq z \leq 500
+        :param int dimensions: optional argument. An integer z such that :math:`1 \leq z \leq 500`
             giving the dimensions of the image.
         :return: the path used to save the figure (different from Chembl API)
 
@@ -443,7 +442,7 @@ prevented us from fulfilling your request. """)
 
         :param str query: a valid target ChEMBLID. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
-        :return:see:meth:`get_compounds_activities`
+        :return: see :meth:`get_compounds_activities`
 
         ::
 
