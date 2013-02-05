@@ -29,12 +29,14 @@ class ChEMBLdb(RESTService):
 
     """
     _url = "http://www.ebi.ac.uk/chemblws/"
-    _chemblId_example = 'CHEMBL1'
+    _chemblId_example = "CHEMBL1"
     _inChiKey_example = "QFFGVLORLPOAEC-SNVBAGLBSA-N"
     _smiles_example = "COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56"
-    _smiles_similar_example = _smiles_example + '/98'
+    _smiles_similar_example = _smiles_example + "/98"
+    _image_chemblId_example = "CHEMBL192"
+    _image_dimension_example = 200
     _bioactivities_example = "CHEMBL2"
-    _target_chemblId_example = 'CHEMBL2477'
+    _target_chemblId_example = "CHEMBL2477"
     _target_uniprotId_example = "Q13936"
     _target_biactivities_example = "CHEMBL240"
     _assay_example = "CHEMBL1217643"
@@ -213,8 +215,7 @@ prevented us from fulfilling your request. """)
 
         If json format is requested, a dictionary is returned. The dictionary
         has a unique key 'compounds'. The value of that key is a list of compound
-        records. Each compound record is the same dictionary that the returned one
-        in :meth:`get_compounds_by_ChemblId`.
+        records. For each compound record dictionary see :meth:`get_compounds_by_ChemblId`.
 
         :: 
 
@@ -229,7 +230,8 @@ prevented us from fulfilling your request. """)
 
     @__process("compounds/substructure")
     def get_compounds_containing_SMILES(self, query):
-        """Get list of compounds containing the substructure represented by the given Canonical SMILES
+        """Get list of compounds containing the substructure represented
+        by the given Canonical SMILES
 
         :param str query: a valid SMILES string. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
@@ -243,14 +245,13 @@ prevented us from fulfilling your request. """)
             >>> print(s._smiles_example)
             >>> resxml = s.get_compounds_containing_SMILES(s._smiles_example + ".xml")
             >>> resjson = s.get_compounds_containing_SMILES(s._smiles_example + ".json")
-
         """
         pass
 
 
     @__process("compounds/similarity")
     def get_compounds_similar_to_SMILES(self, query):
-        """Get list of compounds similar to the one represented by the given Canonical SMILES, 
+        """Get list of compounds similar to the one represented by the given Canonical SMILES.
 
         The similarity is at a cutoff percentage score (minimum value=70%, maximum value=100%).
 
@@ -259,9 +260,9 @@ prevented us from fulfilling your request. """)
             can be added to bypass default :attr:`default_extension`
             The SMILE string must be followed by a slash character and the
             expected similarity (e.g., "/98")
-        :return: Compound Record. See :meth:`get_compounds_by_ChemblId`
+        :return: Compound records. See :meth:`get_compounds_by_chemblId`
 
-        In addition to the keys returned in :meth:`get_compounds_by_ChemblId`,
+        In addition to the keys returned in :meth:`get_compounds_by_chemblId`,
         the following keys are returned:
 
          * acdAcidicPka
@@ -287,15 +288,15 @@ prevented us from fulfilling your request. """)
         :param int dimensions: optional argument. An integer z such that
                         1 \leq z \leq 500
             giving the dimensions of the image.
-        :return: file_name (different from Chembl API)
+        :return: the path used to save the figure (different from Chembl API)
 
         ::
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
-            >>> s.get_image_of_compounds_by_ChEMBLID("CHEMBL192")
-            >>> s.get_image_of_compounds_by_ChEMBLID("CHEMBL192", dimensions=200)
-
+            >>> print (s._image_chemblId_example, s._image_dimension_example)
+            >>> s.get_image_of_compounds_by_ChEMBLID(s._image_chemblId_example)
+            >>> s.get_image_of_compounds_by_ChEMBLID(s._image_chemblId_example, s._image_dimension_example)
         """
         def __f_save(target_data,file_out):
             FILE = open(file_out,'w')
@@ -369,8 +370,6 @@ prevented us from fulfilling your request. """)
             >>> resjson = s.get_compounds_activities(s._bioactivities_example)
         """
         pass
-    #    return url
-    #get_compounds_activities = __f1(get_compounds_activities)
 
 
     @__process("targets")
@@ -404,11 +403,8 @@ prevented us from fulfilling your request. """)
             >>> resjson = s.get_target_by_chemblId(s._target_chemblId_example)
         """
         pass
-    #i    return url
-    #get_target_by_chemblId = __f1(get_target_by_chemblId)
 
 
-    #def get_target_by_uniprotId(url='http://www.ebi.ac.uk/chemblws/targets/uniprot/%s.json'):
     @__process("targets/uniprot")
     def get_target_by_uniprotId(self, query):
         """Get individual target by UniProt Accession Id
@@ -426,8 +422,6 @@ prevented us from fulfilling your request. """)
             >>> resjson = s.get_target_by_uniprotId(s._target_uniprotId_example)
         """
         pass
-    #return url        
-    #get_target_by_uniprotId = __f1(get_target_by_uniprotId)
 
     
     @__process("targets/refseq")
@@ -461,8 +455,6 @@ prevented us from fulfilling your request. """)
             >>> resjson = s.get_target_bioactivities(s._target_biactivities_example)
         """
         pass
-    #    return url
-    #get_target_bioactivities = __f1(get_target_bioactivities)
 
 
     def get_all_targets(self):
@@ -487,7 +479,7 @@ prevented us from fulfilling your request. """)
         ::
 
             >>> from bioservices import *
-            >>> s = ChEMBLdb()
+            >>> s = ChEMBLdb(verbose=False)
             >>> res = s.get_all_targets()
         """
         res = self.request(self.url + "/targets." + self.default_extension)
@@ -526,8 +518,7 @@ prevented us from fulfilling your request. """)
 
         """
         pass
-        #return url
-    #get_assay_by_chemblId = __f1(get_assay_by_chemblId)
+
     
     @__process("assays", "bioactivities")
     def get_assay_bioactivities(self, query):
@@ -536,7 +527,7 @@ prevented us from fulfilling your request. """)
         :param str query: a valid assay ChEMBLID. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
         :return: Bioactivity records for a given assay in XML or dictionary
-            (if json requested). see :meth:`get_compounds_activities`
+            (if json requested). See :meth:`get_compounds_activities`
 
         ::
 
@@ -547,8 +538,6 @@ prevented us from fulfilling your request. """)
             >>> resjson = s.get_assay_bioactivities(s._assay_example)
         """
         pass
-    #    return url
-    #get_assay_bioactivities = __f1(get_assay_bioactivities)
 
 
     def inspect(self, query):
