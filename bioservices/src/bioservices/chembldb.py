@@ -26,7 +26,6 @@ import webbrowser
 
 class ChEMBLdb(RESTService):
     """Interface to `ChEMBLdb <http://www.ebi.ac.uk/chembldb/index.php>`_ 
-
     """
     _url = "http://www.ebi.ac.uk/chemblws/"
     _chemblId_example = "CHEMBL1"
