@@ -250,8 +250,10 @@ class Kegg(RESTService):
 
         .. doctest::
 
+            >>> from bioservices import *
+            >>> s = Kegg()
             >>> s.code2Tnumber("hsa")
-            'T01101'
+            'T01001'
         """
         index = self.organismIds.index(code)
         return self.organismsTnumbers[index]
@@ -261,8 +263,10 @@ class Kegg(RESTService):
 
         .. doctest::
 
-            >>> s.Tnumber2code("hsa")
-            'T01101'
+            >>> from bioservices import *
+            >>> s = Kegg()
+            >>> s.Tnumber2code("T01001")
+            'hsa'
         """
         index = self.organismsTnumbers.index(Tnumber)
         return self.organismIds[index]
