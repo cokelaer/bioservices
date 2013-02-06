@@ -2,7 +2,7 @@ from bioservices.chembldb import *
 import unittest
 
 
-class test_Chembl(chEMBLdb):
+class test_Chembl(ChEMBLdb):
 
     def __init__(self):
         super(test_Chembl, self).__init__(verbose=False)
@@ -16,9 +16,10 @@ class test_Chembl(chEMBLdb):
     def test_api_status(self):
         self.api_status()
 
-    def test_get_compounds_by_ChemblId(self):
-        self.get_compounds_by_ChemblId("CHEMBL1")
-        self.get_compounds_by_ChemblId("CHEMBL1.json")
+    def test_get_compounds_by_chemblId(self):
+        self.get_compounds_by_chemblId("CHEMBL1")
+        self.get_compounds_by_chemblId("CHEMBL1.json")
+        self.get_compounds_by_chemblId(self._chemblId_example)
 
     def test_get_target_uniprotId(self):
         self.get_target_by_uniprotId("Q13936")
@@ -46,6 +47,12 @@ class test_Chembl(chEMBLdb):
     def test_get_target_bioactivities(self):
         self.get_target_bioactivities("CHEMBL240.json")
 
+    def test_get_target_by_chemblId(self):
+        resjson = self.get_target_by_chemblId(self._target_chemblId_example)
+
+    def test_get_assay_bioactivities(self):
+        res = self.get_assay_bioactivities(self._assay_example)
+
     def test_get_all_targets(self):
         self.get_all_targets()
 
@@ -56,3 +63,9 @@ class test_Chembl(chEMBLdb):
     @unittest.skip
     def test_inspect(self): 
         self.inspect("CHEMBL240")
+
+    def test_image(self):
+        self.get_image_of_compounds_by_chemblId(
+            self._image_chemblId_example,
+            self._image_dimension_example, view=False)
+

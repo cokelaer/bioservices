@@ -26,6 +26,17 @@ import webbrowser
 
 class ChEMBLdb(RESTService):
     """Interface to `ChEMBLdb <http://www.ebi.ac.uk/chembldb/index.php>`_ 
+
+
+    Here is a quick example to retrieve a target given its ChEMBL Id
+    .. doctest::
+
+        >>> from bioservices import ChEMBLId
+        >>> s = ChEMBLdb(verbose=False)
+        >>> print(s._target_chemblId_example)
+        'CHEMBL2477'
+        >>> resjson = s.get_target_by_chemblId(s._target_chemblId_example+".json")
+
     """
     _url = "http://www.ebi.ac.uk/chemblws/"
     _chemblId_example = "CHEMBL1"
@@ -37,13 +48,13 @@ class ChEMBLdb(RESTService):
     _bioactivities_example = "CHEMBL2"
     _target_chemblId_example = "CHEMBL2477"
     _target_uniprotId_example = "Q13936"
-    _target_biactivities_example = "CHEMBL240"
+    _target_bioactivities_example = "CHEMBL240"
     _assay_example = "CHEMBL1217643"
 
     def __init__(self, verbose=True):
         super(ChEMBLdb, self).__init__(url=ChEMBLdb._url, 
             name="ChEMBLdb", verbose=verbose)
-        self._default_extension="json"
+        self._default_extension = "json"
 
     # just a get/set to the default extension
     def _set_default_ext(self, ext):
@@ -52,7 +63,7 @@ class ChEMBLdb(RESTService):
     def _get_default_ext(self):
         return self._default_extension
     default_extension = property(_get_default_ext, _set_default_ext, 
-        doc="set default extension of the requests. Can be 'json' or 'xml'")
+        doc="set extension of the requests (default is json). Can be 'json' or 'xml'")
 
     # ChEMBL specifies those errors, so let us try to catch thmem. May not be
     # needed. Could to everything within services module.
@@ -69,14 +80,14 @@ class ChEMBLdb(RESTService):
             if e.code == 400:
                 self.logging.error(""" Bad request. The parameters passed to the
 API endpoint were deemed invalid. This response will be returned for invalid
-ChEMBLID's i.e. CHEMBLX1, invalid UniProt accessions, invalid SMILES strings
+ChEMBLId's i.e. CHEMBLX1, invalid UniProt accessions, invalid SMILES strings
 e.t.c. """)
             elif e.code == 404:
                 self.logging.error(""" Not found. The resource corresponding to
 the supplied parameters does not exist. This response will be returned for
 requests for non-existent ChEMBL compound, target, and assay resources. """)
             elif e.code == 500:
-                self.loggin.error(""" Service unavailable. An internal problem
+                self.logging.error(""" Service unavailable. An internal problem
 prevented us from fulfilling your request. """)
             else:
                 pass
@@ -140,9 +151,9 @@ prevented us from fulfilling your request. """)
 
     @__process("compounds")
     def get_compounds_by_chemblId(self, query):
-        """Get compound by ChEMBLID
+        """Get compound by ChEMBLId
 
-        :param query: a valid compound ChEMBLID. A ".json" or ".xml" extension
+        :param query: a valid compound ChEMBLId. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
         :return: Compound Record in XML or dictionary (if json requested)
 
@@ -184,7 +195,7 @@ prevented us from fulfilling your request. """)
             can be added to bypass default :attr:`default_extension`
         :return: Compound Record in XML or dictionary (if json requested)
 
-        In addition to the keys returned in :meth:`get_compounds_by_ChemblId`,
+        In addition to the keys returned in :meth:`get_compounds_by_chemblId`,
         the following keys are returned:
 
          * acdAcidicPka
@@ -193,11 +204,12 @@ prevented us from fulfilling your request. """)
          * species
          * synonyms
 
-        :: 
+        .. doctest::
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._inChiKey_example)
+            QFFGVLORLPOAEC-SNVBAGLBSA-N
             >>> resxml = s.get_individual_compounds_by_inChiKey(s._inChiKey_example + ".xml")
             >>> resjson = s.get_individual_compounds_by_inChiKey(s._inChiKey_example + ".json")
         """
@@ -208,13 +220,13 @@ prevented us from fulfilling your request. """)
     def get_compounds_by_SMILES(self, query):
         """Get list of compounds by Canonical SMILES
 
-        :param str query: a valid compound ChEMBLID. A ".json" or ".xml" extension
+        :param str query: a valid compound ChEMBLId. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
         :return: Compound Record in XML or dictionary (if json requested)
 
         If json format is requested, a dictionary is returned. The dictionary
         has a unique key 'compounds'. The value of that key is a list of compound
-        records. For each compound record dictionary see :meth:`get_compounds_by_ChemblId`.
+        records. For each compound record dictionary see :meth:`get_compounds_by_chemblId`.
 
         :: 
 
@@ -280,21 +292,25 @@ prevented us from fulfilling your request. """)
         pass
 
         
-    def get_image_of_compounds_by_chemblId(self, query, dimensions=None, file_out=None):
+    def get_image_of_compounds_by_chemblId(self, query, dimensions=None,
+            file_out=None, view=True):
         r"""Get the image of a given compound.
 
-        :param str query: a valid compound ChEMBLID or a list/tuple of valid compound ChEMBLIDs.
+        :param str query: a valid compound ChEMBLId or a list/tuple of valid compound ChEMBLIds.
         :param int dimensions: optional argument. An integer z such that :math:`1 \leq z \leq 500`
             giving the dimensions of the image.
+        :param str file_out"
+        :param bool view: show the image
         :return: the path used to save the figure (different from Chembl API)
+        
 
         ::
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
             >>> print (s._image_chemblId_example, s._image_dimension_example)
-            >>> s.get_image_of_compounds_by_ChEMBLID(s._image_chemblId_example)
-            >>> s.get_image_of_compounds_by_ChEMBLID(s._image_chemblId_example, s._image_dimension_example)
+            >>> s.get_image_of_compounds_by_chemblId(s._image_chemblId_example)
+            >>> s.get_image_of_compounds_by_chemblId(s._image_chemblId_example, s._image_dimension_example)
         """
         def __f_save(target_data,file_out):
             FILE = open(file_out,'w')
@@ -312,7 +328,8 @@ prevented us from fulfilling your request. """)
                 file_out = os.getcwd()
                 file_out += '/%s.png' % query
             __f_save(target_data,file_out)
-            webbrowser.open(file_out)
+            if view:
+                webbrowser.open(file_out)
         elif isinstance(query, tuple) or isinstance(query,list):
             for item in query:
                 url= self.url + '/compounds/%s/image' % item
@@ -332,7 +349,7 @@ prevented us from fulfilling your request. """)
     def get_compounds_activities(self, query):
         """Get individual compound bioactivities
 
-        :param str query: Compound ChEMBLID with optional extension. This is different from
+        :param str query: Compound ChEMBLId with optional extension. This is different from
             the API!! API is compounds/%s/bioactivities.json here we need to provide json if
             we want json output. So query must be CHEMBL2.json (or use
             default_extension
@@ -372,11 +389,11 @@ prevented us from fulfilling your request. """)
 
     @__process("targets")
     def get_target_by_chemblId(self, query):
-        """Get target by ChEMBLID
+        """Get target by ChEMBLId
 
-        :param str query: a target ChEMBLID. A ".json" or ".xml" extension
+        :param str query: a target ChEMBLId. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
-        :param str query: target ChEMBLID
+        :param str query: target ChEMBLId
         :return: Target Record in XML or dictionary (if json requested)
 
         If json format is requested, a dictionary is returned. The dictionary
@@ -440,7 +457,7 @@ prevented us from fulfilling your request. """)
     def get_target_bioactivities(self, query):
         """Get individual target bioactivities
 
-        :param str query: a valid target ChEMBLID. A ".json" or ".xml" extension
+        :param str query: a valid target ChEMBLId. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
         :return: see :meth:`get_compounds_activities`
 
@@ -448,9 +465,9 @@ prevented us from fulfilling your request. """)
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
-            >>> print(s._target_biactivities_example)
-            >>> resxml = s.get_target_bioactivities(s._target_biactivities_example + '.xml')
-            >>> resjson = s.get_target_bioactivities(s._target_biactivities_example)
+            >>> print(s._target_bioactivities_example)
+            >>> resxml = s.get_target_bioactivities(s._target_bioactivities_example + '.xml')
+            >>> resjson = s.get_target_bioactivities(s._target_bioactivities_example)
         """
         pass
 
@@ -488,9 +505,9 @@ prevented us from fulfilling your request. """)
 
     @__process("assays")
     def get_assay_by_chemblId(self, query):
-        """Get assay by ChEMBLID
+        """Get assay by ChEMBLId
 
-        :param str query: a valid assay ChEMBLID. A ".json" or ".xml" extension
+        :param str query: a valid assay ChEMBLId. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
         :return: Assay record in XML or dictionary (if json requested)
 
@@ -506,11 +523,12 @@ prevented us from fulfilling your request. """)
          * journal
          * numBioactivities
 
-        ::
+        .. doctest::
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._assay_example)
+            CHEMBL1217643
             >>> resxml = s.get_assay_by_chemblId(s._assay_example + '.xml')
             >>> resjson = s.get_assay_by_chemblId(s._assay_example)
 
@@ -522,7 +540,7 @@ prevented us from fulfilling your request. """)
     def get_assay_bioactivities(self, query):
         """Get individual assay bioactivities
 
-        :param str query: a valid assay ChEMBLID. A ".json" or ".xml" extension
+        :param str query: a valid assay ChEMBLId. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
         :return: Bioactivity records for a given assay in XML or dictionary
             (if json requested). See :meth:`get_compounds_activities`
