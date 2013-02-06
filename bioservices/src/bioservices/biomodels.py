@@ -53,6 +53,12 @@ publicationIdOrText     publication identifier (PMID or DOI) or text
                         which occurs in the publication's title or abstract
 ======================= ============================================================
 
+.. testsetup:: biomodels
+
+    from bioservices import *
+    s = BioModels()
+
+
 """
 import copy
 import webbrowser
@@ -298,7 +304,7 @@ class BioModels(WSDLService):
         :param str Id: identifier of a ChEBI term (e.g. CHEBI:4978)
         :return:  list of model identifiers 
 
-        .. doctest::
+        .. doctest:: biomodels
  
             >>> from bioservices import *
             >>> s = BioModels()
@@ -563,11 +569,12 @@ records.
         """
         return self.serv.getModelsIdByGOId(GOId)
 
-    def extra_getChEBIIds(self, start=0,end=100):
+    def extra_getChEBIIds(self, start=0, end=100, verbose=False):
         """Retrieve existing chEBI Ids by scanning the models
 
         :param int start: starting Id
         :param int end: end Id
+        :param bool verbose: show the status of the analysis
         :return: list of chEBI Ids that have been found in the DB.
 
         This method may be useful to know the ChEBI Ids used in models
@@ -575,28 +582,30 @@ records.
         For instance, scanning the database for start=0 and end=200, a list of
         191 chEBI Ids are returned and its takes a minute.
 
-        .. doctest::
+        .. doctest:: biomodels
 
-            >>> s.extra_getChEBIIds(0, 1000)
-            ['REACT_33', 'REACT_42', 'REACT_85', 'REACT_89']
+            >>> s.extra_getChEBIIds(80, 84)
+            ['CHEBI:81', 'CHEBI:83', 'CHEBI:84']
         """
         if start > end or start<0:
             raise ValueError("start must be positive and lower than end value")
         Ids = []
-        for i in range(start, end):
+        for i in range(start, end+1):
             ChEBI = "CHEBI:" +  str(i)
             if i%100 == 0 and i>0:
-                print("%f %% done" % ((i-start)*100./float(end-start)))
+                if verbose==True:
+                    print("%f %% done" % ((i-start)*100./float(end-start)))
             res = self.getModelsIdByChEBI(ChEBI)
             if res:
 		Ids.append(ChEBI)
         return Ids
 
-    def extra_getReactomeIds(self, start=0, end=1000):
+    def extra_getReactomeIds(self, start=0, end=1000, verbose=False):
         """Retrieve REACTOME Ids by scanning the models
 
         :param int start: starting Id
         :param int end: end Id
+        :param bool verbose: show the status of the analysis
         :return: list of reactome IDs that have been found in the DB.
 
         Search all models for reactome Ids in range 'REACT_start' to 'REACT_end'. 
@@ -605,7 +614,7 @@ records.
         For instance, scanning the database for start=0 and end=3000, a list of
         106 reactome Id are returned and its takes a minute or two.
 
-        .. doctest::
+        .. doctest:: biomodels
 
             >>> s.extra_getReactomeIds(0, 100)
             ['REACT_33', 'REACT_42', 'REACT_85', 'REACT_89']
@@ -613,9 +622,10 @@ records.
         if start > end or start<0:
             raise ValueError("start must be positive and lower than end value")
         Ids = []
-        for i in range(start, end):
+        for i in range(start, end+1):
             if i%100 == 0 and i>0:
-                print("%f %% done" % ((i-start)*100./float(end-start)))
+                if verbose==True:
+                    print("%f %% done" % ((i-start)*100./float(end-start)))
             res = self.serv.getSimpleModelsByReactomeIds(['REACT_%s'%i])
             if 'REACT' in res:
                 Ids.append('REACT_%s' % i)
