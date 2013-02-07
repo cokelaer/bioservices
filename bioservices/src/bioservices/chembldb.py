@@ -18,7 +18,7 @@
 ##############################################################################
 #$Id: biomodels.py 141 2013-02-06 10:22:25Z cokelaer $
 
-"""This module provides a class :class:`ChEMBLdb`
+"""This module provides a class :class:`ChEMBLdb` 
 
 .. topic:: What is ChEMBLdb
 
@@ -40,12 +40,12 @@
 
 """
 import urllib2, urllib, json, re, os
-from services import *
+from bioservices.services import *
 import webbrowser
 
 
 class ChEMBLdb(RESTService):
-    """Interface to `ChEMBLdb <http://www.ebi.ac.uk/chembldb/index.php>`_
+    """Interface to `ChEMBLdb <http://www.ebi.ac.uk/chembldb/index.php>`_ 
 
 
     Here is a quick example to retrieve a target given its ChEMBL Id
@@ -70,9 +70,10 @@ class ChEMBLdb(RESTService):
     _target_uniprotId_example = "Q13936"
     _target_bioactivities_example = "CHEMBL240"
     _assay_example = "CHEMBL1217643"
+    _inspect_example = ('CHEMBL1','compound')
 
     def __init__(self, verbose=True):
-        super(ChEMBLdb, self).__init__(url=ChEMBLdb._url,
+        super(ChEMBLdb, self).__init__(url=ChEMBLdb._url, 
             name="ChEMBLdb", verbose=verbose)
         self._default_extension = "json"
 
@@ -82,7 +83,7 @@ class ChEMBLdb(RESTService):
         self._default_extension = ext
     def _get_default_ext(self):
         return self._default_extension
-    default_extension = property(_get_default_ext, _set_default_ext,
+    default_extension = property(_get_default_ext, _set_default_ext, 
         doc="set extension of the requests (default is json). Can be 'json' or 'xml'")
 
     # ChEMBL specifies those errors, so let us try to catch thmem. May not be
@@ -136,31 +137,43 @@ prevented us from fulfilling your request. """)
 
         def decorator(func):
             def newf(self, query):
-                if query.endswith(".json"):
-                    output = "json"
-                elif query.endswith(".xml"):
-                    output = "xml"
-                elif len(query.split("."))>=2:
-                    raise BioServicesError("""The query must be a valid identifier with .json or .xml extensions or no extension at all (default XML)""")
-                else: # query has no extension, so we need to figure out the default
-                    output = self.default_extension
-                    query += "." +  self.default_extension
+                """
+                There are two cases: query is a string or a list/tuple of strings.
+                In the first case, query is something close to url query. In the second case,
+                is a family of those ones.
+                """
+                def infunc(query):
+                    if query.endswith(".json"):
+                        output = "json"
+                    elif query.endswith(".xml"):
+                        output = "xml"
+                    elif len(query.split("."))>=2:
+                        raise BioServicesError("""The query must be a valid identifier with .json or .xml extensions or no extension at all (default XML)""")
+                    else: # query has no extension, so we need to figure out the default
+                        output = self.default_extension
+                        query += "." +  self.default_extension
+                    if service_extra:
+                        # used for example by get_compounds_activities
+                        url = self.url + "/" + service + "/" + query.split('.')[0]
+                        url += "/" + service_extra
+                        if output == "json":
+                            url += ".json"
+                    else:
+                        url = self.url + "/" + service + "/" + query
+                    self.logging.info(url)
+                    # the request itself
+                    res = self._request(url, output)
 
-                if service_extra:
-                    # used for example by get_compounds_activities
-                    url = self.url + "/" + service + "/" + query.split('.')[0]
-                    url += "/" + service_extra
+                    # converion required if json structure.
                     if output == "json":
-                        url += ".json"
+                        res = json.loads(res)
+                    return res
+                if isinstance(query,str):
+                    res = infunc(query)
+                elif isinstance(query,list) or isinstance(query,tuple):
+                    res = tuple(map(infunc, query))
                 else:
-                    url = self.url + "/" + service + "/" + query
-                self.logging.info(url)
-                # the request itself
-                res = self._request(url, output)
-
-                # converion required if json structure.
-                if output == "json":
-                    res = json.loads(res)
+                    raise TypeError("query must be a string, list or tuple!!")
                 return res
                 #return func(self, *args, **kwds)
             newf.__name__ = func.__name__
@@ -173,9 +186,11 @@ prevented us from fulfilling your request. """)
     def get_compounds_by_chemblId(self, query):
         """Get compound by ChEMBLId
 
-        :param query: a valid compound ChEMBLId. A ".json" or ".xml" extension
-            can be added to bypass default :attr:`default_extension`
-        :return: Compound Record in XML or dictionary (if json requested)
+        :param query: a valid compound ChEMBLId or a list of those ones.
+            A ".json" or ".xml" extension can be added to bypass default
+            :attr:`default_extension`.
+        :return: Compound Record in XML or dictionary (if json requested). If
+            query os a list/tuple, a  tuple of compound records is returned.
 
         If json format is requested, a dictionary is returned. The dictionary
         has a unique key 'compound'. The value of that key is another dictionary
@@ -195,9 +210,9 @@ prevented us from fulfilling your request. """)
          * smiles
          * stdInChiKey
 
-        ::
+        :: 
 
-            >>> from bioservices import *
+            >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
             >>> print (s._chemblId_example)
             >>> resxml = s.get_compounds_by_chemblId(s._chemblId_example)
@@ -205,15 +220,17 @@ prevented us from fulfilling your request. """)
         """
         # the decorator is taking care of the checking and processing
         pass
-
+ 
 
     @__process("compounds/stdinchikey")
     def get_individual_compounds_by_inChiKey(self, query):
         """Get individual compound by standard InChi Key
 
-        :param str query: a valid InChi key. A ".json" or ".xml" extension
-            can be added to bypass default :attr:`default_extension`
-        :return: Compound Record in XML or dictionary (if json requested)
+        :param str query: a valid InChi key or a list of those ones.
+            A ".json" or ".xml" extension can be added to bypass default
+            :attr:`default_extension`.
+        :return: Compound Record in XML or dictionary (if json requested). If
+            query os a list/tuple, a  tuple of compound records is returned.
 
         In addition to the keys returned in :meth:`get_compounds_by_chemblId`,
         the following keys are returned:
@@ -239,9 +256,11 @@ prevented us from fulfilling your request. """)
     def get_compounds_by_SMILES(self, query):
         """Get list of compounds by Canonical SMILES
 
-        :param str query: a valid compound ChEMBLId. A ".json" or ".xml" extension
-            can be added to bypass default :attr:`default_extension`
-        :return: Compound Record in XML or dictionary (if json requested)
+        :param str query: a valid compound ChEMBLId or a list of those ones.
+            A ".json" or ".xml" extension can be added to bypass default
+            :attr:`default_extension`.
+        :return: Compound Record in XML or dictionary (if json requested). If
+            query os a list/tuple, a  tuple of compound records is returned.
 
         If json format is requested, a dictionary is returned. The dictionary
         has a unique key 'compounds'. The value of that key is a list of compound
@@ -263,8 +282,9 @@ prevented us from fulfilling your request. """)
         """Get list of compounds containing the substructure represented
         by the given Canonical SMILES
 
-        :param str query: a valid SMILES string. A ".json" or ".xml" extension
-            can be added to bypass default :attr:`default_extension`
+        :param str query: a valid SMILES string or a list of those ones.
+            A ".json" or ".xml" extension can be added to bypass default
+            :attr:`default_extension`.
         :return: see :meth:`get_compounds_by_SMILES`
 
 
@@ -285,11 +305,11 @@ prevented us from fulfilling your request. """)
 
         The similarity is at a cutoff percentage score (minimum value=70%, maximum value=100%).
 
-
-        :param str query: a valid SMILES string. A ".json" or ".xml" extension
-            can be added to bypass default :attr:`default_extension`
+        :param str query: a valid SMILES string or a list of those ones.
+            A ".json" or ".xml" extension can be added to bypass default
+            :attr:`default_extension`.
             The SMILE string must be followed by a slash character and the
-            expected similarity (e.g., "/90")
+            expected similarity (e.g., "/90").
         :return: Compound records. See :meth:`get_compounds_by_chemblId`
 
         In addition to the keys returned in :meth:`get_compounds_by_chemblId`,
@@ -312,15 +332,23 @@ prevented us from fulfilling your request. """)
 
 
     def get_image_of_compounds_by_chemblId(self, query, dimensions=None,
-            file_out=None, view=True):
-        """Get the image of a given compound.
+            file_out=True, view=True):
+        """Get the image of a given compound with png fromat.
 
         :param str query: a valid compound ChEMBLId or a list/tuple of valid compound ChEMBLIds.
         :param int dimensions: optional argument. An integer z such that :math:`1 \leq z \leq 500`
             giving the dimensions of the image.
-        :param str file_out: if None, images are not save
-        :param bool view: show the image. If True, images are shown in a browser
+        :param file_out: Can be True | False | a string | list of strings. If
+            True, the images are automatically saved to home current work directory with the
+            name of compound. If False, the images are not saved. If string and query is
+            also a string, the image is saved to the path contained into the string. If
+            string and query is a list, a list of paths is created using file_out as a seed.
+            If list with different length of query, is completed with False's to be the same
+            length. So, if list, the writting of the image of ith query depends to the ith
+            value of file_out. If None images are not saved.
+        :param bool view: show the image. If True the images are opened.
         :return: the path (list of paths) used to save the figure (figures) (different from Chembl API)
+
 
         ::
 
@@ -329,43 +357,101 @@ prevented us from fulfilling your request. """)
             >>> print (s._image_chemblId_example, s._image_dimension_example)
             >>> s.get_image_of_compounds_by_chemblId(s._image_chemblId_example)
             >>> s.get_image_of_compounds_by_chemblId(s._image_chemblId_example, s._image_dimension_example)
+        """        
+        def check_args(master_arg, slave_arg, master_name, slave_name):
+            """
+            It checks if the slave_arg is agree with master_arg
+            """
+            if slave_name == 'file_out':
+                if isinstance(master_arg,str):
+                    if not isinstance(slave_arg,str) and not isinstance(slave_arg,bool):
+                        raise TypeError("%s type must be a str or bool type."%slave_name)
+                elif isinstance(master_arg,list) or isinstance(master_arg, tuple):
+                    if not all([isinstance(v,str) for v in master_arg]):
+                        raise TypeError("All %s types must be str type."%master_name)
+                    Lm = len(master_arg)
+                    if isinstance(slave_arg,bool):
+                        slave_arg = [slave_arg]*len(Lm)
+                    elif isinstance(slave_arg,str):
+                        slave_arg = [slave_arg + '-%d'%i for i in xrange(Lm)]
+                    elif isinstance(slave_arg,list) or isinstance(slave_arg,tuple):
+                        if len(slave_arg) > len(master_arg):
+                            slave_arg = slave_arg[:Lm]
+                        if not all([any([isinstance(v,t) for t in [str, bool]]) for v in slave_arg]):
+                            raise TypeError("All %s types must be str or bool type."%slave_name)
+                        Ls = len(slave_arg)
+                        slave_arg = list(slave_arg) + [False for i in xrange(Lm-Ls)]
+                    else:
+                        raise TypeError("%s type must be a str, bool, list or tuple type"%slave_name)
+                else:
+                    raise TypeError("%s type must be a str, list or tuple type"%master_name)
+                return slave_arg
+            elif slave_name == 'dimensions':
+                if isinstance(master_arg,str):
+                    if not type(slave_arg) == int and not isinstance(dimensions,type(None)):
+                        raise TypeError("%s type must be a int or NoneType type."%slave_name)
+                elif isinstance(master_arg,list) or isinstance(master_arg, tuple):
+                    if not all([isinstance(v,str) for v in master_arg]):
+                        raise TypeError("All %s types must be str type."%master_name)
+                    Lm = len(master_arg)
+                    if isinstance(slave_arg,type(None)):
+                        slave_arg = [slave_arg]*Lm
+                    elif type(slave_arg) == int:
+                        slave_arg = [slave_arg]*Lm
+                    elif isinstance(slave_arg,list) or isinstance(slave_arg,tuple):
+                        if len(slave_arg) > len(master_arg):
+                            slave_arg = slave_arg[:Lm]
+                        if not all([any([type(v) == t for t in [int, type(None)]]) for v in slave_arg]):
+                            raise TypeError("All %s types must be int or NoneType type."%slave_name)
+                        Ls = len(slave_arg)
+                        slave_arg = list(slave_arg) + [None]*(Lm-Ls)
+                    else:
+                        raise TypeError("%s type must be a str, bool, list or tuple type"%slave_name)
+                else:
+                    raise TypeError("%s type must be a str, list or tuple type"%master_name)
+                return slave_arg
 
-        """
         def __f_save(target_data,file_out):
             FILE = open(file_out,'w')
             FILE.write(target_data)
             FILE.close()
             print "saved to %s"%file_out
-
+        file_out = check_args(query,file_out,'query','file_out')
+        dimensions = check_args(query,dimensions,'query','dimensions')
         if isinstance(query, str):
             url='http://www.ebi.ac.uk/chemblws/compounds/%s/image' % query
             if dimensions is not None:
                 url += '?dimensions=%s'%dimensions
             target_data = urllib2.urlopen(url).read()
             print url
-            if file_out is None:
+            if file_out is True:
                 file_out = os.getcwd()
                 file_out += '/%s.png' % query
-            __f_save(target_data,file_out)
+            if not file_out is False:
+                __f_save(target_data,file_out)
             if view:
                 webbrowser.open(file_out)
             fout = file_out
         elif isinstance(query, tuple) or isinstance(query,list):
-            fout = []
-            for item in query:
+            L = len(query)
+            if not file_out is False:
+                fout = []
+            for i in xrange(L):
+                item = query[i]
+                fo = file_out[i]
+                dim = dimensions[i]
                 url= self.url + '/compounds/%s/image' % item
-                if dimensions is not None:
-                    url += '?dimensions=%s'%dimensions
+                if dim is not None:
+                    url += '?dimensions=%s'%dim
                 target_data = urllib2.urlopen(url).read()
-                if file_out is None:
-                    file_out = os.getcwd()
-                    file_out += '/%s.png'%item
-                fout.append(file_out)
-                __f_save(target_data,file_out)
+                if fo is False:
+                    fo = os.getcwd()
+                    fo += '/%s.png'%item
+                if not fo is False:
+                    fout.append(fo)
+                    __f_save(target_data,fo)
                 if view:
-                    webbrowser.open(file_out)
-        else:
-            raise TypeError('Inappropriate argument type.')
+                    webbrowser.open(fo)                
         return fout
 
 
@@ -580,13 +666,20 @@ prevented us from fulfilling your request. """)
         pass
 
 
-    def inspect(self, query):
-        """Open the URL of a query in a browser
+    def inspect(self, query, item):
+        """Open the URL of a query in a browser.
+        :param str query: a valid ChEMBLId of a compound, target or assay.
+        :param str item: a valid type. Might be compound, target or assay
 
         ::
 
-            s.inspect("CHEMBL1940")
+            >>> from bioservices import *   
+            >>> s = ChEMBLdb(verbose=False)
+            >>> print(s._assay_example)
+            >>> s.inspect(*s._inspect_example)
+            >>> print(s._assay_example)
+            >>> s.inspect(s._assay_example,'assay')
 
         """
-        url = "https://www.ebi.ac.uk/chembldb/target/inspect/" + query
+        url = "https://www.ebi.ac.uk/chembldb/%s/inspect/%s"%(item,query)
         webbrowser.open(url)

@@ -63,10 +63,10 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-    'sphinx.ext.pngmath',
     'easydev.copybutton',
     'matplotlib.sphinxext.plot_directive',
     'matplotlib.sphinxext.only_directives',
+    'sphinx.ext.pngmath',
     ]
 
 todo_include_todos=True
