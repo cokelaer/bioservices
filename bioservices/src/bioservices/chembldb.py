@@ -20,7 +20,7 @@
 
 """
 import urllib2, urllib, json, re, os
-from bioservices.services import *
+from services import *
 import webbrowser
 
 
@@ -42,7 +42,7 @@ class ChEMBLdb(RESTService):
     _chemblId_example = "CHEMBL1"
     _inChiKey_example = "QFFGVLORLPOAEC-SNVBAGLBSA-N"
     _smiles_example = "COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56"
-    _smiles_similar_example = _smiles_example + "/98"
+    _smiles_similar_example = _smiles_example + "/90"
     _image_chemblId_example = "CHEMBL192"
     _image_dimension_example = 200
     _bioactivities_example = "CHEMBL2"
@@ -209,7 +209,6 @@ prevented us from fulfilling your request. """)
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._inChiKey_example)
-            QFFGVLORLPOAEC-SNVBAGLBSA-N
             >>> resxml = s.get_individual_compounds_by_inChiKey(s._inChiKey_example + ".xml")
             >>> resjson = s.get_individual_compounds_by_inChiKey(s._inChiKey_example + ".json")
         """
@@ -270,7 +269,7 @@ prevented us from fulfilling your request. """)
         :param str query: a valid SMILES string. A ".json" or ".xml" extension
             can be added to bypass default :attr:`default_extension`
             The SMILE string must be followed by a slash character and the
-            expected similarity (e.g., "/98")
+            expected similarity (e.g., "/90")
         :return: Compound records. See :meth:`get_compounds_by_chemblId`
 
         In addition to the keys returned in :meth:`get_compounds_by_chemblId`,
@@ -285,23 +284,23 @@ prevented us from fulfilling your request. """)
 
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
-            >>> print(s._smiles_example)
-            >>> s.get_compounds_similar_to_SMILES(s._smiles_example + "/100") 
-            >>> s.get_compounds_similar_to_SMILES(s._smiles_example + "/98.json")
+            >>> print(s._smiles_similar_example)
+            >>> resjson = s.get_compounds_similar_to_SMILES(s._smiles_example + "/100") 
+            >>> resjson = s.get_compounds_similar_to_SMILES(s._smiles_similar_example)
         """
         pass
 
         
     def get_image_of_compounds_by_chemblId(self, query, dimensions=None,
             file_out=None, view=True):
-        r"""Get the image of a given compound.
+        """Get the image of a given compound.
 
         :param str query: a valid compound ChEMBLId or a list/tuple of valid compound ChEMBLIds.
         :param int dimensions: optional argument. An integer z such that :math:`1 \leq z \leq 500`
             giving the dimensions of the image.
-        :param str file_out"
-        :param bool view: show the image
-        :return: the path used to save the figure (different from Chembl API)
+        :param str file_out. If None images arenot saved.
+        :param bool view: show the image. If True the images are opened.
+        :return: the path (list of paths) used to save the figure (figures) (different from Chembl API)
         
 
         ::
@@ -330,7 +329,9 @@ prevented us from fulfilling your request. """)
             __f_save(target_data,file_out)
             if view:
                 webbrowser.open(file_out)
+            fout = file_out
         elif isinstance(query, tuple) or isinstance(query,list):
+            fout = []
             for item in query:
                 url= self.url + '/compounds/%s/image' % item
                 if dimensions is not None:
@@ -339,10 +340,13 @@ prevented us from fulfilling your request. """)
                 if file_out is None:
                     file_out = os.getcwd()
                     file_out += '/%s.png'%item
+                fout.append(file_out)
                 __f_save(target_data,file_out)
+                if view:
+                    webbrowser.open(file_out)                
         else:
             raise TypeError('Inappropriate argument type.')
-        return file_out
+        return fout
 
 
     @__process("compounds", "bioactivities")
@@ -381,7 +385,7 @@ prevented us from fulfilling your request. """)
             >>> from bioservices import *   
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._bioactivities_example)
-            >>> resxmls.get_compounds_activities(s._bioactivities_example + '.xml')
+            >>> resxmls = get_compounds_activities(s._bioactivities_example + '.xml')
             >>> resjson = s.get_compounds_activities(s._bioactivities_example)
         """
         pass
