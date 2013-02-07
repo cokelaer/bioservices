@@ -1,3 +1,23 @@
+#!/usr/bin/python
+# -*- coding: latin-1 -*-
+#
+#  This file is part of bioservices software
+#
+#  Copyright (c) 2011-2013 - EBI-EMBL
+#
+#  File author(s):
+#      https://www.assembla.com/spaces/bioservices/team
+#
+#  Distributed under the GPLv3 License.
+#  See accompanying file LICENSE.txt or copy at
+#      http://www.gnu.org/licenses/gpl-3.0.html
+#
+#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  documentation: http://packages.python.org/bioservices
+#
+##############################################################################
+#$Id: biomodels.py 141 2013-02-06 10:22:25Z cokelaer $
+
 """This module provides a class :class:`ChEMBLdb` 
 
 .. topic:: What is ChEMBLdb
@@ -20,7 +40,7 @@
 
 """
 import urllib2, urllib, json, re, os
-from services import *
+from bioservices.services import *
 import webbrowser
 
 
