@@ -1,6 +1,47 @@
+#!/usr/bin/python
+# -*- coding: latin-1 -*-
+#
+#  This file is part of bioservices software
+#
+#  Copyright (c) 2011-2013 - EBI-EMBL
+#
+#  File author(s): 
+#      https://www.assembla.com/spaces/bioservices/team
+#
+#  Distributed under the GPLv3 License.
+#  See accompanying file LICENSE.txt or copy at
+#      http://www.gnu.org/licenses/gpl-3.0.html
+#
+#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  documentation: http://packages.python.org/bioservices
+#
+##############################################################################
+#$Id: biomodels.py 141 2013-02-06 10:22:25Z cokelaer $
+"""This module provides a class :class:`~BioGrid`.
+
+.. topic:: What is BioGrid ?
+
+    :URL: http://thebiogrid.org/
+    :Service: Via the PSICQUIC class
+
+    .. highlights::
+
+        BioGRID is an online interaction repository with data compiled through
+        comprehensive curation efforts. Our current index is version 3.2.97 and searches
+        37,954 publications for 638,453 raw protein and genetic interactions from major
+        model organism species. All interaction data are freely provided through our
+        search index and available via download in a wide variety of standardized
+        formats.
+
+        -- From BioGrid website, Feb. 2013
+
+"""
 from bioservices import PSICQUIC
 import re
- 
+
+__all__ = ["BioGRID"]
+
+
 class Search(PSICQUIC):
     """ Class that carries out the actual search via psicquic."""
 
@@ -24,24 +65,25 @@ class Search(PSICQUIC):
             out.append(tuple(sorted(x)))
         return list(set(out))
 
+
 class BioGRID(object):
     """ Interface to BioGRID.
     
     .. doctest::
 
       >>> from bioservices import BioGRID
-      >>> b = BioGRID(querY=["map2k4","akt1"],taxId = "9606")
+      >>> b = BioGRID(query=["map2k4","akt1"],taxId = "9606")
       >>> b.biogrid.interactors
 
     Examples::
 
-        b = BioGRID(querY=(["mtor","akt1"],taxId="9606",exP="two hybrid")
+        b = BioGRID(query=(["mtor","akt1"],taxId="9606",exP="two hybrid")
         b.biogrid.interactors
     """
 
-    def __init__(self, querY=None, taxId=None, exP=None):
+    def __init__(self, query=None, taxId=None, exP=None):
 
-        self.querY = querY
+        self.query = query
         self.taxId = taxId
         self.exP = exP
         self.searchString = self._biogridSearch()
@@ -58,7 +100,7 @@ class BioGRID(object):
 
 
         if query == None:
-            query = self.querY
+            query = self.query
         if taxid == None:
             taxid = self.taxId
         if exp == None:

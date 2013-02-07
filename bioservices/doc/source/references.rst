@@ -26,6 +26,14 @@ xmltools module
 Services
 #############
 
+BioGrid
+====================
+
+.. automodule:: bioservices.biogrid
+    :members:
+    :undoc-members:
+    :synopsis:
+
 BioModels
 ====================
 

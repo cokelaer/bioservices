@@ -134,7 +134,7 @@ class PSICQUIC(RESTService):
     protein ZAP70 within the IntAct database::
 
         >>> from bioservices import *
-        >>> s = psicquic.PSICQUIC()
+        >>> s = PSICQUIC()
         >>> res = s.query("intact", "zap70")
         >>> len(res) # there are 11 interactions found
         11
@@ -153,6 +153,13 @@ class PSICQUIC(RESTService):
 
         res = s.query("reactome", "Q9Y266")
 
+
+    .. warning:: PSICQUIC gives access to 25 other services. We cannot create
+        a dedicated parsing for all of them. So, the ::`query` method returns
+        the raw data. Addition class may provide dedicated parsing in the
+        future.
+
+    ... seealso:: :class:`bioservices.biogrid.BioGrid`
     """
 
     _formats = ["tab25", "tab25", "tab27", "xml25", "count", "biopax", "xgmml",

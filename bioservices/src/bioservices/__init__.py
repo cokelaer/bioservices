@@ -42,3 +42,6 @@ from psicquic import *
 
 import ncbiblast
 from ncbiblast import *
+
+import biogrid
+from biogrid import *
