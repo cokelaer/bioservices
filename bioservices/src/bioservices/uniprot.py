@@ -138,8 +138,8 @@ class UniProt(RESTService):
         return res
 
 
-    def search(self, query, format="html", columns=None, include=False, 
-        	compress=False, limit=None, offset=None, maxTrials=10):
+    def search(self, query, format="html", columns=None,
+        include=False,sort="score", compress=False, limit=None, offset=None, maxTrials=10):
         """Provide some interface to the uniprot search interface.
 
         :param str query: query must be a valid uniprot query.
@@ -154,18 +154,31 @@ class UniProt(RESTService):
             keywords, keyword-id, last-modified, length, organism, organism-id, 
             pathway, protein names, reviewed, score, sequence, 3d, 
             subcellular locations, taxon, tools, version, virus hosts
-        :param bool include:  include isoform sequences when the format parameter is fasta. Include description when format is rdf.
+        :param bool include:  include isoform sequences when the format
+            parameter is fasta. Include description when format is rdf. 
+        :param sort: by score by default. Set to None to bypass this behaviour
         :param bool compress: gzip the results
         :param int limit: Maximum number of results to retrieve.
-        :param int offset:  Offset of the first result, typically used together with the limit parameter. 
-        :param int maxTrials: this request is unstable, so we may want to try several time
+        :param int offset:  Offset of the first result, typically used together
+            with the limit parameter.
+        :param int maxTrials: this request is unstable, so we may want to try
+            several time.
 
         To obtain the list of uniprot ID returned by the search of zap70 can be retrieved as follows
         ::
 
             >>> u.search('zap70+AND+organism:9606', format='list')
+            >>> u.search("zap70+and+taxonomy:9606", format="tab", limit=3, 
+            ...    columns="entry name,length,id, genes")
+            Entry name  Length  Entry   Gene names
+            CBLB_HUMAN  982 Q13191  CBLB RNF56 Nbla00127
+            CBL_HUMAN   906 P22681  CBL CBL2 RNF55
+            CD3Z_HUMAN  164 P20963  CD247 CD3Z T3Z TCRZ
+
+
 
         .. warning:: this function request seems a bit unstable (UniProt web issue ?)
+            so we repeat the request if it fails
         """
         params = {}
 
@@ -178,16 +191,21 @@ class UniProt(RESTService):
             self.checkParam(format, ["tab","xls"])
             _valid_columns = ['citation', 'clusters', 'comments','database',
                 'domains','domain', 'ec','id','entry name','existence',
-		'families', 'features', 'genes', 'go', 'go-id', 'interpro', 
+        		'families', 'features', 'genes', 'go', 'go-id', 'interpro', 
                 'interactor', 'keywords', 'keyword-id', 'last-modified', 
                 'length', 'organism', 'organism-id', 'pathway', 'protein names', 
                 'reviewed', 'score', 'sequence', '3d', 'subcellular locations', 
-                'taxon', 'tools', 'version', 'virus hosts']
+                'taxonomy', 'tools', 'version', 'virus hosts']
             # remove unneeded spaces before/after commas if any
-            columns = ",".join([x.strip() for x in columns.split(",")]) 
-            for xol in columns:
+            if "," in columns:
+                columns = [x.strip() for x in columns.split(",")]
+            else:
+                columns = [columns]
+            for col in columns:
                 self.checkParam(col, _valid_columns)
-            params['columns'] = columns
+
+            # convert back to a string as expected by uniprot
+            params['columns'] = ",".join([x.strip() for x in columns])
 
         if include == True and format in ["fasta", "rdf"]:
             params['include'] = 'yes'
@@ -195,6 +213,10 @@ class UniProt(RESTService):
         if compress == True:
             params['compress'] = 'yes'
  
+        if sort:
+            self.checkParam(sort, ["score"])
+            params['sort'] = sort
+
         if offset != None:
             if isinstance(offset, int):
                 params['offset'] = offset
@@ -209,7 +231,8 @@ class UniProt(RESTService):
         trials = 1
         while trials<maxTrials:
             try:
-                res = self.request("/uniprot/?query=%s" % query + "&" + params, "txt")
+                res = self.request("uniprot/?query=%s" % query + "&" + params, "txt")
+                trials = maxTrials + 1
             except:
                 self.logging.warning("Trying again...")
                 import time

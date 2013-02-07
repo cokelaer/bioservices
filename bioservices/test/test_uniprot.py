@@ -29,3 +29,6 @@ class test_UniProt(UniProt):
 
     def test_search(self):
         self.search('zap70+AND+organism:9606', format='list')
+        self.search("zap70+and+taxonomy:9606", format="tab", limit=3, columns="entry name,length,id, genes")
+        self.search("zap70+and+taxonomy:9606", format="tab", limit=3, columns="entry name")
+
