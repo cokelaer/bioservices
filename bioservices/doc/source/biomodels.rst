@@ -1,37 +1,42 @@
 
-
-.. contents::
-
-
 .. _biomodels_tutorial:
+
+
+.. seealso:: :class:`bioservices.biomodels.BioModels` for the full reference guide.
 
 Biomodels tutorial
 ======================
 
-Introduction
---------------
 Start a biomodels interface:
 
 
-.. doctest::
+.. testsetup:: biomodels
 
-    from bioservices.biomodels import BioModels
-    b = BioModels()
+    from bioservices import BioModels
+    s = BioModels()
+
+
+.. doctest:: biomodels
+
+    >>> from bioservices import BioModels
+    >>> s = BioModels()
 
 look at the list of models Id::
 
-    print b.modelsId
+    print s.modelsId
 
-Get a specific model given its Id. Let us play with the first model::
+Get a specific model given its Id. Let us play with the first model:
 
-    >>> ID = b.modelsId[0]
-    >>> ID
+.. doctest:: biomodels
+
+    >>> s.modelsId[0]
     'BIOMD0000000299'
 
-and look at some meta information::
+and look at some meta information:
 
+.. doctest:: biomodels
 
-    >>> print b.getSimpleModelById(b.modelsId[0])
+    >>> print s.getSimpleModelsByIds(s.modelsId[0])
     <?xml version="1.0" encoding="UTF-8"?>
     <simpleModels>
     <simpleModel>
@@ -53,10 +58,12 @@ and look at some meta information::
     </simpleModel>
     </simpleModels>
 
-Some of these information can be retrieved specifically::
+Some of these information can be retrieved specifically:
 
+.. doctest:: biomodels
 
-    >>> print b.getPublicationByModelId(ID)
-    '10643740'
+    >>> ID = s.modelsId[0]
+    >>> print s.getPublicationByModelId(ID)
+    10643740
 
 

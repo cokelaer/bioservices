@@ -3,46 +3,42 @@
 Quick Start
 #################
 
-Bioservices provides several services. Each service requires some expertise so
-we will neither cover all the services nor all their functionalities in this quickstart. However by the end of this tutorials you should be able to play with all services provided in bioservices. 
-
-There are two main technologies involved in web services: the WSDL and the REST
-styles. The Kegg and Biomodels services presented use WSDL whereas uniprot uses
-REST.
+**BioServices** provides access to several Web Services. Each service requires some expertise on its own. 
+In this Quick Start section, we will neither cover all the services nor all their functionalities. However,
+it should give you a good overview of what you can do with BioServices (both from the user and developer point of views).
 
 
-#.  RESTful URLs are useful in that there is no need for any external
-    dependency. You simply need to build a well-formatted URL and you will retrieve
-    an XML document that you can consume with your preferred technology
-    platform. The XML document that is returned will contain elements defined in the
-    WSDL schema.
+Before starting, let us remind what are Web Services. There provide an access to databases or applications via a web interface based on the SOAP/WSDL or the REST technologies. These technologies allow a programmatic access, which we take advantage in BioServices.
 
+The REST technology uses URLs so there is no external dependency. 
+You simply need to build a well-formatted URL and you will retrieve
+an XML document that you can consume with your preferred technology
+platform.
 
-Web services is an integration and inter-operation technology, to ensure client and server software from various sources will work well together, the technology is built on open standards:
+The SOAP/WSDL technology combines SOAP (Simple Object Access Protocol), which is
+a messaging protocol for transporting information and the WSDL (Web Services
+Description Language), which is a method for describing Web Services and their
+capabilities.
 
-    Representational state transfer (REST): a software architecture style.
-    Simple Object Access Protocol (SOAP): a messaging protocol for transporting information.
-    Web Services Description Language (WSDL): a method for describing Web Services and their capabilities.
-
-
-
+Let us look at some of the Web Services wrapped in BioServices.
 
 Kegg service
 =============
+.. testsetup:: kegg
 
+    from bioservices import Kegg
+    k = Kegg(verbose=False)
 
-Start a kegg interface (default organism is human, that is called hsa)::
+Start a KEGG interface::
 
-    from bioservices.kegg import Kegg
+    from bioservices import Kegg
     k = Kegg(verbose=False)
 
 There are 5-6 main functions (e.g., :meth:`~bioservices.kegg.Kegg.list`) 
-that allow access to the KEGG database. First, you can obtain information about
-the data base itself. Just type::
+that allow access to the KEGG database. 
 
-    print k
-
-to obtain statistics. You can refine your search by using the info method.::
+You can use the :meth:`~bioservices.kegg.Kegg.info` to obtain statistics on the
+**pathway** database::
 
     >>> print k.info("pathway")
     pathway          KEGG Pathway Database
@@ -50,14 +46,24 @@ to obtain statistics. You can refine your search by using the info method.::
                      Kanehisa Laboratories
                      218,277 entries
 
-In order to get the list of valid organisms, type::
+You can see the list of valid databases using the databases method. Each of the
+database entry can also be listed using the :meth:`~bioservices.kegg.Kegg.list`
+method. For instance, the organisms can be retrieved with::
 
-    print k.organismIds
+    k.list("organism")
+
+However, to extract the Ids exta processing is required. So, we provide aliases 
+to retrieve the organism Ids::
+
+    k.organismIds
 
 The human organism is coded as "hsa". You can also get the T number instead of
-Ids::
+Ids:
 
-    print k.organisms_tnumbers
+.. doctest:: kegg
+
+    >>> k.code2Tnumber("hsa")
+    'T01001'
 
 
 Every elements is referred to with a Kegg ID, which may be difficult to handle
@@ -75,27 +81,25 @@ or a pathway::
 
     print k.get("path:hsa05416")
 
+An additional class :class:`~bioservices.kegg.KeggParser` will help you to convert any KEGG ouput returned
+by the get method into a dictionary.
 
 
 .. seealso:: Reference guide of :class:`bioservices.kegg.Kegg` for more details
 .. seealso:: Reference guide of :ref:`kegg_tutorial` for more details
+.. seealso:: Reference guide of :class:`bioservices.kegg.KeggParser` for more details
 
-WSDbfetch service
-==================
+.. WSDbfetch service
+   ==================
+   There is a uniprot module that allows to access to the uniprot WSDL. However,
+   there are really few services and the only relevant method returns raw data that
+   the user will need to scan. For instance::
 
-There is a uniprot module that allows to access to the uniprot WSDL. However,
-there are really few services and the only relevant method returns raw data that
-the user will need to scan. For instance::
-
-
-
-    >>> from bioservices import WSDbfetch
+..    >>> from bioservices import WSDbfetch
     >>> w = WSDbfetch()
     >>> data = w.fetchBatch("uniprot", "zap70_human", "xml", "raw")
 
-
-
-.. seealso:: Reference guide of :class:`bioservices.wsdbfetch.WSDbfetch` for more details
+.. .. seealso:: Reference guide of :class:`bioservices.wsdbfetch.WSDbfetch` for more details
 
 
 UniProt service
@@ -126,7 +130,8 @@ about an ID::
 QuickGO
 =========
 
-Quick access to the GO interface
+To acces to the GO interface, simply create an instance and look for a entry
+using the :meth:`bioservices.quickgo.QuickGO.Term` method:
 
 .. doctest::
 
@@ -134,14 +139,16 @@ Quick access to the GO interface
     >>> g = QuickGO(verbose=False)
     >>> res = g.Term("GO:0003824")
 
+.. seealso:: Reference guide of :class:`bioservices.quickgo.QuickGO` for more details
+
 PICR service
 =============
 
 
-PICR, the Protein Identifier Cross Reference service. It provides 2 services 
-in WSDL and REST protocols. We implemented only the REST interface. The 
-methods available in the REST service are very similar to those available 
-via SOAP, save for one major difference: only one accession or sequence 
+PICR, the Protein Identifier Cross Reference service provides 2 services
+in WSDL and REST protocols. We implemented only the REST interface. The
+methods available in the REST service are very similar to those available
+via SOAP, save for one major difference: only one accession or sequence
 can be mapped per request.
 
 
@@ -173,7 +180,7 @@ In order to get the model IDs, you can look at the full list::
     >>> b.modelsId
 
 Of course it does not tell you anything about a model; there are more useful functions such as 
-:meth:`~bioservices.services.biomodels.getModelsIdByUniprotId` and others from the getModelsIdBy family.
+:meth:`~bioservices.biomodels.getModelsIdByUniprotId` and others from the getModelsIdBy family.
 
 
 .. seealso:: Reference guide of :class:`bioservices.biomodels.BioModels` for more details
@@ -217,8 +224,8 @@ output format can be found in ::
     >>> r.format_entry
     ['cmlreact', 'biopax2', 'rxn']
 
-.. note:: Id may be in only a subset of the above formats
 
+.. seealso:: Reference guide of :class:`bioservices.rhea.Rhea` for more details
 
 Create your own wrapper around WSDL service
 ==============================================

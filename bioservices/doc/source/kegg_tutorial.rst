@@ -18,194 +18,182 @@ Start a kegg interface (default organism is human, that is called **hsa**):
     from bioservices.kegg import Kegg
     k = Kegg()
 
-look at the list of organisms::
+Kegg has many databases. The list can be found in the attribute
+:attr:`bioservices.kegg.Kegg.databases`. Each database can be
+queried with the :meth:`bioservices.kegg.Kegg.list` method::
 
-    print k.organisms
+    k.list("organism")
+
+The output contains Id of the organism and some oter information. To retrieve
+the Ids, you will need to process the output. However, we provide an alias::
+
+    print k.organismIds
 
 In general, methods require an access to the on-line Kegg database
 therefore it takes time. For instance, the command above takes a couple of
-seconds. However, it is buffered so next time you call it, it will be much faster.
+seconds. However, some are buffered so next time you call it, it will be much faster.
 
-The list of methods is available as follows::
+Another useful alias is the **pathwayIds** to retrieve all pathway Ids. However,
+you must first specify the organism you are intereted in. From the command above
+we know that **hsa** (human) is valid organism Id, so let us set it and then get
+the list of pathways::
 
-    k.methods
+    k.organism = "hsa"
+    k.pathwaysIds
 
-Some of the function have been wrapped and therefore are accesible from the
-methods of the Kegg class itself. For instance, **bget** allows to query an
-entry::
+Another function provided by the KEGG API is the
+:meth:`bioservices.kegg.Kegg.get` one that query a specific entry. Here we are
+interested into the human gene with the code 7535::
 
-    k.bget("hsa:7535")    #hsa:7535 is also known as ZAP70
+    k.get("hsa:7535")    #hsa:7535 is also known as ZAP70
 
-If a WSDL method is not visible, you can still call it via the serv attribute as
-follows::
+It is quite verbose and is a single string, which may be tricky to handle. We
+provide a tool to ease the parsing (see below and :class:`bioservices.kegg.KeggParser`)
 
-    k.serv.bget("hsa:7535")
 
-Finally, not that the bget function can be used quite a lot but needs to access
-to the Kegg server. So it takes time. If you need to perform same request again
-and again, use :meth:`~bioservices.kegg.Kegg.bget_buffer` that buffers the output of bget. 
 
 Searching for an organism
 ---------------------------
 
-You can search for an organism id using :meth:`~bioservices.kegg.Kegg.lookfor_organism`, where you can enter an
-id or a part of the full name (lower and upper case are not important)::
+The method :meth:`bioservices.kegg.Kegg.find` is quite convenient to search for
+entries in different database. For instance, if you want to know the code of
+an entry for the gene called ZAP70 in the human organism, type::
 
-    >>> k.lookfor_organism('droso')
-    [('Drosophila melanogaster (fruit fly)', 'dme'),
-     ('Drosophila pseudoobscura pseudoobscura', 'dpo'),
-     ('Drosophila ananassae', 'dan'),
-     ('Drosophila erecta', 'der'),
-     ('Drosophila persimilis', 'dpe'),
-     ('Drosophila sechellia', 'dse'),
-     ('Drosophila simulans', 'dsi'),
-     ('Drosophila willistoni', 'dwi'),
-     ('Drosophila yakuba', 'dya'),
-     ('Drosophila grimshawi', 'dgr'),
-     ('Drosophila mojavensis', 'dmo'),
-     ('Drosophila virilis', 'dvi')]
+    >>> s.find("hsa", "zap70")
+    'hsa:7535\tZAP70, SRK, STCD, STD, TZK, ZAP-70; zeta-chain (TCR) associated protein kinase 70kDa (EC:2.7.10.2); K07360 tyrosine-protein kinase ZAP-70 [EC:2.7.10.2]\n'
+
+It is quite powerful and more examples will be showm. However, it has some limitations.
+For example, what about searching for the organism Ids that correspond to any
+Drosophila ? It does not look like it is possible. BioServices provides a method to search 
+for an organism Id using :meth:`~bioservices.kegg.Kegg.lookfor_organism` given
+the name (or part of it)::
+
+    >>> k.lookfor_organism("droso")
+    ['T00030 dme Drosophila melanogaster (fruit fly) Eukaryotes;Animals;Arthropods;Insects',
+    'T01032 dpo Drosophila pseudoobscura pseudoobscura Eukaryotes;Animals;Arthropods;Insects',
+    'T01059 dan Drosophila ananassae Eukaryotes;Animals;Arthropods;Insects',
+    'T01060 der Drosophila erecta Eukaryotes;Animals;Arthropods;Insects',
+    'T01063 dpe Drosophila persimilis Eukaryotes;Animals;Arthropods;Insects',
+    'T01064 dse Drosophila sechellia Eukaryotes;Animals;Arthropods;Insects',
+    'T01065 dsi Drosophila simulans Eukaryotes;Animals;Arthropods;Insects',
+    'T01067 dwi Drosophila willistoni Eukaryotes;Animals;Arthropods;Insects',
+    'T01068 dya Drosophila yakuba Eukaryotes;Animals;Arthropods;Insects',
+    'T01061 dgr Drosophila grimshawi Eukaryotes;Animals;Arthropods;Insects',
+    'T01062 dmo Drosophila mojavensis Eukaryotes;Animals;Arthropods;Insects',
+    'T01066 dvi Drosophila virilis Eukaryotes;Animals;Arthropods;Insects']
 
 
 Look for pathways (by name)
 ------------------------------------
 
-Searching for pathways is quite similar. The output is just not formatted in the
-same way::
+Searching for pathways is quite similar. You can use the **find** method as
+above::
+
+    >>> print s.find("pathway", "B+cell")
+    path:map04112   Cell cycle - Caulobacter
+    path:map04662   B cell receptor signaling pathway
+    path:map05100   Bacterial invasion of epithelial cells
+    path:map05120   Epithelial cell signaling in Helicobacter pylori infection
+    path:map05217   Basal cell carcinoma
+
+Note that without the + sign, you get all pathway that contains *B* or *cell*.
+Yet, we have 5 results, which do not neccesseraly fit our request. Alternatively
+you can use one of BioServices method::
 
     >>> k.lookfor_pathway("B cell")
-    Out[9]: [<SOAPpy.Types.structType item at 58640288>: {'definition': 'B cell
-        receptor signaling pathway - Homo sapiens (human)', 'entry_id':
-        'path:hsa04662'}]
+    ['path:map04662 B cell receptor signaling pathway']
 
 
-You can also search for a pathway knowing some genes but first, we need to
+You can also search for a pathway knowing some gene names but first we need to
 introspect the pathway to get the genes IDs.
 
 
 Look for pathway (by genes i.e., IDs or usual name)
 --------------------------------------------------------
 
-One issue for end-users is to deal with the Kegg IDs. It's hard to search for a
-pathway if you do not know the Kegg IDs of a given specy (e.g., ZAP70). 
+Imagine you want to find the pathway that contains **ZAP70**. As we have seen
+earlier you can get its gene Id::
 
-We provide some methods to ease the search for a pathway given IDs or usual
-names. As an example, let us consider the specy **ZAP70**. Let us consider for
-now that we know its Kegg Id (**hsa:7535**) although in practice we don't. We
-will see later on how to find this Id. 
+    >>> s.find("hsa", "zap70")
+    hsa:7535
 
-In order to obtain the Id, you would need to search for all genes within the organism::
+The following commands do not help::
 
-    >>> genes = k.get_genes_by_organism()
-    >>> len(genes)
-    25945
-
-and, for each gene Id, you would need to introspect the description of the Id using
-for instance::
-
-    print k.get("hsa:7535")
-    print k.btit("hsa:7535")
+    >>> s.find("pathway", "zap70")
+    >>> s.find("pathway", "hsa:7535")
+    >>> s.find("pathway", "7535")
 
 
-Here we see that the usual names are::
+We provide a method to search for pathways that contain the required gene Id.
+You need to know its ID and the name of the organism and then type::
 
-    hsa:7535 ZAP70, SRK, STD, TZK, ZAP-70; zeta-chain (TCR) associated protein
-    kinase 70kDa (EC:2.7.10.2); K07360 zeta-chain (TCR) associated protein kinase
-    [EC:2.7.10.2]
-
-
-We need to look at all genes to be able to build a reverse
-dictionary so that given a name, we get the Kegg Id. This is obviously
-cumbersome and therefore we provide a method that does it automatically. It is called `lookfor_specy`::
-
-    k.lookfor_specy("zap70")
-
-The first time you call the method, it will search for a zipped file that is provided with the package and 
-stores a snapshot of a mapping between species and their Kegg Ids. The file may
-be out-dated but you can rebuild it (takes a few minutes)::
-
-    k.build_specy_ids_mapping()
-
-and save it so that you can load the results another time::
-
-    k.save_mapping("test.dat")
-    k.load_mapping("test.dat")
-
-Once the dictionary us built, it is easy and fast to search for a pathway given the specy
-name::
-
-    >>> k.lookfor_specy("zap70")
-    [{'description': 'ZAP70, SRK, STD, TZK, ZAP-70; zeta-chain (TCR) associated
-    protein kinase 70kDa (EC:2.7.10.2); K07360 zeta-chain (TCR) associated protein
-    kinase [EC:2.7.10.2]',
-      'keggid': 'hsa:7535'}]
-
-Here, you see that zap70 has Id **hsa:7535**. Now, you can search for a pathway
-that contain that Id::
-
-    >>> k.get_pathways_by_genes("hsa:7535")
+    >>> s.get_pathway_by_gene("7535", "hsa")
     ['path:hsa04064', 'path:hsa04650', 'path:hsa04660', 'path:hsa05340']
 
-If you have several gene Ids, you can provide them within a list::
-
-    >>> k.get_pathways_by_genes(["hsa:6363", "hsa:7535"])
-    ['path:hsa04064']
-
+This is quite long (1-2 minutes) since the function scans all pathways. However,
+there are buffered so the next query takes a second.
 
 
 
 Introspecting a pathway
 --------------------------
 
-Let us focus on one pathway, which entry is **path:hsa4660**. You can obtain all
-gene entries contained in the pathway as follows::
+Let us focus on one pathway ( **path:hsa04660**). You can use the :meth:`get`
+command to obtain information about the pathway. ::
 
-    pid = "path:hsa4660"
-    k.get_genes_by_pathway(pid)
+    print s.get("hsa04660")
 
-and all relations within the pathways as follows::
+The output is a single string where you can recognise different fields such as 
+NAME, GENE, DESCRIPTION and so on. This is quite limited. We provide another 
+class called :class:`bioservices.kegg.KeggParser` that inherits from the Kegg class used so
+far (i.e., all functions seen so far works with KeggParser). In addition, it will help us to
+convert the output of the previous command into a dictionary to easily extract
+information contained in the pathway (e.g., gene name)::
 
-    relations = k.get_element_relations_by_pathway(pid)
+    >>> s = KeggParser()
+    >>> data = s.get("hsa04660")
+    >>> dict_data = s.parse(data)
+    >>> print dict_data['gene']
+    '10000': 'AKT3; v-akt murine thymoma viral oncogene homolog 3 (protein kinase B, gamma) [KO:K04456] [EC:2.7.11.1]',
+    '10125': 'RASGRP1; RAS guanyl releasing protein 1 (calcium and DAG-regulated) [KO:K04350]',
+    '1019': 'CDK4; cyclin-dependent kinase 4 [KO:K02089] [EC:2.7.11.22]',
+    ...
 
-The output is a list of dictionaries, each dictionary representing a relation in the pathway. For instance, the first relation above contains::
+This is fine if we just want the name of the genes but what about their
+relations ? Actually, there is an option with the get metho where you can
+specify the output format. In particular you can erquest the pathway to be
+returned as a kgml file::
 
-    <SOAPpy.Types.structType item at 84641120>:
-        {   'element_id2': 63,
-            'element_id1':61,
-            'type': 'PPrel',
-            'subtypes': [<SOAPpy.Types.structType item at 79054320>:
-                {   'type': '---',
-                    'element_id': None,
-                    'relation': 'binding/association'}]
-        }
+    res = s.get("hsa04660", "kgml")
 
-As you can see, elements of the relation or ids (element_id1 and element_id2),
-and the type of the edge are provided in **type** and **subtypes**.
+This file can be parsed to extract the relations. We provide a tool to do that::
 
-.. warning:: the element ids are ids within the pathway itself NOT the ids of the genes! So, you
-    need to get the mapping. 
+    res = s.parse_kgml_pathway("hsa04660")
 
-To build a mapping between the element Ids and genes Ids, you need the elements of the pathways::
+The variable returned is a dictionary with 2 keys: "entries" and "relations".
 
-    elements = k.get_elements_by_pathway(pid)
+You can extract the relations as follows::
+
+    res['relations']
+
+It is a list of relations, each relation being a dictionary::
+
+    >>> res['relations'][0]
+    {'entry1': u'61',
+     'entry2': u'63',
+     'link': u'PPrel',
+     'name': u'binding/association',
+     'value': u'---'}
+
+Here entry1 and 2 are Ids. The Ids can be found in ::
+
+    res['entries']
 
 
-for instance, the first element is ::
-
-    >>> elements[0]
-    >>> Out[563]: <SOAPpy.Types.structType item at 90802944>: {'element_id': 1, 'type':
-           'compound', 'names': ['cpd:C05981'], 'components': []}
-
-so now, we know that the element with id=1 is a compound, which entry is
-cpd:C05981.
-
-The unique types can be extracted with a simple python statement::
-
-    set([e['type'] for e in elements])
-    Out[565]: set(['ortholog', 'map', 'gene', 'group', 'compound'])
-
-If we are interested in the gene only, we can use::
-
-    k.get_elements_by_pathway_and_type(pid, 'gene')
+From there you should consult :meth:`bioservices.kegg.Kegg.parse_kgml_pathway`
+and the KEGG document for more information. You may also look at 
+:meth:`bioservices.kegg.Kegg.pathway2sif` method that extact only protein-protein
+interactions with activation and inhibition links only.
 
 
 
@@ -215,7 +203,8 @@ Building a histogram of all relations in human pathways
 Scanning all relations of the Human organism takes about 5-10 minutes. You can
 look at a subset by setting Nmax to a small value (e.g., Nmax=10).
 
-.. note:: relations are buffered when using extra_get_all_relations method.
+
+
 
 ::
 
@@ -223,9 +212,12 @@ look at a subset by setting Nmax to a small value (e.g., Nmax=10).
     # extract all relations from all pathways
     from bioservices.kegg import Kegg
     k = Kegg()
-    Nmax = None  # set to None to get all relations (for 258 pathways)
-    all_relations = k.extra_get_all_relations(Nmax)for 
-    hist([len(r) for r in all_relations], 20)
+
+    # retrieve more than 260 pathways so it takes time
+    results = [s.parse_kgml_pathway(x) for x in s.pathwayIds] 
+    relations = [x['relations'] for x in results]
+
+    hist([len(r) for r in relations], 20)
     xlabel('number of relations')
     ylabel('\#')
     title("number of relations per pathways")
@@ -237,75 +229,56 @@ look at a subset by setting Nmax to a small value (e.g., Nmax=10).
 
 You can then extract more information such as the type of relations::
 
-    # scan all relations looking for the type of relations
-    counter = k.extra_count_relations(all_relations)
+    >>> # scan all relations looking for the type of relations
+    >>> import collections # for python 2.7.0 and above
 
-    # For 258 pathways, we obtained:
+    >>> # we extract from all pathways, all relations, where we retrieve the type of
+    >>> # relation (name)
+    >>> data = list(flatten([[x['name'] for x in rel] for rel in relations]))
 
-    {'activation': 3171,
-     'binding/association': 1051,
-     'compound': 5216,
-     'dephosphorylation': 16,
-     'dissociation': 76,
-     'expression': 532,
-     'indirect effect': 155,
-     'inhibition': 665,
-     'methylation': 2,
-     'missing interaction': 77,
-     'phosphorylation': 196,
-     'repression': 12,
-     'state change': 28,
-     'ubiquitination': 17}
-
-    
+    >>> counter = collections.Counter(data)
+    >>> print counter
+    Counter({u'compound': 5235, u'activation': 3265, u'binding/association': 1087,
+    u'phosphorylation': 940, u'inhibition': 672, u'indirect effect': 559,
+    u'expression': 542, u'dephosphorylation': 93, u'missing interaction': 80,
+    u'dissociation': 78, u'ubiquitination': 48, u'state change': 24, u'repression':
+    12, u'methylation': 2})
 
 
 
-Access to compound, reactions, ko, drugs...
---------------------------------------------
 
-This example uses the NFkB signalling pathway. Let us search for its id within
-the database using the :meth:`lookfor_pathway` command::
+.. Access to compound, reactions, ko, drugs...
+   --------------------------------------------
 
+.. This example uses the NFkB signalling pathway. Let us search for its id within
+    the database using the :meth:`lookfor_pathway` command::
     >>> k.lookfor_pathway("NF")
     [<SOAPpy.Types.structType item at 98402888>: {'definition': 
         'NF-kappa B signaling pathway - Homo sapiens (human)', 'entry_id': 'path:hsa04064'},
      <SOAPpy.Types.structType item at 98450176>: {'definition': 
         'Vibrio cholerae infection - Homo sapiens (human)', 'entry_id': 'path:hsa05110'},
     ...
-
-
-The first pathway is the one we are looking for. Its entry_id is
-"path:hsa04064". Now, we can obtain a list of genes ids corresponding to this
-pathway::
-
+    The first pathway is the one we are looking for. Its entry_id is
+    "path:hsa04064". Now, we can obtain a list of genes ids corresponding to this
+    pathway::
     >>> pw = k.lookfor_pathway("NF")[0]
     >>> pid = pw.entry_id
     >>> genes = k.get_genes_by_pathway(pid)
     >>> len(genes)
     93
-
-If you do not know the name of a pathwya but know some species in it (given
-their name, not kegg id), then you can use the following command::
-
-
-    >>> k.lookfor_specy("ZAP70")
+    If you do not know the name of a pathwya but know some species in it (given
+    their name, not kegg id), then you can use the following command::
+     >>> k.lookfor_specy("ZAP70")
     'hsa:7535'
     >>> k.get_pathways_by_genes("hsa:7535")
     ['path:hsa04064', 'path:hsa04650', 'path:hsa04660', 'path:hsa05340']
-
-You can see the pathway "path:hsa04064"  (NF-kappaB).
-
-
-From a pathway, you can obtain the number of compounds:: 
-
+    You can see the pathway "path:hsa04064"  (NF-kappaB).
+    From a pathway, you can obtain the number of compounds:: 
     >>> compounds = k.get_compounds_by_pathway(pid)
     >>> print(compounds)
     ['cpd:C00076', 'cpd:C00165', 'cpd:C01245']
-
-Now, you may want to do the inverse and search for pathways that contains these
-compounds::
-
+    Now, you may want to do the inverse and search for pathways that contains these
+    compounds::
     >>> k.get_pathways_by_compounds(['cpd:C00076', 'cpd:C00165', 'cpd:C01245'])
      ['path:ko04010', 'path:ko04012', 'path:ko04020', 'path:ko04062',
     'path:ko04064', 'path:ko04066', 'path:ko04070', 'path:ko04270', 'path:ko04370',
@@ -315,42 +288,26 @@ compounds::
     'path:ko04912', 'path:ko04916', 'path:ko04961', 'path:ko04970', 'path:ko04971',
     'path:ko04972', 'path:ko05143', 'path:ko05146', 'path:ko05200', 'path:ko05214',
     'path:ko05223']
-
-There are quite a few pathways containing these compounds, in particular **path:ko04064**, which can be visualized::
-
+    There are quite a few pathways containing these compounds, in particular **path:ko04064**, which can be visualized::
     k.view_pathways(["path:ko04064"])
-
-The pathway **path:hsa04064** does not contain drugs or reactions. If you consider **path:hsa00010** you could also use more functions to retrieve elements::
-
+    The pathway **path:hsa04064** does not contain drugs or reactions. If you consider **path:hsa00010** you could also use more functions to retrieve elements::
     >>> reactions = k.get_reactions_by_pathway("path:hsa00010")
     >>> drugs = k.get_drugs_by_pathway("path:hsa00010")
     >>> enzymes = k.get_enzymes_by_pathway("path:hsa00010")
     >>> glycans = k.get_enzymes_by_pathway("path:hsa00010") # nothing
-
-and conversely::
-
+    and conversely::
     >>> k.get_pathways_by_reactions(reactions)
     ['path:rn00010']
     >>> k.get_pathways_by_enzymes(['path:map00010'])
     ['path:map00010']
+    .. note:: not that the pathway name is now rn00010 or map00010, dr:D00010but it corresponds to
+    hsa00010. rn stands for reactions, map for enzymes ??.
+    .. note:: get_pathways_by_drugs does not seem to work.
 
 
-.. note:: not that the pathway name is now rn00010 or map00010, dr:D00010but it corresponds to
-   hsa00010. rn stands for reactions, map for enzymes ??.
-
-.. note:: get_pathways_by_drugs does not seem to work.
-
-
-
-
-
-
-Notes about KO
-------------------
-
-KO stands for Kegg Orthology, several methods are available::
-
-
+.. Notes about KO
+    ------------------
+    KO stands for Kegg Orthology, several methods are available::
     >>> kos = k.get_kos_by_pathway(pid)
     >>> ko = kos[0] # ko:K01116
     >>> k.get_genes_by_ko(ko, "hsa").entry_id
@@ -358,25 +315,16 @@ KO stands for Kegg Orthology, several methods are available::
     >>> k.get_ko_by_gene("hsa:5335")
     ['ko:K01116']
     >>> k.serv.get_ko_by_ko_class("00903", "hsa",1,100)
-
-
-
-Drugs
----------------
-
-Some pathways contains drugs::
-
+    Drugs
+    ---------------
+    Some pathways contains drugs::
     >>> k.get_drugs_by_pathway("path:hsa00010")
     ['dr:D00009', 'dr:D00010', 'dr:D00068', 'dr:D02798', 'dr:D04855', 'dr:D06542']
-
-From the Drug Ids, you can get information::
-
+    From the Drug Ids, you can get information::
     >>> data = k.bget("dr:D00009") # gives you information
     # we see that its name is d-glucose, its mass is around180.15
     # Given the name, you can get the drug id. 
-
-You have also search drugs by name or  mass::
-
+    You have also search drugs by name or  mass::
     >>> k.serv.search_drugs_by_name("d-glucose")
     ['dr:D00009', 'dr:D02325']
     # and check its mass or find drugs with similar mass
@@ -384,116 +332,11 @@ You have also search drugs by name or  mass::
     ['dr:D00009', 'dr:D00109', 'dr:D00114', 'dr:D00371', 'dr:D01195',
     'dr:D01422', 'dr:D03201', 'dr:D04291', 'dr:D05033', 'dr:D06055', 'dr:D08079',
     'dr:D08482', 'dr:D09007', 'dr:D09924']
-
-You can also obtain the drug Ids in other databases::
-
+    You can also obtain the drug Ids in other databases::
     >>> drugs = k.get_drugs_by_pathway("path:hsa00010")
     ['dr:D00009', 'dr:D00010', 'dr:D00068', 'dr:D02798', 'dr:D04855','dr:D06542']
     >>> print k.bconv("dr:D00010")
 
 
 
-
-KEGG WSDL methods
--------------------------------------------------------
-
-
-
-
-Here is an organigram of the functions (from Kegg website) available in kegg
-module. functions without links can still be accessed using the :attr:`serv`
-attribute:
-
-
-* Meta information
-    * :meth:`~bioservices.kegg.Kegg.list_databases`
-    * :meth:`~bioservices.kegg.Kegg.list_organisms`
-    * :meth:`~bioservices.kegg.Kegg.list_pathways`
-    * :meth:`~bioservices.kegg.Kegg.list_ko_classes` (deprecated?)
-* DBGET
-    * :meth:`~bioservices.kegg.Kegg.binfo`
-    * :meth:`~bioservices.kegg.Kegg.bfind`
-    * :meth:`~bioservices.kegg.Kegg.bget`
-    * :meth:`~bioservices.kegg.Kegg.btit`
-    * :meth:`~bioservices.kegg.Kegg.bconv`
-* LinkDB
-    * Database cross references
-        * :meth:`~bioservices.kegg.Kegg.get_linkdb_by_entry`
-        * :meth:`~bioservices.kegg.Kegg.get_linkdb_between_databases`
-    * Relation among genes and enzymes
-          * :meth:`~bioservices.kegg.Kegg.get_genes_by_enzyme`
-          * :meth:`~bioservices.kegg.Kegg.get_enzymes_by_gene`
-    * Relation among enzymes, compounds and reactions
-        * :meth:`~bioservices.kegg.Kegg.get_enzymes_by_compound`
-        * :meth:`~bioservices.kegg.Kegg.get_enzymes_by_glycan`
-        * :meth:`~bioservices.kegg.Kegg.get_enzymes_by_reaction`
-        * :meth:`~bioservices.kegg.Kegg.get_compounds_by_enzyme`
-        * :meth:`~bioservices.kegg.Kegg.get_compounds_by_reaction`
-        * :meth:`~bioservices.kegg.Kegg.get_glycans_by_enzyme`
-        * :meth:`~bioservices.kegg.Kegg.get_glycans_by_reaction`
-        * :meth:`~bioservices.kegg.Kegg.get_reactions_by_enzyme`
-        * :meth:`~bioservices.kegg.Kegg.get_reactions_by_compound`
-        * :meth:`~bioservices.kegg.Kegg.get_reactions_by_glycan`
-    * SSDB
-        * :meth:`~bioservices.kegg.Kegg.get_best_best_neighbors_by_gene`
-        * :meth:`~bioservices.kegg.Kegg.get_best_neighbors_by_gene`
-        * :meth:`~bioservices.kegg.Kegg.get_reverse_best_neighbors_by_gene`
-        * :meth:`~bioservices.kegg.Kegg.get_paralogs_by_gene`
-* Motif
-    * :meth:`~bioservices.kegg.Kegg.get_motifs_by_gene`
-    * :meth:`~bioservices.kegg.Kegg.get_genes_by_motifs`
-* KO (Kegg orthology)
-    * :meth:`~bioservices.kegg.Kegg.get_ko_by_gene`
-    * :meth:`~bioservices.kegg.Kegg.get_ko_by_ko_class`
-    * :meth:`~bioservices.kegg.Kegg.get_genes_by_ko_class`
-    * :meth:`~bioservices.kegg.Kegg.get_genes_by_ko`
-* PATHWAY
-    * Coloring pathways
-        * :meth:`~bioservices.kegg.Kegg.mark_pathway_by_objects`
-        * :meth:`~bioservices.kegg.Kegg.color_pathway_by_objects`
-        * :meth:`~bioservices.kegg.Kegg.color_pathway_by_elements`
-        * :meth:`~bioservices.kegg.Kegg.get_html_of_marked_pathway_by_objects`
-        * :meth:`~bioservices.kegg.Kegg.get_html_of_colored_pathway_by_objects`
-        * :meth:`~bioservices.kegg.Kegg.get_html_of_colored_pathway_by_elements`
-    * References for the pathway
-        * :meth:`~bioservices.kegg.Kegg.get_references_by_pathway`
-    * Relations of objects on the pathway
-        * :meth:`~bioservices.kegg.Kegg.get_element_relations_by_pathway`
-    * Objects on the pathway
-        * :meth:`~bioservices.kegg.Kegg.get_elements_by_pathway`
-        * :meth:`~bioservices.kegg.Kegg.get_genes_by_pathway`
-        * :meth:`~bioservices.kegg.Kegg.get_enzymes_by_pathway`
-        * :meth:`~bioservices.kegg.Kegg.get_compounds_by_pathway`
-        * :meth:`~bioservices.kegg.Kegg.get_drugs_by_pathway`
-        * :meth:`~bioservices.kegg.Kegg.get_glycans_by_pathway`
-        * :meth:`~bioservices.kegg.Kegg.get_reactions_by_pathway`
-        * :meth:`~bioservices.kegg.Kegg.get_kos_by_pathway`
-    * Pathways by objects
-        * :meth:`~bioservices.kegg.Kegg.get_pathways_by_genes`
-        * :meth:`~bioservices.kegg.Kegg.get_pathways_by_enzymes`
-        * :meth:`~bioservices.kegg.Kegg.get_pathways_by_compounds`
-        * :meth:`~bioservices.kegg.Kegg.get_pathways_by_drugs`
-        * :meth:`~bioservices.kegg.Kegg.get_pathways_by_glycans`
-        * :meth:`~bioservices.kegg.Kegg.get_pathways_by_reactions`
-        * :meth:`~bioservices.kegg.Kegg.get_pathways_by_kos`
-    * Relation among pathways
-        * :meth:`~bioservices.kegg.Kegg.get_linked_pathways`
-* GENES
-    * :meth:`~bioservices.kegg.Kegg.get_genes_by_organism`
-* GENOME
-    * :meth:`~bioservices.kegg.Kegg.get_number_of_genes_by_organism`
-* LIGAND
-    * :meth:`~bioservices.kegg.Kegg.convert_mol_to_kcf`
-    * :meth:`~bioservices.kegg.Kegg.search_compounds_by_name`
-    * :meth:`~bioservices.kegg.Kegg.search_drugs_by_name`
-    * :meth:`~bioservices.kegg.Kegg.search_glycans_by_name`
-    * :meth:`~bioservices.kegg.Kegg.search_compounds_by_composition`
-    * :meth:`~bioservices.kegg.Kegg.search_drugs_by_composition`
-    * :meth:`~bioservices.kegg.Kegg.search_glycans_by_composition`
-    * :meth:`~bioservices.kegg.Kegg.search_compounds_by_mass`
-    * :meth:`~bioservices.kegg.Kegg.search_drugs_by_mass`
-    * :meth:`~bioservices.kegg.Kegg.search_glycans_by_mass`
-    * :meth:`~bioservices.kegg.Kegg.search_compounds_by_subcomp`
-    * :meth:`~bioservices.kegg.Kegg.search_drugs_by_subcomp`
-    * :meth:`~bioservices.kegg.Kegg.search_glycans_by_kcam`
 

@@ -230,6 +230,9 @@ class Kegg(RESTService):
         self._drug = None
         self._brite = None
 
+        self._buffer = {}
+
+
     # we could use this to retrieve all databases Ids but 
     def __getattr__(self, req):
         """ for x in s._valid_databases_list: print len(getattr(s, x))"""
@@ -368,7 +371,7 @@ class Kegg(RESTService):
         :attr:`pathwayIds` attribute (after defining the :attr:`organism` attribute). 
 
         .. note:: If you set the query to a valid organism, then the second
-               argument (organism is irrelevant and ignored.
+               argument rganism is irrelevant and ignored.
 
         .. note:: If the query is not a database or an organism, it is supposed
             to be a valid dbentries string and the maximum number of entries is 100.
@@ -475,9 +478,9 @@ class Kegg(RESTService):
             compound, glycan,  reaction, rpair, rclass, enzyme **or** any organism 
             using the KEGG organism code (see :attr:`organismIds`
             attributes) or T number (see :attr:`organismsTnumbers` attribute).
-        :param str option: one of: aaseq, ntseq, mol, kcf, image
+        :param str option: one of: aaseq, ntseq, mol, kcf, image, kgml
 
-        .. note:: you can add the option at the end of dbentries in which case
+      .. note:: you can add the option at the end of dbentries in which case
             the parameter option must not be used (see example)
 
         ::
@@ -500,7 +503,7 @@ class Kegg(RESTService):
 
         Another example here below shows how to save the image of a given pathway::
 
-            res =  s.get("hsa05130/image")
+           res =  s.get("hsa05130/image")
             # same as : res =  s.get("hsa05130","image")
             f = open("test.png", "w")
             f.write(res)
@@ -508,7 +511,7 @@ class Kegg(RESTService):
 
         .. note::  The input is limited up to 10 entries (KEGG restriction). 
         """
-        _valid_options = ["aaseq", "ntseq", "mol", "kcf", "image"]
+        _valid_options = ["aaseq", "ntseq", "mol", "kcf", "image", "kgml"]
         _valid_db_options = ["compound", "drug"]
 
         #self._checkDB(database, mode="find") 
@@ -691,6 +694,7 @@ class Kegg(RESTService):
                 keggid={'1525':'yellow,red', '1604':'blue,green', '2534':"blue"})
 
 
+        .. anotherway to higlight: http://www.kegg.jp/pathway/map00010+K00873+C00022
         """
         if pathId.startswith("path:"):
             pathId = pathId.split(":")[1]
@@ -915,6 +919,191 @@ class Kegg(RESTService):
 
     """)
 
+    def lookfor_organism(self, query):
+        """Look for a specific organism
+
+        :param str query: your search term. upper and lower cases are ignored
+        :return: a list of definition that matches the query
+        """
+        matches = []
+        definitions = [" ".join(x.split()) for x in self.list("organism").split("\n")]
+        for i, item in enumerate(definitions):
+            if query.lower() in item.lower():
+                matches.append(i)
+        return [definitions[i] for i in matches]
+
+    def lookfor_pathway(self, query):
+        """Look for a specific pathwaym
+
+        :param str query: your search term. upper and lower cases are ignored
+        :return: a list of definition that matches the query
+        """
+        matches = []
+        definitions = [" ".join(x.split()) for x in self.list("pathway").split("\n")]
+        for i, item in enumerate(definitions):
+            if query.lower() in item.lower():
+                matches.append(i)
+        return [definitions[i] for i in matches]
+
+    def get_pathway_by_gene(self, gene, organism):
+        """Search for pathways that contain a specific gene
+
+        :param str gene: a valid gene Id
+        :param str organism: a valid organism (e.g., hsa)
+        :return: list of pathway Ids that contain the gene
+
+        ::
+
+            >>> s.get_pathway_by_gene("7535", "hsa")
+            ['path:hsa04064', 'path:hsa04650', 'path:hsa04660', 'path:hsa05340']
+
+        This method is quite long (1-2 minutes) since it scans all pathways.
+        However, there are buffered so the next query takes only a second.
+
+        .. note:: the buffering is done in the _buffer attribute.
+        """ 
+        matches = []
+        p = KeggParser()
+        # using existing buffered list if same organism are used
+        if self.organism == organism:
+            Ids = self.pathwayIds
+        else:
+            p.organism = organism
+            Ids = p.pathwayIds
+
+        for i,Id in enumerate(Ids): 
+            print("scannind %s (%s/%s)" % (Id, i, len(Ids)))
+            if Id not in self._buffer.keys():
+                res = p.get(Id)
+                self._buffer[Id] = res
+            else:
+                res = self._buffer[Id]
+
+            parsed = p.parse(res)
+            if 'gene' in parsed.keys() and gene in parsed['gene']:
+                print("Found %s in pathway Ids %s" % (gene, Id))
+                matches.append(Id)
+        return matches
+ 
+    def parse_kgml_pathway(self, pathwayId):
+        """Parse the pathway in KGML format and returns a dictionary (relations and entries)
+
+        :param str pathwayId: a valid pathwayId e.g. hsa04660
+        :return: a tuple with the first item being a list of relations. Each
+            relations is a dictionary with id2, id2, link, value, name. The
+            second item is a dictionary that maps the Ids to 
+
+
+        ::
+
+            >>> res = s.parse_kgml_pathway("hsa04660")
+            >>> set([x['name'] for x in res['relations']])
+            >>> res['relations'][-1]
+            {'entry1': u'15',
+             'entry2': u'13',
+             'link': u'PPrel',
+             'name': u'phosphorylation',
+             'value': u'+p'}
+
+            >>> set([x['link'] for x in res['relations']])
+            set([u'PPrel', u'PCrel'])
+
+            >>> res['entries'][4]
+
+        .. seealso:: `KEGG API <http://www.kegg.jp/kegg/xml/docs/>`_
+        """
+        output = {'relations':[], 'entries':[]}
+        res = self.easyXML(self.get(pathwayId, "kgml"))
+        # here entry1 and 2 are Id related to the kgml file
+
+        # read and parse the entries
+        entries = [x for x in res.findAll("entry")]
+        for entry in entries:
+            output['entries'].append({
+                'id': entry.get("id"),
+                'name': entry.get("name"),
+                'type': entry.get("type"),
+                'link': entry.get("link")
+                })
+
+        relations = [(x.get("entry1"), x.get("entry2"), x.get("type")) for x in res.findAll("relation")]
+        subtypes = [x.findAll("subtype") for x in res.findAll("relation")]
+
+        assert len(subtypes) == len(relations)
+
+        for relation, subtype in zip(relations, subtypes):
+            if len(subtype)==0: # nothing to do with the species ??? TODO
+                pass
+            else:
+                for this in subtype:
+                    value = this.get("value")
+                    name = this.get("name")
+                    output['relations'].append({
+                        'entry1':relation[0],
+                        'entry2':relation[1],
+                        'link':relation[2],
+                       'value':value, 
+                        'name':name})
+        # we need to map back to KEgg IDs...
+        return output
+
+    def pathway2sif(self, pathwayId, uniprot=True):
+        """Extract protein-protein interaction from KEGG pathway to a SIF format
+
+        .. warning:: experimental Not tested on all pathway.
+
+        :param str pathwayId: a valid pathway Id
+        :param bool uniprot: convert to uniprot Id or not (default is True)
+        :return: a list of relations (A 1 B) for activation and (A -1 B) for
+            inhibitions
+
+        This is longish due to the conversion from KeggIds to UniProt.
+
+        This method can be useful to provide prior knowledge network to software
+        such as CellNOpt (see http://www.cellnopt.org)
+        """
+        res = self.parse_kgml_pathway(pathwayId)
+        sif = []
+        for rel in res['relations']:
+            # types can be PPrel (protein-protein interaction only
+            if rel['link'] != 'PPrel':
+                continue
+            if rel['name'] == 'activation':
+                Id1 = rel['entry1']
+                Id2 = rel['entry2']
+                name1 = res['entries'][[x['id'] for x in res['entries']].index(Id1)]['name']
+                name2 = res['entries'][[x['id'] for x in res['entries']].index(Id2)]['name']
+                type1 = res['entries'][[x['id'] for x in res['entries']].index(Id1)]['type']
+                type2 = res['entries'][[x['id'] for x in res['entries']].index(Id2)]['type']
+                print "names:", rel, name1, name2
+                print type1, type2
+                if type1!='gene' or type2!='gene':
+                    continue
+                if uniprot:
+                    name1 = self.conv("uniprot", name1)[1][0]
+                    name2 = self.conv("uniprot", name2)[1][0]
+                print name1, 1, name2
+                sif.append([name1, 1, name2])
+            elif  rel['name'] == 'inhibition':
+                Id1 = rel['entry1']
+                Id2 = rel['entry2']
+                name1 = res['entries'][[x['id'] for x in res['entries']].index(Id1)]['name']
+                name2 = res['entries'][[x['id'] for x in res['entries']].index(Id2)]['name']
+                type1 = res['entries'][[x['id'] for x in res['entries']].index(Id1)]['type']
+                type2 = res['entries'][[x['id'] for x in res['entries']].index(Id2)]['type']
+                print "names:", rel, name1, name2
+                print type1, type2
+                if type1!='gene' or type2!='gene':
+                    continue
+                if uniprot:
+                    name1 = self.conv("uniprot", name1)[1][0]
+                    name2 = self.conv("uniprot", name2)[1][0]
+                print name1, -1, name2
+                sif.append([name1, -1, name2])
+            else:
+                print "#", rel['entry1'], rel['name'], rel['entry2']
+
+        return sif
 
     def __str__(self):
         txt = self.info()

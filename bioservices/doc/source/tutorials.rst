@@ -1,6 +1,5 @@
 
 
-.. contents::
 
 
 .. _tutorial:
@@ -10,7 +9,7 @@ Tutorials
 ============
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     :numbered:
 
     kegg_tutorial.rst

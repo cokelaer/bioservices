@@ -27,4 +27,5 @@ class test_UniProt(UniProt):
         except:
             assert True
 
-
+    def test_search(self):
+        self.search('zap70+AND+organism:9606', format='list')

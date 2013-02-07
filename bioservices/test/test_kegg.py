@@ -144,6 +144,9 @@ class test_Kegg(Kegg):
         assert 'hsa' == self.Tnumber2code("T01001")
         assert 'T01001' == self.code2Tnumber("hsa")
 
+    def test_parse_kgml_pathway(self):
+        res = self.parse_kgml_pathway("hsa04660")
+
 
 def test_KeggParser():
     s = KeggParser()

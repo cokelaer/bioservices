@@ -5,7 +5,7 @@ import unittest
 class TestRepGen(unittest.TestCase, Wikipathway):
     @classmethod
     def setUpClass(self):
-        self.s = Wikipath()
+        self.s = Wikipathway()
 
 
 

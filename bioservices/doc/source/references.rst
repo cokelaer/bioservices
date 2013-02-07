@@ -23,7 +23,6 @@ xmltools module
 
 
 
-
 Services
 #############
 
@@ -54,10 +53,11 @@ QuickGO
 Kegg
 ===================================================================
 
+
 .. automodule:: bioservices.kegg
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 NCBIblast
 ================

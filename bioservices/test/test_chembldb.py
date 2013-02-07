@@ -30,8 +30,9 @@ class test_Chembl(ChEMBLdb):
     def test_get_compounds_by_SMILES(self):
         self.get_compounds_by_SMILES(self._smiles_example + ".json")
 
+
     def test_get_compounds_containing_SMILES(self):
-        self.get_compounds_containing_SMILES(self._smiles_example)
+        self.get_compounds_containing_SMILES(self._smiles_example + ".json")
 
     def test_get_compounds_similar_to_SMILES(self):
         res = self.get_compounds_similar_to_SMILES(self._smiles_example + "/70.json")

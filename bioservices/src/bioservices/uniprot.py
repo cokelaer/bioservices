@@ -139,7 +139,7 @@ class UniProt(RESTService):
 
 
     def search(self, query, format="html", columns=None, include=False, 
-        	compress=False, limit=None, offset=None):
+        	compress=False, limit=None, offset=None, maxTrials=10):
         """Provide some interface to the uniprot search interface.
 
         :param str query: query must be a valid uniprot query.
@@ -158,11 +158,14 @@ class UniProt(RESTService):
         :param bool compress: gzip the results
         :param int limit: Maximum number of results to retrieve.
         :param int offset:  Offset of the first result, typically used together with the limit parameter. 
+        :param int maxTrials: this request is unstable, so we may want to try several time
 
         To obtain the list of uniprot ID returned by the search of zap70 can be retrieved as follows
         ::
 
             >>> u.search('zap70+AND+organism:9606', format='list')
+
+        .. warning:: this function request seems a bit unstable (UniProt web issue ?)
         """
         params = {}
 
@@ -203,7 +206,15 @@ class UniProt(RESTService):
         params = self.urlencode(params)
         
         #res = s.request("/uniprot/?query=zap70+AND+organism:9606&format=xml", params)
-        res = self.request("/uniprot/?query=%s" % query + "&" + params, "txt")
+        trials = 1
+        while trials<maxTrials:
+            try:
+                res = self.request("/uniprot/?query=%s" % query + "&" + params, "txt")
+            except:
+                self.logging.warning("Trying again...")
+                import time
+                time.sleep(2)
+                trials += 1
         return res
 
 

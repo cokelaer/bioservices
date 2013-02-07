@@ -1,4 +1,24 @@
-"""This module provides a class :class:`ChEMBLdb` 
+#!/usr/bin/python
+# -*- coding: latin-1 -*-
+#
+#  This file is part of bioservices software
+#
+#  Copyright (c) 2011-2013 - EBI-EMBL
+#
+#  File author(s):
+#      https://www.assembla.com/spaces/bioservices/team
+#
+#  Distributed under the GPLv3 License.
+#  See accompanying file LICENSE.txt or copy at
+#      http://www.gnu.org/licenses/gpl-3.0.html
+#
+#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  documentation: http://packages.python.org/bioservices
+#
+##############################################################################
+#$Id: biomodels.py 141 2013-02-06 10:22:25Z cokelaer $
+
+"""This module provides a class :class:`ChEMBLdb`
 
 .. topic:: What is ChEMBLdb
 
@@ -25,7 +45,7 @@ import webbrowser
 
 
 class ChEMBLdb(RESTService):
-    """Interface to `ChEMBLdb <http://www.ebi.ac.uk/chembldb/index.php>`_ 
+    """Interface to `ChEMBLdb <http://www.ebi.ac.uk/chembldb/index.php>`_
 
 
     Here is a quick example to retrieve a target given its ChEMBL Id
@@ -52,7 +72,7 @@ class ChEMBLdb(RESTService):
     _assay_example = "CHEMBL1217643"
 
     def __init__(self, verbose=True):
-        super(ChEMBLdb, self).__init__(url=ChEMBLdb._url, 
+        super(ChEMBLdb, self).__init__(url=ChEMBLdb._url,
             name="ChEMBLdb", verbose=verbose)
         self._default_extension = "json"
 
@@ -62,7 +82,7 @@ class ChEMBLdb(RESTService):
         self._default_extension = ext
     def _get_default_ext(self):
         return self._default_extension
-    default_extension = property(_get_default_ext, _set_default_ext, 
+    default_extension = property(_get_default_ext, _set_default_ext,
         doc="set extension of the requests (default is json). Can be 'json' or 'xml'")
 
     # ChEMBL specifies those errors, so let us try to catch thmem. May not be
@@ -175,9 +195,9 @@ prevented us from fulfilling your request. """)
          * smiles
          * stdInChiKey
 
-        :: 
+        ::
 
-            >>> from bioservices import *   
+            >>> from bioservices import *
             >>> s = ChEMBLdb(verbose=False)
             >>> print (s._chemblId_example)
             >>> resxml = s.get_compounds_by_chemblId(s._chemblId_example)
@@ -185,7 +205,7 @@ prevented us from fulfilling your request. """)
         """
         # the decorator is taking care of the checking and processing
         pass
- 
+
 
     @__process("compounds/stdinchikey")
     def get_individual_compounds_by_inChiKey(self, query):
@@ -206,7 +226,7 @@ prevented us from fulfilling your request. """)
 
         .. doctest::
 
-            >>> from bioservices import *   
+            >>> from bioservices import *
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._inChiKey_example)
             >>> resxml = s.get_individual_compounds_by_inChiKey(s._inChiKey_example + ".xml")
@@ -227,9 +247,9 @@ prevented us from fulfilling your request. """)
         has a unique key 'compounds'. The value of that key is a list of compound
         records. For each compound record dictionary see :meth:`get_compounds_by_chemblId`.
 
-        :: 
+        ::
 
-            >>> from bioservices import *   
+            >>> from bioservices import *
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._smiles_example)
             >>> resxml = s.get_compounds_by_SMILES(s._smiles_example + ".xml")
@@ -248,9 +268,9 @@ prevented us from fulfilling your request. """)
         :return: see :meth:`get_compounds_by_SMILES`
 
 
-        :: 
+        ::
 
-            >>> from bioservices import *   
+            >>> from bioservices import *
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._smiles_example)
             >>> resxml = s.get_compounds_containing_SMILES(s._smiles_example + ".xml")
@@ -282,15 +302,15 @@ prevented us from fulfilling your request. """)
 
         ::
 
-            >>> from bioservices import *   
+            >>> from bioservices import *
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._smiles_similar_example)
-            >>> resjson = s.get_compounds_similar_to_SMILES(s._smiles_example + "/100") 
+            >>> resjson = s.get_compounds_similar_to_SMILES(s._smiles_example + "/100")
             >>> resjson = s.get_compounds_similar_to_SMILES(s._smiles_similar_example)
         """
         pass
 
-        
+
     def get_image_of_compounds_by_chemblId(self, query, dimensions=None,
             file_out=None, view=True):
         """Get the image of a given compound.
@@ -298,18 +318,18 @@ prevented us from fulfilling your request. """)
         :param str query: a valid compound ChEMBLId or a list/tuple of valid compound ChEMBLIds.
         :param int dimensions: optional argument. An integer z such that :math:`1 \leq z \leq 500`
             giving the dimensions of the image.
-        :param str file_out. If None images arenot saved.
-        :param bool view: show the image. If True the images are opened.
+        :param str file_out: if None, images are not save
+        :param bool view: show the image. If True, images are shown in a browser
         :return: the path (list of paths) used to save the figure (figures) (different from Chembl API)
-        
 
         ::
 
-            >>> from bioservices import *   
+            >>> from bioservices import *
             >>> s = ChEMBLdb(verbose=False)
             >>> print (s._image_chemblId_example, s._image_dimension_example)
             >>> s.get_image_of_compounds_by_chemblId(s._image_chemblId_example)
             >>> s.get_image_of_compounds_by_chemblId(s._image_chemblId_example, s._image_dimension_example)
+
         """
         def __f_save(target_data,file_out):
             FILE = open(file_out,'w')
@@ -343,7 +363,7 @@ prevented us from fulfilling your request. """)
                 fout.append(file_out)
                 __f_save(target_data,file_out)
                 if view:
-                    webbrowser.open(file_out)                
+                    webbrowser.open(file_out)
         else:
             raise TypeError('Inappropriate argument type.')
         return fout
@@ -379,10 +399,10 @@ prevented us from fulfilling your request. """)
          * target_name
          * units
          * value
-        
+
         ::
 
-            >>> from bioservices import *   
+            >>> from bioservices import *
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._bioactivities_example)
             >>> resxmls = get_compounds_activities(s._bioactivities_example + '.xml')
@@ -412,7 +432,7 @@ prevented us from fulfilling your request. """)
          * proteinAccession
          * synonyms
          * targetType
-        
+
         ::
 
             >>> from bioservices import *
@@ -442,7 +462,7 @@ prevented us from fulfilling your request. """)
         """
         pass
 
-    
+
     @__process("targets/refseq")
     def get_target_by_refSeqId(self, query):
         """Get individual target by RefSeq Accession Id
@@ -467,7 +487,7 @@ prevented us from fulfilling your request. """)
 
         ::
 
-            >>> from bioservices import *   
+            >>> from bioservices import *
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._target_bioactivities_example)
             >>> resxml = s.get_target_bioactivities(s._target_bioactivities_example + '.xml')
@@ -529,7 +549,7 @@ prevented us from fulfilling your request. """)
 
         .. doctest::
 
-            >>> from bioservices import *   
+            >>> from bioservices import *
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._assay_example)
             CHEMBL1217643
@@ -539,7 +559,7 @@ prevented us from fulfilling your request. """)
         """
         pass
 
-    
+
     @__process("assays", "bioactivities")
     def get_assay_bioactivities(self, query):
         """Get individual assay bioactivities
@@ -551,7 +571,7 @@ prevented us from fulfilling your request. """)
 
         ::
 
-            >>> from bioservices import *   
+            >>> from bioservices import *
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._assay_example)
             >>> resxml = s.get_assay_bioactivities(s._assay_example + '.xml')
