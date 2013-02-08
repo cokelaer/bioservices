@@ -32,3 +32,5 @@ class test_UniProt(UniProt):
         self.search("zap70+and+taxonomy:9606", format="tab", limit=3, columns="entry name,length,id, genes")
         self.search("zap70+and+taxonomy:9606", format="tab", limit=3, columns="entry name")
 
+        self.search("ZAP70_HUMAN", format="tab", columns="sequence", limit=1)
+

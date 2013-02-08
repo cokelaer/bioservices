@@ -64,6 +64,9 @@ class UniProt(RESTService):
         ['FromACC', 'ToKEGG_ID', 'P43403', 'hsa:7535']
         >>> res = u.search("P43403")
 
+        # Returns sequence on the ZAP70_HUMAN accession Id
+        >>> sequence = u.search("ZAP70_HUMAN", 
+            format="tab", columns="sequence")
 
     """
     _url = "http://www.uniprot.org"
