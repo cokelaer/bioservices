@@ -661,10 +661,10 @@ prevented us from fulfilling your request. """)
         pass
 
 
-    def inspect(self, query, item):
+    def inspect(self, query, item_type):
         """Open the URL of a query in a browser.
         :param str query: a valid ChEMBLId of a compound, target or assay.
-        :param str item: a valid type. Might be compound, target or assay
+        :param str item_type: a valid type. Must be one of compound, target or assay
 
         ::
 
@@ -676,5 +676,5 @@ prevented us from fulfilling your request. """)
             >>> s.inspect(s._assay_example,'assay')
 
         """
-        url = "https://www.ebi.ac.uk/chembldb/%s/inspect/%s"%(item,query)
+        url = "https://www.ebi.ac.uk/chembldb/%s/inspect/%s"%(item_type, query)
         webbrowser.open(url)

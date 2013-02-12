@@ -338,14 +338,18 @@ prevented us from fulfilling your request. """)
         :param str query: a valid compound ChEMBLId or a list/tuple of valid compound ChEMBLIds.
         :param int dimensions: optional argument. An integer z such that :math:`1 \leq z \leq 500`
             giving the dimensions of the image.
+            If query is a list and dimension is None or an integer, a list of the same size than query
+            is created containing the same initial value into all positions.
+            If both query and diemnsion are lists, the ith dimension is related to the image of the ith query.
         :param file_out: Can be True | False | a string | list of strings. If
             True, the images are automatically saved to home current work directory with the
-            name of compound. If False, the images are not saved. If string and query is
-            also a string, the image is saved to the path contained into the string. If
-            string and query is a list, a list of paths is created using file_out as a seed.
-            If list with different length of query, is completed with False's to be the same
-            length. So, if list, the writting of the image of ith query depends to the ith
-            value of file_out. If None images are not saved.
+            name of compound.
+            If False, the images are not saved.
+            If string and query is also a string, the image is saved to the path contained into the string.
+            If string and query is a list, a list of paths is created using file_out as a seed.
+            If list with different length of query, is completed with False's to be the same length
+            If both file_out and query are lists with the same length, the image corresponding to ith query
+            is saved using ith path into fiel_out.
         :param bool view: show the image. If True the images are opened.
         :return: the path (list of paths) used to save the figure (figures) (different from Chembl API)
 
@@ -388,7 +392,7 @@ prevented us from fulfilling your request. """)
                 return slave_arg
             elif slave_name == 'dimensions':
                 if isinstance(master_arg,str):
-                    if not type(slave_arg) == int and not isinstance(dimensions,type(None)):
+                    if not type(slave_arg) == int and not isinstance(slave_arg, type(None)):
                         raise TypeError("%s type must be a int or NoneType type."%slave_name)
                 elif isinstance(master_arg,list) or isinstance(master_arg, tuple):
                     if not all([isinstance(v,str) for v in master_arg]):
@@ -666,10 +670,10 @@ prevented us from fulfilling your request. """)
         pass
 
 
-    def inspect(self, query, item):
+    def inspect(self, query, item_type):
         """Open the URL of a query in a browser.
         :param str query: a valid ChEMBLId of a compound, target or assay.
-        :param str item: a valid type. Might be compound, target or assay
+        :param str item_type: a valid type. Might be compound, target or assay
 
         ::
 
@@ -681,5 +685,5 @@ prevented us from fulfilling your request. """)
             >>> s.inspect(s._assay_example,'assay')
 
         """
-        url = "https://www.ebi.ac.uk/chembldb/%s/inspect/%s"%(item,query)
+        url = "https://www.ebi.ac.uk/chembldb/%s/inspect/%s"%(item_type, query)
         webbrowser.open(url)
