@@ -46,6 +46,12 @@ class Service(object):
     .. seealso:: :class:`RESTService`, :class:`WSDLService`
 
     """
+
+    response_codes = {
+        200 : 'OK',
+        400 : 'Bad Request',
+        404 : 'Not found'}
+
     def __init__(self, name, url=None, verbose=True):
         """.. rubric:: Constructor
 
@@ -82,6 +88,8 @@ class Service(object):
         else:
             self.debugLevel = "WARNING"
         self.logging = logging
+
+        
     
     def _set_level(self, level):
         valid_level = ["INFO", "DEBUG", "WARNING", "CRITICAL", "ERROR"]
@@ -292,6 +300,7 @@ class RESTService(Service):
         logging.info('getUserAgent: user_agent: ' + user_agent)
         logging.info('getUserAgent: End')
         return user_agent
+
 
 
     def request(self, path, format="xml", baseUrl=True):
