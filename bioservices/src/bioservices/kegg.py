@@ -259,7 +259,7 @@ class Kegg(RESTService):
             'T01001'
         """
         index = self.organismIds.index(code)
-        return self.organismsTnumbers[index]
+        return self.organismTnumbers[index]
 
     def Tnumber2code(self, Tnumber):
         """Converts organism T number to its code
@@ -271,7 +271,7 @@ class Kegg(RESTService):
             >>> s.Tnumber2code("T01001")
             'hsa'
         """
-        index = self.organismsTnumbers.index(Tnumber)
+        index = self.organismTnumbers.index(Tnumber)
         return self.organismIds[index]
 
     def isOrganism(self, org):
@@ -288,7 +288,7 @@ class Kegg(RESTService):
         """
         if org in self.organismIds:
             return True
-        if org in self.organismsTnumbers:
+        if org in self.organismTnumbers:
             return True
         else:
             return False
@@ -414,7 +414,7 @@ class Kegg(RESTService):
         :param str database: can be one of pathway, module, disease, drug,
             environ, ko, genome, compound, glycan, reaction, rpair, rclass, 
             enzyme, genes, ligand or an organism code (see :attr:`organismIds`
-            attributes) or T number (see :attr:`organismsTnumbers` attribute).
+            attributes) or T number (see :attr:`organismTnumbers` attribute).
         :param str query: See examples
         :param str option: If option provided, database can be only 'compound' 
             or 'drug'. Option can be 'formula', 'exact_mass' or 'mol_weight'
@@ -477,7 +477,7 @@ class Kegg(RESTService):
             database: pathway, brite, module, disease, drug, environ, ko, genome
             compound, glycan,  reaction, rpair, rclass, enzyme **or** any organism 
             using the KEGG organism code (see :attr:`organismIds`
-            attributes) or T number (see :attr:`organismsTnumbers` attribute).
+            attributes) or T number (see :attr:`organismTnumbers` attribute).
         :param str option: one of: aaseq, ntseq, mol, kcf, image, kgml
 
       .. note:: you can add the option at the end of dbentries in which case
@@ -821,7 +821,7 @@ class Kegg(RESTService):
         if self._organisms_tnumbers == None:
             self._organisms_tnumbers = self._get_database("organism", 0)
         return self._organisms_tnumbers
-    organismsTnumbers = property(_get_organisms_tnumbers, 
+    organismTnumbers = property(_get_organisms_tnumbers, 
         doc="returns list of organisms (T numbers)" + _docIds)
 
     def _get_glycans(self):
@@ -933,7 +933,7 @@ class Kegg(RESTService):
         return [definitions[i] for i in matches]
 
     def lookfor_pathway(self, query):
-        """Look for a specific pathwaym
+        """Look for a specific pathway
 
         :param str query: your search term. upper and lower cases are ignored
         :return: a list of definition that matches the query
