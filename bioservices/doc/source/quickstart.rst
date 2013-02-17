@@ -148,7 +148,7 @@ PICR service
 PICR, the Protein Identifier Cross Reference service provides 2 services
 in WSDL and REST protocols. We implemented only the REST interface. The
 methods available in the REST service are very similar to those available
-via SOAP, save for one major difference: only one accession or sequence
+via SOAP except for one major difference: only one accession or sequence
 can be mapped per request.
 
 
@@ -173,7 +173,7 @@ You can access the biomodels service and obtain a model as follows::
     >>> b = biomodels.BioModels()
     >>> model = b.getModelSBMLById('BIOMD0000000299')
 
-Then you can play with the SBML file with your favorite tools.
+Then you can play with the SBML file with your favorite SBML tool.
 
 In order to get the model IDs, you can look at the full list::
 

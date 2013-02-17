@@ -85,7 +85,7 @@ User guide
 
     quickstart.rst
     tutorials.rst
-                           
+    developers.rst                           
 
 
 .. toctree::
