@@ -5,6 +5,9 @@ Whats' new, what has changed
 Revision 0.9
 ------------------
 
+* 1.0.0:
+    * First release of bioservices
+
 * 0.9.7: 
     * add new feature in KEgg module to instrospect kgml data sets
 	* add biogrid test and documentation.
