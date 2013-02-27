@@ -20,7 +20,7 @@ metainfo = {
     'license' : 'GPL',
     'download_url' : ['http://pypi.python.org/pypi/bioservices'],
     'url' : ['http://pypi.python.org/pypi/bioservices'],
-    'description':'utilities to ease manipulation of R packages using rpy2.' ,
+    'description':'Access to Biological Web Services from Python' ,
     'platforms' : ['Linux', 'Unix', 'MacOsX', 'Windows'],
     'keywords' : ["BioServices", "Web Services", "Kegg", "BioModels", "UniProt"],
     'classifiers' : [
