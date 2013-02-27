@@ -77,7 +77,7 @@ class BioGRID(object):
 
     Examples::
 
-        b = BioGRID(query=(["mtor","akt1"],taxId="9606",exP="two hybrid")
+        b = BioGRID(query=["mtor","akt1"],taxId="9606",exP="two hybrid")
         b.biogrid.interactors
 
     One can also query an entire organism, by using the taxid as the query::
