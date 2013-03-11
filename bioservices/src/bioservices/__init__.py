@@ -1,3 +1,7 @@
+#from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import division
+
 import services
 from services import *
 
@@ -45,3 +49,6 @@ from ncbiblast import *
 
 import biogrid
 from biogrid import *
+
+import miriam
+from miriam import *
