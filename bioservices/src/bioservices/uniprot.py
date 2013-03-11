@@ -244,4 +244,24 @@ class UniProt(RESTService):
         return res
 
 
-#[x for x in [res.getchildren()[i].getchildren()[0].text for i in range(0,32)] if x.startswith('P43')]
+
+    def quick_search(self, query, include=False,sort="score", limit=None):
+
+        res = self.search(query, "tab", include=include, sort=sort, limit=limit)
+
+        #if empty result, nothing to do
+        if len(res) == 0:
+            return res
+        # else populate a dictionary
+        newres = {}
+        for line in res.split("\n")[1:-1]:
+            print line
+            Entry, a,b,c,d,e,f = line.split("\t")
+            print Entry, a, b, c, d, e, f
+            newres[Entry] = { 'Entry name': a,
+                         'Status': b,
+                         'Protein names': c,
+                         'Gene names': d,
+                         'Organism' : e,
+                         'Length' : f}
+        return newres

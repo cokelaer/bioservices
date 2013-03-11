@@ -36,6 +36,8 @@
         -- From BioGrid website, Feb. 2013
 
 """
+from __future__ import print_function
+
 from bioservices import PSICQUIC
 import re
 
@@ -50,11 +52,11 @@ class Search(PSICQUIC):
 
         self.data = data
         self.output = self.query("biogrid",self.data)
-        self.interactors = self.interactors(self.output)
+        self.interactors = self.get_interactors()
 
-    def interactors(self, output):
+    def get_interactors(self):
         l = []
-        for line in output:
+        for line in self.output:
             t = []
             for col in line.split("\t"):
                 t += [col]

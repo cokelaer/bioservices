@@ -144,8 +144,10 @@ gene name.
 
 
 """
+from __future__ import print_function
 
-from services import RESTService, BioServicesError
+from bioservices.services import RESTService, BioServicesError
+#from services import RESTService, BioServicesError
 import webbrowser
 import copy
 
@@ -774,15 +776,15 @@ class Kegg(RESTService):
                     status = False
                     allStatus = False
                     if checkAll == False:
-                        print entry, status 
+                        print(entry, status)
                         return False
                 else:
-                    print e
+                    print(e)
                     raise
             except:
                 self.debugLevel = debugLevel
                 raise
-            print entry, status 
+            print(entry, status)
         # retrieve logging level
         self.debugLevel = debugLevel
         return allStatus
@@ -1075,14 +1077,14 @@ class Kegg(RESTService):
                 name2 = res['entries'][[x['id'] for x in res['entries']].index(Id2)]['name']
                 type1 = res['entries'][[x['id'] for x in res['entries']].index(Id1)]['type']
                 type2 = res['entries'][[x['id'] for x in res['entries']].index(Id2)]['type']
-                print "names:", rel, name1, name2
-                print type1, type2
+                print("names:", rel, name1, name2)
+                print(type1, type2)
                 if type1!='gene' or type2!='gene':
                     continue
                 if uniprot:
                     name1 = self.conv("uniprot", name1)[1][0]
                     name2 = self.conv("uniprot", name2)[1][0]
-                print name1, 1, name2
+                print(name1, 1, name2)
                 sif.append([name1, 1, name2])
             elif  rel['name'] == 'inhibition':
                 Id1 = rel['entry1']
@@ -1091,17 +1093,17 @@ class Kegg(RESTService):
                 name2 = res['entries'][[x['id'] for x in res['entries']].index(Id2)]['name']
                 type1 = res['entries'][[x['id'] for x in res['entries']].index(Id1)]['type']
                 type2 = res['entries'][[x['id'] for x in res['entries']].index(Id2)]['type']
-                print "names:", rel, name1, name2
-                print type1, type2
+                print("names:", rel, name1, name2)
+                print(type1, type2)
                 if type1!='gene' or type2!='gene':
                     continue
                 if uniprot:
                     name1 = self.conv("uniprot", name1)[1][0]
                     name2 = self.conv("uniprot", name2)[1][0]
-                print name1, -1, name2
+                print(name1, -1, name2)
                 sif.append([name1, -1, name2])
             else:
-                print "#", rel['entry1'], rel['name'], rel['entry2']
+                print("#", rel['entry1'], rel['name'], rel['entry2'])
 
         return sif
 

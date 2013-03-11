@@ -67,6 +67,16 @@ Kegg
     :undoc-members:
     :synopsis:
 
+Miriam
+======================
+
+.. automodule:: bioservices.miriam
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
+
 NCBIblast
 ================
 

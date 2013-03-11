@@ -162,7 +162,7 @@ class PSICQUIC(RESTService):
     ... seealso:: :class:`bioservices.biogrid.BioGrid`
     """
 
-    _formats = ["tab25", "tab25", "tab27", "xml25", "count", "biopax", "xgmml",
+    _formats = ["tab25", "tab26", "tab27", "xml25", "count", "biopax", "xgmml",
         "rdf-xml", "rdf-xml-abbrev", "rdf-n3", "rdf-turtle"]
 
     def __init__(self, verbose=True):
@@ -292,7 +292,9 @@ class PSICQUIC(RESTService):
     registry_versions = property(_get_registry_version, doc="returns version of each service")
 
     def query(self, service, query, output=None, version="current", firstResult=None, maxResults=None):
-        """format = count; query = zap70, service intact returns 
+        """Send a query to a specific database 
+
+        format = count; query = zap70, service intact returns 
 
         :param str service: a registered service. See :attr:`registry_names`.
         :param str query: a valid query. Can be `*` or a protein name.
@@ -314,6 +316,10 @@ class PSICQUIC(RESTService):
         restrict the query to 100 results::
 
             s.query("string", "species:10090", firstResult=0, maxResults=100, output="tab25")
+
+        # spaces are automatically converted
+
+            s.query("biogrid", "ZAP70 and species:human")
 
         """
         params = {}
@@ -339,7 +345,7 @@ class PSICQUIC(RESTService):
 
         postData = self.urlencode(params)
 
-        url = resturl  + 'query/' + query 
+        url = resturl  + 'query/' + query.replace(" ", "%20")
         if params:
             url += "?" + postData
 
@@ -350,6 +356,49 @@ class PSICQUIC(RESTService):
             res = self.request(url, format="txt",baseUrl=False)
             res = res.strip().split("\n")
 
+        if output.startswith("tab"):
+            res = self._convert_tab2dict(res)
+
         return res
+
+
+    def _convert_tab2dict(self, data):
+        """
+
+        https://code.google.com/p/psicquic/wiki/MITAB26Format
+        """
+        results = []
+        for line in data:
+            results.append(line.split("\t"))
+
+        return results
+
+
+    def queryAll(self, query, databases=None, output="tab25", version="current", firstResult=None, maxResults=None):
+        """Same as query but runs on all active database
+
+        :param list databases: database to query. Queries all active DB if not provided
+        :return: dictionary where keys correspond to databases and values to the output of the query.
+
+        """
+
+        results = {}
+        if databases == None:
+             databases = [x.lower() for x in self.registry_names]
+        names = [x.lower() for x in self.registry_names]
+        for name, active in zip(names, self.registry_actives):
+            if active and name in databases:
+                print("Querying %s" % name)
+                try:
+                    res = self.query(name, query, output=output, version=version, firstResult=firstResult, maxResults=maxResults)
+                except:
+                    print("Failed to query %s " % name)
+                else:
+                    if output.startswith("tab25"):
+                        results[name] = [x for x in res if len(x)]
+                    else:
+                        import copy
+                        results[name] = copy.copy(res)
+        return results
 
 

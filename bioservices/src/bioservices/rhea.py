@@ -43,6 +43,8 @@
         -- from Rhea Home page, Dec 2012 (http://www.ebi.ac.uk/rhea/about.xhtml)
 
 """
+from __future__ import print_function
+
 from services import RESTService
 
 __all__ = ["Rhea"]

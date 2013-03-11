@@ -52,3 +52,8 @@ from biogrid import *
 
 import miriam
 from miriam import *
+
+import arrayexpress
+from arrayexpress import *
+
+

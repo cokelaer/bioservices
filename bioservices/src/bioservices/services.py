@@ -20,6 +20,7 @@
 
 
 """
+from __future__ import print_function
 
 from SOAPpy import SOAPProxy, WSDL
 import urllib
@@ -147,7 +148,7 @@ easyXML object (Default behaviour).""")
             [<id>1</id>, <id>2</id>]
 
         """
-        import xmltools
+        from bioservices import xmltools
         return xmltools.easyXML(res)
 
     def urlencode(self, params):
@@ -237,7 +238,7 @@ class WSDLService(Service):
             #: attribute to access to the methods provided by this WSDL service
             self.serv = WSDL.Proxy(self.url)
         except Exception, e:
-            print "Could not connect to the service %s " % self.url
+            print("Could not connect to the service %s " % self.url)
             raise Exception
 
     def _get_methods(self):
@@ -284,7 +285,7 @@ class RESTService(Service):
             urllib.urlopen(self.url)
         except e:
             logging.critical("The URL (%s) provided cannot be reached" % self.url)
-            print e
+            print(e)
 
     def getUserAgent(self):
         import os
@@ -364,7 +365,7 @@ class RESTService(Service):
         """
         import sys
         requestData = urllib.urlencode(params)
-        print requestData
+        print(requestData)
         if extra != None:
             requestData += extra
         # Concatenate the two parts.
@@ -375,7 +376,7 @@ class RESTService(Service):
             http_headers = { 'User-Agent' : user_agent }
             req = urllib2.Request(requestUrl, None, http_headers)
             # Make the submission (HTTP POST).
-            print req
+            print(req)
             reqH = urllib2.urlopen(req, requestData)
             jobId = reqH.read()
             reqH.close()

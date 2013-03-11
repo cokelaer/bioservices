@@ -60,11 +60,12 @@ publicationIdOrText     publication identifier (PMID or DOI) or text
 
 
 """
+
 import copy
 import webbrowser
 from functools import wraps
 
-from services import WSDLService
+from bioservices.services import WSDLService
 
 __all__ = ["BioModels"]
 
@@ -256,7 +257,7 @@ class BioModels(WSDLService):
 
         ::
 
-            >>> print s.getModelNameById("BIOMD0000000256")
+            >>> print(s.getModelNameById("BIOMD0000000256"))
             'Rehm2006_Caspase'
 
         """
@@ -403,7 +404,7 @@ class BioModels(WSDLService):
 
         ::
 
-             >>> print s.getModelsIdByPerson(u"Novère")
+             >>> print(s.getModelsIdByPerson(u"Novère"))
 
         .. note:: the use of the letter **u** in front of the string to encode special characters.
 

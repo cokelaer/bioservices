@@ -32,6 +32,8 @@
         -- from QuickGO home page, Dec 2012
 
 """
+from __future__ import print_function
+
 from bioservices.services import RESTService
 
 __all__ = ["QuickGO"]
@@ -168,8 +170,6 @@ class QuickGO(RESTService):
         _valid_db = ['UniProtKB', 'UniGene', 'Ensembl']
         _valid_aspect = ['P', 'F', 'C']
 
-        if limit<0:
-            raise ValueError("limit parameter must be an integer greater than zero")
         if isinstance(limit, int)==False:
             raise TypeError("limit parameter must be an integer greater than zero")
 

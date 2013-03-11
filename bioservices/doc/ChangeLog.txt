@@ -2,11 +2,18 @@ Whats' new, what has changed
 ================================
 
 
-Revision 0.9
+Revision 1.0
 ------------------
+
+* 1.0.1
+    * Add miriam module
+    * Add arrayexpress 
 
 * 1.0.0:
     * First release of bioservices
+
+Revision 0.9
+------------------
 
 * 0.9.7: 
     * add new feature in KEgg module to instrospect kgml data sets
