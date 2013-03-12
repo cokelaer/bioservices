@@ -5,6 +5,13 @@ Whats' new, what has changed
 Revision 1.0
 ------------------
 
+* 1.0.2:
+    * add SOAPpy in the setup requirements
+
+* 1.0.1: 
+    update metadata
+
+=======
 * 1.0.1
     * Add miriam module
     * Add arrayexpress 
