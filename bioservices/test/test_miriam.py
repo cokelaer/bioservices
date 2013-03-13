@@ -6,7 +6,7 @@ from bioservices import Miriam
 class test_miriam(Miriam):
 
     def __init__(self):
-        super(test_miriam, self).__init__()
+        super(test_miriam, self).__init__(verbose=False)
 
 
     def test_checkRegExp(self):

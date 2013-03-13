@@ -26,6 +26,15 @@ xmltools module
 Services
 #############
 
+ArrayExpress
+===================
+
+.. automodule:: bioservices.arrayexpress
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
 BioGrid
 ====================
 

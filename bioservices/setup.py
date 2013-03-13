@@ -8,7 +8,7 @@ import glob
 
 _MAJOR               = 1
 _MINOR               = 0
-_MICRO               = 1
+_MICRO               = 2
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -22,7 +22,8 @@ metainfo = {
     'url' : ['http://pypi.python.org/pypi/bioservices'],
     'description':'Access to Biological Web Services from Python' ,
     'platforms' : ['Linux', 'Unix', 'MacOsX', 'Windows'],
-    'keywords' : ["BioServices", "Web Services", "Kegg", "BioModels", "UniProt"],
+    'keywords' : ["BioServices", "Web Services", "Kegg", "BioModels", "UniProt",
+"PICR", "ArrayExpress", "QuickGO", "PSICQUIC", "Blast", "BioGRID", "MIRIAM"],
     'classifiers' : [
           'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Developers',

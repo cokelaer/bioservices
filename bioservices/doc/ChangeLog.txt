@@ -7,6 +7,7 @@ Revision 1.0
 
 * 1.0.2:
     * add SOAPpy in the setup requirements
+	* finished ArrayExpress +doc + tests
 
 * 1.0.1: 
     update metadata
