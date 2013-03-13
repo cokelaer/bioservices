@@ -959,11 +959,18 @@ class Kegg(RESTService):
             >>> s.get_pathway_by_gene("7535", "hsa")
             ['path:hsa04064', 'path:hsa04650', 'path:hsa04660', 'path:hsa05340']
 
-        This method is quite long (1-2 minutes) since it scans all pathways.
-        However, there are buffered so the next query takes only a second.
-
-        .. note:: the buffering is done in the _buffer attribute.
         """ 
+        p = KeggParser(verbose=False)
+        p.organism = organism
+        res = self.get(":".join([organism, gene]))
+        dic = p.parse(res)
+        if 'pathway' in dic.keys():
+            return dic['pathway']
+        else:
+            print("No pathway found ?")
+
+
+    def _old_get_pathway_by_gene(self, gene, organism):
         matches = []
         p = KeggParser()
         # using existing buffered list if same organism are used
@@ -974,7 +981,7 @@ class Kegg(RESTService):
             Ids = p.pathwayIds
 
         for i,Id in enumerate(Ids): 
-            print("scannind %s (%s/%s)" % (Id, i, len(Ids)))
+            print("scanning %s (%s/%s)" % (Id, i, len(Ids)))
             if Id not in self._buffer.keys():
                 res = p.get(Id)
                 self._buffer[Id] = res
@@ -1158,7 +1165,7 @@ class KeggParser(Kegg):
     def parse(self, res):
         """A dispatcher to parse all outputs returned by :meth:`Kegg.get`
 
-	:param str res: output of a :meth:`Kegg.get`.
+        :param str res: output of a :meth:`Kegg.get`.
         :return: a dictionary
 
         ::
@@ -1312,8 +1319,8 @@ class KeggParser(Kegg):
 
         """
 
-        flatfile = ["ENTRY", "NAME", "DEFINITION", "ORTHOLOGY", "ORGANISM", "PATHWAY"
-            "MODULE", "DISEASE", "DRUG_TARGET", "CLASS", "MOTIF", "DBLINKS", 
+        flatfile = ["ENTRY", "NAME", "DEFINITION", "ORTHOLOGY", "ORGANISM",
+            "PATHWAY", "MODULE", "DISEASE", "DRUG_TARGET", "CLASS", "MOTIF", "DBLINKS", 
             "STRUCTURE", "POSITION", "AASEQ", "NTSEQ"]
         parser = self._parse(res, flatfile)
         return parser

@@ -75,7 +75,7 @@ class BioGRID(object):
 
       >>> from bioservices import BioGRID
       >>> b = BioGRID(query=["map2k4","akt1"],taxId = "9606")
-      >>> b.biogrid.interactors
+      >>> interactors = b.biogrid.interactors
 
     Examples::
 

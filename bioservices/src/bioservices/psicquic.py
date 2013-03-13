@@ -149,7 +149,30 @@ class PSICQUIC(RESTService):
         .
         .
 
-    Another reaction with reactome::
+    Here we have a list of entries. There are 15 of them (depending on
+    the *output* parameter). The meaning of the entries is described on PSICQUIC
+    website: https://code.google.com/p/psicquic/wiki/MITAB25Format . In short:
+
+    
+    #. Unique identifier for interactor A
+    #. Unique identifier for interactor B.
+    #. Alternative identifier for interactor A, for example the official gene
+    #. Alternative identifier for interactor B.
+    #. Aliases for A, separated by "|
+    #. Aliases for B.
+    #. Interaction detection methods, taken from the corresponding PSI-MI
+    #. First author surname(s) of the publication(s) 
+    #. Identifier of the publication 
+    #. NCBI Taxonomy identifier for interactor A. 
+    #. NCBI Taxonomy identifier for interactor B.
+    #. Interaction types, 
+    #. Source databases and identifiers, 
+    #. Interaction identifier(s) i
+    #. Confidence score. Denoted as scoreType:value. 
+
+
+
+    Another example with reactome database::
 
         res = s.query("reactome", "Q9Y266")
 
@@ -159,7 +182,7 @@ class PSICQUIC(RESTService):
         the raw data. Addition class may provide dedicated parsing in the
         future.
 
-    ... seealso:: :class:`bioservices.biogrid.BioGrid`
+    .. seealso:: :class:`bioservices.biogrid.BioGrid`
     """
 
     _formats = ["tab25", "tab26", "tab27", "xml25", "count", "biopax", "xgmml",

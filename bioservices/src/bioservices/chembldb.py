@@ -246,6 +246,7 @@ prevented us from fulfilling your request. """)
             >>> from bioservices import *
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._inChiKey_example)
+            QFFGVLORLPOAEC-SNVBAGLBSA-N
             >>> resxml = s.get_individual_compounds_by_inChiKey(s._inChiKey_example + ".xml")
             >>> resjson = s.get_individual_compounds_by_inChiKey(s._inChiKey_example + ".json")
         """
