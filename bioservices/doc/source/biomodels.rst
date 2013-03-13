@@ -35,6 +35,7 @@ Get a specific model given its Id. Let us play with the first model:
 and look at some meta information:
 
 .. doctest:: biomodels
+    :options: +SKIP
 
     >>> print s.getSimpleModelsByIds(s.modelsId[0])
     <?xml version="1.0" encoding="UTF-8"?>
@@ -57,6 +58,8 @@ and look at some meta information:
         <lastModificationDate>2011-01-18T12:23:47+00:00</lastModificationDate>
     </simpleModel>
     </simpleModels>
+    
+
 
 Some of these information can be retrieved specifically:
 

@@ -38,7 +38,7 @@ Here is a list of services that you can already access from **BioServices**:
 .. autosummary::
     :nosignatures:
 
-    bioservices.biomodels.ArrayExpress
+    bioservices.arrayexpress.ArrayExpress
     bioservices.biomodels.BioModels
     bioservices.kegg.Kegg
     bioservices.chembldb.ChEMBLdb
