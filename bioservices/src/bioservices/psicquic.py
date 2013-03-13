@@ -207,6 +207,14 @@ class PSICQUIC(RESTService):
         return PSICQUIC._formats
     formats = property(_get_formats, doc="Returns the possible output formats")
 
+    def _get_active_db(self):
+        names = self.registry_names[:]
+        actives = self.registry_actives[:]
+        names = [x.lower() for x,y in zip(names, actives) if y=="true"]
+        return names
+    activeDBs = property(_get_active_db, doc="returns the active DBs only")
+        
+
     def read_registry(self):
         """Reads and returns the active registry 
 
@@ -317,8 +325,6 @@ class PSICQUIC(RESTService):
     def query(self, service, query, output=None, version="current", firstResult=None, maxResults=None):
         """Send a query to a specific database 
 
-        format = count; query = zap70, service intact returns 
-
         :param str service: a registered service. See :attr:`registry_names`.
         :param str query: a valid query. Can be `*` or a protein name.
         :param str output: a valid format. See s._formats
@@ -342,7 +348,7 @@ class PSICQUIC(RESTService):
 
         # spaces are automatically converted
 
-            s.query("biogrid", "ZAP70 and species:human")
+            s.query("biogrid", "ZAP70 and species:9606")
 
         """
         params = {}
@@ -403,25 +409,43 @@ class PSICQUIC(RESTService):
         :param list databases: database to query. Queries all active DB if not provided
         :return: dictionary where keys correspond to databases and values to the output of the query.
 
+        ::
+
+            res = s.queryAll("ZAP70 AND species:9606")
         """
 
         results = {}
         if databases == None:
-             databases = [x.lower() for x in self.registry_names]
-        names = [x.lower() for x in self.registry_names]
-        for name, active in zip(names, self.registry_actives):
-            if active and name in databases:
-                print("Querying %s" % name)
-                try:
-                    res = self.query(name, query, output=output, version=version, firstResult=firstResult, maxResults=maxResults)
-                except:
-                    print("Failed to query %s " % name)
-                else:
-                    if output.startswith("tab25"):
-                        results[name] = [x for x in res if len(x)]
-                    else:
-                        import copy
-                        results[name] = copy.copy(res)
+             databases = [x.lower() for x in self.activeDBs]
+
+        for name in databases:
+            print("Querying %s" % name)
+            res = self.query(name, query, output=output, version=version, firstResult=firstResult, maxResults=maxResults)
+            if output.startswith("tab25"):
+                results[name] = [x for x in res if x!=[""]]
+            else:
+                import copy
+                results[name] = copy.copy(res)
         return results
+
+
+
+    def getInteractionCounter(self, query):
+        """Returns a dictionary with database as key and results as values
+
+        :param str query: a valid query
+        :return: a dictionary which key as database and value as number of entries 
+
+        Consider only the active database.
+
+        """
+        # get the active names only
+        activeDBs = self.activeDBs[:] 
+        res = [(str(name), int(self.query(name, query, output="count")[0])) for name in activeDBs]
+        return dict(res)
+
+
+
+
 
 
