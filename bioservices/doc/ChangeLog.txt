@@ -9,6 +9,10 @@ Revision 1.0
     * add SOAPpy in the setup requirements
 	* finished ArrayExpress +doc + tests
 	* fixed a bug in KEGGParser.parseGene
+	* add methods in psicquic to parse all databases and convert to uniprot if
+      possible. These methods are used to build an application provided in the
+	  tutorial
+    * add biomart
 
 * 1.0.1: 
     update metadata

@@ -283,7 +283,7 @@ class RESTService(Service):
         try:
             import urllib
             urllib.urlopen(self.url)
-        except e:
+        except Exception, e:
             logging.critical("The URL (%s) provided cannot be reached" % self.url)
             print(e)
 

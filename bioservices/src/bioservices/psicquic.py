@@ -59,6 +59,9 @@ based on Lucene's syntax.
   as identifier:P12345 OR pubid:P12345 OR pubauth:P12345 OR species:P12345 OR
   type:P12345 OR detmethod:P12345 OR interaction_id:P12345
 
+About the MITAB output
+=========================
+
 =============== =========================================== =============== ======================
 Field Name      Searches on                                 Implicit*       Example
 =============== =========================================== =============== ======================
@@ -108,10 +111,16 @@ param           Interaction parameters. Only true or
                 interaction having parameters available     Yes             param:true
 =============== =========================================== =============== ======================
 
+About the databases (some usefule links)
+===========================================
+
+
+#. irefindex: `about mitab <http://irefindex.uio.no/wiki/README_MITAB2.6_for_iRefIndex_8.0#What_each_line_represents>`_
+
 
 """
 
-from bioservices import RESTService
+from bioservices import RESTService, UniProt
 
 
 #http://code.google.com/p/psicquic/wiki/PsicquicSpec_1_3_Rest
@@ -188,6 +197,29 @@ class PSICQUIC(RESTService):
     _formats = ["tab25", "tab26", "tab27", "xml25", "count", "biopax", "xgmml",
         "rdf-xml", "rdf-xml-abbrev", "rdf-n3", "rdf-turtle"]
 
+
+    # note the typo in "genbank indentifier from bind DB
+    _mapping_uniprot = {"genbank indentifier": "P_GI",
+        'entrezgene/locuslink':"ENTREZGENEID",
+        'uniprotkb': "ACC+ID",
+        'rcsb pdb':"PDB_ID",
+        'ensembl':"ENSEMBL_ID",
+        'refseq':"P_REFSEQ_AC",
+        'hgnc':'HGNC_ID',
+        "kegg": "KEGG_ID",
+        "entrez gene/locuslink": "P_ENTREZGENEID",
+        "chembl": "CHEMBL_ID",
+        "ddbj/embl/genbank": "EMBL_ID",
+        "dip": "DIP_ID",
+        "ensemblgenomes": "ENSEMBLGENOME_ID",
+        "omim":"MIM_ID",
+        "chebi": None,
+        "chembl": None,
+#        "intact": None
+    }
+
+# unknown: hprd, omim, bind, bind complexid, mdl, 
+
     def __init__(self, verbose=True):
         """.. rubric:: Constructor
 
@@ -203,6 +235,13 @@ class PSICQUIC(RESTService):
         super(PSICQUIC, self).__init__("PSICQUIC", verbose=verbose, url=urlStr)
         self._registry = None
 
+        try:
+            self.uniprot = UniProt(verbose=False)
+        except:
+            self.logging.warning("UniProt service could be be initialised")
+
+        self.buffer = {}
+
     def _get_formats(self):
         return PSICQUIC._formats
     formats = property(_get_formats, doc="Returns the possible output formats")
@@ -213,7 +252,7 @@ class PSICQUIC(RESTService):
         names = [x.lower() for x,y in zip(names, actives) if y=="true"]
         return names
     activeDBs = property(_get_active_db, doc="returns the active DBs only")
-        
+
 
     def read_registry(self):
         """Reads and returns the active registry 
@@ -348,7 +387,16 @@ class PSICQUIC(RESTService):
 
         # spaces are automatically converted
 
-            s.query("biogrid", "ZAP70 and species:9606")
+            s.query("biogrid", "ZAP70 AND species:9606")
+
+        .. warning:: AND must be in big caps. Some database are ore permissive
+than other (e.g., intact accepts "and"). species must be a valid ID number. Again, some DB are more
+ipermissive and may accept the name (e.g., human)
+
+        To obtain the number of interactions in intact for the human specy:: 
+
+            >>> len(p.query("intact", "species:9606"))
+
 
         """
         params = {}
@@ -418,14 +466,21 @@ class PSICQUIC(RESTService):
         if databases == None:
              databases = [x.lower() for x in self.activeDBs]
 
+        for x in databases:
+            if x not in self.activeDBs:
+                raise ValueError("database %s not in active databases" % x)
+
+
         for name in databases:
-            print("Querying %s" % name)
+            self.logging.warning("Querying %s" % name),
             res = self.query(name, query, output=output, version=version, firstResult=firstResult, maxResults=maxResults)
             if output.startswith("tab25"):
                 results[name] = [x for x in res if x!=[""]]
             else:
                 import copy
                 results[name] = copy.copy(res)
+        for name in databases:
+            self.logging.info("Found %s in %s" % (len(results[name], name)))
         return results
 
 
@@ -444,8 +499,318 @@ class PSICQUIC(RESTService):
         res = [(str(name), int(self.query(name, query, output="count")[0])) for name in activeDBs]
         return dict(res)
 
+    def getName(self, data):
+        idsA = [x[0] for x in data]
+        idsB = [x[1] for x in data]
+        return idsA, idsB
+
+    def knownName(self, data):
+        """Scan all entries (MITAB) and returns simplified version
+
+
+        Each item in the input list of mitab entry
+        The output is made of 2 lists corresponding to 
+        interactor A and B found in the mitab entries.
+
+        elements in the input list takes the following forms::
+
+            DB1:ID1|DB2:ID2
+            DB3:ID3
+
+        The | sign separates equivalent IDs from different databases. 
+
+        We want to keep only one. The first known databae is kept. If in the list of DB:ID pairs no known
+        database is found, then we keep the first one whatsover.
+
+        known databases are those available in the uniprot mapping tools. 
+
+        chembl and chebi IDs are kept unchanged.
+
+
+        """
+
+
+        self.logging.info("converting data into known names")
+        idsA = [x[0].replace("\"","") for x in data]
+        idsB = [x[1].replace("\"", "") for x in data]
+        # extract the first and second ID but let us check if it is part of a
+        # known uniprot mapping.Otherwise no conversion will be possible.
+        # If so, we set the ID to "unknown"
+        # remove the " character that can be found in a few cases (e.g,
+        # chebi:"CHEBI:29036")
+        #idsA = [x.replace("chebi:CHEBI:","chebi:") for x in idsA]
+        #idsB = [x.replace("chebi:CHEBI:", "chebi:") for x in idsB]
+
+        # special case:
+        # in mint, there is an entry that ends with a | uniprotkb:P17844|
+        idsA = [x.strip("|") for x in idsA]
+        idsB = [x.strip("|") for x in idsB]
+
+
+        # the first ID
+        for i, entry in enumerate(idsA):
+            try:
+                dbs = [x.split(":")[0] for x in entry.split("|")]
+                IDs = [x.split(":")[1] for x in entry.split("|")]
+                valid_dbs = [(db,ID) for db,ID in zip(dbs,IDs) if db in self._mapping_uniprot.keys()]
+                # search for an existing DB
+                if len(valid_dbs)>=1:
+                    idsA[i] = valid_dbs[0][0] + ":" + valid_dbs[0][1]
+                else:
+                    self.logging.debug("none of the DB for this entry (%s) are available" % (entry))
+                    idsA[i] = "?" + dbs[0] + ":" + IDs[0]
+            except:
+                self.logging.info("Could not extract name from %s" % entry)
+                idsA[i] = "??:" + entry  # we add a : so that we are sure that a split(":") will work
+        # the second ID
+        for i, entry in enumerate(idsB):
+            try:
+                dbs = [x.split(":")[0] for x in entry.split("|")]
+                IDs = [x.split(":")[1] for x in entry.split("|")]
+                valid_dbs = [(db,ID) for db,ID in zip(dbs,IDs) if db in self._mapping_uniprot.keys()]
+                # search for an existing DB
+                if len(valid_dbs)>=1:
+                    idsB[i] = valid_dbs[0][0] + ":" + valid_dbs[0][1]
+                else:
+                    self.logging.debug("none of the DB (%s) for this entry are available" % (entry))
+                    idsB[i] = "?" + dbs[0] + ":" + IDs[0]
+            except:
+                self.logging.info("Could not extract name from %s" % entry)
+                idsB[i] = "??:" + entry
+
+        countA = len([x for x in idsA if x.startswith("?")])
+        countB = len([x for x in idsB if x.startswith("?")])
+        if countA+countB > 0:
+            self.logging.warning("%s ids out of %s were not identified" % (countA+countB, len(idsA)*2))
+            print (set([x.split(":")[0] for x in idsA if x.startswith("?")]))
+            print (set([x.split(":")[0] for x in idsB if x.startswith("?")]))
+        self.logging.info("knownName done")
+        return idsA, idsB
+
+    def preCleaning(self, data):
+        """remove entries ehre IdA or IdB is set to "-"
+
+        """
+        ret = [x for x in data if x[0] !="-" and x[1]!="-"]
+        return ret
+
+    def postCleaningAll(self,data, keep_only="HUMAN", flatten=True):
+        """
+    
+        even more cleaing by ignoring score, db and interaction
+        len(set([(x[0],x[1]) for x in retnew]))
+        """
+        results = {}
+        for k in data.keys():
+            self.logging.info("Post cleaning %s" % k)
+            ret = self.postCleaning(data[k], keep_only="HUMAN")
+            if len(ret):
+                results[k] = ret
+        if flatten:
+            results = [x for k in results.keys() for x in results[k]]
+        return results
+
+    def postCleaning(self, data, keep_only="HUMAN", remove_db=["chebi","chembl"], 
+        keep_self_loop=False):
+        """Remove entries with a None and keep only those with the keep pattern
 
 
 
 
+        """
+        print("Before removing anything: ", len(data))
 
+        data = [x for x in data if x[0]!=None and x[1]!=None]
+        print("After removing the None: ", len(data))
+    
+        data = [x for x in data if x[0].startswith("!")==False and x[1].startswith("!")==False]
+        print("After removing the !: ", len(data))
+
+    
+        for db in remove_db:
+            data = [x for x in data if x[0].startswith(db)==False]
+            data = [x for x in data if x[1].startswith(db)==False]
+            print("After removing entries that match %s : " % db, len(data))
+
+        data = [x for x in data if keep_only in x[0] and keep_only in x[1]]
+        print("After removing entries that don't match %s : " % keep_only, len(data))
+    
+        if keep_self_loop == False:
+            data = [x for x in data if x[0]!=x[1]]
+            print("After removing self loop : ", len(data))
+
+        data = list(set(data))
+        print("After removing identical entries", len(data))
+
+
+
+        return data
+
+
+    def convertAll(self, data):
+        results = {}
+        for k in data.keys():
+            self.logging.info("Analysing %s" % k)
+            results[k] = self.convert(data[k], db=k)
+        return results
+
+    def convert(self, data, db=None):
+        idsA, idsB = self.knownName(data)
+        mapping = self.mappingOneDB(data)
+        results = []
+        for i, entry in enumerate(data):
+            x = idsA[i].split(":",1)[1]
+            y = idsB[i].split(":",1)[1]
+            xp = mapping[x]
+            yp = mapping[y]
+            score = entry[14]
+            interaction = entry[11]
+            results.append((xp, yp, score, interaction, db))
+        return results
+
+
+    def mappingOneDB(self, data):
+        query = {}
+        self.logging.debug("converting IDs with proper DB name (knownName function)")
+        entriesA, entriesB = self.knownName(data) # idsA and B contains list of a single identifier of the form db:id
+        # the db is known from _mapping.uniprot otherwise it is called "unknown"
+
+        # get unique DBs to build the query dictionary
+        dbsA = [x.split(":")[0] for x in entriesA]
+        dbsB = [x.split(":")[0] for x in entriesB]
+        for x in set(dbsA):
+            query[x] = set()
+        for x in set(dbsB):
+            query[x] = set()
+        for k in query.keys():
+            if k.startswith("?"):
+                del query[k]
+
+        # the data to store
+        mapping = {}
+        N = len(data)
+
+        # scan all entries
+        counter = 0
+        for entryA, entryB in zip(entriesA, entriesB):
+            counter += 1
+            dbA, idA = entryA.split(":")
+            try:
+                dbB, idB = entryB.split(":")
+            except:
+                print entryB
+            if idA not in mapping.keys():
+                if dbA.startswith("?"):
+                    mapping[idA] = entryA
+                else:
+                    query[dbA].add(idA)
+            if idB not in mapping.keys():
+                if dbB.startswith("?"):
+                    mapping[idB] = entryB
+                else:
+                    query[dbB].add(idB)
+
+            for k in query.keys():
+                if len(query[k])>2000 or counter == N:
+                    this_query = list(query[k])
+                    DBname = self._mapping_uniprot[k]
+
+                    if DBname != None:
+                        self.logging.warning("Request sent to uniprot for %s database (%s/%s)" % (DBname, counter, N))
+                        res = self.uniprot.mapping(fr=DBname, to="ID", query=" ".join(this_query))
+                        for x in this_query:
+                            if x not in res: #was not found
+                                mapping[x] = "!" + k+":"+x
+                            else:
+                                # we should be here since the queries are populated
+                                # if not already in the mapping dictionary
+                                if x == mapping.keys():
+                                    raise ValueError(x)
+                                index = res.index(x)
+                                mapping[x] = res[index+1]
+                    else:
+                        for x in this_query:
+                            mapping[x] = k + ":" + x
+                    query[k] = set()
+
+        for k in query.keys():
+            assert len(query[k])==0
+        return mapping
+
+
+
+
+class MITAB(object):
+    def __init__(self, version="25"):
+
+        self.elements = [
+            "interactions",
+            "interactor_genes",
+            "interactor_rogs",
+            "canonical_interactor_rogs",
+            "interaction_rigs",
+            "canonical_interaction_rigs",
+            "interactor_taxonomy",
+            "alternatives",
+            "aliases",
+            "method_names",
+            "interaction_type_names",
+            "authors",
+            "pubmed",
+            "sources",
+            "interaction_identifiers",
+            "confidence"
+            ]
+
+
+    def parse(self, entry):
+        assert len(entry)>=15
+        d = {}
+        for i,v in enumerate(entry):
+            d[self.elements[i]] = v
+        return d
+
+
+
+
+"""mitab 26
+(symA, symB,                                            # interactor symbols (orcomplex identifiers, prefixed)
+                altA, altB, aliasA, aliasB,                         # interactordetails
+                method, authors, pmids,
+                taxA, taxB,
+                interactionType,
+                sourcedb, interactionIdentifiers,
+                confidence,
+                # New in iRefIndex 7.0 MITAB2.6:
+                expansion,
+                biologicalRoleA, biologicalRoleB,
+                experimentalRoleA, experimentalRoleB,
+                # Preserved from the original format:
+                Atype, Btype,
+                # New in iRefIndex 7.0 MITAB2.6:
+                xrefsA, xrefsB, xrefsInteraction,                   # not used by iRefIndex
+                annotationsA, annotationsB, annotationsInteraction, # not used by iRefIndex
+                taxHost, parametersInteraction,
+                creationDate, updateDate,
+                checksumA, checksumB, checksumInteraction,          # ROG and RIG identifiers, prefixed
+                negative                                            # always "false" for iRefIndex
+                ) = fields[:36]
+
+and mitab 2.7
+
+    if len(fields) >= 54:
+                (origA, origB,                                          # theoriginal identifiers
+                    finalA, finalB,                                     #corrected/selected identifiers
+                    mappingScoreA, mappingScoreB,
+                    irogidA, irogidB,                                   #integer identifiers
+                    irigid,
+                    crogidA, crogidB,                                   #canonical ROG identifiers, unprefixed
+                    crigid,                                             #canonical RIG identifier, unprefixed
+                    icrogidA, icrogidB,                                 #integer identifiers
+                    icrigid,
+                    imexid,
+                    # Preserved from the original format:
+                    edgetype,
+                    numParticipants,
+                    ) = fields[36:54]
+"""

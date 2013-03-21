@@ -59,6 +59,14 @@ ChEMBLdb
     :undoc-members:
     :synopsis:
 
+EUtils
+==========
+
+.. automodule:: bioservices.eutils
+    :members:
+    :undoc-members:
+    :synopsis:
+
 QuickGO
 ================
 

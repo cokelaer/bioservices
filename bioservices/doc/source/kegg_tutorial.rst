@@ -112,7 +112,7 @@ Look for pathway (by genes i.e., IDs or usual name)
 --------------------------------------------------------
 
 Imagine you want to find the pathway that contains **ZAP70**. As we have seen
-earlier you can get its gene Id::
+earlier you can get its gene Id as follows::
 
     >>> s.find("hsa", "zap70")
     hsa:7535
@@ -125,14 +125,14 @@ The following commands do not help::
 
 
 We provide a method to search for pathways that contain the required gene Id.
-You need to know its ID and the name of the organism and then type::
+You can search by Kegg Id or gene name::
 
-    >>> s.get_pathway_by_gene("7535", "hsa")
+    >>> res = s.get_pathway_by_gene("7535", "hsa")
+    >>> s.get_pathway_by_gene("zap70", "hsa")
     ['path:hsa04064', 'path:hsa04650', 'path:hsa04660', 'path:hsa05340']
 
-This is quite long (1-2 minutes) since the function scans all pathways. However,
-there are buffered so the next query takes a second.
-
+This commands first search for the gene Id in the KEGG database and then parse
+the output to retrieve the pathways.
 
 
 Introspecting a pathway

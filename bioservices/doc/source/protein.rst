@@ -101,11 +101,144 @@ For this purpose, we could use PSICQUIC services::
 
     >>> from bioservices import PSICQUIC
     >>> s = PSICQUIC(verbose=False)
-    >>> data = s.query("biogrid", "ZAP70 and species:human")
+    >>> data = s.query("intact", "ZAP70 AND species:9606")
 
-how many interactions were found and in this DB ?
+where 9606 is the taxonomy Id for home sapiens. We could also figure out how
+many interctions could be found in ech dabase for this particular query::
+
+    >>> p.getInteractionCounter("zap70 AND species:9606")
+    {'apid': 82,
+     'bar': 0,
+     'bind': 4,
+     'bindingdb': 29,
+     'biogrid': 73,
+     'chembl': 161,
+     'dip': 0,
+     'i2d-imex': 0,
+     'innatedb': 13,
+     'innatedb-imex': 0,
+     'intact': 11,
+     'interoporc': 0,
+     'irefindex': 273,
+     'matrixdb': 0,
+     'mbinfo': 0,
+     'mint': 34,
+     'molcon': 0,
+     'mpidb': 0,
+     'reactome': 0,
+     'reactome-fis': 134,
+     'spike': 47,
+     'string': 319,
+     'topfind': 0,
+     'uniprot': 0}
 
 
-    >>> 
+We see for instance that intact has 11 intercations. Coming back to the interactions returned by s.query, we find indeed 11 intercations
+between ZAP70 and other proteins::
+
+    >>> len(data)
+    11
+
+Let us look at the first one::
+
+    >>> data[0]
+    ['uniprotkb:Q9Y2R2',
+     'uniprotkb:P43403',
+     'intact:EBI-1211241|uniprotkb:E9PPI1|uniprotkb:B1ALC8|uniprotkb:Q8WVM1|uniprotkb:Q6IPX8|uniprotkb:D4NZ71|uniprotkb:O95064|uniprotkb:O95063|uniprotkb:A0N0K6',
+     'intact:EBI-1211276|uniprotkb:Q9UBS6|uniprotkb:Q8IXD6|uniprotkb:Q6PIA4|uniprotkb:A6NFP4',
+     'psi-mi:ptn22_human(display_long)|uniprotkb:PTPN22(gene name)|psi-mi:PTPN22(display_short)|uniprotkb:PTPN8(gene name synonym)|uniprotkb:Hematopoietic cell protein-tyrosine phosphatase 70Z-PEP(gene name synonym)|uniprotkb:Lymphoid phosphatase(gene name synonym)|uniprotkb:PEST-domain phosphatase(gene name synonym)',
+    'psi-mi:zap70_human(display_long)|uniprotkb:ZAP70(gene name)|psi-mi:ZAP70(display_short)|uniprotkb:SRK(gene name synonym)|uniprotkb:Syk-related tyrosine kinase(gene name synonym)|uniprotkb:70kDa zeta-chain associated protein(gene name synonym)',
+     'psi-mi:"MI:0096"(pull down)',
+     'Wu et al. (2006)',
+     'pubmed:16461343',
+     'taxid:9606(human)|taxid:9606(Homo sapiens)',
+     'taxid:9606(human)|taxid:9606(Homo sapiens)',
+     'psi-mi:"MI:0914"(association)',
+     'psi-mi:"MI:0469"(IntAct)',
+     'intact:EBI-1211263',
+     'intact-miscore:0.60']
+
+The First two element are the entries for specy A and B. The last element is the
+score. The 11th element the type of interaction and so on.
+
+What could be useful is to convert these elements into uniprot ID only. Witrh
+intact DB it is irrelevant but with other DBs, it may be useful (e.g., biogrid).
+
+There is such a function called convertQuery::
+
+
+    >>> data = s.query("biogrid", "ZAP70 AND species:9606")
+    >>> data2 = s.convertQuery(data, "biogrid")
+
+
+
+you can also query and convert for each database that is active. THis can be
+done manually:
+
+    for each db in s.database_active:
+
+or 
+
+   >>> res = s.queryAll("ZAP70 AND species:9606")
+   >>> res2 = s.convertQuery(res)
+
+res2 contains N entry with uniprot ID as first and second element. 
+
+
+   >>> len(set(res2))
+
+
+
+For instance all human interactions reported in MArch 2013
+----------------------------------------------------------------
+
+=========== =============== ===================================
+Status              name      number of interactions
+=========== =============== ===================================
+ONLINE      APID            123,427  
+ONLINE      BAR             0    
+ONLINE      BIND            38,419   
+ONLINE      BindingDB       74,082   
+ONLINE      BioGrid         182,911  
+ONLINE      ChEMBL          399,482  
+ONLINE      DIP             18,434   
+OFFLINE     DrugBank      
+OFFLINE     GeneMANIA 
+OFFLINE     I2D     
+ONLINE      I2D-IMEx        915  
+ONLINE      InnateDB        14,734   
+ONLINE      InnateDB-IMEx   352  
+ONLINE      IntAct          84,692   
+ONLINE      Interoporc      17,284   
+ONLINE      iRefIndex       396,368  
+ONLINE      MatrixDB        604  
+ONLINE      MBInfo          307  
+ONLINE      MINT            36,741   
+ONLINE      MolCon          242  
+ONLINE      MPIDB           28   
+ONLINE      Reactome        113,204  
+ONLINE      Reactome-FIs    209,988  
+ONLINE      Spike           36,248   
+ONLINE      STRING          656,493  
+ONLINE      TopFind         4,986    
+ONLINE      UniProt         5,564    
+OFFLINE     VirHostNet      
+=========== =============== ===================================
+
+
+
+res = p.queryAll("species:9606", databases=["uniprot", "apid"])
+
+data1 = res['uniprot']
+data2 = p.preCleaning(data1)
+mapping = p.convertUniprot(data2)
+ 
+
+len(set(p.postCleaning(mapping)))
+('Before removing anything: ', 5558)
+('After removing the None: ', 5545)
+('Before removing the !: ', 5107)
+("Before removing entries that don't match HUMAN : ", 4242)
+
 
 
