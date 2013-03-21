@@ -56,4 +56,8 @@ from miriam import *
 import arrayexpress
 from arrayexpress import *
 
+import biomart
+from biomart import *
 
+import eutils
+from eutils import *
