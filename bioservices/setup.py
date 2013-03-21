@@ -22,8 +22,7 @@ metainfo = {
     'url' : ['http://pypi.python.org/pypi/bioservices'],
     'description':'Access to Biological Web Services from Python' ,
     'platforms' : ['Linux', 'Unix', 'MacOsX', 'Windows'],
-    'keywords' : ["BioServices", "Web Services", "Kegg", "BioModels", "UniProt",
-"PICR", "ArrayExpress", "QuickGO", "PSICQUIC", "Blast", "BioGRID", "MIRIAM"],
+    'keywords' : ["BioServices", "Web Services", "Biology", "Kegg", "BioModels", "EUtils", "UniProt", "PICR", "ArrayExpress", "QuickGO", "PSICQUIC", "Blast", "BioGRID", "MIRIAM", "BioMart"],
     'classifiers' : [
           'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Developers',
