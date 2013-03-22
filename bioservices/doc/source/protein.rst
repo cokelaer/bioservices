@@ -1,6 +1,13 @@
 Protein test case study
 ==========================
 
+.. topic:: Application: retrieving information about a given protein
+
+    This section uses BioServices to demonstrate the interest of combining
+    several services together within a single framework using the Python
+    language as a glue language.
+
+
 .. testsetup:: protein
 
     from bioservices import *
@@ -10,19 +17,17 @@ Get a unique identifier and gene names from a name
 ----------------------------------------------------
 
 In this tutorial we are interested in using BioServices to obtain information
-about a specific protein. Let us use the ZAP70 protein for the human organism. 
+about a specific protein. Let us focus on ZAP70 protein (homo sapiens).
 
 From **Uniprot**, we can obtain its unique accession number, which may be
-useful later on. Let us try to use the search method:: 
+useful later on. Let us try to use the :meth:`~bioservices.uniprot.UniProt.search` method:: 
 
     >>> from bioservices import *
     >>> u = UniProt(verbose=False)
     >>> u.search("ZAP70_HUMAN") # could be lower case
 
 
-The output from this request is quite verbose because the default behaviour is to
-return the HTML file. We want something more user friendly, so let us use this
-command instead::
+The default format of the returned answer is in HTML format, which is not very convenient. So, let us request a tabular answer instead::
 
     >>> res = u.search("ZAP70_HUMAN", format="tab")
     >>> print(res)
@@ -47,7 +52,8 @@ variables as follows::
 Getting the fasta sequence
 ---------------------------
 
-It is then straightforward to obtain the FASTA sequence of ZAP70:
+It is then straightforward to obtain the FASTA sequence of ZAP70 using another
+method from the UniProt class called :meth:`~bioservices.uniprot.UniProt.searchUniProtId`:
 
 
 .. doctest:: protein
@@ -67,6 +73,22 @@ It is then straightforward to obtain the FASTA sequence of ZAP70:
     KKMKGPEVMAFIEQGKRMECPPECPPELYALMSDCWIYKWEDRPDFLTVEQRMRACYYSL
     ASKVEGPPGSTQKAEAACA
     <BLANKLINE>
+
+You can then analyse this sequence with your favorite tool.
+
+For instance, with bioservices, you can use NCIBlast but first let us extract
+the sequence itself(without the header)
+
+    sequence = sequence.split("\n", 1)[1].strip("\n") 
+
+then, ::
+
+    blast = NCBIblast(verbose=False)
+    jobid = s.run(program="blastp", sequence=sequence, stype="protein", \
+        database="uniprotkb", email="cokelaer@ebi.ac.uk")
+    print s.getResult(jobid, "out")
+
+The last command waits for the job to be finised before printing the results
 
 
 Searching for relevant pathways
@@ -239,6 +261,31 @@ len(set(p.postCleaning(mapping)))
 ('After removing the None: ', 5545)
 ('Before removing the !: ', 5107)
 ("Before removing entries that don't match HUMAN : ", 4242)
+
+
+Finally, a set can be use to extract unique entries
+
+a further cleanup: A-B is same as B-A
+
+
+
+    >>> p = psicquic.PPI()
+    >>> p.queryAll("ZAP70 AND species:9606")
+    >>> p.summary()
+    >>> for i in range(1,p.N+1):
+    ...    print i, len(p.relevant_interactions[i])
+    1 265
+    2 62
+    3 31
+    4 12
+    5 11
+    6 7
+    7 4
+    8 2
+    9 1
+    >>> labels = range(1, p.N + 1 )
+    >>> counting = [len(p.relevant_interactions[i]) for i in labels]
+    >>> pie(counting, labels = [str(x) for x in labels])
 
 
 

@@ -1,18 +1,21 @@
 """
 
+http://www.biomart.org/martservice.html
+
 SOAP could not be used directly, so we used REST instead.
 """
 
 
-"""Retrieving Meta Data
-
-    to retrieve filters available for a dataset: ?type=filters&dataset=oanatinus_gene_ensembl
-    to retrieve configuration for a dataset:?type=configuration&dataset=oanatinus_gene_ensembl
-"""
 from bioservices import RESTService
 
+__all__ = ["BioMart"]
+
 class BioMart(RESTService):
+    """Interface to the `BioMart <http://www.biomart.org>`_ database"""
+
     def __init__(self):
+        """.. rubric:: Constructor"""
+
         url = "http://www.biomart.org/biomart/martservice"
         super(BioMart, self).__init__("BioMart", url=url)
 

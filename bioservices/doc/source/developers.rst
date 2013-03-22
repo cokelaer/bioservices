@@ -52,3 +52,31 @@ and you would use it as follows::
 
 Creating a service class (WSDL case)
 -----------------------------------------------
+
+
+If a web service interface is not provided within bioservices, you can still
+easily access its functionalities. As an example, let us look at the 
+`Ontology Lookup service <http://www.ebi.ac.uk/ontology-lookup/WSDLDocumentation.do>`_, which provides a
+WSDL service. In order to easily access this service, use the :class:`WSDLService` class as follows::
+
+    >>> from bioservices import WSDLService
+    >>> ols = WSDLService("OLS", "http://www.ebi.ac.uk/ontology-lookup/OntologyQuery.wsdl")
+
+You can now see which methods are available::
+
+    >>> ols.methods
+
+and call one (getVersion) using the :meth:`bioservices.services.WSDLService.serv`::
+
+    >>> ols.serv.getVersion()
+
+You can then look at something more complex and extract relevant information::
+
+    >>> [x.value for x in ols.serv.getOntologyNames()[0]]
+
+Of course, you can add new methods to ease the access to any functionalities::
+
+    >>> ols.getOnlogyNames() # returns the values
+
+Similarly to the previous case using REST, you can wrap this example into a
+proper class. 

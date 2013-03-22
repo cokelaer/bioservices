@@ -234,6 +234,8 @@ class Kegg(RESTService):
 
         self._buffer = {}
 
+        #self.keggParser = KeggParser()
+
 
     # we could use this to retrieve all databases Ids but 
     def __getattr__(self, req):
@@ -430,17 +432,17 @@ class Kegg(RESTService):
             # search for pathways that contain Viral in the definition
             s.find("pathway", "Viral")
             # for keywords "shiga" and "toxin"
-            s.find("genes", "shiga+toxin") 
+            s.find("genes", "shiga+toxin")
             # for keywords "shiga toxin"
-            s.find("genes", ""shiga toxin")  
+            s.find("genes", ""shiga toxin")
             # for chemical formula "C7H10O5"
-            s.find("compound", "C7H10O5", "formula") 
+            s.find("compound", "C7H10O5", "formula")
             # for chemical formula containing "O5" and "C7"
-            s.find("compound", "O5C7","formula")     
+            s.find("compound", "O5C7","formula")
             # for 174.045 =< exact mass < 174.055
-            s.find("compound", "174.05","exact_mass") 
-            # for 300 =< molecular weight =< 310 
-            s.find("compound", "300-310","mol_weight") 
+            s.find("compound", "174.05","exact_mass")
+            # for 300 =< molecular weight =< 310
+            s.find("compound", "300-310","mol_weight")
 
         """
         _valid_options = ["formula", "exact_mass", "mol_weight"]
@@ -525,6 +527,7 @@ class Kegg(RESTService):
             url +=  "/" + option
 
         res = self.request(url)
+
         return res
 
 

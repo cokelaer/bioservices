@@ -40,6 +40,8 @@ Here is a list of services that you can already access from **BioServices**:
 
     bioservices.arrayexpress.ArrayExpress
     bioservices.biomodels.BioModels
+    bioservices.biomart.BioMart
+    bioservices.eutils.EUtils
     bioservices.kegg.Kegg
     bioservices.chembldb.ChEMBLdb
     bioservices.miriam.Miriam

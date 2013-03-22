@@ -34,13 +34,20 @@
         -- Dec 2012
 
 
+.. _about_queries:
+
 About queries
 ================
 
 .. rubric:: source: PSICQUIC View web page
 
+The idea behind PSICQUIC is to retrieve information related to protein
+interactions from various databases. Note that protein interactions does not
+necesseraly mean protein-protein interactions. In order to be effective, the
+query format has been standarised. 
+
 To do a search you can use the Molecular Interaction Query Language which is
-based on Lucene's syntax.
+based on Lucene's syntax. Here are some rules 
 
 * Use OR or space ' ' to search for ANY of the terms in a field
 * Use AND if you want to search for those interactions where ALL of your terms are found
@@ -61,6 +68,17 @@ based on Lucene's syntax.
 
 About the MITAB output
 =========================
+
+The output returned by a query contains a list of entries. Each entry is
+formatted following the MITAB output. 
+
+Here below are listed the name of the field returned ordered as they would
+appear in one entry. The first item is always idA whatever version of MITAB is
+used. The version 25 of MITAB contains the first 15 fields in the table below.
+Newer version may incude more fields but always include the 15 from MITAB 25 in
+the same order.  See the link from **irefindex** 
+`about mitab <http://irefindex.uio.no/wiki/README_MITAB2.6_for_iRefIndex_8.0#What_each_line_represents>`_
+for more information.
 
 =============== =========================================== =============== ======================
 Field Name      Searches on                                 Implicit*       Example
@@ -111,11 +129,6 @@ param           Interaction parameters. Only true or
                 interaction having parameters available     Yes             param:true
 =============== =========================================== =============== ======================
 
-About the databases (some usefule links)
-===========================================
-
-
-#. irefindex: `about mitab <http://irefindex.uio.no/wiki/README_MITAB2.6_for_iRefIndex_8.0#What_each_line_represents>`_
 
 
 """
@@ -480,7 +493,7 @@ ipermissive and may accept the name (e.g., human)
                 import copy
                 results[name] = copy.copy(res)
         for name in databases:
-            self.logging.info("Found %s in %s" % (len(results[name], name)))
+            self.logging.info("Found %s in %s" % (len(results[name]), name))
         return results
 
 
@@ -663,9 +676,10 @@ ipermissive and may accept the name (e.g., human)
             y = idsB[i].split(":",1)[1]
             xp = mapping[x]
             yp = mapping[y]
+            ref = entry[8]
             score = entry[14]
             interaction = entry[11]
-            results.append((xp, yp, score, interaction, db))
+            results.append((xp, yp, score, interaction, ref, db))
         return results
 
 
@@ -740,77 +754,141 @@ ipermissive and may accept the name (e.g., human)
 
 
 
-class MITAB(object):
-    def __init__(self, version="25"):
+class AppsPPI(object):
+    """This is an application based on PPI that search for relevant interactions
 
-        self.elements = [
-            "interactions",
-            "interactor_genes",
-            "interactor_rogs",
-            "canonical_interactor_rogs",
-            "interaction_rigs",
-            "canonical_interaction_rigs",
-            "interactor_taxonomy",
-            "alternatives",
-            "aliases",
-            "method_names",
-            "interaction_type_names",
-            "authors",
-            "pubmed",
-            "sources",
-            "interaction_identifiers",
-            "confidence"
-            ]
+    Interctions between proteins may have a score provided by each database.
+    However, scores are sometimes ommited. Besides, they may have different
+    meaning for different databases. Another way to score an interaction is to
+    count in how many database it is found.
+
+    This class works as follows. First, you query a protein:
 
 
-    def parse(self, entry):
-        assert len(entry)>=15
-        d = {}
-        for i,v in enumerate(entry):
-            d[self.elements[i]] = v
-        return d
+        p = AppsPPI()
+        p.query("XAP70 AND species:9606")
+
+    This, is going to call the PSICQUIC queryAll method to send this query to
+    all active databases. Then, it calls the convertAll functions to convert all
+    interactors names into uniprot name if possible. If not, interactions are
+    not taken into account. Finally, it removes duplicated and performs some
+    cleaning inside the postCleaningall method.
+
+    Then, you can call the summary method that counts the interactions. The
+    count is stored in the attrbiute relevant_interactions.
+
+        p.summary()
+
+    Let us see how many intercations where found with. THe number of databases
+    that contains at least one interactions is 
+
+        >>> p.N
+        >>> p.relevant_interactions[N]
+        [['ZAP70_HUMAN', 'DBNL_HUMAN']]
+
+    So, there was 1 interaction found in all databases.
+
+    """
+    def __init__(self):
+        """.. rubric:: constructor"""
+        self.psicquic = PSICQUIC(verbose=False)
+
+    def queryAll(self, query, databases=None):
+        """
+
+        :param str query: a valid query. See :class:`~bioservices.psicquic.PSICQUIC` 
+            and :mod:`bioservices.psicquic` documentation.
+        :param str databases: by default, queries are sent to each active database.
+            you can overwrite this behavious by providing your own list of
+            databses
+        :return: nothing but the interactions attributes is populated with a
+            dictionary where keys correspond to each database that returned a non empty list
+            of interactions. The item for each key is a list of interactions containing the
+            interactors A and B, the score, the type of intercations and the score.
+
+
+        """
+        #self.results_query = self.psicquic.queryAll("ZAP70 AND species:9606")
+        print("Requests sent to psicquic. Can take a while, please be patient...")
+        self.results_query = self.psicquic.queryAll(query, databases)
+        self.interactions = self.psicquic.convertAll(self.results_query)
+        self.interactions = self.psicquic.postCleaningAll(self.interactions, flatten=False)
+        self.N = len(self.interactions.keys())
+        self.counter = {}
+        self.relevant_interactions = {}
+
+    def summary(self):
+        """Build some summary related to the found interactions from queryAll
+
+        :return: nothing but the relevant_interactions and counter attribute
+
+            p = AppsPPI()
+            p.queryAll("ZAP70 AND species:9606")
+            p.summary()
+
+        """
+        for k,v in self.interactions.iteritems():
+            print("Found %s interactions within %s database" % (len(v), k))
+
+        counter = {}
+        for k in self.interactions.keys():
+            # scan each dabase
+            for v in self.interactions[k]:
+                interaction = v[0] + "++" + v[1]
+                db = v[5]
+                if interaction in counter.keys():
+                    counter[interaction].append(db)
+                else:
+                    counter[interaction] = [db]
+        for k in counter.keys():
+            counter[k] = list(set(counter[k]))
+
+        N = len(self.interactions.keys())
+
+        print("-------------")
+        summ = {}
+        for i in range(1, N+1):
+            res = [(x.split("++"),counter[x]) for x in counter.keys() if len(counter[x]) == i]
+            print("Found %s interactions in %s common databases" % (len(res), i))
+            res = [x.split("++") for x in counter.keys() if len(counter[x]) == i]
+            if len(res):
+                summ[i] = [x for x in res]
+            else:
+                summ[i] = []
+
+        self.counter = counter.copy()
+        self.relevant_interactions = summ.copy() 
 
 
 
+    def get_reference(self, idA, idB):
+        key = idA+"++"+idB
+        uniq = len(self.counter[key])
+        ret = [x for k in self.interactions.keys() for x in self.interactions[k] if x[0]==idA and x[1]==idB]
+        N = len(ret)
+        print("Interactions %s -- %s has %s entries in %s databases (%s):" %
+                (idA, idB, N, uniq, self.counter[key]))
+        for r in ret:
+            print r[5], " reference", r[4]
 
-"""mitab 26
-(symA, symB,                                            # interactor symbols (orcomplex identifiers, prefixed)
-                altA, altB, aliasA, aliasB,                         # interactordetails
-                method, authors, pmids,
-                taxA, taxB,
-                interactionType,
-                sourcedb, interactionIdentifiers,
-                confidence,
-                # New in iRefIndex 7.0 MITAB2.6:
-                expansion,
-                biologicalRoleA, biologicalRoleB,
-                experimentalRoleA, experimentalRoleB,
-                # Preserved from the original format:
-                Atype, Btype,
-                # New in iRefIndex 7.0 MITAB2.6:
-                xrefsA, xrefsB, xrefsInteraction,                   # not used by iRefIndex
-                annotationsA, annotationsB, annotationsInteraction, # not used by iRefIndex
-                taxHost, parametersInteraction,
-                creationDate, updateDate,
-                checksumA, checksumB, checksumInteraction,          # ROG and RIG identifiers, prefixed
-                negative                                            # always "false" for iRefIndex
-                ) = fields[:36]
 
-and mitab 2.7
+    def show_pie(self):
+        """a simple example to demonstrate how to visualise number of
+            interactions found in various databases
 
-    if len(fields) >= 54:
-                (origA, origB,                                          # theoriginal identifiers
-                    finalA, finalB,                                     #corrected/selected identifiers
-                    mappingScoreA, mappingScoreB,
-                    irogidA, irogidB,                                   #integer identifiers
-                    irigid,
-                    crogidA, crogidB,                                   #canonical ROG identifiers, unprefixed
-                    crigid,                                             #canonical RIG identifier, unprefixed
-                    icrogidA, icrogidB,                                 #integer identifiers
-                    icrigid,
-                    imexid,
-                    # Preserved from the original format:
-                    edgetype,
-                    numParticipants,
-                    ) = fields[36:54]
-"""
+        """
+        try:
+            from pylab import pie
+        except ImportError:
+            from bioservices import BioServicesError
+            raise BioServicesError("You must install pylab/matplotlib to use this functionality")
+        labels = range(1, self.N + 1 )
+        counting = [len(self.relevant_interactions[i]) for i in labels]
+
+        clf()
+        pie(counting, labels=[str(int(x)) for x in labels], shadow=True)
+        title("Number of interactions found in N databases")
+        show()
+
+
+

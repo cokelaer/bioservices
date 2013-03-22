@@ -43,6 +43,14 @@ BioGrid
     :undoc-members:
     :synopsis:
 
+BioMart
+====================
+
+.. automodule:: bioservices.biomart
+    :members:
+    :undoc-members:
+    :synopsis:
+
 BioModels
 ====================
 

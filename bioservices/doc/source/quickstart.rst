@@ -227,26 +227,16 @@ output format can be found in ::
 
 .. seealso:: Reference guide of :class:`bioservices.rhea.Rhea` for more details
 
-Create your own wrapper around WSDL service
-==============================================
 
-If a web service interface is not provided within bioservices, you can still easily access its functionalities. As an example, let us look at the `Ontology Lookup service <http://www.ebi.ac.uk/ontology-lookup/WSDLDocumentation.do>`_, which provides a WSDL service. In order to easily access this service, use the :class:`WSDLService` class as follows::
+Other services
+==================
 
-    >>> from bioservices import WSDLService
-    >>> ols = WSDLService("OLS", " http://www.ebi.ac.uk/ontology-lookup/OntologyQuery.wsdl")
+There are many other services provided within BioServices and the reference
+guide should give you all the information available with examples to start to
+play with any of them. The home page of the services themselves is usually a
+good starting point as well.
 
-You can now see which methods are available::
+Services that are not available in BioServices can still be accesssed to quite
+easily as demonstrated in the next section for :ref:`Developer Guide` section.
 
-    >>> ols.methods
 
-and call one (getVersion) using the :meth:`bioservices.services.WSDLService.serv`::
-
-    >>> ols.serv.getVersion()
-
-You can then look at something more complex and extract relevant information::
-
-    >>> [x.value for x in ols.serv.getOntologyNames()[0]]
-
-Of course, you can add new methods to ease the access to any functionalities::
-
-    >>> ols.getOnlogyNames() # returns the values
