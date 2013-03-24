@@ -40,6 +40,7 @@ class BioServicesError(Exception):
     def __str__(self):
         return repr(self.value)
 
+
 class Service(object):
     """Base class for WSDL and REST classes
 
@@ -89,8 +90,6 @@ class Service(object):
         else:
             self.debugLevel = "WARNING"
         self.logging = logging
-
-        
     
     def _set_level(self, level):
         valid_level = ["INFO", "DEBUG", "WARNING", "CRITICAL", "ERROR"]
@@ -127,7 +126,6 @@ class Service(object):
     easyXMLConversion = property(_get_easyXMLConversion, 
         _set_easyXMLConversion, doc="""If True, xml output from a request are converted to
 easyXML object (Default behaviour).""")
-
 
     def easyXML(self, res):
         """Use this method to convert a XML document into an
@@ -207,6 +205,11 @@ easyXML object (Default behaviour).""")
         url = "http://www.ncbi.nlm.nih.gov/pubmed/"
         import webbrowser
         webbrowser.open(url + str(Id))
+
+    def onWeb(self, url):
+        """Open a URL into a browser"""
+        import webbrowser
+        webbrowser.open(url)
 
 
 class WSDLService(Service):

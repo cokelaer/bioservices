@@ -13,6 +13,7 @@ Revision 1.0
       possible. These methods are used to build an application provided in the
 	  tutorial
     * add biomart
+    * add onWeb method in Service class
 
 * 1.0.1: 
     update metadata
