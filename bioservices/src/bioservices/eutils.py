@@ -4,7 +4,7 @@ http://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.EFetch
 
 http://www.ncbi.nlm.nih.gov/books/NBK25500/#chapter1.Demonstration_Programs
 
-
+http://www.ncbi.nlm.nih.gov/entrez/query/static/esoap_help.html
 
 """
 
@@ -53,6 +53,14 @@ class EUtilsSNP(WSDLService):
 
  
 class EUtils(WSDLService):
+    """Interface to `NCBI Entrez Utilities <http://www.ncbi.nlm.nih.gov/entrez/query/static/esoap_help.html>`_ service
+
+
+
+    """
+
+
+
     def __init__(self, verbose=False):
         url = "http://www.ncbi.nlm.nih.gov/entrez/eutils/soap/v2.0/eutils.wsdl?"
         super(EUtils, self).__init__(name="EUtils", verbose=verbose, url=url)

@@ -374,7 +374,7 @@ class PSICQUIC(RESTService):
         return  version
     registry_versions = property(_get_registry_version, doc="returns version of each service")
 
-    def query(self, service, query, output=None, version="current", firstResult=None, maxResults=None):
+    def query(self, service, query, output="tab25", version="current", firstResult=None, maxResults=None):
         """Send a query to a specific database 
 
         :param str service: a registered service. See :attr:`registry_names`.
@@ -607,7 +607,7 @@ ipermissive and may accept the name (e.g., human)
         ret = [x for x in data if x[0] !="-" and x[1]!="-"]
         return ret
 
-    def postCleaningAll(self,data, keep_only="HUMAN", flatten=True):
+    def postCleaningAll(self,data, keep_only="HUMAN", flatten=True, verbose=True):
         """
     
         even more cleaing by ignoring score, db and interaction
@@ -616,7 +616,7 @@ ipermissive and may accept the name (e.g., human)
         results = {}
         for k in data.keys():
             self.logging.info("Post cleaning %s" % k)
-            ret = self.postCleaning(data[k], keep_only="HUMAN")
+            ret = self.postCleaning(data[k], keep_only="HUMAN", verbose=verbose)
             if len(ret):
                 results[k] = ret
         if flatten:
@@ -624,36 +624,36 @@ ipermissive and may accept the name (e.g., human)
         return results
 
     def postCleaning(self, data, keep_only="HUMAN", remove_db=["chebi","chembl"], 
-        keep_self_loop=False):
+        keep_self_loop=False, verbose=True):
         """Remove entries with a None and keep only those with the keep pattern
 
 
 
 
         """
-        print("Before removing anything: ", len(data))
+        if verbose:print("Before removing anything: ", len(data))
 
         data = [x for x in data if x[0]!=None and x[1]!=None]
-        print("After removing the None: ", len(data))
+        if verbose:print("After removing the None: ", len(data))
     
         data = [x for x in data if x[0].startswith("!")==False and x[1].startswith("!")==False]
-        print("After removing the !: ", len(data))
+        if verbose:print("After removing the !: ", len(data))
 
     
         for db in remove_db:
             data = [x for x in data if x[0].startswith(db)==False]
             data = [x for x in data if x[1].startswith(db)==False]
-            print("After removing entries that match %s : " % db, len(data))
+            if verbose:print("After removing entries that match %s : " % db, len(data))
 
         data = [x for x in data if keep_only in x[0] and keep_only in x[1]]
-        print("After removing entries that don't match %s : " % keep_only, len(data))
+        if verbose:print("After removing entries that don't match %s : " % keep_only, len(data))
     
         if keep_self_loop == False:
             data = [x for x in data if x[0]!=x[1]]
-            print("After removing self loop : ", len(data))
+            if verbose:print("After removing self loop : ", len(data))
 
         data = list(set(data))
-        print("After removing identical entries", len(data))
+        if verbose:print("After removing identical entries", len(data))
 
 
 
@@ -766,7 +766,7 @@ class AppsPPI(object):
 
 
         p = AppsPPI()
-        p.query("XAP70 AND species:9606")
+        p.query("ZAP70 AND species:9606")
 
     This, is going to call the PSICQUIC queryAll method to send this query to
     all active databases. Then, it calls the convertAll functions to convert all
@@ -789,9 +789,10 @@ class AppsPPI(object):
     So, there was 1 interaction found in all databases.
 
     """
-    def __init__(self):
+    def __init__(self, verbose=False):
         """.. rubric:: constructor"""
         self.psicquic = PSICQUIC(verbose=False)
+        self.verbose = verbose
 
     def queryAll(self, query, databases=None):
         """
@@ -812,7 +813,8 @@ class AppsPPI(object):
         print("Requests sent to psicquic. Can take a while, please be patient...")
         self.results_query = self.psicquic.queryAll(query, databases)
         self.interactions = self.psicquic.convertAll(self.results_query)
-        self.interactions = self.psicquic.postCleaningAll(self.interactions, flatten=False)
+        self.interactions = self.psicquic.postCleaningAll(self.interactions,
+            flatten=False, verbose=self.verbose)
         self.N = len(self.interactions.keys())
         self.counter = {}
         self.relevant_interactions = {}
@@ -878,16 +880,20 @@ class AppsPPI(object):
 
         """
         try:
-            from pylab import pie
+            from pylab import pie, clf, title, show, legend
         except ImportError:
             from bioservices import BioServicesError
             raise BioServicesError("You must install pylab/matplotlib to use this functionality")
         labels = range(1, self.N + 1 )
+        print labels
         counting = [len(self.relevant_interactions[i]) for i in labels]
 
+
         clf()
-        pie(counting, labels=[str(int(x)) for x in labels], shadow=True)
+        #pie(counting, labels=[str(int(x)) for x in labels], shadow=True)
+        pie(counting, labels=[str(x) for x in counting], shadow=True)
         title("Number of interactions found in N databases")
+        legend([str(x) + " database(s)" for x in labels])
         show()
 
 

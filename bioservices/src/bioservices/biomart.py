@@ -1,37 +1,156 @@
+#!/usr/bin/python
+# -*- coding: latin-1 -*-
+#
+#  This file is part of bioservices software
+#
+#  Copyright (c) 2011-2013 - EBI-EMBL
+#
+#  File author(s): 
+#      https://www.assembla.com/spaces/bioservices/team
+#
+#  Distributed under the GPLv3 License.
+#  See accompanying file LICENSE.txt or copy at
+#      http://www.gnu.org/licenses/gpl-3.0.html
+#
+#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  documentation: http://packages.python.org/bioservices
+#
+##############################################################################
+#$Id$
+"""This module provides a class :class:`~BioModels` that allows an easy access
+to all the BioModel service.
+
+
+.. topic:: What is BioMart ?
+
+    :URL: http://www.biomart.org/
+    :REST: http://www.biomart.org/martservice.html
+
+    .. highlights::
+
+        The BioMart project provides free software and data services to the
+        international scientific community in order to foster scientific collaboration
+        and facilitate the scientific discovery process. The project adheres to the open
+        source philosophy that promotes collaboration and code reuse.
+
+        -- from BioMart March 2013
+
+.. note:: SOAP and REST are available. We use REST for the wrapping.
 """
-
-http://www.biomart.org/martservice.html
-
-SOAP could not be used directly, so we used REST instead.
-"""
-
-
 from bioservices import RESTService, BioServicesError
 
 __all__ = ["BioMart"]
 
+
 class BioMart(RESTService):
-    """Interface to the `BioMart <http://www.biomart.org>`_ database
+    r"""Interface to the `BioMart <http://www.biomart.org>`_ service
 
+    BioMart is made of different views. Each view correspond to a specific **MART**. 
+    For instance the UniProt service has a `BioMart view <http://www.ebi.ac.uk/uniprot/biomart/martview/>`_.
 
+    The registry can help to find the different services available through
+    BioMart. 
+
+        >>> from bioservices import *
         >>> s = BioMart()
         >>> s.registry() # to get information about existing services
+
+    The registry is a list of dictionaries. Some aliases are available to get
+    all the names or databases::
+
         >>> s.names      # alias to list of valid service names from registry
         >>> "unimart" in s.names
         True
-        >>> s.datasets("unimart")  # retrieve datasets available for this mart
 
-    .. rubric:: terminology
+    Once you selected a view, you will want to select a database associated with
+    this view and then a dataset. The datasets can be retrieved as follows::
 
-        * a **mart* is a service associated to biomart. For instance **ensembl**.
+        >>> s.datasets("prod-intermart_1")  # retrieve datasets available for this mart
+
+    The main issue is how to figure out the database name (here **prod-intermart_1**) ?
+    Indeed, from the web site, what you see is the **displayName** and you must
+    introspect the registry to get this information. In **BioServices**, we provide
+    the :meth:`~bioservices.biomart.BioMart.lookfor` method to help you. For instance, to
+    retrieve the database name of **interpro**, type::
+
+        >>> s = BioMart(verbose=False)
+        >>> s.lookfor("interpro")
+        Candidate:
+             database: intermart_1 
+            MART name: prod-intermart_1 
+          displayName: INTERPRO (EBI UK) 
+                hosts: www.ebi.ac.uk
+
+    The display name (INTERPRO) correspond to the MART name
+    prod-intermart_1. Let us you it to retrieve the datasets::
+
+        >>> s.datasets("prod-intermart_1")
+        ['protein', 'entry', 'uniparc']
+
+    Now that we have the dataset names, we can select one and build a
+    query. Queries are XML that contains the dataset name, some
+    attributes and filters. The dataset name is one of the element
+    returned by the datasets method. Let us suppose that we want to query
+    **protein**, we need to add this dataset to the query::
+
+        >>> s.add_dataset("protein")
+
+    Then, you can add attributes (one of the keys of the dictionary
+    returned by attributes("protein")::
+
+        >>> s.add_attribute_to_xml("protein_accession")
+
+    Optional filters can be used::
+
+        >>> s.add_filter_to_xml("protein_length_greater_than", 1000)
+
+    Finally, you can retrieve the XML query::
+
+        >>> xml_query = s.get_xml()
+
+    and send the request to biomart::
+
+        >>> res = s.query(xml_query)
+        >>> len(res)
+        12801
+        # print the first 10 accession numbers
+        >>> res = res.split("\n")
+        >>> for x in res[0:10]: print(x)
+        ['P18656',
+         'Q81998',
+         'O09585',
+         'O77624',
+         'Q9R3A1',
+         'E7QZH5',
+         'O46454',
+         'Q9T3F4',
+         'Q9TCA3',
+         'P72759']
+
+
+    REACTOME example::
+
+        s.lookfor("reactome")
+        s.datasets("REACTOME")
+        ['interaction', 'complex', 'reaction', 'pathway']
+
+        s.new_query()
+        s.add_dataset_to_xml("pathway")
+        s.add_filter_to_xml("species_selection", "Homo sapiens")
+        s.add_attribute_to_xml("pathway_db_id")
+        s.add_attribute_to_xml("_displayname")
+        xmlq = s.biomartQuery.get_xml()
+        res = s.query(xmlq)
+
+
 
     """
-        
+
 
     _xml_example = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Query>
 <Query  virtualSchemaName = "default" formatter = "TSV" header = "0" uniqueRows = "0" count = "" datasetConfigVersion = "0.6" >
-			
+
 	<Dataset name = "pathway" interface = "default" >
 		<Filter name = "referencepeptidesequence_uniprot_id_list" value = "P43403"/>
 		<Attribute name = "stableidentifier_identifier" />
@@ -52,7 +171,7 @@ class BioMart(RESTService):
         self._valid_attributes = None
         self._hosts = None
 
-        self._init()
+        self._init()   # can be commented if we do not want to check the validity of attributes 
 
     def _init(self):
         self.logging.info("Initialisation %s" % self.name)
@@ -61,8 +180,7 @@ class BioMart(RESTService):
         res = self.lookfor("uniprot", verbose=False)
         res = self.valid_attributes
         self.debugLevel = temp
-
-        self.biomartQuery = BioMartQuery()
+        self._biomartQuery = BioMartQuery()
 
     def registry(self):
         """to retrieve registry information
@@ -86,11 +204,12 @@ class BioMart(RESTService):
 
         :param str mart: e.g. ensembl. see :attr:`names` for a list of valid MART names 
             the mart is the database. see lookfor method or databases attributes
-       
+
         >>> s = BioMart(verbose=False)
         >>> s.datasets("prod-intermart_1")
-        ['Protein Matches', 'InterPro Entry Annotation', 'UniParc Protein Matches']
- 
+        ['protein', 'entry', 'uniparc']
+
+
         """
         if mart not in self.names:
             raise BioServicesError("Provided mart name (%s) is not valid. see 'names' attribute" % mart)
@@ -101,7 +220,7 @@ class BioMart(RESTService):
                 ret = [x[1] for x in ret2]
             except:
                 ret = ["?"]
-                
+
         return ret
 
     def attributes(self, dataset):
@@ -129,6 +248,14 @@ class BioMart(RESTService):
 
         s.filters("uniprot").split("\n")[1].split("\t")
 
+        is.filters("pathway")["species_selection"]
+[Arabidopsis thaliana,Bos taurus,Caenorhabditis elegans,Canis familiaris,Danio
+rerio,Dictyostelium discoideum,Drosophila melanogaster,Escherichia coli,Gallus
+gallus,Homo sapiens,Mus musculus,Mycobacterium tuberculosis,Oryza
+sativa,Plasmodium falciparum,Rattus norvegicus,Saccharomyces
+cerevisiae,Schizosaccharomyces pombe,Staphylococcus aureus N315,Sus
+scrofa,Taeniopygia guttata ,Xenopus tropicalis]
+
         """
         if dataset not in [x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]]:
             raise ValueError("provided dataset (%s) is not found. see valid_attributes" % dataset)
@@ -149,7 +276,6 @@ class BioMart(RESTService):
         ret = self.request("?type=configuration&dataset=%s" %dataset)
         return ret
 
-
     def version(self, mart):
         """Returns version of a **mart**
 
@@ -159,8 +285,8 @@ class BioMart(RESTService):
         ret = self.request("?type=version&mart=%s" % mart)
         return ret
 
-
-
+    def new_query(self):
+        self._biomartQuery.reset()
 
     def query(self, xmlq):
         """Send a query to biomart
@@ -170,18 +296,34 @@ class BioMart(RESTService):
             <?xml version="1.0" encoding="UTF-8"?>
             <!DOCTYPE Query>
             <Query  virtualSchemaName = "default" formatter = "TSV" header = "0" uniqueRows = "0" count = "" datasetConfigVersion = "0.6" >
-			
+
                 <Dataset name = "pathway" interface = "default" >
 		    <Filter name = "referencepeptidesequence_uniprot_id_list" value = "P43403"/>
     	            <Attribute name = "stableidentifier_identifier" />
                	    <Attribute name = "pathway_db_id" />
                 </Dataset>
             </Query>
-        
+
         """
 
         ret = self.requestPost(self.url, params={"query":xmlq})
         return ret
+
+    def add_attribute_to_xml(self, name, dataset=None):
+        attr = self.create_attribute(name, dataset)
+        self._biomartQuery.add_attribute(attr)
+
+    def add_filter_to_xml(self, name, value, dataset=None):
+        filt = self.create_filter(name, value, dataset)
+        self._biomartQuery.add_filter(filt)
+
+    def add_dataset_to_xml(self, dataset):
+        self.attributes(dataset)
+        #    raise BioServicesError("invalid dataset names provided. Check names attribute")
+        self._biomartQuery.add_dataset(dataset)
+
+    def get_xml(self):
+        return self._biomartQuery.get_xml()
 
     def create_filter(self, name, value, dataset=None):
         if dataset:
@@ -238,16 +380,25 @@ class BioMart(RESTService):
     def _get_valid_attributes(self,):
         res = {}
         if self._valid_attributes == None:
+            # we could use a loop and call self.datasets(name, raw=False) but it
+            # can be a bit longish, so we use the threaded_request module to
+            # speed up things.
+            import threaded_request
+            requests = threaded_request.RequestMultiURL()
             for name in self.names:
-                datasets = self.datasets(name, raw=False)
-                res[name] = [x for x in datasets if len(x)>1]
-                for x in datasets:
-                    if len(x)<=1:
-                        print("Not available within bioservice: ",name)
+                url = self.url + "?type=datasets&mart=%s" % name
+                requests.add_url(url)
+            requests.start()
+            requests.wait()
+            results = requests.get_results()
+            for i, name in enumerate(self.names):
+                try:
+                    res[name] = [x.split("\t")[1] for x in results[i].split("\n") if len(x.strip())>1]
+                except:
+                    res[name] = "?"
             self._valid_attributes = res.copy()
         return self._valid_attributes
     valid_attributes = property(_get_valid_attributes, doc="list of valid datasets")
-
 
     def lookfor(self, pattern, verbose=True):
         for a,x,y,z in zip(self.hosts, self.databases, self.names, self.displayNames):
@@ -280,13 +431,14 @@ class BioMartQuery(object):
         }
 
         self.header = """<?xml version="%(version)s" encoding="UTF-8"?>
-            <!DOCTYPE Query>
-            <Query  virtualSchemaName = "%(virtualSchemaName)s" formatter = "%(formatter)s" header = "%(header)s" uniqueRows = "%(uniqueRows)s" count = "" datasetConfigVersion = "%(configVersion)s" >""" % params
+<!DOCTYPE Query>
+<Query  virtualSchemaName = "%(virtualSchemaName)s" formatter = "%(formatter)s"
+header = "%(header)s" uniqueRows = "%(uniqueRows)s" count = ""
+datasetConfigVersion = "%(configVersion)s" >\n""" % params
 
 
         self.footer = "    </Dataset>\n</Query>"
-        self.attributes = []
-        self.filters = []
+        self.reset()
 
     def add_filter(self, filter):
         self.filters.append(filter)
@@ -295,19 +447,21 @@ class BioMartQuery(object):
         self.attributes.append(attribute)
 
     def add_dataset(self, dataset):
-	self.dataset = "<Dataset name = "%s" interface = "default" >" % dataset
+	    self.dataset = """    <Dataset name = "%s" interface = "default" >""" % dataset
 
     def reset(self):
         self.attributes = []
         self.filters = []
+        self.dataset = None
 
     def get_xml(self):
+        if self.dataset == None:
+            raise BioServicesError("data set must be set. Use add_dataset method")
         xml = self.header
-        xml += self.dataset
-        xml += "\n"
+        xml += self.dataset + "\n\n"
         for line in self.filters:
             xml += line +"\n"
-        for line in self.filters:
+        for line in self.attributes:
             xml += line + "\n"
         xml += self.footer
         return xml

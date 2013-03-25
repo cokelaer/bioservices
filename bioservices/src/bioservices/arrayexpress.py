@@ -38,16 +38,23 @@ from bioservices.services import RESTService, BioServicesError
 __all__ = ["ArrayExpress"]
 
 class ArrayExpress(RESTService):
-    """Interface to the `ArrayExpress <"http://www.ebi.ac.uk/arrayexpress">`_ database
+    """Interface to the `ArrayExpress <"http://www.ebi.ac.uk/arrayexpress">`_ service
 
-     ::
+    ArrayExpress allows to retrieve data sets used in various experiments. If
+    you know the file and experiment name, you can retrieve a file as follows::
 
-         >>> from bioservices import Kegg
-         >>> s = ArrayExpress()
-         >>> #res = s.queryExperiments(keywords="cancer+breast", wholewords=True)
+        >>> from bioservices import ArrayExpress
+        >>> s = ArrayExpress()
+        >>> # retrieve a specific file from a experiment
+        >>> res = s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")
 
-         >>> # retrieve a specific file from a experiment
-         >>> res = s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")
+    The main issue is that you may not know the experiment you are looking for. 
+    You can query experiments by keyword::
+
+        >>> # Search for experiments
+        >>> res = s.queryExperiments(keywords="cancer+breast", wholewords=True)
+
+    keywords used in queries follows these rules:
 
     * Accession number and keyword searches are case insensitive
     * More than one keyword can be searched for using the + sign (e.g. keywords="cancer+breast")
@@ -108,7 +115,7 @@ class ArrayExpress(RESTService):
     .. warning:: supports only new style (v2). You can still use the old style by 
         setting the request manually using the :meth:`request`.
 
-    .. warning:: filtering is not implemented (e.g., assaycount:[x TO y] syntax.
+    .. warning:: filtering is not implemented (e.g., assaycount:[x TO y]syntax.)
     """
 
     def __init__(self, verbose=True):
@@ -128,7 +135,7 @@ class ArrayExpress(RESTService):
     def _get_format(self):
         return self._format
     format = property(_get_format, _set_format,
-        doc="Read/Write access to format (json or xml)")
+        doc="Read/Write access to specify the output format (json or xml)")
 
     def _search(self, mode, **kargs):
         """common function to search for files or experiments"""
@@ -181,7 +188,7 @@ class ArrayExpress(RESTService):
         url += "&".join(params)
 
 
-        print(url)
+        self.logging.info(url)
 
         res = self.request(url)
         return res
@@ -292,6 +299,17 @@ class ArrayExpress(RESTService):
 
     def retrieveFilesFromExperiment(self, experiment):
         """Given an experiment, returns the list of files found in its description
+
+
+        :param str experiment: a valid experiment name
+        :return: the experiment files
+
+        .. doctest::
+
+            >>> from bioservices import *
+            >>> s = ArrayExpress(verbose=False)
+            >>> s.retrieveFilesFromExperiment("E-MEXP-31")
+            ['E-MEXP-31.raw.1.zip', 'E-MEXP-31.processed.1.zip', 'E-MEXP-31.idf.txt', 'E-MEXP-31.sdrf.txt']
 
 
         """

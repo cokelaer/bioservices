@@ -15,22 +15,21 @@ Overview
 ==========
 
 `BioServices <http://pypi.python.org/pypi/bioservices>`_  is a Python package
-that provides a framework to easily implement wrapper of Web Services. It focuses on
-Biological Web Services based WSDL/SOAP or REST protocols.
+that provides a framework to easily implement Web Service wrappers. It focuses on
+Biological Web Services based on WSDL/SOAP or REST protocols.
 
-The primary goal of BioServices is to use Python as a glue language to provide 
+The primary goal of **BioServices** is to use Python as a glue language to provide 
 a programmatic access to several Web Services. By doing so, elaboration of 
-new applications that combine several of the wrapped Web Services should be
-fostered.
+new applications that combine several Web Services should be fostered.
 
 One of the main philosophy of **BioServices** is to make use of the
 existing SOAP/WSDL facilities provided in biological databases, not to 
 re-invent new databases.
 
-There are a lot of Web Services from many institutes; some are free, some are not. The
-first release of BioServices provides a wrapping to more than 10 Web
-Services. Contributions to implement new wrapper are more than welcome. See
-`BioServices wiki <https://www.assembla.com/spaces/bioservices/wiki>`_
+The first release of **BioServices** provides a wrapping to more than 15 Web
+Services (more if we consider **BioMart** and **PSICQUIC** portals that link to
+many other Web Services). 
+
 
 
 Here is a list of services that you can already access from **BioServices**:
@@ -56,11 +55,14 @@ Here is a list of services that you can already access from **BioServices**:
 
 
 
-The links above refers to the offical web site of each service (right column)
+The links above refers to the official web site of each service (right column)
 and our reference guide (left column) that provides an exhaustive documentation.
-For tutorials and quick start please follow the links below. Before that let us
-show you how to install BioServices.
+For tutorials and quick start please follow the links below. 
 
+.. note:: Contributions to implement new wrappers are more than welcome. 
+    See `BioServices wiki <https://www.assembla.com/spaces/bioservices/wiki>`_
+    to join the development, and the :ref:`developer` on how to implement new
+    wrappers.
 
 
 .. _installation:

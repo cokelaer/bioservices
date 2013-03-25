@@ -7,6 +7,8 @@ Protein test case study
     several services together within a single framework using the Python
     language as a glue language.
 
+In this tutorial we are interested in using **BioServices** to obtain information
+about a specific protein. Let us focus on ZAP70 protein (homo sapiens).
 
 .. testsetup:: protein
 
@@ -16,10 +18,7 @@ Protein test case study
 Get a unique identifier and gene names from a name
 ----------------------------------------------------
 
-In this tutorial we are interested in using BioServices to obtain information
-about a specific protein. Let us focus on ZAP70 protein (homo sapiens).
-
-From **Uniprot**, we can obtain its unique accession number, which may be
+From **Uniprot**, we can obtain the unique accession number of ZAP70, which may be
 useful later on. Let us try to use the :meth:`~bioservices.uniprot.UniProt.search` method:: 
 
     >>> from bioservices import *
@@ -34,8 +33,10 @@ The default format of the returned answer is in HTML format, which is not very c
     Entry   Entry name  Status  Protein names   Gene names  Organism    Length
     P43403  ZAP70_HUMAN reviewed    Tyrosine-protein kinase ZAP-70 (EC 2.7.10.2) (70 kDa zeta-chain associated protein) (Syk-related tyrosine kinase)    ZAP70 SRK Homo sapiens (Human)    619
 
-It is better, but let us simplify even further. We are interesd in the ID
-(accession number) and let us say gene names::
+It is better, but let us simplify even further. In **BioServices**, the output
+of the tabulated format contains several columns but we can select only a subset
+such as the Entry (accession number) and the gene names, which are coded as "id"
+and "genes" in uniprot database::
 
     >>> res = u.search("ZAP70_HUMAN", format="tab", columnds="id,genes")
     >>> print(res)
@@ -74,27 +75,66 @@ method from the UniProt class called :meth:`~bioservices.uniprot.UniProt.searchU
     ASKVEGPPGSTQKAEAACA
     <BLANKLINE>
 
-You can then analyse this sequence with your favorite tool.
+.. note:: There are many services that provides access to the FASTA sequence. We chose
+   uniprot but you could use the Entrez utilities as well as other services.
 
-For instance, with bioservices, you can use NCIBlast but first let us extract
-the sequence itself(without the header)
+Using BLAST on the sequence 
+------------------------------
+
+You can then analyse this sequence with your favorite tool. As an example, within **BioServices** you can use :class:`~bioservices.services.nciblast.NCIBlast` but first let us extract the sequence itself (without the header)::
 
     sequence = sequence.split("\n", 1)[1].strip("\n") 
 
 then, ::
 
-    blast = NCBIblast(verbose=False)
-    jobid = s.run(program="blastp", sequence=sequence, stype="protein", \
-        database="uniprotkb", email="cokelaer@ebi.ac.uk")
-    print s.getResult(jobid, "out")
+    >>> blast = NCBIblast(verbose=False)
+    >>> jobid = s.run(program="blastp", sequence=sequence, stype="protein", \
+    ...    database="uniprotkb", email="cokelaer@ebi.ac.uk")
+    >>> print s.getResult(jobid, "out")[0:1000]
+    BLASTP 2.2.26 [Sep-21-2011]
 
-The last command waits for the job to be finised before printing the results
+
+    Reference: Altschul, Stephen F., Thomas L. Madden, Alejandro A. Schaffer, 
+    Jinghui Zhang, Zheng Zhang, Webb Miller, and David J. Lipman (1997), 
+    "Gapped BLAST and PSI-BLAST: a new generation of protein database search
+    programs",  Nucleic Acids Res. 25:3389-3402.
+
+    Query= EMBOSS_001
+             (619 letters)
+
+    Database: uniprotkb 
+               32,727,302 sequences; 10,543,978,207 total letters
+
+    Searching..................................................done
+
+
+
+                                                                     Score    E
+    Sequences producing significant alignments:                      (bits) Value
+
+    SP:ZAP70_HUMAN P43403 Tyrosine-protein kinase ZAP-70 OS=Homo sap...  1279   0.0  
+    TR:H2QIE3_PANTR H2QIE3 Tyrosine-protein kinase OS=Pan troglodyte...  1278   0.0  
+    TR:G3QGN8_GORGO G3QGN8 Tyrosine-protein kinase OS=Gorilla gorill...  1278   0.0  
+    TR:G1QLX3_NOMLE G1QLX3 Tyrosine-protein kinase OS=Nomascus leuco...  1249   0.0  
+    TR:F6SWY7_CALJA F6SWY7 Tyrosin
+
+The last command waits for the job to be finised before printing the results,
+which may be quite long. We could look at the beginnin of the reported results
+and select only HUMAN sequences to see that the best sequence found is indeed
+ZAP70_HUMAN as expected::
+
+    >>> [x for x in res.split("\n") if "HUMAN" in x]
+    ['SP:ZAP70_HUMAN P43403 Tyrosine-protein kinase ZAP-70 OS=Homo sap...  1279 0.0  ',
+     'SP:KSYK_HUMAN P43405 Tyrosine-protein kinase SYK OS=Homo sapiens...   691 0.0  ',
+     'TR:A8K4G2_HUMAN A8K4G2 Tyrosine-protein kinase OS=Homo sapiens P...   691 0.0  ',
+    ...
 
 
 Searching for relevant pathways
 ------------------------------------------
 
-Let us start with KEGG. First we need to know the KEGG Id that corresponds to
+The KEGG services provides pathways, so let try to find pathways that contains
+our targetted protein. First we need to know the KEGG Id that corresponds to
 ZAP70. We can use the **find** method form KEGG service::
 
     >>> from bioservices import KeggParser
@@ -111,22 +151,23 @@ Now, let us get the pathways that contains this ID::
      'hsa04660': 'T cell receptor signaling pathway',
      'hsa05340': 'Primary immunodeficiency'}
 
-We can look at them in  browser::
+We can look at the first pathway in a browser (highlighting the ZAP70 node)::
 
-    >>> k.show_pathway("hsa04060")
+    >>> k.show_pathway("hsa04060", keggid={"7535": "red"})
 
 Searching for binary Interactions
 -----------------------------------
 
 
-For this purpose, we could use PSICQUIC services::
+For this purpose, we could use PSICQUIC services to find the interactions that
+involve ZAP70 in the **mint** database::
 
     >>> from bioservices import PSICQUIC
     >>> s = PSICQUIC(verbose=False)
-    >>> data = s.query("intact", "ZAP70 AND species:9606")
+    >>> data = s.query("mint", "ZAP70 AND species:9606")
 
-where 9606 is the taxonomy Id for home sapiens. We could also figure out how
-many interctions could be found in ech dabase for this particular query::
+where 9606 is the taxonomy Id for homo sapiens. We could also figure out how
+many interactions could be found in each dabase for this particular query::
 
     >>> p.getInteractionCounter("zap70 AND species:9606")
     {'apid': 82,
@@ -155,121 +196,156 @@ many interctions could be found in ech dabase for this particular query::
      'uniprot': 0}
 
 
-We see for instance that intact has 11 intercations. Coming back to the interactions returned by s.query, we find indeed 11 intercations
-between ZAP70 and other proteins::
+We see for instance that the **mint** database has 34 interactions. Coming back to the interactions returned by s.query, we find indeed 34 intercations
+between ZAP70 and another component::
 
     >>> len(data)
-    11
+    34
 
 Let us look at the first one::
 
-    >>> data[0]
-    ['uniprotkb:Q9Y2R2',
-     'uniprotkb:P43403',
-     'intact:EBI-1211241|uniprotkb:E9PPI1|uniprotkb:B1ALC8|uniprotkb:Q8WVM1|uniprotkb:Q6IPX8|uniprotkb:D4NZ71|uniprotkb:O95064|uniprotkb:O95063|uniprotkb:A0N0K6',
-     'intact:EBI-1211276|uniprotkb:Q9UBS6|uniprotkb:Q8IXD6|uniprotkb:Q6PIA4|uniprotkb:A6NFP4',
-     'psi-mi:ptn22_human(display_long)|uniprotkb:PTPN22(gene name)|psi-mi:PTPN22(display_short)|uniprotkb:PTPN8(gene name synonym)|uniprotkb:Hematopoietic cell protein-tyrosine phosphatase 70Z-PEP(gene name synonym)|uniprotkb:Lymphoid phosphatase(gene name synonym)|uniprotkb:PEST-domain phosphatase(gene name synonym)',
-    'psi-mi:zap70_human(display_long)|uniprotkb:ZAP70(gene name)|psi-mi:ZAP70(display_short)|uniprotkb:SRK(gene name synonym)|uniprotkb:Syk-related tyrosine kinase(gene name synonym)|uniprotkb:70kDa zeta-chain associated protein(gene name synonym)',
-     'psi-mi:"MI:0096"(pull down)',
-     'Wu et al. (2006)',
-     'pubmed:16461343',
-     'taxid:9606(human)|taxid:9606(Homo sapiens)',
-     'taxid:9606(human)|taxid:9606(Homo sapiens)',
-     'psi-mi:"MI:0914"(association)',
-     'psi-mi:"MI:0469"(IntAct)',
-     'intact:EBI-1211263',
-     'intact-miscore:0.60']
+    >>> for x in data[0].split("\t"): print(x)
+    uniprotkb:P15498
+    uniprotkb:P43403
+    -
+    -
+    uniprotkb:VAV1(gene name)|uniprotkb:VAV(gene name synonym)
+    uniprotkb:ZAP70(gene name)|uniprotkb:SRK(gene name synonym)|uniprotkb:70 kDa
+    zeta-associated protein(gene name synonym)|uniprotkb:Syk-related tyrosine
+    kinase(gene name synonym)
+    psi-mi:"MI:0019"(coimmunoprecipitation)
+    -
+    pubmed:9151714
+    taxid:9606(Homo sapiens)
+    taxid:9606(Homo sapiens)
+    psi-mi:"MI:0914"(association)
+    psi-mi:"MI:0471"(mint)
+    mint:MINT-8035351
+    mint-score:0.28(free-text)|homomint-score:0.28(free-text)'intact-miscore:0.60']
 
-The First two element are the entries for specy A and B. The last element is the
-score. The 11th element the type of interaction and so on.
+The First two elements are the entries for specy A and B. The last element is the
+score. The 11th element is the type of interaction and so on.
 
-What could be useful is to convert these elements into uniprot ID only. Witrh
-intact DB it is irrelevant but with other DBs, it may be useful (e.g., biogrid).
+What could be useful is to convert these elements into uniprot ID only. With
+mint database it is irrelevant for this particular entry but with other DBs or entries, it may be useful (e.g., biogrid).
 
-There is such a function called convertQuery::
-
+BioServices provides such a function called :meth:`~bioservices.services.psicquic.convert`::
 
     >>> data = s.query("biogrid", "ZAP70 AND species:9606")
-    >>> data2 = s.convertQuery(data, "biogrid")
+    >>> data2 = s.convert(data, "biogrid")
+
+**convert** method converts all entries from data into uniprot ID. If this is
+not possible, the entry is removed. The **query** and **convert** works on a single database but you we could query all
+or a subset of all databases using the queryAll and convertAll functions::
+
+   >>> data = s.queryAll("ZAP70 AND species:9606", databases=["mint", "biogrid"])
+   >>> data2 = s.convertAll(data)
+
+However, extra cleaning is required to remove entries that are not relevant (no match
+to uniprot ID, redundant, not a protein, self interactions, ...). In order to
+ease this tast, the psicquic.AppsPPI class is very useful. 
+
+
+.. plot::
+    :width: 80%
+    :include-source:
+
+    from bioservices import psicquic
+    s = psicquic.AppsPPI()
+    s.queryAll("ZAP70 AND species:9606", databases=["mint", "biogrid", "intact", "reactome-fis"])
+    s.summary()
+    s.show_pie()
 
 
 
-you can also query and convert for each database that is active. THis can be
-done manually:
+The summary function print a useful summary about the number of found
+interactions and overlap between databases:
 
-    for each db in s.database_active:
-
-or 
-
-   >>> res = s.queryAll("ZAP70 AND species:9606")
-   >>> res2 = s.convertQuery(res)
-
-res2 contains N entry with uniprot ID as first and second element. 
-
-
-   >>> len(set(res2))
-
-
-
-For instance all human interactions reported in MArch 2013
-----------------------------------------------------------------
-
-=========== =============== ===================================
-Status              name      number of interactions
-=========== =============== ===================================
-ONLINE      APID            123,427  
-ONLINE      BAR             0    
-ONLINE      BIND            38,419   
-ONLINE      BindingDB       74,082   
-ONLINE      BioGrid         182,911  
-ONLINE      ChEMBL          399,482  
-ONLINE      DIP             18,434   
-OFFLINE     DrugBank      
-OFFLINE     GeneMANIA 
-OFFLINE     I2D     
-ONLINE      I2D-IMEx        915  
-ONLINE      InnateDB        14,734   
-ONLINE      InnateDB-IMEx   352  
-ONLINE      IntAct          84,692   
-ONLINE      Interoporc      17,284   
-ONLINE      iRefIndex       396,368  
-ONLINE      MatrixDB        604  
-ONLINE      MBInfo          307  
-ONLINE      MINT            36,741   
-ONLINE      MolCon          242  
-ONLINE      MPIDB           28   
-ONLINE      Reactome        113,204  
-ONLINE      Reactome-FIs    209,988  
-ONLINE      Spike           36,248   
-ONLINE      STRING          656,493  
-ONLINE      TopFind         4,986    
-ONLINE      UniProt         5,564    
-OFFLINE     VirHostNet      
-=========== =============== ===================================
-
-
-
-res = p.queryAll("species:9606", databases=["uniprot", "apid"])
-
-data1 = res['uniprot']
-data2 = p.preCleaning(data1)
-mapping = p.convertUniprot(data2)
+.. doctest:: 
+   :options: +SKIP
  
+    >>> s.summary()
+    Found 8 interactions within intact database
+    Found 124 interactions within reactome-fis database
+    Found 19 interactions within mint database
+    Found 67 interactions within biogrid database
+    -------------
+    Found 152 interactions in 1 common databases
+    Found 14 interactions in 2 common databases
+    Found 0 interactions in 3 common databases
+    Found 1 interactions in 4 common databases
 
-len(set(p.postCleaning(mapping)))
-('Before removing anything: ', 5558)
-('After removing the None: ', 5545)
-('Before removing the !: ', 5107)
-("Before removing entries that don't match HUMAN : ", 4242)
+Finally, you can obtain the relation that was found in the 4 databases:
+
+.. doctest:: 
+   :options: +SKIP
+
+    >>> s.relevant_interactions[4]
+    [['LCK_HUMAN', 'ZAP70_HUMAN']]
 
 
-Finally, a set can be use to extract unique entries
+What's next ?
+-------------------
 
-a further cleanup: A-B is same as B-A
+There are lots of other services that could be usefule. An example is the
+wikipathway (see :class:`~bioservices.wikipathway.Wikipathway`) to retrieve even more pathways that include the ZAP70 protein.
+Another example is the BioMart portal. You could use it to retrieve pathways
+from REACTOME (see :class:`~bioservices.biomart.BioMart`)
 
 
 
-    >>> p = psicquic.PPI()
+
+
+
+
+
+
+.. For instance all human interactions reported in MArch 2013
+    ----------------------------------------------------------------
+    =========== =============== ===================================
+    Status              name      number of interactions
+    =========== =============== ===================================
+    ONLINE      APID            123,427  
+    ONLINE      BAR             0    
+    ONLINE      BIND            38,419   
+    ONLINE      BindingDB       74,082   
+    ONLINE      BioGrid         182,911  
+    ONLINE      ChEMBL          399,482  
+    ONLINE      DIP             18,434   
+    OFFLINE     DrugBank      
+    OFFLINE     GeneMANIA 
+    OFFLINE     I2D     
+    ONLINE      I2D-IMEx        915  
+    ONLINE      InnateDB        14,734   
+    ONLINE      InnateDB-IMEx   352  
+    ONLINE      IntAct          84,692   
+    ONLINE      Interoporc      17,284   
+    ONLINE      iRefIndex       396,368  
+    ONLINE      MatrixDB        604  
+    ONLINE      MBInfo          307  
+    ONLINE      MINT            36,741   
+    ONLINE      MolCon          242  
+    ONLINE      MPIDB           28   
+    ONLINE      Reactome        113,204  
+    ONLINE      Reactome-FIs    209,988  
+    ONLINE      Spike           36,248   
+    ONLINE      STRING          656,493  
+    ONLINE      TopFind         4,986    
+    ONLINE      UniProt         5,564    
+    OFFLINE     VirHostNet      
+    =========== =============== ===================================
+    res = p.queryAll("species:9606", databases=["uniprot", "apid"])
+    data1 = res['uniprot']
+    data2 = p.preCleaning(data1)
+    mapping = p.convertUniprot(data2)
+    len(set(p.postCleaning(mapping)))
+    ('Before removing anything: ', 5558)
+    ('After removing the None: ', 5545)
+    ('Before removing the !: ', 5107)
+    ("Before removing entries that don't match HUMAN : ", 4242)
+    Finally, a set can be use to extract unique entries
+    a further cleanup: A-B is same as B-A
+    >>> p = psicquic.AppsPPI()
     >>> p.queryAll("ZAP70 AND species:9606")
     >>> p.summary()
     >>> for i in range(1,p.N+1):

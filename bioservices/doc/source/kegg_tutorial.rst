@@ -204,14 +204,13 @@ Scanning all relations of the Human organism takes about 5-10 minutes. You can
 look at a subset by setting Nmax to a small value (e.g., Nmax=10).
 
 
-
-
 ::
 
     from pylab import *
     # extract all relations from all pathways
     from bioservices.kegg import Kegg
-    k = Kegg()
+    s = Kegg()
+    s.organism = "hsa"
 
     # retrieve more than 260 pathways so it takes time
     results = [s.parse_kgml_pathway(x) for x in s.pathwayIds] 

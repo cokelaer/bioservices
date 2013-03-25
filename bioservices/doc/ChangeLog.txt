@@ -12,7 +12,7 @@ Revision 1.0
 	* add methods in psicquic to parse all databases and convert to uniprot if
       possible. These methods are used to build an application provided in the
 	  tutorial
-    * add biomart
+    * add biomart + doc + test
     * add onWeb method in Service class
 
 * 1.0.1: 

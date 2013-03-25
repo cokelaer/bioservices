@@ -3,12 +3,14 @@
 Quick Start
 #################
 
+Introduction
+================
+
 **BioServices** provides access to several Web Services. Each service requires some expertise on its own. 
 In this Quick Start section, we will neither cover all the services nor all their functionalities. However,
-it should give you a good overview of what you can do with BioServices (both from the user and developer point of views).
+it should give you a good overview of what you can do with **BioServices** (both from the user and developer point of views).
 
-
-Before starting, let us remind what are Web Services. There provide an access to databases or applications via a web interface based on the SOAP/WSDL or the REST technologies. These technologies allow a programmatic access, which we take advantage in BioServices.
+Before starting, let us remind what are Web Services. There provide an access to databases or applications via a web interface based on the SOAP/WSDL or the REST technologies. These technologies allow a programmatic access, which we take advantage in **BioServices**.
 
 The REST technology uses URLs so there is no external dependency. 
 You simply need to build a well-formatted URL and you will retrieve
@@ -20,22 +22,95 @@ a messaging protocol for transporting information and the WSDL (Web Services
 Description Language), which is a method for describing Web Services and their
 capabilities.
 
-Let us look at some of the Web Services wrapped in BioServices.
+What methods are available for a given service 
+------------------------------------------------
 
-Kegg service
+Usually most of the service functionalities have been wrapped and we try to keep
+the names as close as possible to the API. On top of the service methods, each
+class inherits from the BioService class (REST or WSDL). For instance REST
+service have the useful request method. Another nice function is the onWeb. 
+
+.. seealso:: :class:`~bioservice.services.RESTService`, :class:`~bioservices.services.WSDLService`
+
+What about the output ?
+------------------------
+
+Outputs depend on the service and functionalities of the service. It can be
+heteregeneous. However, output are mostly XML formatted or in tabulated
+separated column format (TSV). When XML is returned, it is usually parsed via the
+BeautilSoup package (for instance you can get all children using getchildren() function).
+Sometimes, we also convert output into dictionaries. So, it really depends on
+the service/functionality you are using.
+
+
+
+Let us look at some of the Web Services wrapped in **BioServices**.
+
+
+
+
+
+UniProt service
+================
+
+Let us start with the :class:`~bioservices.uniprot.UniProt` class. With this 
+class, you can access to uniprot services. In particular, you can map an ID 
+from a database to another one. For instance to convert the UniProtKB ID into KEGG ID, use:
+
+.. doctest::
+
+    >>> from bioservices.uniprot import UniProt
+    >>> u = UniProt(verbose=False)
+    >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403')
+    ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535']
+
+Note that the returned response from uniprot web service is converted into a list. The first two elements are the databases used for the mapping. Then, alternance of the queried element and the answer populates the list. 
+
+You can also search for a specific UniProtKB ID to get exhaustive information::
+
+    >>> print u.search("P43403", format="txt")
+    ID   ZAP70_HUMAN             Reviewed;         619 AA.
+    AC   P43403; A6NFP4; Q6PIA4; Q8IXD6; Q9UBS6;
+    DT   01-NOV-1995, integrated into UniProtKB/Swiss-Prot.
+    DT   01-NOV-1995, sequence version 1.
+    ...
+
+To obtain the FASTA sequence, you can use :meth:`~bioservices.uniprot.UniProt.searchUniProtId`::
+
+
+    >>> res = u.searchUniProtId("P09958", format="xml")
+    >>> print(u.searchUniProtId("P09958", format="fasta"))
+    sp|P09958|FURIN_HUMAN Furin OS=Homo sapiens GN=FURIN PE=1 SV=2
+    MELRPWLLWVVAATGTLVLLAADAQGQKVFTNTWAVRIPGGPAVANSVARKHGFLNLGQI
+    FGDYYHFWHRGVTKRSLSPHRPRHSRLQREPQVQWLEQQVAKRRTKRDVYQEPTDPKFPQ
+    QWYLSGVTQRDLNVKAAWAQGYTGHGIVVSILDDGIEKNHPDLAGNYDPGASFDVNDQDP
+    DPQPRYTQMNDNRHGTRCAGEVAAVANNGVCGVGVAYNARIGGVRMLDGEVTDAVEARSL
+    GLNPNHIHIYSASWGPEDDGKTVDGPARLAEEAFFRGVSQGRGGLGSIFVWASGNGGREH
+    DSCNCDGYTNSIYTLSISSATQFGNVPWYSEACSSTLATTYSSGNQNEKQIVTTDLRQKC
+    TESHTGTSASAPLAAGIIALTLEANKNLTWRDMQHLVVQTSKPAHLNANDWATNGVGRKV
+    SHSYGYGLLDAGAMVALAQNWTTVAPQRKCIIDILTEPKDIGKRLEVRKTVTACLGEPNH
+    ITRLEHAQARLTLSYNRRGDLAIHLVSPMGTRSTLLAARPHDYSADGFNDWAFMTTHSWD
+    EDPSGEWVLEIENTSEANNYGTLTKFTLVLYGTAPEGLPVPPESSGCKTLTSSQACVVCE
+    EGFSLHQKSCVQHCPPGFAPQVLDTHYSTENDVETIRASVCAPCHASCATCQGPALTDCL
+    SCPSHASLDPVEQTCSRQSQSSRESPPQQQPPRLPPEVEAGQRLRAGLLPSHLPEVVAGL
+    SCAFIVLVFVTVFLVLQLRSGFSFRGVKVYTMDRGLISYKGLPPEAWQEECPSDSEEDEG
+    RGERTAFIKDQSAL
+
+.. seealso:: Reference guide of :class:`bioservices.uniprot.UniProt` for more details
+
+KEGG service
 =============
+
 .. testsetup:: kegg
 
     from bioservices import Kegg
     k = Kegg(verbose=False)
 
-Start a KEGG interface::
+The KEGG interface is similar but contains more methods. The tutorial presents
+the KEGG itnerface in details, but let us have a quick overview. First, let us start a KEGG instance::
 
     from bioservices import Kegg
     k = Kegg(verbose=False)
-
-There are 5-6 main functions (e.g., :meth:`~bioservices.kegg.Kegg.list`) 
-that allow access to the KEGG database. 
 
 You can use the :meth:`~bioservices.kegg.Kegg.info` to obtain statistics on the
 **pathway** database::
@@ -46,19 +121,18 @@ You can use the :meth:`~bioservices.kegg.Kegg.info` to obtain statistics on the
                      Kanehisa Laboratories
                      218,277 entries
 
-You can see the list of valid databases using the databases method. Each of the
+You can see the list of valid databases using the databases attribute. Each of the
 database entry can also be listed using the :meth:`~bioservices.kegg.Kegg.list`
 method. For instance, the organisms can be retrieved with::
 
     k.list("organism")
 
-However, to extract the Ids exta processing is required. So, we provide aliases 
-to retrieve the organism Ids::
+However, to extract the Ids extra processing is required. So, we provide aliases 
+to retrieve the organism Ids easily::
 
     k.organismIds
 
-The human organism is coded as "hsa". You can also get the T number instead of
-Ids:
+The human organism is coded as "hsa". You can also get its T number instead:
 
 .. doctest:: kegg
 
@@ -68,7 +142,7 @@ Ids:
 
 Every elements is referred to with a Kegg ID, which may be difficult to handle
 at first. There are methods to retrieve the IDs though. For instance, get the list of 
-pathways ids for the current organism as follows::
+pathways iIs for the current organism as follows::
 
     k.pathwayIds
 
@@ -81,13 +155,9 @@ or a pathway::
 
     print k.get("path:hsa05416")
 
-An additional class :class:`~bioservices.kegg.KeggParser` will help you to convert any KEGG ouput returned
-by the get method into a dictionary.
-
-
 .. seealso:: Reference guide of :class:`bioservices.kegg.Kegg` for more details
-.. seealso:: Reference guide of :ref:`kegg_tutorial` for more details
-.. seealso:: Reference guide of :class:`bioservices.kegg.KeggParser` for more details
+.. seealso:: :ref:`kegg_tutorial` for more details
+.. seealso:: Reference guide of :class:`bioservices.kegg.KeggParser` to parse a KEGG entry into a dictionary
 
 .. WSDbfetch service
    ==================
@@ -102,30 +172,6 @@ by the get method into a dictionary.
 .. .. seealso:: Reference guide of :class:`bioservices.wsdbfetch.WSDbfetch` for more details
 
 
-UniProt service
-================
-
-With this module, you can map an ID from a database to another one. For instance
-to convert the UniProtKB ID into KEGG ID, use:
-
-.. doctest::
-
-    >>> from bioservices.uniprot import UniProt
-    >>> u = UniProt(verbose=False)
-    >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403')
-    ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535']
-
-Note that the returned response from uniprot web service is converted into a list.
-
-You can also search for a specific UniProtKB id to get exhaustive information
-about an ID::
-
-    >>> res = u.searchUniProtId("P09958", format="xml")
-    >>> u.searchUniProtId("P09958", format="fasta")
-    '>sp|P09958|FURIN_HUMAN Furin OS=Homo sapiens GN=FURIN PE=1SV=2\nMELRPWLLWVVAATGTLVLLAADAQGQKVFTNTWAVRIPGGPAVANSVARKHGFLNLGQI\nFGDYYHFWHRGVTKRSLSPHRPRHSRLQREPQVQWLEQQVAKRRTKRDVYQEPTDPKFPQ\nQWYLSGVTQRDLNVKAAWAQGYTGHGIVVSILDDGIEKNHPDLAGNYDPGASFDVNDQDP\nDPQPRYTQMNDNRHGTRCAGEVAAVANNGVCGVGVAYNARIGGVRMLDGEVTDAVEARSL\nGLNPNHIHIYSASWGPEDDGKTVDGPARLAEEAFFRGVSQGRGGLGSIFVWASGNGGREH\nDSCNCDGYTNSIYTLSISSATQFGNVPWYSEACSSTLATTYSSGNQNEKQIVTTDLRQKC\nTESHTGTSASAPLAAGIIALTLEANKNLTWRDMQHLVVQTSKPAHLNANDWATNGVGRKV\nSHSYGYGLLDAGAMVALAQNWTTVAPQRKCIIDILTEPKDIGKRLEVRKTVTACLGEPNH\nITRLEHAQARLTLSYNRRGDLAIHLVSPMGTRSTLLAARPHDYSADGFNDWAFMTTHSWD\nEDPSGEWVLEIENTSEANNYGTLTKFTLVLYGTAPEGLPVPPESSGCKTLTSSQACVVCE\nEGFSLHQKSCVQHCPPGFAPQVLDTHYSTENDVETIRASVCAPCHASCATCQGPALTDCL\nSCPSHASLDPVEQTCSRQSQSSRESPPQQQPPRLPPEVEAGQRLRAGLLPSHLPEVVAGL\nSCAFIVLVFVTVFLVLQLRSGFSFRGVKVYTMDRGLISYKGLPPEAWQEECPSDSEEDEG\nRGERTAFIKDQSAL\n'
-
-
-.. seealso:: Reference guide of :class:`bioservices.uniprot.UniProt` for more details
 
 QuickGO
 =========
@@ -134,10 +180,24 @@ To acces to the GO interface, simply create an instance and look for a entry
 using the :meth:`bioservices.quickgo.QuickGO.Term` method:
 
 .. doctest::
+    :options: +SKIP
 
     >>> from bioservices import QuickGO
     >>> g = QuickGO(verbose=False)
-    >>> res = g.Term("GO:0003824")
+    >>> print(g.Term("GO:0003824"), format="obo")
+    [Term]
+    id: GO:0003824
+    name: catalytic activity
+    def: "Catalysis of a biochemical reaction at physiological temperatures. In
+    biologically catalyzed reactions, the reactants are known as substrates, and the
+    catalysts are naturally occurring macromolecular substances known as enzymes.
+    Enzymes possess specific binding sites for substrates, and are usually composed
+    wholly or largely of protein, but RNA that has catalytic activity (ribozyme) is
+    often also regarded as enzymatic."
+    synonym: "enzyme activity" exact
+    xref: InterPro:IPR000183
+    ...
+
 
 .. seealso:: Reference guide of :class:`bioservices.quickgo.QuickGO` for more details
 
@@ -146,11 +206,11 @@ PICR service
 
 
 PICR, the Protein Identifier Cross Reference service provides 2 services
-in WSDL and REST protocols. We implemented only the REST interface. The
+in WSDL and REST protocols. When it is the case, we arbitrary chose one of the
+available protocol. In the PICR case, we implemented only the REST interface. The
 methods available in the REST service are very similar to those available
 via SOAP except for one major difference: only one accession or sequence
 can be mapped per request.
-
 
 The following example returns a XML document containing information about the
 protein P29375 found in two specific databases::
@@ -180,10 +240,11 @@ In order to get the model IDs, you can look at the full list::
     >>> b.modelsId
 
 Of course it does not tell you anything about a model; there are more useful functions such as 
-:meth:`~bioservices.biomodels.getModelsIdByUniprotId` and others from the getModelsIdBy family.
+:meth:`~bioservices.biomodels.BioModels.getModelsIdByUniprotId` and others from the getModelsIdBy family.
 
 
 .. seealso:: Reference guide of :class:`bioservices.biomodels.BioModels` for more details
+.. seealso:: :ref:`biomodels_tutorial` for more details
 
 Rhea service 
 ==============
@@ -231,12 +292,12 @@ output format can be found in ::
 Other services
 ==================
 
-There are many other services provided within BioServices and the reference
+There are many other services provided within **BioServices** and the reference
 guide should give you all the information available with examples to start to
 play with any of them. The home page of the services themselves is usually a
 good starting point as well.
 
-Services that are not available in BioServices can still be accesssed to quite
-easily as demonstrated in the next section for :ref:`Developer Guide` section.
+Services that are not available in **BioServices** can still be accesssed to quite
+easily as demonstrated in the  :ref:`developer` section.
 
 

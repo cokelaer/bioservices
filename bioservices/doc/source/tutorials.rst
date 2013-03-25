@@ -8,6 +8,11 @@
 Tutorials
 ============
 
+This section present the KEGG and BioModels services in more details.  The
+Protein test case study illustrates how several services can be used to get lots
+of information about a specific protein. New Contributino to this section are
+welcomed.
+
 .. toctree::
     :maxdepth: 1
     :numbered:

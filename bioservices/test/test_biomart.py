@@ -25,3 +25,17 @@ def test_registry():
     s.query(s._xml_example)
 
 
+
+def test_reactome_example():
+    s = biomart.BioMart()
+    s.lookfor("reactome")
+    s.datasets("REACTOME")
+    #['interaction', 'complex', 'reaction', 'pathway']
+    s.new_query()
+    s.add_dataset_to_xml("pathway")
+    s.add_filter_to_xml("species_selection", "Homo sapiens")
+    s.add_attribute_to_xml("pathway_db_id")
+    s.add_attribute_to_xml("_displayname")
+    xmlq = s.get_xml()
+    res = s.query(xmlq)
+

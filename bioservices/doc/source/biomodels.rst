@@ -1,8 +1,10 @@
 
-.. _biomodels_tutorial:
 
 
 .. seealso:: :class:`bioservices.biomodels.BioModels` for the full reference guide.
+
+
+.. _biomodels_tutorial:
 
 Biomodels tutorial
 ======================

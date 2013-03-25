@@ -155,7 +155,7 @@ import copy
 __all__ = ["Kegg", "KeggParser"]
 
 class Kegg(RESTService):
-    """Interface to the `KEGG <http://www.genome.jp/kegg/pathway.html>`_ database
+    """Interface to the `KEGG <http://www.genome.jp/kegg/pathway.html>`_ service
 
     This class provides an interface to the KEGG REST API. The weblink tools 
     are partially accesible. All dbentries can be parsed into dictionaries using
@@ -997,10 +997,12 @@ class Kegg(RESTService):
                 matches.append(Id)
         return matches
  
-    def parse_kgml_pathway(self, pathwayId):
+    def parse_kgml_pathway(self, pathwayId, res=None):
         """Parse the pathway in KGML format and returns a dictionary (relations and entries)
 
         :param str pathwayId: a valid pathwayId e.g. hsa04660
+        :param str res: if you already have the output of the query
+            get(pathwayId), you can provide it, otherwise it is queried.
         :return: a tuple with the first item being a list of relations. Each
             relations is a dictionary with id2, id2, link, value, name. The
             second item is a dictionary that maps the Ids to 
@@ -1025,7 +1027,8 @@ class Kegg(RESTService):
         .. seealso:: `KEGG API <http://www.kegg.jp/kegg/xml/docs/>`_
         """
         output = {'relations':[], 'entries':[]}
-        res = self.easyXML(self.get(pathwayId, "kgml"))
+        if res==None:
+            res = self.easyXML(self.get(pathwayId, "kgml"))
         # here entry1 and 2 are Id related to the kgml file
 
         # read and parse the entries
