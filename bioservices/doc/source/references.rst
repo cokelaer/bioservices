@@ -67,6 +67,14 @@ ChEMBLdb
     :undoc-members:
     :synopsis:
 
+ChemSpider
+===============
+
+.. automodule:: bioservices.chemspider
+    :members:
+    :undoc-members:
+    :synopsis:
+
 EUtils
 ==========
 
