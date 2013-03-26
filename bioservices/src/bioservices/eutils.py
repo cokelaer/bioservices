@@ -200,11 +200,11 @@ class EUtils(WSDLService):
         self._efetch = EFetch(verbose=verbose)
 
     def _get_databases(self):
-        """alias to run_einfo"""
+        """alias to run_eInfo"""
         if self._databases == None:
             self._databases = self.serv.run_eInfo().DbName
         return self._databases
-    databases = property(_get_databases, doc="alias to run_einfo()")
+    databases = property(_get_databases, doc="alias to run_eInfo()")
 
     def taxonomy(self, Id):
         """
@@ -233,7 +233,18 @@ class EUtils(WSDLService):
         ret = self._efetch.efetch(db,Id)
         return ret
 
-    def run_einfo(self, db):
+    def run_eInfo(self, db=None):
+        """Provides the number of records indexed in each field of a given
+        database, the date of the last update of the database, and the available links
+        from the database to other Entrez databases.
+
+            >>> s.run_eInfo("taxonomy")
+            >>> s.Count
+
+        """
+        if db == None or db not in self.databases:
+            print("You must provide a valid databases from : ", self.databases)
+            return
         return self.serv.run_eInfo(db=db) 
 
     def run_eSummary(self, db, Id):
@@ -243,22 +254,14 @@ class EUtils(WSDLService):
         OR returns DocSums for a set of UIDs stored on the Entrez History server
 
 
-        ret = e.serv.run_eSummary(db="snp",id="7535")
+            >>> ret = e.serv.run_eSummary(db="snp",id="7535")
+            >>> ret = e.serv.run_eSummary(db="snp",id="7535,7530")
+            
         """
 
         # assert db in ??
-        ret = e.serv.run_eSummary(db=db, id=Id)
-
-        """if isinstance(idlist, list):
-            idlist = ",".join([x for x in idlist])
-        elif isinstance(idlist, str):
-            pass
-        else:
-            raise NotImplementedError
-        request = "db=%s&id=%s&version=%s" % (db, idlist,version)
-        res = self.serv.run_eSummary(request)
-
-        """
+        ret = self.serv.run_eSummary(db=db, id=Id)
+        return ret
 
     def run_eGQuery(self, term):
         """Provides the number of records retrieved in all Entrez databases by a single text query. 
