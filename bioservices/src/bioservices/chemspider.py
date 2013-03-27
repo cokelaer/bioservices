@@ -101,6 +101,10 @@ class ChemSpider(RESTService):
     def image(self, Id):
         """ Return string containing PNG binary image data of 2D structure image 
 
+        ::
+
+            >>> from bioservices import *
+            >>> s = ChemSpider()
             >>> ret = s.image(1020)
             >>> with open("test.png", "w") as f:
             ...     f.write(ret)

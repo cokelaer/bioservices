@@ -15,6 +15,7 @@ Revision 1.0
     * add biomart + doc + test
     * add onWeb method in Service class
     * add chemspider draft
+	* complete eutils 
 
 * 1.0.1: 
     update metadata

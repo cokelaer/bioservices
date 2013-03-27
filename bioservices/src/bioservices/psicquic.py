@@ -204,7 +204,7 @@ class PSICQUIC(RESTService):
         the raw data. Addition class may provide dedicated parsing in the
         future.
 
-    .. seealso:: :class:`bioservices.biogrid.BioGrid`
+    .. seealso:: :class:`bioservices.biogrid.BioGRID`
     """
 
     _formats = ["tab25", "tab26", "tab27", "xml25", "count", "biopax", "xgmml",
@@ -403,8 +403,8 @@ class PSICQUIC(RESTService):
             s.query("biogrid", "ZAP70 AND species:9606")
 
         .. warning:: AND must be in big caps. Some database are ore permissive
-than other (e.g., intact accepts "and"). species must be a valid ID number. Again, some DB are more
-ipermissive and may accept the name (e.g., human)
+            than other (e.g., intact accepts "and"). species must be a valid ID number. Again, some DB are more
+            permissive and may accept the name (e.g., human)
 
         To obtain the number of interactions in intact for the human specy:: 
 

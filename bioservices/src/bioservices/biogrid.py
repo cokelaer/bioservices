@@ -55,14 +55,15 @@ class Search(PSICQUIC):
         self.interactors = self.get_interactors()
 
     def get_interactors(self):
-        l = []
-        for line in self.output:
-            t = []
-            for col in line.split("\t"):
-                t += [col]
-            l.append(t)
+        # this is now done in PSIQUIC itself.
+        #l = []
+        #for line in self.output:
+        #    #t = []
+        #    #for col in line.split("\t"):
+        #    #    t += [col]
+        #    l.append(line)
         out = []
-        for element in l:
+        for element in self.output:
             x = (re.sub(".*:","", element[2:4][0]), re.sub(".*:","", element[2:4][1]))
             out.append(tuple(sorted(x)))
         return list(set(out))
@@ -70,7 +71,7 @@ class Search(PSICQUIC):
 
 class BioGRID(object):
     """ Interface to BioGRID.
-    
+
     .. doctest::
 
       >>> from bioservices import BioGRID
@@ -79,12 +80,13 @@ class BioGRID(object):
 
     Examples::
 
-        b = BioGRID(query=["mtor","akt1"],taxId="9606",exP="two hybrid")
-        b.biogrid.interactors
+        >>> from bioservices import BioGRID
+        >>> b = BioGRID(query=["mtor","akt1"],taxId="9606",exP="two hybrid")
+        >>> b.biogrid.interactors
 
     One can also query an entire organism, by using the taxid as the query::
     
-        b = BioGRID(query="6239")
+        >>> b = BioGRID(query="6239")
 
     """
 

@@ -290,7 +290,10 @@ What's next ?
 There are lots of other services that could be usefule. An example is the
 wikipathway (see :class:`~bioservices.wikipathway.Wikipathway`) to retrieve even more pathways that include the ZAP70 protein.
 Another example is the BioMart portal. You could use it to retrieve pathways
-from REACTOME (see :class:`~bioservices.biomart.BioMart`)
+from REACTOME (see :class:`~bioservices.biomart.BioMart`). You can also retrieve
+target from ChEMBL given the uniprot ID ( get_target_by_uniprotId("P43403") )
+and so on.
+
 
 
 

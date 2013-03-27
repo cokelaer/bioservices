@@ -66,13 +66,14 @@ class ReactomeURL(RESTService):
         """
         url = self.url + "/link?SOURCE" +  source + "&ID=" + identifier
         res = self.request(url)
-        return reis
+        return res
 
 
 
 class Reactome(WSDLService):
     """Interface to the `Reactome <http://www.reactome.org>`_ service
 
+    :in progress: dont use
 
 
     """

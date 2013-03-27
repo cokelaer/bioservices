@@ -53,7 +53,7 @@ class BioMart(RESTService):
 
         >>> from bioservices import *
         >>> s = BioMart()
-        >>> s.registry() # to get information about existing services
+        >>> ret = s.registry() # to get information about existing services
 
     The registry is a list of dictionaries. Some aliases are available to get
     all the names or databases::
@@ -161,10 +161,10 @@ class BioMart(RESTService):
     """
 
 
-    def __init__(self):
+    def __init__(self, verbose=False):
         """.. rubric:: Constructor"""
         url = "http://www.biomart.org/biomart/martservice"
-        super(BioMart, self).__init__("BioMart", url=url)
+        super(BioMart, self).__init__("BioMart", url=url, verbose=verbose)
         self._names = None
         self._databases = None
         self._display_names = None
@@ -242,19 +242,20 @@ class BioMart(RESTService):
         return results
 
     def filters(self, dataset):
-        """to retrieve filters available for a dataset:
+        r"""to retrieve filters available for a dataset:
 
         :param str dataset: e.g. oanatinus_gene_ensembl
 
-        s.filters("uniprot").split("\n")[1].split("\t")
+        ::
 
-        is.filters("pathway")["species_selection"]
-[Arabidopsis thaliana,Bos taurus,Caenorhabditis elegans,Canis familiaris,Danio
-rerio,Dictyostelium discoideum,Drosophila melanogaster,Escherichia coli,Gallus
-gallus,Homo sapiens,Mus musculus,Mycobacterium tuberculosis,Oryza
-sativa,Plasmodium falciparum,Rattus norvegicus,Saccharomyces
-cerevisiae,Schizosaccharomyces pombe,Staphylococcus aureus N315,Sus
-scrofa,Taeniopygia guttata ,Xenopus tropicalis]
+            >>> s.filters("uniprot").split("\n")[1].split("\t")
+            >>> s.filters("pathway")["species_selection"]
+            [Arabidopsis thaliana,Bos taurus,Caenorhabditis elegans,Canis familiaris,Danio
+            rerio,Dictyostelium discoideum,Drosophila melanogaster,Escherichia coli,Gallus
+            gallus,Homo sapiens,Mus musculus,Mycobacterium tuberculosis,Oryza
+            sativa,Plasmodium falciparum,Rattus norvegicus,Saccharomyces
+            cerevisiae,Schizosaccharomyces pombe,Staphylococcus aureus N315,Sus
+            scrofa,Taeniopygia guttata ,Xenopus tropicalis]
 
         """
         if dataset not in [x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]]:

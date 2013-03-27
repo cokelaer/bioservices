@@ -9,3 +9,4 @@ def test_chemspider():
     s.mol3d(1020)
     s.image(1020)
     s.ImagesHandler(1020)
+    s.databases
