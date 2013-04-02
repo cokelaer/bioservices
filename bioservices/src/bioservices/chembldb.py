@@ -51,7 +51,7 @@ class ChEMBLdb(RESTService):
     Here is a quick example to retrieve a target given its ChEMBL Id
     .. doctest::
 
-        >>> from bioservices import ChEMBLId
+        >>> from bioservices import ChEMBLdb
         >>> s = ChEMBLdb(verbose=False)
         >>> print(s._target_chemblId_example)
         'CHEMBL2477'
