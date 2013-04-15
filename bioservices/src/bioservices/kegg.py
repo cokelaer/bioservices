@@ -1164,6 +1164,7 @@ class KeggParser(Kegg):
 
     .. note:: The 2 outputs are slightly different. 
 
+    .. seealso:: http://www.kegg.jp/kegg/rest/dbentry.html
     """
     def __init__(self, verbose=False):
         super(KeggParser, self).__init__(verbose=verbose)
@@ -1182,6 +1183,7 @@ class KeggParser(Kegg):
         entry = res.split("\n")[0].split()[0]
         if entry == "ENTRY":
             dbentry = res.split("\n")[0].split(None, 2)[2]
+
         if "Pathway" in dbentry and "Module" not in dbentry:
             parser = self.parsePathway(res)
         elif dbentry.lower() == "pathway   module":
@@ -1192,10 +1194,14 @@ class KeggParser(Kegg):
             parser = self.parseDisease(res)
         elif "Environ" in dbentry: 
             parser = self.parseEnviron(res)
+        elif "Orthology" in dbentry: 
+            parser = self.parseOrthology(res)
         elif "KO" in dbentry: 
             parser = self.parseOrthology(res)
         elif "Genome" in dbentry: 
             parser = self.parseGenome(res)
+        elif "gene" in dbentry: 
+            parser = self.parseGene(res)
         elif "CDS" in dbentry: 
             parser = self.parseGene(res)
         elif "Compound" in dbentry: 

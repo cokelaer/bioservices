@@ -150,5 +150,27 @@ class test_Kegg(Kegg):
 
 def test_KeggParser():
     s = KeggParser()
-    res = s.get("rp:RP00001")
-    d = s.parseRpair(res)
+
+    d = s.parse(s.get("cpd:C00001"))
+    d = s.parse(s.get("ds:H00001"))
+    d = s.parse(s.get("dr:D00001"))
+    d = s.parse(s.get("ev:E00001"))
+    d = s.parse(s.get("ec:1.1.1.1"))
+    d = s.parse(s.get("hsa:1525"))
+    d = s.parse(s.get("genome:T00001"))
+    d = s.parse(s.get("gl:G00001"))
+    d = s.parse(s.get("md:hsa_M00554"))
+    d = s.parse(s.get("ko:K00001"))
+    d = s.parse(s.get("path:hsa04914"))
+    d = s.parse(s.get("rc:RC00001"))
+    d = s.parse(s.get("rn:R00001"))
+    d = s.parse(s.get("rp:RP00001"))
+
+
+
+
+
+
+
+
+
