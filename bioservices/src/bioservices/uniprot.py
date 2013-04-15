@@ -168,8 +168,7 @@ class UniProt(RESTService):
         >>> res = u.search("P43403")
 
         # Returns sequence on the ZAP70_HUMAN accession Id
-        >>> sequence = u.search("ZAP70_HUMAN", 
-            format="tab", columns="sequence")
+        >>> sequence = u.search("ZAP70_HUMAN", columns="sequence")
 
     """
     _mapping = mapping.copy()
@@ -245,7 +244,7 @@ class UniProt(RESTService):
         return res
 
 
-    def search(self, query, format="html", columns=None,
+    def search(self, query, format="tab", columns=None,
         include=False,sort="score", compress=False, limit=None, offset=None, maxTrials=10):
         """Provide some interface to the uniprot search interface.
 
@@ -253,7 +252,7 @@ class UniProt(RESTService):
             See http://www.uniprot.org/help/text-search, http://www.uniprot.org/help/query-fields 
         :param str format: a valid format amongst html, tab, xls, asta, gff,
             txt, xml, rdf, list, rss. If tab or xls, you can also provide the 
-            columns argument. 
+            columns argument.  (default is tab)
         :param str columns: comma-separated list of values. Works only if fomat 
             is tab or xlsFor UnitProtKB, the possible columns are:
             citation, clusters, comments, database, domains, domain, ec, id, entry name

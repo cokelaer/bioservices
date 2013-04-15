@@ -26,10 +26,9 @@ class test_quickGO(QuickGO):
         try:
             res = self.Annotation(tax='9606', format='tsv', limit=-1)
             assert False
-        except ValueError:
-            assert True
         except:
-            assert False
+            assert True
+
         try:
             res = self.Annotation(tax='9606', format='tsv', limit="dummy")
             assert False

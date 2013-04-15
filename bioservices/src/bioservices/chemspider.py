@@ -22,6 +22,7 @@
 .. topic:: What is ChemSpider ?
 
 
+    :Status: in progress
     :URL:  http://www.chemspider.com/
     :REST: http://www.chemspider.com/AboutServices.aspx?
 

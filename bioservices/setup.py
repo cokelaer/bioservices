@@ -8,7 +8,7 @@ import glob
 
 _MAJOR               = 1
 _MINOR               = 0
-_MICRO               = 2
+_MICRO               = 3
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -25,8 +25,7 @@ metainfo = {
     'keywords' : [
         "BioServices", "Web Services", "Biology", "Kegg", "KEGG", "BioModels",
         "EUtils", "UniProt", "PICR", "ArrayExpress", "QuickGO", "PSICQUIC", "Blast",
-        "BioMART", "BioGRID", "MIRIAM", "BioMart", "EUtils", "ChEMBL",
-"ChemSpider"],
+        "BioMART", "BioGRID", "MIRIAM", "BioMart", "EUtils", "ChEMBL", "ChemSpider"],
     'classifiers' : [
           'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Developers',

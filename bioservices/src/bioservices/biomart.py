@@ -93,7 +93,7 @@ class BioMart(RESTService):
     returned by the datasets method. Let us suppose that we want to query
     **protein**, we need to add this dataset to the query::
 
-        >>> s.add_dataset("protein")
+        >>> s.add_dataset_to_xml("protein")
 
     Then, you can add attributes (one of the keys of the dictionary
     returned by attributes("protein")::

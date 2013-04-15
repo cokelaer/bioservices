@@ -26,7 +26,7 @@ useful later on. Let us try to use the :meth:`~bioservices.uniprot.UniProt.searc
     >>> u.search("ZAP70_HUMAN") # could be lower case
 
 
-The default format of the returned answer is in HTML format, which is not very convenient. So, let us request a tabular answer instead::
+The default format of the returned answer is "tabulated"::
 
     >>> res = u.search("ZAP70_HUMAN", format="tab")
     >>> print(res)
@@ -38,7 +38,7 @@ of the tabulated format contains several columns but we can select only a subset
 such as the Entry (accession number) and the gene names, which are coded as "id"
 and "genes" in uniprot database::
 
-    >>> res = u.search("ZAP70_HUMAN", format="tab", columnds="id,genes")
+    >>> res = u.search("ZAP70_HUMAN", format="tab", columns="id,genes")
     >>> print(res)
     Entry   Gene names
     P43403  ZAP70 SRK
@@ -46,7 +46,7 @@ and "genes" in uniprot database::
 So here we got the Entry P43403. Entry and Gene names can be saved in two
 variables as follows::
 
-    >>> res = u.search("ZAP70_HUMAN", format="tab", columnds="id,genes")
+    >>> res = u.search("ZAP70_HUMAN", format="tab", columns="id,genes")
     >>> entry, gene_names = res.split("\n")[1].split("\t") 
 
 
@@ -87,10 +87,10 @@ You can then analyse this sequence with your favorite tool. As an example, withi
 
 then, ::
 
-    >>> blast = NCBIblast(verbose=False)
+    >>> s = NCBIblast(verbose=False)
     >>> jobid = s.run(program="blastp", sequence=sequence, stype="protein", \
     ...    database="uniprotkb", email="cokelaer@ebi.ac.uk")
-    >>> print s.getResult(jobid, "out")[0:1000]
+    >>> print(s.getResult(jobid, "out")[0:1000])
     BLASTP 2.2.26 [Sep-21-2011]
 
 
@@ -123,7 +123,7 @@ which may be quite long. We could look at the beginnin of the reported results
 and select only HUMAN sequences to see that the best sequence found is indeed
 ZAP70_HUMAN as expected::
 
-    >>> [x for x in res.split("\n") if "HUMAN" in x]
+    >>> [x for x in s.getResults(jobid, "out").split("\n") if "HUMAN" in x]
     ['SP:ZAP70_HUMAN P43403 Tyrosine-protein kinase ZAP-70 OS=Homo sap...  1279 0.0  ',
      'SP:KSYK_HUMAN P43405 Tyrosine-protein kinase SYK OS=Homo sapiens...   691 0.0  ',
      'TR:A8K4G2_HUMAN A8K4G2 Tyrosine-protein kinase OS=Homo sapiens P...   691 0.0  ',
@@ -137,11 +137,12 @@ The KEGG services provides pathways, so let try to find pathways that contains
 our targetted protein. First we need to know the KEGG Id that corresponds to
 ZAP70. We can use the **find** method form KEGG service::
 
-    >>> from bioservices import KeggParser
-    >>> k = KeggParser(verbose=False)
+    >>> from bioservices import Kegg
+    >>> k = Kegg(verbose=False)
     >>> k.find("hsa", "zap70")  # "hsa" stands for homo sapiens
     hsa:7535 ZAP70, SRK, STCD, STD, TZK, ZAP-70; zeta-chain (TCR) associated protein kinase 70kDa (EC:2.7.10.2); K07360 tyrosine-protein kinase ZAP-70 [EC:2.7.10.2
 
+There are other ways to perform this conversion using the :meth:`bioservices.uniprot.UniProt.mapping`  or :meth:`bioeservices.Kegg.conv` methods (e.g., \textit{k.conv("hsa", "up:P43403")}).
 
 Now, let us get the pathways that contains this ID::
 
@@ -153,7 +154,7 @@ Now, let us get the pathways that contains this ID::
 
 We can look at the first pathway in a browser (highlighting the ZAP70 node)::
 
-    >>> k.show_pathway("hsa04060", keggid={"7535": "red"})
+    >>> k.show_pathway("hsa04064", keggid={"7535": "red"})
 
 Searching for binary Interactions
 -----------------------------------

@@ -560,7 +560,7 @@ prevented us from fulfilling your request. """)
 
         .. warning:: not yet working. Example on the Chembl website is not working.
 
-        :param query: a valid RefSea accession Id
+        :param str query: a valid RefSea accession Id
         :return: Target Record
 
 
@@ -673,6 +673,7 @@ prevented us from fulfilling your request. """)
 
     def inspect(self, query, item_type):
         """Open the URL of a query in a browser.
+
         :param str query: a valid ChEMBLId of a compound, target or assay.
         :param str item_type: a valid type. Might be compound, target or assay
 

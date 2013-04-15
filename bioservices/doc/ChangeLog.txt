@@ -5,6 +5,12 @@ Whats' new, what has changed
 Revision 1.0
 ------------------
 
+* 1.0.3
+    * uniprot.UniPort.search method: default value of the parameter format is
+      now "tab"
+	* fix 1 quickgo test
+	* a few documentation updates in biomart/uniprot/chembldb and tutorial.
+
 * 1.0.2:
     * add SOAPpy in the setup requirements
 	* finished ArrayExpress +doc + tests
