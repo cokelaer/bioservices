@@ -185,21 +185,43 @@ class UniProt(RESTService):
         """This is an interface to the UniProt mapping service
 
 
+        :param fr: the source database identifier. See :attr:`_mapping`.
+        :param to: the targetted database identifier. See :attr:`_mapping`.
+        :param format: the output format (default is tabulated "tab")
+        :param query: a string containing one or more IDs separated by a space
+        :return: a list. The first element is the source database Id. The second
+            is the targetted source identifier. Following elements are alternate
+            of one the entry and its mapped Id. If a query has several mapped
+            Ids, the query is repeated (see example with PDB mapping here below)
+
+
+e.g., ["From:ID", "to:PDB_ID", "P43403"]
+
+
         ::
 
             >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403')
             ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535']
             >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403 P00958')
             ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535', 'P00958', 'sce:YGR264C']
+            >>> u.mapping(fr="ID", to="PDB_ID", query="P43403", format="tab")
+            ['From:ID', 'To:PDB_ID', 'P43403', '1FBV', 'P43403', '1M61', 'P43403', '1U59',
+            'P43403', '2CBL', 'P43403', '2OQ1', 'P43403', '2OZO', 'P43403', '2Y1N',
+            'P43403', '4A4B', 'P43403', '4A4C']
+
 
 
         There is a web page that gives the list of correct `database identifiers
-        <http://www.uniprot.org/faq/28>`_
+        <http://www.uniprot.org/faq/28>`_. You can also look at the
+        :attr:`_mapping ` attribute.
 
         :URL: http://www.uniprot.org/mapping/
 
         """
         import urllib
+        self.checkParam(fr, self._mapping.values())
+        self.checkParam(to, self._mapping.values())
+
         url = self.url + '/mapping/'
         params = {'from':fr, 'to':to, 'format':format, 'query':query}
         data = urllib.urlencode(params)
@@ -259,7 +281,9 @@ class UniProt(RESTService):
             existence, families, features, genes, go, go-id, interpro, interactor,
             keywords, keyword-id, last-modified, length, organism, organism-id, 
             pathway, protein names, reviewed, score, sequence, 3d, 
-            subcellular locations, taxon, tools, version, virus hosts
+            subcellular locations, taxon, tools, version, virus hosts. The
+            column database must be follows by the database name in brackets
+            (e.g. "database(PDB)")
         :param bool include:  include isoform sequences when the format
             parameter is fasta. Include description when format is rdf. 
         :param sort: by score by default. Set to None to bypass this behaviour
@@ -281,6 +305,9 @@ class UniProt(RESTService):
             CBL_HUMAN   906 P22681  CBL CBL2 RNF55
             CD3Z_HUMAN  164 P20963  CD247 CD3Z T3Z TCRZ
 
+        other examples::
+
+            u.search("ZAP70+AND+organism:9606", limit=3, columns="id,database(PDB)")
 
 
         .. warning:: this function request seems a bit unstable (UniProt web issue ?)
@@ -307,8 +334,12 @@ class UniProt(RESTService):
                 columns = [x.strip() for x in columns.split(",")]
             else:
                 columns = [columns]
+
             for col in columns:
-                self.checkParam(col, _valid_columns)
+                if col.startswith("database(") == True:
+                    pass
+                else:
+                    self.checkParam(col, _valid_columns)
 
             # convert back to a string as expected by uniprot
             params['columns'] = ",".join([x.strip() for x in columns])

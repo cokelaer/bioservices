@@ -44,6 +44,7 @@ Here is a list of services that you can already access from **BioServices**:
     bioservices.kegg.Kegg
     bioservices.chembldb.ChEMBLdb
     bioservices.miriam.Miriam
+    bioservices.pdb.PDB
     bioservices.picr.PICR
     bioservices.quickgo.QuickGO
     bioservices.rhea.Rhea

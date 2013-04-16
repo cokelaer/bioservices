@@ -24,6 +24,7 @@
 
     :URL:  https://www.ebi.ac.uk/chembldb/index.php/
     :REST: https://www.ebi.ac.uk/chembldb/index.php/ws
+    :FAQS: https://www.ebi.ac.uk/chembldb/index.php/faq
 
 
     .. highlights::

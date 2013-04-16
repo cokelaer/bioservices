@@ -118,8 +118,16 @@ NCBIblast
     :undoc-members:
     :synopsis:
 
+PDB module
+========================
+
+.. automodule:: bioservices.pdb
+    :members:
+    :undoc-members:
+    :synopsis:
+
 PICR module
-===================================================================
+=====================================
 
 .. automodule:: bioservices.picr
     :members:

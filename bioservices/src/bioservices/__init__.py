@@ -20,6 +20,9 @@ from xmltools import *
 import wikipathway
 from wikipathway import *
 
+import pdb
+from pdb import *
+
 import uniprot
 from uniprot import *
 

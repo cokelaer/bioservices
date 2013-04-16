@@ -5,6 +5,11 @@ Whats' new, what has changed
 Revision 1.0
 ------------------
 
+* 1.0.4
+    * add a draft version of PDB
+	* add a missing docstring in uniprot +  check to/fr parameters in UniProt.mapping
+	method.
+
 * 1.0.3
     * uniprot.UniPort.search method: default value of the parameter format is
       now "tab"

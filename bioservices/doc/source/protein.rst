@@ -170,7 +170,7 @@ involve ZAP70 in the **mint** database::
 where 9606 is the taxonomy Id for homo sapiens. We could also figure out how
 many interactions could be found in each dabase for this particular query::
 
-    >>> p.getInteractionCounter("zap70 AND species:9606")
+    >>> s.getInteractionCounter("zap70 AND species:9606")
     {'apid': 82,
      'bar': 0,
      'bind': 4,
@@ -234,6 +234,9 @@ BioServices provides such a function called :meth:`~bioservices.services.psicqui
 
     >>> data = s.query("biogrid", "ZAP70 AND species:9606")
     >>> data2 = s.convert(data, "biogrid")
+
+.. warning:: some databases may be offline. If so, try we another database. Type
+   "s.activeDBs".
 
 **convert** method converts all entries from data into uniprot ID. If this is
 not possible, the entry is removed. The **query** and **convert** works on a single database but you we could query all
