@@ -10,7 +10,9 @@ Revision 1.0
       with external tool such as PyMOL as shown in the new pymol.rst
       documentation.
 	* add a missing docstring in uniprot +  check to/fr parameters in UniProt.mapping
-	method.
+	  method.
+	* Fix a typo in PSICQUIC module.
+	
 
 * 1.0.3
     * uniprot.UniPort.search method: default value of the parameter format is
