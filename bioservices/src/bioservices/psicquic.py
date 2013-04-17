@@ -213,7 +213,7 @@ class PSICQUIC(RESTService):
 
     # note the typo in "genbank indentifier from bind DB
     _mapping_uniprot = {"genbank indentifier": "P_GI",
-        'entrezgene/locuslink':"ENTREZGENEID",
+        'entrezgene/locuslink':"P_ENTREZGENEID",
         'uniprotkb': "ACC+ID",
         'rcsb pdb':"PDB_ID",
         'ensembl':"ENSEMBL_ID",
