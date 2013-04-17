@@ -123,7 +123,7 @@ which may be quite long. We could look at the beginnin of the reported results
 and select only HUMAN sequences to see that the best sequence found is indeed
 ZAP70_HUMAN as expected::
 
-    >>> [x for x in s.getResults(jobid, "out").split("\n") if "HUMAN" in x]
+    >>> [x for x in s.getResult(jobid, "out").split("\n") if "HUMAN" in x]
     ['SP:ZAP70_HUMAN P43403 Tyrosine-protein kinase ZAP-70 OS=Homo sap...  1279 0.0  ',
      'SP:KSYK_HUMAN P43405 Tyrosine-protein kinase SYK OS=Homo sapiens...   691 0.0  ',
      'TR:A8K4G2_HUMAN A8K4G2 Tyrosine-protein kinase OS=Homo sapiens P...   691 0.0  ',

@@ -92,6 +92,7 @@ User guide
 
     quickstart.rst
     tutorials.rst
+    applications.rst
     developers.rst                           
 
 

@@ -2,39 +2,43 @@ from bioservices import picr
 
 
 
-class TestPICR(picr.PICR):
+class TestPICR(object):
 
-    def __init__(self):
-        super(TestPICR, self).__init__(verbose=False)
+    @classmethod
+    def setup_class(klass):
+        klass.e = picr.PICR(verbose=False)
+
+    #def __init__(self):
+    #    super(TestPICR, self).__init__(verbose=False)
 
 
     def test_getUPIForSequence(self):
-        res = self.getUPIForSequence(self._sequence_example, ["IPI", "ENSEMBL", "SWISSPROT"])
-        res = self.getUPIForSequence(self._sequence_example, "SWISSPROT", taxid="9606")
-        res = self.getUPIForSequence(self._sequence_example, "SWISSPROT", onlyactive=False, includeattributes=False)
+        res = self.e.getUPIForSequence(self.e._sequence_example, ["IPI", "ENSEMBL", "SWISSPROT"])
+        res = self.e.getUPIForSequence(self.e._sequence_example, "SWISSPROT", taxid="9606")
+        res = self.e.getUPIForSequence(self.e._sequence_example, "SWISSPROT", onlyactive=False, includeattributes=False)
         print res
 
     def test_databases(self):
-        assert len(self.databases)>0
+        assert len(self.e.databases)>0
 
     def test_MappedDB(self):
         #res = xmltools.easyXML(res)
-        self.getMappedDatabaseNames()
+        self.e.getMappedDatabaseNames()
 
     def test_checkDB(self):
-        self._checkDBname("IPI")
+        self.e._checkDBname("IPI")
         try:
-            self._checkDBname("dummy")
+            self.e._checkDBname("dummy")
             assert False
         except:
             assert True
 
     def test_getUPIForAccession(self):
-        self.getUPIForAccession(self._accession_example, ["SWISSPROT"])
-        self.getUPIForAccession(self._accession_example, "SWISSPROT", taxid="9606")
-        res = self.getUPIForAccession(self._accession_example, "SWISSPROT", onlyactive=False, includeattributes=False)
+        self.e.getUPIForAccession(self.e._accession_example, ["SWISSPROT"])
+        self.e.getUPIForAccession(self.e._accession_example, "SWISSPROT", taxid="9606")
+        res = self.e.getUPIForAccession(self.e._accession_example, "SWISSPROT", onlyactive=False, includeattributes=False)
 
     def test_getUPIForBLAST(self):
-        self.getUPIForBLAST(self._blastfrag_example, "SWISSPROT", taxid="9606")
-        self.getUPIForBLAST(self._blastfrag_example, ["SWISSPROT"], taxid="9606", includeattributes=False)
-        self.getUPIForBLAST(self._blastfrag_example, ["SWISSPROT"], taxid="9606", program="blastp",matrix="BLOSUM62")
+        self.e.getUPIForBLAST(self.e._blastfrag_example, "SWISSPROT", taxid="9606")
+        self.e.getUPIForBLAST(self.e._blastfrag_example, ["SWISSPROT"], taxid="9606", includeattributes=False)
+        self.e.getUPIForBLAST(self.e._blastfrag_example, ["SWISSPROT"], taxid="9606", program="blastp",matrix="BLOSUM62")

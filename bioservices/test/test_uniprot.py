@@ -6,8 +6,8 @@ class test_UniProt(UniProt):
         super(test_UniProt, self).__init__(verbose=False)
 
     def test_mapping(self):
-        res = self.mapping(fr="ACC", to="KEGG_ID", query='P43403')
-        assert res == ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535']
+        res = self.mapping(fr="ACC+ID", to="KEGG_ID", query='P43403')
+        assert res == ['From:ACC+ID', 'To:KEGG_ID', 'P43403', 'hsa:7535']
         try: 
             res = self.mapping(fr="AC", to="KEID", query='P434')
             assert False

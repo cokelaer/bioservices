@@ -412,6 +412,9 @@ class PSICQUIC(RESTService):
 
 
         """
+        if service not in self.activeDBs:
+            raise ValueError("database %s not in active databases" % service)
+
         params = {}
         if output!=None:
             self.checkParam(output, self.formats)

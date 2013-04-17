@@ -69,14 +69,17 @@ class PICR(RESTService):
     _accession_example = "P29375"
     _url = "http://www.ebi.ac.uk/Tools/picr/rest"
 
-    def __init__(self, verbose=True):
+    def __init__(self, verbose=False):
+        """.. rubric:: Constructor
+
+        :param bool verbose: prints informative messages (default is False)
+
+        """
         super(PICR, self).__init__(name="PICR", url=PICR._url, verbose=verbose)
         self._databases = None
 
     def getMappedDatabaseNames(self):
-        """Return the valid database names
-
-        This method calls the getMappedDatabaseNames REST services from PICR website.
+        """Returns names of the databases
 
         :returns: An XML containing the databases available.
 
@@ -91,7 +94,8 @@ class PICR(RESTService):
             res = self.getMappedDatabaseNames()
             self._databases = [a.text for a in res.getchildren()]
         return self._databases
-    databases = property(_get_databases, doc="Get a human-readable list of databases (from XML returned by :meth:`getMappedDatabaseNames`)")
+    databases = property(_get_databases, 
+        doc="Get a human-readable list of databases (obtained from XML returned by :meth:`getMappedDatabaseNames`)")
 
     def getUPIForSequence(self, sequence, database, taxid=None,
         onlyactive=True, includeattributes=False):

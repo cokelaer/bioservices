@@ -61,8 +61,8 @@ from a database to another one. For instance to convert the UniProtKB ID into KE
 
     >>> from bioservices.uniprot import UniProt
     >>> u = UniProt(verbose=False)
-    >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403')
-    ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535']
+    >>> u.mapping(fr="ACC+ID", to="KEGG_ID", query='P43403')
+    ['From:ACC+ID', 'To:KEGG_ID', 'P43403', 'hsa:7535']
 
 Note that the returned response from uniprot web service is converted into a list. The first two elements are the databases used for the mapping. Then, alternance of the queried element and the answer populates the list. 
 
