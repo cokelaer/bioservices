@@ -213,7 +213,7 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
 
         There is a web page that gives the list of correct `database identifiers
         <http://www.uniprot.org/faq/28>`_. You can also look at the
-        :attr:`_mapping ` attribute.
+        :attr:`_mapping` attribute.
 
         :URL: http://www.uniprot.org/mapping/
 

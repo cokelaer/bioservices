@@ -38,7 +38,7 @@ from bioservices.services import RESTService, BioServicesError
 __all__ = ["ArrayExpress"]
 
 class ArrayExpress(RESTService):
-    """Interface to the `ArrayExpress <"http://www.ebi.ac.uk/arrayexpress">`_ service
+    """Interface to the `ArrayExpress <http://www.ebi.ac.uk/arrayexpress>`_ service
 
     ArrayExpress allows to retrieve data sets used in various experiments. If
     you know the file and experiment name, you can retrieve a file as follows::
