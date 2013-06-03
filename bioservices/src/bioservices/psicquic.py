@@ -671,6 +671,7 @@ class PSICQUIC(RESTService):
         return results
 
     def convert(self, data, db=None):
+        self.logging.debug("converting the database %s" % db)
         idsA, idsB = self.knownName(data)
         mapping = self.mappingOneDB(data)
         results = []
@@ -679,9 +680,12 @@ class PSICQUIC(RESTService):
             y = idsB[i].split(":",1)[1]
             xp = mapping[x]
             yp = mapping[y]
-            ref = entry[8]
-            score = entry[14]
-            interaction = entry[11]
+            try:ref = entry[8]
+            except:ref="?"
+            try:score = entry[14]
+            except:score = "?"
+            try:interaction = entry[11]
+            except:interaction="?"
             results.append((xp, yp, score, interaction, ref, db))
         return results
 

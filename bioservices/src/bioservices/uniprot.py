@@ -48,7 +48,7 @@ __all__ = ["UniProt"]
 
 
 mapping = {"UniProtKB AC/ID":"ACC+ID", 
-    "UniProtKB": "AC",
+    "UniProtKB": "ACC",
     "UniProtKB": "ID",
     "UniParc": "UPARC",
     "UniRef50": "NF50",
@@ -219,8 +219,8 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
 
         """
         import urllib
-        self.checkParam(fr, self._mapping.values())
-        self.checkParam(to, self._mapping.values())
+        #self.checkParam(fr, self._mapping.values())
+        #self.checkParam(to, self._mapping.values())
 
         url = self.url + '/mapping/'
         params = {'from':fr, 'to':to, 'format':format, 'query':query}

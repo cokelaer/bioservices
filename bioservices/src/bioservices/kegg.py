@@ -580,7 +580,7 @@ class Kegg(RESTService):
         entire database to another (e.g., from uniprot to Kegg Id all human gene
         IDs):: 
 
-            kegg_ids, uniprot_ids = s.conv("hsa", "uniprot")
+            uniprot_ids, kegg_ids = s.conv("hsa", "uniprot")
 
         or a subset by providing a valid **dbentries**::
 
@@ -1034,11 +1034,13 @@ class Kegg(RESTService):
         # read and parse the entries
         entries = [x for x in res.findAll("entry")]
         for entry in entries:
+
             output['entries'].append({
                 'id': entry.get("id"),
                 'name': entry.get("name"),
                 'type': entry.get("type"),
-                'link': entry.get("link")
+                'link': entry.get("link"),
+                'gene_names': entry.find("graphics").get("name")
                 })
 
         relations = [(x.get("entry1"), x.get("entry2"), x.get("type")) for x in res.findAll("relation")]
