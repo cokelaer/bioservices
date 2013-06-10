@@ -219,7 +219,7 @@ class WSDLService(Service):
 
     """
 
-    def __init__(self, name, url, verbose=True):
+    def __init__(self, name, url, verbose=True, lib="soappy"):
         """.. rubric:: Constructor
 
         :param str name: a name e.g. Kegg, Reactome, ...
@@ -232,6 +232,8 @@ class WSDLService(Service):
         the list of functionalities.
 
         """
+        assert lib in ["suds", "soappy"],\
+            "library used to connect to the WSDL service must either sud or soappy (default)"
         super(WSDLService, self).__init__(name, url, verbose=verbose)
 
         #self.serv = SOAPProxy(self.url) # what's that ? can we access to a method directly ?
@@ -239,7 +241,14 @@ class WSDLService(Service):
 
         try:
             #: attribute to access to the methods provided by this WSDL service
-            self.serv = WSDL.Proxy(self.url)
+            if lib == "soappy":
+                self.serv = WSDL.Proxy(self.url)
+            elif lib == "suds":
+                serv = WSDL.Proxy(self.url)
+                from suds.client import Client
+                self.suds = Client(self.url)
+                self.serv = self.suds.service
+                self.serv.methods = serv.methods.copy()
         except Exception, e:
             print("Could not connect to the service %s " % self.url)
             raise Exception
@@ -388,5 +397,32 @@ class RESTService(Service):
             print(sys.stderr, ex.read())
             raise
         return jobId
+
+
+def get_bioservices_env(section, option):
+    import os
+    import ConfigParser
+    cf = ConfigParser.ConfigParser()
+
+    homedir = os.getenv("HOME") 
+    bioservices_home = homedir + os.sep + ".bioservices"
+    config_file = bioservices_home + os.sep + "bioservices.cfg"
+
+    if os.path.isdir(bioservices_home) == False:
+        os.mkdir(bioservices_home)
+    if os.path.isfile(config_file) == False:
+        cf.add_section("chemspider")
+        cf.set("chemspider", "token", "")
+        fh = open(config_file, "w")
+        cf.write(fh)
+        fh.close()
+        raise ValueError("No token found for chemspider. Create one on http//www.chemspider.com and provide it when creating instance of ChemSpider")
+    else:
+        cf.read(config_file)
+        value = cf.get(section, option)
+        if value=="":
+            raise ValueError("No token found for chemspider. Create one on http//www.chemspider.com and provide it when creating instance of ChemSpider")
+        return value
+
 
 
