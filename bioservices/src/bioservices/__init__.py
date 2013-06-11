@@ -8,6 +8,9 @@ from services import *
 import biomodels
 from biomodels import *
 
+import chebi
+from chebi import *
+
 import kegg
 from kegg import *
 
