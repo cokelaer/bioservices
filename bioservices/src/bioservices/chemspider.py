@@ -58,8 +58,14 @@ class ChemSpider(RESTService):
 
 
     """
-    def __init__(self, verbose=False):
-        self._token = "7a621478-4e35-4da0-895c-7950af45f2fd"
+    def __init__(self, verbose=False, token=None):
+        if token == None:
+            import services
+            try:
+                token = services.get_bioservices_env("chemspider", "token")
+            except Exception,e:
+                raise Exception(e)
+        self._token = token
         url = 'http://www.chemspider.com/'
         super(ChemSpider, self).__init__("ChemSpider", url=url, verbose=verbose)
         self._databases = None
@@ -68,7 +74,10 @@ class ChemSpider(RESTService):
         self._token = token
     def _get_token(self):
         return self._token
+    # keep it hidden ? 
     token = property(None, _set_token)
+
+
 
     def find(self, query):
         """return the first 100 compounds that match the query"""
@@ -132,7 +141,6 @@ class ChemSpider(RESTService):
     def _get_databases(self):
         if self._databases == None:
             ret = self.request("/MassSpecAPI.asmx/GetDatabases?")
-            print ret
             self._databases = [x.text for x in ret.getchildren()]
             print self._databases
         return self._databases
