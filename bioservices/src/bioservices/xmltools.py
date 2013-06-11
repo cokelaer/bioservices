@@ -22,7 +22,7 @@ from __future__ import print_function
 
 
 import xml.etree.ElementTree as ET
-import BeautifulSoup
+import bs4
 
 __all__ = ["easyXML"]
 
@@ -75,7 +75,7 @@ class easyXML(object):
 
     def _get_soup(self):
         if self._soup == None:
-            self._soup = BeautifulSoup.BeautifulSoup(self.data)
+            self._soup = bs4.BeautifulSoup(self.data)
         return self._soup
     soup = property(_get_soup, doc="Returns the beautiful soup instance")
 
