@@ -29,6 +29,9 @@ from pdb import *
 import uniprot
 from uniprot import *
 
+import unichem
+from unichem import *
+
 import wsdbfetch
 from wsdbfetch import *
 
