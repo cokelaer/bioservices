@@ -40,9 +40,10 @@ Here is a list of services that you can already access from **BioServices**:
     bioservices.arrayexpress.ArrayExpress
     bioservices.biomodels.BioModels
     bioservices.biomart.BioMart
+    bioservices.chebi.ChEBI
+    bioservices.chembldb.ChEMBLdb
     bioservices.eutils.EUtils
     bioservices.kegg.Kegg
-    bioservices.chembldb.ChEMBLdb
     bioservices.miriam.Miriam
     bioservices.pdb.PDB
     bioservices.picr.PICR
@@ -78,6 +79,8 @@ Installation
 
 If not, please see the external `pip installation page <http://www.pip-installer.org/en/latest/installing.html>`_ or `pip installation <http://thomas-cokelaer.info/blog/2013/02/python-pip-installation/>`_
 
+In case of trouble, please see the :ref:`troubleshootings page <troubleshootings>`
+
 
 .. toctree::
     :maxdepth: 3
@@ -93,7 +96,7 @@ User guide
     quickstart.rst
     tutorials.rst
     applications.rst
-    developers.rst                           
+    developers.rst
 
 
 .. toctree::
@@ -110,3 +113,10 @@ References
     references
 
 
+FAQS
+###########
+
+.. toctree:: 
+    :maxdepth: 1
+
+    faqs

@@ -5,6 +5,14 @@ Whats' new, what has changed
 Revision 1.0
 ------------------
 
+* 1.0.5:
+    * in psicquic when performing the conversion, we now use a try/except since
+	  some fields (in rare case) may be missing
+	* add faqs in the doc + update of the README and metadata.
+	* fix typo in the list of uniprot mapping
+	* Use BeautifulSoup4 instead of 3
+	* add the chEBI  Web Service.
+
 * 1.0.4
     * add a draft version of PDB just to be able to fetch PDB data and use it
       with external tool such as PyMOL as shown in the new pymol.rst

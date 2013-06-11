@@ -59,6 +59,15 @@ BioModels
     :undoc-members:
     :synopsis:
 
+ChEBI
+=======
+
+.. automodule:: bioservices.chebi
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
 ChEMBLdb
 ==========
 
