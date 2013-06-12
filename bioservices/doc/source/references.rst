@@ -167,7 +167,15 @@ Rhea
     :undoc-members:
     :synopsis:
 
-Uniprot
+UniChem
+===================================================================
+
+.. automodule:: bioservices.unichem
+    :members:
+    :undoc-members:
+    :synopsis:
+
+UniProt
 ===================================================================
 
 .. automodule:: bioservices.uniprot

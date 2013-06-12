@@ -20,3 +20,4 @@ welcomed.
     kegg_tutorial.rst
     biomodels.rst
     protein.rst
+    compound_tutorial.rst

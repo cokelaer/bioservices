@@ -26,7 +26,7 @@ One of the main philosophy of **BioServices** is to make use of the
 existing SOAP/WSDL facilities provided in biological databases, not to 
 re-invent new databases.
 
-The first release of **BioServices** provides a wrapping to more than 15 Web
+The first release of **BioServices** provides a wrapping to more than 18 Web
 Services (more if we consider **BioMart** and **PSICQUIC** portals that link to
 many other Web Services). 
 
@@ -49,6 +49,7 @@ Here is a list of services that you can already access from **BioServices**:
     bioservices.picr.PICR
     bioservices.quickgo.QuickGO
     bioservices.rhea.Rhea
+    bioservices.unichem.UniChem
     bioservices.uniprot.UniProt
     bioservices.wsdbfetch.WSDbfetch
     bioservices.ncbiblast.NCBIblast
