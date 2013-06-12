@@ -350,7 +350,7 @@ class RESTService(Service):
                     try:
                         res = self.easyXML(res)
                     except:
-                        logging.error("--Conversion to easyXML failed. returns the raw response"),
+                        logging.warning("--Conversion to easyXML failed. returns the raw response"),
             self.last_response = res
             return res
         except Exception, e:
