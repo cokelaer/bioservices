@@ -17,7 +17,7 @@
 #
 ##############################################################################
 #$Id$
-"""This module provides a class :class:`~BioModels` that allows an easy access to all the BioModel service.
+"""This module provides a class :class:`~BioModels` to access to BioModels WS.
 
 
 .. topic:: What is BioModels ?

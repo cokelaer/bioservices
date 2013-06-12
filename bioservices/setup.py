@@ -7,8 +7,8 @@ import glob
 
 
 _MAJOR               = 1
-_MINOR               = 0
-_MICRO               = 4
+_MINOR               = 1
+_MICRO               = 0
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -20,10 +20,10 @@ metainfo = {
     'license' : 'GPL',
     'download_url' : ['http://pypi.python.org/pypi/bioservices'],
     'url' : ['http://pypi.python.org/pypi/bioservices'],
-    'description':'Access to Biological Web Services from Python i' ,
+    'description':'Access to Biological Web Services from Python' ,
     'platforms' : ['Linux', 'Unix', 'MacOsX', 'Windows'],
     'keywords' : [
-        "BioServices", "Web Services", "Biology", "Kegg", "KEGG", "BioModels",
+        "BioServices", "Web Services", "Biology", "ChEBI", "UniChem", "Kegg", "KEGG", "BioModels",
         "EUtils", "UniProt", "PICR", "ArrayExpress", "QuickGO", "PDB", "PSICQUIC", "Blast",
         "BioMART", "BioGRID", "MIRIAM", "BioMart", "EUtils", "ChEMBL", "ChemSpider"],
     'classifiers' : [
@@ -62,7 +62,7 @@ setup(
     package_dir = {'':'src'},
     packages = ['bioservices'],
     #package_dir  = package_dir,
-    install_requires = ["easydev>=0.5.6", "BeautifulSoup", "SOAPpy"],
+    install_requires = ["easydev>=0.5.6", "beautifulsoup4", "SOAPpy"],
     )
 
 

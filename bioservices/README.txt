@@ -7,10 +7,17 @@ applications that combine several of the wrapped Web Services should be
 fostered.
 
 One of the main philosophy of **BioServices** is to make use of the existing
- biological databases (not to re-invent new databases) and to alleviates the
+biological databases (not to re-invent new databases) and to alleviates the
 needs for expertise in web services for the developers/users.
 
-So far, BioServices provides wrappers for about 15 Web Services including `KEGG <http://www.genome.jp/kegg/pathway.html>`_, `UniProt <http://www.uniprot.org/>`_, `BioModels <http://www.ebi.ac.uk/biomodels-main/>`_, `WikiPathway <http://www.wikipathways.org/index.php/WikiPathways>`_, `quickGO <http://www.ebi.ac.uk/QuickGO/WebServices.html>`_, `PSICQUIC <http://code.google.com/p/psicquic/>`_, .
+So far, BioServices provides wrappers for about 17 Web Services including 
+
+* `BioModels <http://www.ebi.ac.uk/biomodels-main/>`_
+* `KEGG <http://www.genome.jp/kegg/pathway.html>`_
+* `UniProt <http://www.uniprot.org/>`_
+* `quickGO <http://www.ebi.ac.uk/QuickGO/WebServices.html>`_
+* `PSICQUIC <http://code.google.com/p/psicquic/>`_
+* `WikiPathway <http://www.wikipathways.org/index.php/WikiPathways>`_
 
 Example using the UniProt Web Service to search for the zap70 specy in human
 organism::
@@ -24,6 +31,4 @@ organism::
     B4E0E2_HUMAN 185     B4E0E2
     RHOH_HUMAN   191     Q15669  RHOH ARHH TTF
 
-
 Up-to-date list of Web Services is provided within the `documentation <http://pythonhosted.org/bioservices/>`_.
-
