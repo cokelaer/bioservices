@@ -6,6 +6,11 @@ def test_chebi():
     ch.getCompleteEntity("CHEBI:10102")
     res = ch.conv("CHEBI:10102", "ChEMBL COMPOUND")
     assert res == ["521332"]
+    try:
+        res = ch.conv("CHEBI:10102", "wrong db")
+        assert False
+    except:
+        assert True
 
 
     ch.getOntologyChildren("CHEBI:27732")
@@ -18,6 +23,9 @@ def test_chebi_mass():
 
     res = ch.getLiteEntity("194.19076", "MASS", 5, 2)
     assert  res[0]["chebiId"] == "CHEBI:27732"
+
+    # should return nothing
+    res = ch.getLiteEntity("194.19076", "SMILES", 5, 2)
 
 def test_polymer():
     ch = ChEBI()
