@@ -118,7 +118,7 @@ class ArrayExpress(RESTService):
     .. warning:: filtering is not implemented (e.g., assaycount:[x TO y]syntax.)
     """
 
-    def __init__(self, verbose=True):
+    def __init__(self, verbose=False):
         """.. rubric:: Constructor
 
         :param bool verbose: prints informative messages
