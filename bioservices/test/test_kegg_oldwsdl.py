@@ -1,10 +1,10 @@
 from bioservices import Kegg
-from nose import with_setup
+#from nose import with_setup
 
-import easydev
-import os
-sharepath = easydev.get_shared_directory_path("bioservices") + os.sep + "data"
-sharepath = easydev.get_shared_directory_path("bioservices") + os.sep  
+#import easydev
+#import os
+#sharepath = easydev.get_shared_directory_path("bioservices") + os.sep + "data"
+#sharepath = easydev.get_shared_directory_path("bioservices") + os.sep  
 
 
 

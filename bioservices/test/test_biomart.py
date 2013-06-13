@@ -1,15 +1,15 @@
-from bioservices import biomart
+from bioservices import BioMart
+import unittest
 
 
-
-def test_registry():
-    s = biomart.BioMart()
-    s.registry()
+def test_general():
+    s = BioMart()
+    #s.registry()
     s.datasets("ensembl")
+    s.version("ensembl")
     s.attributes("oanatinus_gene_ensembl")
     s.filters("oanatinus_gene_ensembl")
     s.configuration("oanatinus_gene_ensembl")
-
 
     xmlq = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Query>
@@ -25,8 +25,12 @@ def test_registry():
     s.query(s._xml_example)
 
 
+    # build own xml using the proper functions
+    s.add_dataset_to_xml("protein")
+    s.get_xml()
 
-def test_reactome_example():
+def _test_reactome_example():
+    # this is not working anymore...
     s = biomart.BioMart()
     s.lookfor("reactome")
     s.datasets("REACTOME")

@@ -118,7 +118,8 @@ class test_biomodels(BioModels):
     def test_getModelsIdByTaxonomyId(self, taxonomyId='9606'):
         return self.getModelsIdByTaxonomyId(taxonomyId)
 
-    def _test_getSubModelSBML(self):
+    def test_getSubModelSBML(self):
+        self.getSubModelSBML("BIOMD0000000242", "cyclinEdegradation_1")
         #self.getSubModelSBML(modelId, elementsIDs)
         pass
 

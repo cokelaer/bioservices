@@ -1,6 +1,9 @@
 from bioservices import ChEBI
 
 
+
+
+
 def test_chebi():
     ch = ChEBI()
     ch.getCompleteEntity("CHEBI:10102")
@@ -12,9 +15,9 @@ def test_chebi():
     except:
         assert True
 
-
     ch.getOntologyChildren("CHEBI:27732")
     ch.getOntologyParents("CHEBI:27732")
+    ch.getUpdatedPolymer("CHEBI:27732")
 
 def test_chebi_mass():
     ch = ChEBI()
@@ -38,7 +41,6 @@ def test_polymer():
     # C8H10N4O2
     x.updatedStructure
 
-
 def test_completelist():
     ch = ChEBI()
     names = [x.chebiAsciiName for x in ch.getCompleteEntityByList(["CHEBI:27732","CHEBI:36707"])]
@@ -48,3 +50,13 @@ def test_search():
     ch = ChEBI()
     smiles = ch.getCompleteEntity("CHEBI:27732").smiles
     ch.serv.getStructureSearch(smiles, "SMILES", "SIMILARITY", 3, 0.25)
+
+def test_ontology():
+    ch = ChEBI()
+    ch.getAllOntologyChildrenInPath("CHEBI:27732", "has part")
+
+def test_structure():
+    ch = ChEBI()
+    smiles = ch.getCompleteEntity("CHEBI:27732").smiles
+    ch.getStructureSearch(smiles, "SMILES", "SIMILARITY", 3, 0.25)
+
