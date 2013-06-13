@@ -65,19 +65,15 @@ class ChemSpider(RESTService):
                 token = services.get_bioservices_env("chemspider", "token")
             except Exception,e:
                 raise Exception(e)
-        self._token = token
+        self._token = None
+        self.token = token
         url = 'http://www.chemspider.com/'
         super(ChemSpider, self).__init__("ChemSpider", url=url, verbose=verbose)
         self._databases = None
 
     def _set_token(self, token):
         self._token = token
-    def _get_token(self):
-        return self._token
-    # keep it hidden ? 
     token = property(None, _set_token)
-
-
 
     def find(self, query):
         """return the first 100 compounds that match the query"""
