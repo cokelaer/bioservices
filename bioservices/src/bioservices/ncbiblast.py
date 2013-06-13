@@ -339,12 +339,6 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
 
         return output
 
-    #def save(self, jobId, identifier, fileSuffix):
-    #    filename = jobId + '.' + str(resultType['identifier']) + '.' + \
-    #        str(resultType['fileSuffix'])
-
-
-
 
     # TODO need to check that jobid is finished
     def getResult(self, jobid, resultType):
@@ -362,16 +356,11 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
         requestUrl = self.url + '/result/' + jobid + '/' + resultType
         res = self.request(requestUrl, format=resultType)
 
-        #todo
-        #create filename and save
-        #fh = open(filename, 'w');
-        #fh.write(result)
-        #fh.close()
 
         return res
 
 
-    def wait(self, jobId, checkInterval=2, verbose=True):
+    def wait(self, jobId, checkInterval=5, verbose=True):
         """This function checks the status of a jobid while it is running
 
         :param str jobid: a job identifier returned by :meth:`run`.
