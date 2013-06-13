@@ -52,14 +52,14 @@ class EFetch(WSDLService):
         ret = self.serv.run_eFetch(db=db, id=Id)
         return ret
 
-class EUtilsPubmed(WSDLService):
-    def __init__(self,verbose=False):
-        url = "http://www.ncbi.nlm.nih.gov/entrez/eutils/soap/v2.0/efetch_taxon.wsdl"
-        super(EUtilsPubmed, self).__init__(name="EUtilsTaxon", verbose=verbose, url=url)
-
-    def run_eFetch(self, db, Id):
-        ret = self.serv.run_eFetch(db=db, id=Id)
-        return ret
+#class EUtilsPubmed(WSDLService):
+#    def __init__(self,verbose=False):
+#        url = "http://www.ncbi.nlm.nih.gov/entrez/eutils/soap/v2.0/efetch_taxon.wsdl"
+#        super(EUtilsPubmed, self).__init__(name="EUtilsTaxon", verbose=verbose, url=url)
+#
+#    def run_eFetch(self, db, Id):
+#        ret = self.serv.run_eFetch(db=db, id=Id)
+#        return ret
 
 
 class EUtilsTaxon(WSDLService):
