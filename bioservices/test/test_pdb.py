@@ -6,8 +6,4 @@ def test_pdb():
     res = s.getFile("1FBV", "pdb")
     res = s.getFile("1FBV", "xml")
     ids = s.getCurrentIDs()
-    #import tempfile
-    #fh = tempfile.NamedTemporaryFile()
-    #fh.write(res)
-    #fh.close()
 

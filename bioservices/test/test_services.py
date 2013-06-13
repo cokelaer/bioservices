@@ -14,6 +14,10 @@ class test_Service(Service):
         res = self.urlencode({'a':1, 'b':2})
         assert res in ["a=1&b=2", "b=2&a=1"]
 
+    def test_pubmed(self):
+        self.pubmed("http://www.ncbi.nlm.nih.gov/pubmed/19693079")
+
+
 class test_WSDLService(WSDLService):
     def __init__(self):
         super(test_WSDLService, self).__init__("test",

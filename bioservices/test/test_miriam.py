@@ -10,7 +10,8 @@ class test_miriam(Miriam):
 
 
     def test_checkRegExp(self):
-        assert self.checkRegExp("uniprot", "P62158") == True
+        assert self.checkRegExp("1P43403", "uniprot") == False
+        assert self.checkRegExp("P43403", "uniprot") == True
 
     def test_convertURL(self):
         assert self.convertURL("http://identifiers.org/ec-code/1.1.1.1") == 'urn:miriam:ec-code:1.1.1.1'
@@ -57,6 +58,8 @@ class test_miriam(Miriam):
 
     def test_getLocation(self):
         self.getLocation("UniProt", "MIR:00100005")
+        self.getLocations("urn:miriam:obo.go:GO%3A0045202")
+
 
     def test_getLocations(self ):
         self.getLocations("UniProt","P62158")
@@ -98,16 +101,14 @@ class test_miriam(Miriam):
     def test_getServicesVersion(self):
         self.getServicesVersion()
 
-
-    def getURI(self, name, Id):
+    def test_getURI(self):
         res = self.getURI("UniProt", "P62158")
         assert res == 'urn:miriam:uniprot:P62158'
 
-    def getURIs(self, name, Id):
+    def test_getURIs(self):
         res = self.getURIs("UniProt", "P62158")
 
-    def isDeprecated(self):
+    def test_isDeprecated(self):
         self.isDeprecated("urn:miriam:uniprot")
     
-
 

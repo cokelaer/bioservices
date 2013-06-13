@@ -1,5 +1,5 @@
 from bioservices import picr
-
+import unittest
 
 
 class TestPICR(object):
@@ -38,7 +38,9 @@ class TestPICR(object):
         self.e.getUPIForAccession(self.e._accession_example, "SWISSPROT", taxid="9606")
         res = self.e.getUPIForAccession(self.e._accession_example, "SWISSPROT", onlyactive=False, includeattributes=False)
 
-    def test_getUPIForBLAST(self):
+    # this one is failing from time to time even the exemple on the web site.
+    @unittest.skip
+    def _test_getUPIForBLAST(self):
         self.e.getUPIForBLAST(self.e._blastfrag_example, "SWISSPROT", taxid="9606")
         self.e.getUPIForBLAST(self.e._blastfrag_example, ["SWISSPROT"], taxid="9606", includeattributes=False)
         self.e.getUPIForBLAST(self.e._blastfrag_example, ["SWISSPROT"], taxid="9606", program="blastp",matrix="BLOSUM62")

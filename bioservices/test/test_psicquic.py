@@ -36,3 +36,9 @@ class test_psicquic(PSICQUIC):
         # accessing the string DB
         self.query("string", "species:10090", firstResult=0, maxResults=100, output="tab25")
 
+
+def test_appsPPI():
+    p = psicquic.AppsPPI(verbose=False)
+    p.queryAll("ZAP70", ["intact"])
+    p.summary()
+

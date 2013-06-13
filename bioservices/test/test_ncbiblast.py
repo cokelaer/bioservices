@@ -23,11 +23,11 @@ class test_nciblast(NCBIblast):
         try:
             self.jobid = self.run(program="blastp", sequence=self._sequence_example,
                 stype="protein", database="uniprotkb")
-            assert False # missing argument
+            assert False # missing email argument
         except:
             assert True
         self.jobid = self.run(program="blastp", sequence=self._sequence_example,
-            stype="protein", database="uniprotkb", email="name@test.org",
+            stype="protein", database="uniprotkb", email="cokelaer@ebi.ac.uk",
             matrix="BLOSUM45")
         res = self.getResult(self.jobid, "out")
 

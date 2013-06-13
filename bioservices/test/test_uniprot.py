@@ -34,3 +34,5 @@ class test_UniProt(UniProt):
 
         self.search("ZAP70_HUMAN", format="tab", columns="sequence", limit=1)
 
+        self.quick_search("ZAP70")
+
