@@ -538,8 +538,7 @@ class Kegg(RESTService):
         :param str source: the source database (e.g., uniprot) or a valid
             dbentries; see below for details.
 
-        :return: a tuple with 2 lists. The first contains the target IDs and the
-            second contains the source IDs. 
+        :return: a dictionary with keys being the source and values being the target.
 
         Here are the rules to set the target and source parameters.
 
@@ -588,7 +587,10 @@ class Kegg(RESTService):
 
 
         .. warning:: dbentries are not check and are supposed to be correct. 
-            See :meth:`check_dbentries` to help you checking a dbentries.
+            See :meth:`check_idbentries` to help you checking a dbentries.
+
+        .. versionchanged:: 1.1
+            the output is now a dictionary, not a list of tuples
         """
 
         # The second argument may be a source_db or a dbentries so checking
@@ -631,7 +633,7 @@ class Kegg(RESTService):
         try:
             t = [x.split("\t")[0] for x in res.strip().split("\n")]
             s = [x.split("\t")[1] for x in res.strip().split("\n")]
-            return (t, s)
+            return dict([(x,y) for x,y in zip(t, s)])
         except:
             return res
 
@@ -1067,7 +1069,8 @@ class Kegg(RESTService):
     def pathway2sif(self, pathwayId, uniprot=True):
         """Extract protein-protein interaction from KEGG pathway to a SIF format
 
-        .. warning:: experimental Not tested on all pathway.
+        .. warning:: experimental Not tested on all pathway. should be move to
+            another package such as cellnopt
 
         :param str pathwayId: a valid pathway Id
         :param bool uniprot: convert to uniprot Id or not (default is True)
