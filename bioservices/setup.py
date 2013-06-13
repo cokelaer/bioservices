@@ -62,7 +62,7 @@ setup(
     package_dir = {'':'src'},
     packages = ['bioservices'],
     #package_dir  = package_dir,
-    install_requires = ["easydev>=0.5.6", "beautifulsoup4", "SOAPpy"],
+    install_requires = ["easydev>=0.5.6", "beautifulsoup4", "SOAPpy", "suds"],
     )
 
 
