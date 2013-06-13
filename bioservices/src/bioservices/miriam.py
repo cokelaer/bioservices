@@ -78,7 +78,7 @@ class Miriam(WSDLService):
             raise ValueError("boolean can be true or false only (%s)" % boolean)
 
     def checkRegExp(self, identifier, datatype):
-        """Checks if the identifier given follows the regular expression of the data collection (also provided).
+        """Checks if the identifier given follows the regular expression of the data collection
 
         :param str identifier: internal identifier used by the data collection
         :param str datatype: name, synonym or MIRIAM URI of a data collection
@@ -86,9 +86,14 @@ class Miriam(WSDLService):
 
         ::
 
-            >>> m.checkRegExp("uniprot", "P62158")
+            >>> m.checkRegExp("P62158", "uniprot")
             True
+            >>> m.checkRegExp("!P62158", "uniprot")
+            False
 
+        .. warning:: there is no sanity check on the datatype. Default output is
+            True. So if you inverse the parameters, you may get True even tough it does not
+            make sense. This is a feature of the Web Service.
         """
         res = self.serv.checkRegExp(identifier, datatype)
         res = self._boolean_convertor(res)

@@ -132,12 +132,12 @@ chemical structures, using the ChEBI identifier.
 
 
             >>> ch.getLiteEntity("CHEBI:27732")
-            (LiteEntity){
+            [(LiteEntity){
                chebiId = "CHEBI:27732"
                chebiAsciiName = "caffeine"
-               searchScore = 0.87
+               searchScore = 4.77
                entityStar = 3
-             }
+             }]
             >>> res = ch.getLiteEntity("caffeine")
             >>> res = ch.getLiteEntity("caffeine", maximumResults=10)
             >>> len(res)

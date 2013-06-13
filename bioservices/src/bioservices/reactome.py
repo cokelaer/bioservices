@@ -19,6 +19,7 @@
 #$Id: $
 """Interface to the Reactome webs services
 
+:STATUS: in progress/draft don't use !
 
 .. topic:: What is Reactome?
 

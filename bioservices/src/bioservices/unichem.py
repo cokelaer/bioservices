@@ -234,7 +234,10 @@ class UniChem(RESTService):
 
         :return: list of 'src_id's.
 
+        ::
+
             >>> uni.get_all_src_ids()
+
         """
         res = self.request("src_ids")
         res = eval(res)
