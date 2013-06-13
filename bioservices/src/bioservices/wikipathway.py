@@ -148,10 +148,10 @@ class Wikipathway(WSDLService):
         codes parameters should match, they will be paired to form xrefs, 
         e.g.::
 
-            from bioservices import RESTService
-            r = RESTService("test", url=s.url[:-5])
-            r.request('/findPathwaysByXref?ids=1234&ids=ENSG00000130164&codes=L&codes=EnHs')
-            r.request('/findPathwaysByXref?ids=1234&codes=L')
+            >>> from bioservices import RESTService
+            >>> r = RESTService("test", url=s.url[:-5])
+            >>> r.request('/findPathwaysByXref?ids=1234&ids=ENSG00000130164&codes=L&codes=EnHs')
+            >>> r.request('/findPathwaysByXref?ids=1234&codes=L')
 
         :param str string ids: One DataNode identifier(s) (e.g. 'P45985').
             Datanodes can be (gene/protein/metabolite identifiers). 
@@ -162,7 +162,7 @@ class Wikipathway(WSDLService):
 
         ::
 
-            s.findPathwaysByXref(ids="P45985")
+            >>> s.findPathwaysByXref(ids="P45985")
 
 
         .. warning:: **codes** is not available. Does not seem to work in WSDLinterface.
@@ -200,6 +200,8 @@ class Wikipathway(WSDLService):
             if organism == None:
                 organism = self.organism
             for x in self.serv.findInteractions(query=query):
+                if len(x) == 0:
+                    continue
                 if 'species' not in x._keyord:
                     continue
                 if x['species'] == organism:
