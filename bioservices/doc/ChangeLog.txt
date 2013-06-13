@@ -14,6 +14,7 @@ Revision 1.0
 	* add the chEBI  Web Service.
 	* add the UniChem  Web Service.
 	* logging ERROR in Service when data cannot be converted to XML is now a simple warning
+	* kegg.conv method now returns a dictionary instead of list of tuples.
 
 * 1.0.4
     * add a draft version of PDB just to be able to fetch PDB data and use it

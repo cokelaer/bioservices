@@ -33,7 +33,7 @@ bioservices. If so, make this solution persistent by adding the
 code into your environment. For that, just copy and paste the code in a file called
 .bashrc_profile (or .bashrc)
 
-:reference: `http://patrick.arminio.info/blog/2012/02/fix-valueerror-unknown-locale-utf8/`
+:reference: `blog entry <http://patrick.arminio.info/blog/2012/02/fix-valueerror-unknown-locale-utf8/>`_
 
 
 General questions
@@ -55,7 +55,7 @@ Or you can use the uniprot mapping function::
     u = UniProt()
     u.mapping(to="KEGG_ID", fr="ACC", query="ZAP70_HUMAN")
 
-
+.. seealso:: :ref:`mapping`
 
 Specific Usage
 ===================
@@ -71,9 +71,9 @@ This may happen. Consider::
 
 This request performed on UniProt web sites is actually pretty fast but there
 are 386 pages of results. In BioServices, the search commands reads the 386
-pages of results and stores them in u. So it may take a while. 
+pages of results and then stores the result in a variable. So it may take a while. 
 
-More generally if a request returns a very long results, it may take a while.
+More generally if a request returns a very long result, it may take a while.
 You can use the socket module::
 
     import socket

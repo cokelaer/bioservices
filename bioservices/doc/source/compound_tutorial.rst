@@ -1,5 +1,9 @@
 Manipulating compound identifiers
 =======================================
+.. testsetup:: compound
+
+    from bioservices import *
+    k = Kegg(verbose=False)
 
 .. topic:: Application: retrieving information about a compound
 
@@ -7,97 +11,85 @@ Manipulating compound identifiers
     several services together within a single framework using the Python language as
     a glue language
 
-In this tuturial, we are interested in using BioServices to obtain information
-about a specific compound.
-Let us look at a compound called Lysine. Let us search for information about
-that compound in several databases and manage the differnt Identifiers. 
 
-First, ket us retrieve information on KEGG database::
+Retrieve a compound identifier from KEGG, ChEBI and ChEMBL
+--------------------------------------------------------------
+
+Let us look at a compound called **Geldanamycin** that inhibits Hsp90. 
+Let us search for information about that compound in several databases 
+and manipulate the different identifiers. 
+
+First, let us retrieve information on KEGG database::
 
     >>> from bioservices import *
     >>> k = Kegg(verbose=False)
 
+KEGG compounds have links to other databases. It is not systematic but the ChEBI
+database is often referenced. So we will want to convert the KEGG identifer to a
+ChEBI identifier. Later, we can convert a ChEBI to a ChEMBL identifier using
+another Web Service such as UniChem. 
 
-    >>> res3 = k.conv("compound", "chebi")
+We can get a mapping dictionary from the KEGG compound to ChEBI as follows:
 
-    len(k.compoundIds)
-    Out[11]: 17012
+.. doctest:: compound
 
+    >>> map_kegg_chebi = k.conv("chebi", "compound")
+    >>> len(map_kegg_chebi) # doctest: +SKIP
+    6896
 
-    >>> print(k.find("compound", "lysine"))
-    cpd:C00047  L-Lysine; Lysine acid; 2,6-Diaminohexanoic acid
-    cpd:C00449  N6-(L-1,3-Dicarboxypropyl)-L-lysine; Saccharopine; L-Saccharopine;N-[(S)-5-Amino-5-carboxypentyl]-L-glutamic acid
+    >>> print(k.find("compound", "geldanamycin"))
+    cpd:C11222  Geldanamycin
+    cpd:C15823  Progeldanamycin
+    <BLANKLINE>
 
-Let us look at the first one (L-Lysine with Kegg id cpd:C00047). We can get lots
-of information from KEGG already by using::
+Let us look at the first one (Kegg id cpd:C11222). We can get lots
+of information from KEGG already by using:
 
-    >>> print(k.get("C00047"))
+.. doctest::
+    :options: +SKIP
 
-Form which, there is a link to other databases in particular chEBI
-(ChEBI:18019). Of course here there is no programmatic call. What about using
-the converter from KEGG::
+    >>> print(k.get("C11222"))
 
-    >>> k.conv("chebi","cpd:c00047")
-    (['cpd:C00047'], ['chebi:18019'])
+Form which, there is a link to other databases in particular ChEBI
+(ChEBI:5292). We could use the mapping dictionary created above:
 
-There is no links to chembl database in KEGG. Although UniProt and KEGG conv
-functon provides some mapping, the KEGG to ChEMBL or CHEBI to CHEMBL cannot be
-found. We could 
+.. doctest:: compound
 
-So, we have now the chebi ID of the L-Lysine compound from KEGG. LEt us search
-in ArrayExpress 
+    >>> map_kegg_chebi['cpd:C11222']
+    'chebi:5292'
 
-::
+Unfortunately, there is no mapping function from KEGG to ChEMBL in KEGG Web Service.
 
-    res = c.get_compounds_by_chemblId("CHEMBL8085")
-    INFO:root:http://www.ebi.ac.uk/chemblws/compounds/CHEMBL8085.json
-    INFO:root:REST.bioservices.ChEMBLdb request begins
-    INFO:root:--Fetching url=http://www.ebi.ac.uk/chemblws/compounds/CHEMBL8085.json
-    
-    In [32]: res['compound']['molecularWeight']
-    Out[32]: 146.19
-    
-    In [33]: print k.get("cpd:C00047")
-i
+However, BioServices provides access to the :mod:`bioservices.unichem` service.
+This service provides a useful mapping function from kegg to chembl::
 
-
-tumor protein p53
- >>> uni = UniChem()
-
- >>> mapping = uni.get_mapping("kegg_ligand", "chembl")
-
- >>> mapping['C11222']
-
-  'CHEMBL278315'
+    >>> uni = UniChem()
+    >>> mapping = uni.get_mapping("kegg_ligand", "chembl")
+    >>> mapping['C11222']
+    'CHEMBL278315'
 
 For sanity check, let us see that the ChEBI is indeed 5292 as given within the
-KEGG database:
+KEGG database::
 
- >>> mapping = uni.get_mapping("kegg_ligand", "chebi")
-
- >>> mapping['C11222']
-
-  '5292'
+    >>> uni = UniChem()
+    >>> mapping = uni.get_mapping("kegg_ligand", "chebi")
+    >>> mapping['C11222']
+    '5292'
 
 
 (2) In order to convert KEGG gene names into uniprot gene name, we can also use
-the UniProt web service from BioServices as follows
+the UniProt web service from BioServices as follows::
 
    >>> from bioservices import *
-
    >>> u = UniProt()
-
-   >>> u.mapping(fr='ID', to='KEGG_ID', format='tab', query=ZAP70_HUMAN)
+   >>> u.mapping(fr='ID', to='KEGG_ID', format='tab', query="ZAP70_HUMAN")
 
    ['From:ID', 'To:KEGG_ID', 'P43403', 'hsa:7535']
 
 You can get accession number or protein name identifier from the KEGG identifier
-as follows
+as follows::
 
    >>> u.mapping(fr='KEGG_ID', to='ID', format='tab', query='hsa:7535')
-
    'ZAP70_HUMAN'
-
    >>> u.mapping(fr='KEGG_ID', to='ACC', format='tab', query='hsa:7535')
-
    'P43403'

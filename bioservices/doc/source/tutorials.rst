@@ -21,3 +21,4 @@ welcomed.
     biomodels.rst
     protein.rst
     compound_tutorial.rst
+    convertor_tutorial.rst
