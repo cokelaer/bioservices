@@ -45,23 +45,22 @@ __all__ = ["BioGRID"]
 
 
 class Search(PSICQUIC):
-    """ Class that carries out the actual search via psicquic."""
+    """ Class that carries out the actual search via psicquic.
+
+
+    .. todo:: to be removed"""
 
     def __init__(self, data):
-        super(Search, self).__init__()
-
+        super(Search, self).__init__(verbose=False)
         self.data = data
-        self.output = self.query("biogrid",self.data)
+        if "biogrid" in self.activeDBs:
+            self.output = self.query("biogrid",self.data)
+        else:
+            self.logging.warning("BioGrid is not active")
+            self.output = []
         self.interactors = self.get_interactors()
 
     def get_interactors(self):
-        # this is now done in PSIQUIC itself.
-        #l = []
-        #for line in self.output:
-        #    #t = []
-        #    #for col in line.split("\t"):
-        #    #    t += [col]
-        #    l.append(line)
         out = []
         for element in self.output:
             x = (re.sub(".*:","", element[2:4][0]), re.sub(".*:","", element[2:4][1]))
