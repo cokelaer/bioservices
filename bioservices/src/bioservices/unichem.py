@@ -100,8 +100,8 @@ class UniChem(RESTService):
 
     def get_src_compound_ids_from_src_compound_id(self, src_compound_id, src_id, target=None):
         """Obtain a list of all src_compound_ids from all sources which are
-            CURRENTLY assigned to the same structure as a currently assigned query
-            src_compound_id. 
+        CURRENTLY assigned to the same structure as a currently assigned query
+        src_compound_id. 
 
         The output will include query src_compound_id if it is a valid
         src_compound_id with a current assignment. Note also, that by adding an
@@ -249,21 +249,22 @@ class UniChem(RESTService):
 
         :param int src_id: identifier of a source database. 
         :return: dictionary containing:
-            src_id (the src_id for this source),
-            src_url (the main home page of the source),
-            name (the unique name for the source in UniChem, always lower case),
-            name_long (the full name of the source, as defined by the source),
-            name_label (A name for the source suitable for use as a 'label' for the source
+
+            * src_id (the src_id for this source),
+            * src_url (the main home page of the source),
+            * name (the unique name for the source in UniChem, always lower case),
+            * name_long (the full name of the source, as defined by the source),
+            * name_label (A name for the source suitable for use as a 'label' for the source
                 within a web-page. Correct case setting for source, and always less than 30
                 characters),
-            description (a description of the content of the source),
-            base_id_url_available (an flag indicating whether this source provides a valid
-            base_id_url for creating cpd-specific links [1=yes, 0=no]).
-            base_id_url (the base url for constructing hyperlinks to this source [append an
-            identifier f    rom this source to the end of this url to create a valid url to a
-            specific page for this cpd], unless aux_for_url=1),
-            aux_for_url (A flag to indicate whether the aux_src field should be used to
-                create hyperlinks instead of the src_compound_id [1=yes, 0=no]
+            * description (a description of the content of the source),
+            * base_id_url_available (an flag indicating whether this source provides a valid
+            * base_id_url for creating cpd-specific links [1=yes, 0=no]).
+            * base_id_url (the base url for constructing hyperlinks to this source [append an
+            * identifier f    rom this source to the end of this url to create a valid url to a
+            * specific page for this cpd], unless aux_for_url=1),
+            * aux_for_url (A flag to indicate whether the aux_src field should be used to create 
+                hyperlinks instead of the src_compound_id [1=yes, 0=no]
 
         Example:  https://www.ebi.ac.uk/unichem/rest/sources/1"""
 
@@ -295,7 +296,7 @@ class UniChem(RESTService):
         return res
 
     def get_structure_all(self, src_compound_id, src_id):
-        """Description:  Obtain structure(s) with current AND obsolete assignments to a
+        """Obtain structure(s) with current AND obsolete assignments
 
         :param str src_compound_id: a valid compound identifier
         :param int src_id: corresponding database identifier (name or id). 
@@ -349,8 +350,8 @@ class UniChem(RESTService):
     def get_src_compound_ids_all_from_obsolete(self, obsolete_src_compound_id,
         src_id, to_src_id=None):
         """Obtain a list of all src_compound_ids from all sources with BOTH
-            current AND obsolete to the same structure with an obsolete assignment to the
-            query src_compound_id. 
+        current AND obsolete to the same structure with an obsolete assignment to the 
+        query src_compound_id. 
 
         The output will include query src_compound_id if it is a
         valid src_compound_id with an obsolete assignment. Note also, that by adding an
@@ -392,24 +393,25 @@ class UniChem(RESTService):
     
         :param str inchikey: input source identified by its InChiKey
         :return: list containing
-            src_id (the src_id for this source),
-            src_url (the main home page of the source),
-            name (the unique name for the source in UniChem, always lower case),
-            name_long (the full name of the source, as defined by the source),
-            name_label (A name for the source suitable for use as a 'label' for the source
+
+            * src_id (the src_id for this source),
+            * src_url (the main home page of the source),
+            * name (the unique name for the source in UniChem, always lower case),
+            * name_long (the full name of the source, as defined by the source),
+            * name_label (A name for the source suitable for use as a 'label' for the source
                 within a web-page. Correct case setting for source, and always less than 30
                 characters),
-            description (a description of the content of the source),
-            base_id_url_available (an flag indicating whether this source provides a valid
-            base_id_url for creating cpd-specific links [1=yes, 0=no]).
-            base_id_url (the base url for constructing hyperlinks to this source [append an
-            identifier from this source to the end of this url to create a valid url to a
+            * description (a description of the content of the source),
+            * base_id_url_available (an flag indicating whether this source provides a valid
+            * base_id_url for creating cpd-specific links [1=yes, 0=no]).
+            * base_id_url (the base url for constructing hyperlinks to this source [append an
+            * identifier from this source to the end of this url to create a valid url to a
                 specific pag    e for this cpd], unless aux_for_url=1),
-            aux_for_url (A flag to indicate whether the aux_src field should be used to
+            * aux_for_url (A flag to indicate whether the aux_src field should be used to
                 create hyperlinks instead of the src_compound_id [1=yes, 0=no] ,
-            src_compound_id (a list of src_compound_ids from this source which are currently
+            * src_compound_id (a list of src_compound_ids from this source which are currently
                 assigned to the query InChIKey.
-            aux_src (a list of src-compound_id keys mapping to corresponding auxiliary data
+            * aux_src (a list of src-compound_id keys mapping to corresponding auxiliary data
                 (url_id:value), for creating links if aux_for_url=1. Only shown if
                 aux_for_url=1).
 

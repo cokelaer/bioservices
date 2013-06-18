@@ -11,7 +11,7 @@ Revision 1.0
 	* add faqs in the doc + update of the README and metadata.
 	* fix typo in the list of uniprot mapping
 	* Use BeautifulSoup4 instead of 3
-	* add the chEBI  Web Service.
+	* add the ChEBI  Web Service.
 	* add the UniChem  Web Service.
 	* logging ERROR in Service when data cannot be converted to XML is now a simple warning
 	* kegg.conv method now returns a dictionary instead of list of tuples.
