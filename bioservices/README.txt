@@ -18,8 +18,10 @@ So far, BioServices provides wrappers for about 17 Web Services including
 * `quickGO <http://www.ebi.ac.uk/QuickGO/WebServices.html>`_
 * `PSICQUIC <http://code.google.com/p/psicquic/>`_
 * `WikiPathway <http://www.wikipathways.org/index.php/WikiPathways>`_
+* and more (e.g., UniChem, ChEMBL, EUtils, ...). Up-to-date list of Web Services is 
+  provided within the `documentation <http://pythonhosted.org/bioservices/>`_.
 
-Example using the UniProt Web Service to search for the zap70 specy in human
+Here is just a little example using the UniProt Web Service to search for the zap70 specy in human
 organism::
 
     >>> from bioservices import UniProt
@@ -31,4 +33,5 @@ organism::
     B4E0E2_HUMAN 185     B4E0E2
     RHOH_HUMAN   191     Q15669  RHOH ARHH TTF
 
-Up-to-date list of Web Services is provided within the `documentation <http://pythonhosted.org/bioservices/>`_.
+Much more example and tutorials are available in the 
+`On-line documentation <http://pythonhosted.org//bioservices>`_
