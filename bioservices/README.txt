@@ -1,16 +1,17 @@
-**Bioservices**  provides a single framework to easily implement wrapper of Web Services. 
-It focuses on  Life Sciences Web Services (based WSDL/SOAP or REST protocols).
+**Bioservices** provides access to many Bioinformatices Web Services (e.g.,
+UniProt) and a framework to easily implement wrapper of Web Services (based on 
+WSDL/SOAP or REST protocols).
 
 The primary goal of **BioServices** is to use Python as a glue language to provide
-a programmatic access to several Web Services. By doing so, elaboration of  new
+a programmatic access to several Bioinformatics Web Services. By doing so, elaboration of  new
 applications that combine several of the wrapped Web Services should be
 fostered.
 
 One of the main philosophy of **BioServices** is to make use of the existing
 biological databases (not to re-invent new databases) and to alleviates the
-needs for expertise in web services for the developers/users.
+needs for expertise in Web Services for the developers/users.
 
-So far, BioServices provides wrappers for about 17 Web Services including 
+So far, BioServices provides wrappers for 18 Web Services including 
 
 * `BioModels <http://www.ebi.ac.uk/biomodels-main/>`_
 * `KEGG <http://www.genome.jp/kegg/pathway.html>`_
@@ -33,5 +34,5 @@ organism::
     B4E0E2_HUMAN 185     B4E0E2
     RHOH_HUMAN   191     Q15669  RHOH ARHH TTF
 
-Much more example and tutorials are available in the 
+More examples and tutorials are available in the exhaustive 
 `On-line documentation <http://pythonhosted.org//bioservices>`_
