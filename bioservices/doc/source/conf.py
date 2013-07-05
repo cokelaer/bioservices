@@ -70,7 +70,7 @@ extensions = [
     ]
 
 todo_include_todos=True
-jscopybutton_path = easydev.copybutton.get_copybutton_path()
+jscopybutton_path = "copybutton.js"
 autoclass_content = 'both'
 
 # Add any paths that contain templates here, relative to this directory.
@@ -175,7 +175,7 @@ html_theme_path = [get_path_sphinx_themes()]
 # so a file named "default.css" will overwrite the builtin "default.css".
 
 # the copybutton.js must be copied there: 
-#html_static_path = ['_static']
+html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.

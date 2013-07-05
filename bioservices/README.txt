@@ -1,5 +1,5 @@
-**Bioservices** provides access to many Bioinformatices Web Services (e.g.,
-UniProt) and a framework to easily implement wrapper of Web Services (based on 
+**Bioservices** is a Python package that provides access to many Bioinformatices Web Services (e.g.,
+UniProt) and a framework to easily implement Web Services wrappers (based on 
 WSDL/SOAP or REST protocols).
 
 The primary goal of **BioServices** is to use Python as a glue language to provide

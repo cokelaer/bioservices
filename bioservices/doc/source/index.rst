@@ -5,6 +5,11 @@
 BIOSERVICES: a Python package to access biological web services programmaticaly
 #################################################################################
 
+.. note:: Contributions to implement new wrappers are more than welcome. 
+    See `BioServices wiki <https://www.assembla.com/spaces/bioservices/wiki>`_
+    to join the development, and the :ref:`developer` on how to implement new
+    wrappers.
+
 .. toctree::
     :maxdepth: 2
 
@@ -15,15 +20,16 @@ Overview
 ==========
 
 `BioServices <http://pypi.python.org/pypi/bioservices>`_  is a Python package
-that provides a framework to easily implement Web Service wrappers. It focuses on
-Biological Web Services based on WSDL/SOAP or REST protocols.
+that provides access to many Bioinformatics Web Services (e.g., UniProt) and 
+a framework to easily implement Web Service wrappers (based on WSDL/SOAP or 
+REST protocols).
 
 The primary goal of **BioServices** is to use Python as a glue language to provide 
 a programmatic access to Biological Web Services. By doing so, elaboration of 
 new applications that combine several Web Services should be fostered.
 
 One of the main philosophy of **BioServices** is to make use of the
-existing SOAP/WSDL facilities provided in biological databases, not to 
+existing REST or SOAP/WSDL Web Services and therefore existing databases, not to 
 re-invent new databases.
 
 The first release of **BioServices** provides a wrapping to more than 18 Web
@@ -60,10 +66,6 @@ The links above refers to the official web site of each service (right column)
 and our reference guide (left column) that provides an exhaustive documentation.
 For tutorials and quick start please follow the links below. 
 
-.. note:: Contributions to implement new wrappers are more than welcome. 
-    See `BioServices wiki <https://www.assembla.com/spaces/bioservices/wiki>`_
-    to join the development, and the :ref:`developer` on how to implement new
-    wrappers.
 
 
 .. _installation:
