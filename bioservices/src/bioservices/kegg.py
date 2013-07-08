@@ -589,6 +589,9 @@ class Kegg(RESTService):
         .. warning:: dbentries are not check and are supposed to be correct. 
             See :meth:`check_idbentries` to help you checking a dbentries.
 
+        .. warning:: call to this function may be long. conv("hsa", "uniprot") takes a minute
+            suprinsingly, conv("uniprot", "hsa") takes just a few seconds.
+
         .. versionchanged:: 1.1
             the output is now a dictionary, not a list of tuples
         """

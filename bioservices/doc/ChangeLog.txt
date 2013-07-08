@@ -5,6 +5,9 @@ Whats' new, what has changed
 Revision 1.0
 ------------------
 
+* 1.1.1:
+    * uniprot mapping function now returns a dictionary instead of a list
+
 * 1.1.0:
     * in psicquic when performing the conversion, we now use a try/except since
 	  some fields (in rare case) may be missing

@@ -83,13 +83,12 @@ the UniProt web service from BioServices as follows::
    >>> from bioservices import *
    >>> u = UniProt()
    >>> u.mapping(fr='ID', to='KEGG_ID', format='tab', query="ZAP70_HUMAN")
-
-   ['From:ID', 'To:KEGG_ID', 'P43403', 'hsa:7535']
+   {'ZAP70_HUMAN':  'hsa:7535'}
 
 You can get accession number or protein name identifier from the KEGG identifier
 as follows::
 
    >>> u.mapping(fr='KEGG_ID', to='ID', format='tab', query='hsa:7535')
-   'ZAP70_HUMAN'
+   {'hsa7535': 'ZAP70_HUMAN'}
    >>> u.mapping(fr='KEGG_ID', to='ACC', format='tab', query='hsa:7535')
-   'P43403'
+   {'hsa7535': 'P43403'}

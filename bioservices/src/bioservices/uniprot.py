@@ -36,9 +36,10 @@
         -- From Uniprot web site (help/about) , Dec 2012
 
 
-.. mapping betwenn uniprot and bench of other DBs.
+.. mapping between uniprot and bunch of other DBs.
 .. ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/
-
+.. http://www.uniprot.org/docs/speclist
+.. http://www.uniprot.org/docs/pkinfam
 
 """
 from services import Service, RESTService
@@ -217,6 +218,9 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
 
         :URL: http://www.uniprot.org/mapping/
 
+
+        .. versionchanged:: 1.1.1 to return a dictionary insted of a list
+
         """
         import urllib
         #self.checkParam(fr, self._mapping.values())
@@ -231,9 +235,9 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
         contact = ""
         request.add_header('User-Agent', 'Python contact')
         response = urllib2.urlopen(request)
-        result = response.read(200000)
+        result = response.read(200000) # TODO: do we want to cut the results ?? 
 
-        # let us improvve the output a little bit using a list  instead of a
+        # let us improve the output a little bit using a list instead of a
         # string
         try:
             result = result.split()
@@ -241,6 +245,17 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
             result[1]+=':'+to
         except:
             pass
+
+	# changes in version 1.1.1 returns a dictionary
+        del result[0]
+        del result[0]
+       
+        if len(result) == 0:
+            return {}
+        else:
+            keys = result[0::2]
+	    values = result[1::2]
+            result = dict(zip(keys, values))
 
         return result
 
