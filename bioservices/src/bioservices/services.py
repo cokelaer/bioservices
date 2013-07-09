@@ -90,7 +90,11 @@ class Service(object):
         else:
             self.debugLevel = "WARNING"
         self.logging = logging
-    
+
+        # used by HGNC where some XML contains non-utf-8 characters !! 
+        self._fixing_unicode = False
+        self._fixing_encoding = "utf-8"
+
     def _set_level(self, level):
         valid_level = ["INFO", "DEBUG", "WARNING", "CRITICAL", "ERROR"]
         if level in valid_level:
@@ -147,7 +151,8 @@ easyXML object (Default behaviour).""")
 
         """
         from bioservices import xmltools
-        return xmltools.easyXML(res)
+        return xmltools.easyXML(res, encoding=self._fixing_encoding,
+                    fixing_unicode=self._fixing_unicode)
 
     def urlencode(self, params):
         """Returns a string compatible with a URL request.
@@ -349,7 +354,8 @@ class RESTService(Service):
                     #logging.warning("--Conversion to easyXML"),
                     try:
                         res = self.easyXML(res)
-                    except:
+                    except Exception,e :
+                        print(e)
                         logging.warning("--Conversion to easyXML failed. returns the raw response"),
             self.last_response = res
             return res

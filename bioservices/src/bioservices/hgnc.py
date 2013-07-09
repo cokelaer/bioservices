@@ -1,18 +1,41 @@
 # -*- python -*-
 #
-#  This file is part of BioServices software
+#  This file is part of bioservices software
 #
 #  Copyright (c) 2011-2013 - EBI-EMBL
 #
-#  File author(s): Thomas Cokelaer <cokelaer@ebi.ac.uk>
+#  File author(s):
+#      Thomas Cokelaer <cokelaer@ebi.ac.uk>
+#      https://www.assembla.com/spaces/bioservices/team
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
 #      http://www.gnu.org/licenses/gpl-3.0.html
 #
-#  website: http://pythonhosted.org/bioservices/
+#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
+#$Id$
+"""Interface to HUGO/HGNC web services
+
+.. topic:: What is HGNC ?
+
+    :URL: http://www.genenames.org
+    :Citation:
+
+    .. highlights::
+
+        "The HUGO Gene Nomenclature Committee (HGNC) has assigned unique gene symbols and
+        names to over 37,000 human loci, of which around 19,000 are protein coding.
+        genenames.org is a curated online repository of HGNC-approved gene nomenclature
+        and associated resources including links to genomic, proteomic and phenotypic
+        information, as well as dedicated gene family pages."
+
+        -- From HGNC web site, July 2013
+
+
+"""
 from bioservices import RESTService, xmltools
 from xmltools import bs4
 from urllib2 import HTTPError
@@ -22,7 +45,8 @@ __all__ = ["HGNC"]
 
 
 class HGNC(RESTService):
-    """Wrapping of the HGNC URL
+    """Interface to the `HGNC <http://www.genenames.org>`_ service
+
 
     ::
 
@@ -49,10 +73,10 @@ class HGNC(RESTService):
         ['http://www.uniprot.org/uniprot/P43403.xml']
 
 
-    You can access to the links of a cross reference as well:
+    You can access to the links of a cross reference as well::
 
-    values = s.get_xrefs("ZAP70")
-    s.onWeb(values['EntrezGene']['link'][0])
+        values = s.get_xrefs("ZAP70")
+        s.onWeb(values['EntrezGene']['link'][0])
 
 
     :references: http://www.avatar.se/HGNC/doc/tutorial.html
@@ -62,6 +86,10 @@ class HGNC(RESTService):
         url = "http://www.avatar.se/HGNC/wr/gene/"
         super(RESTService,self).__init__("HGNC", url=url, verbose=verbose)
         self._always_return_list = False
+
+        #: Force XML to be checked for unicode consistency see :class:`Service`
+        self._fixing_unicode = True
+        self._fixing_encoding = "utf-8"
 
 
     def _set_return(self, mode):
@@ -74,21 +102,21 @@ class HGNC(RESTService):
         """Returns XML of a single gene or list of genes
 
 
-        :param str gene: a valid gene name. Several gene names can be concatenated with 
+        :param str gene: a valid gene name. Several gene names can be concatenated with
             comma ; character (e.g., 'ZAP70;INSR')
 
 
         .. doctest::
 
-            >>> res = s.fetchXML("ZAP70")
+            >>> from bioservices import *
+            >>> s = HGNC()
+            >>> res = s.get_xml("ZAP70")
             >>> res.findAll("alias")
             >>> [x.text for x in res.findAll("alias")]
+            [u'ZAP-70', u'STD']
 
         .. seealso:: :meth:`get_aliases`
-            
         """
-        
-        
         try:
             if ";" in gene:
                 res = self.request(self.url + "s/%s" % gene)
@@ -96,16 +124,16 @@ class HGNC(RESTService):
                 res = self.request("%s.xml" % gene)
         except HTTPError:
             print("!!BioServices HTTPError caught in HGNC. Probably an invalid gene name")
-            
+
             res = bs4.BeautifulSoup()
-        except Exception:
-            raise Exception    
+        #except Exception:
+        #    raise Exception
         return res
 
     def _get_attribute(self, gene, attribute):
         res = self.get_xml(gene)
         values = [x.text.strip() for x in res.findAll(attribute)][0]
-	if len(values) == 1:
+        if len(values) == 1:
             return values[0]
         else:
             return values
@@ -150,23 +178,26 @@ class HGNC(RESTService):
 
 
         """
-        assert keep in ["html", "xml", "fasta", "rdf", "txt", "gff"]
-        # returns list of dictionary that contains the attributes of each 
+        assert keep in ["html", "xml", "fasta", "rdf", "txt", "gff", None]
+        # returns list of dictionary that contains the attributes of each
         # reference as well as a list of links provided for each reference.
 
         xml = self.get_xml(gene)
+        values = self._get_xref(xml, keep)
+        return values
 
+    def _get_xref(self, xml, keep):
         # get all dbs and build up a dict out of it
         dbs =  [x.attrs['xdb'] for x in xml.findAll("xref")]
         values =  dict([(this,{}) for this in dbs])
-        
+
         # rescan the xml to get the other attributes
         refs = [x.attrs for x in xml.findAll("xref")]
         for ref in refs:
             db = ref['xdb']
             values[db] = ref.copy()
             # this looks quite complicated so here is a bit of explanation:
-            # Each reference may have a few links. However, we are interested 
+            # Each reference may have a few links. However, we are interested
             # only in this function by the HTML format. So, for a given database (res.findAll(xref)),
             # we search for all links (findAll(link)) and for each link found, we keep only those where
             # format is HTML. Finally; we get only the attribute 'xlink:href'
@@ -179,12 +210,12 @@ class HGNC(RESTService):
         """Finds all genes that starts with a given pattern
 
         :param str pattern: a string. Could be the wild character `*`
-        :return: list of dictionary. Each dictionary contains the 'acc', 
+        :return: list of dictionary. Each dictionary contains the 'acc',
             'xlink:href' and 'xlink:title' keys
 
 
-        .. doctest:: 
-       
+        .. doctest::
+
             >>> from bioservices import *
             >>> s = HGNC()
             >>> s.lookfor("ZAP")
@@ -194,24 +225,29 @@ class HGNC(RESTService):
 
 
         This function may be used to count the number of entries::
-        
+
 
             len(s.lookfor('*'))
- 
+
         """
         params = {'search': 'symbol', 'value':pattern}
-        # note the extra s before ;index.xml 
+        # note the extra s before ;index.xml
         xml = self.request(self.url + "s;index.xml?" + self.urlencode(params))
-        
+
         res = [x.attrs for x in xml.findAll("gene")]
         return res
 
+    def get_all_names(self):
+        """Returns all gene names"""
+        entries = self.lookfor("*")
+        names = [entry['xlink:title'] for entry in entries]
+        return names
 
     def mapping(self, value):
-        """maps an identifier from a database onto HGNC database 
+        """maps an identifier from a database onto HGNC database
 
         :param str value: a valid DB:id string (e.g. "UniProt:P36888")
-	:return: a list of dictionary with the keys 'acc', 'xlink:href', 'xlink:title'
+        :return: a list of dictionary with the keys 'acc', 'xlink:href', 'xlink:title'
 
             >>> value = "UniProt:P43403"
             >>> res = s.mapping(value)
@@ -220,28 +256,47 @@ class HGNC(RESTService):
             >>> res[0]['acc']
             'HGNC:12858'
 
+
+        .. seealso:: :meth:`mapping_all`
         """
+        
         xml = self.request(self.url + "s;index.xml?" + self.urlencode({'search': 'xref', 'value':value}))
         genes = xml.findAll("gene")
         res = [g.attrs for g in genes]
         return res
-            
+
+    def mapping_all(self ):
+        """Retrieves cross references for more than one entry
 
 
+        :returns: list of dictionaries
 
-    def mapping2(self):
-        """.. warning:: in development"""
+        .. warning:: in development
+        """
+        from math import ceil
+        results = {}
         print("First, get all entries")
         entries = self.lookfor('*')
-        mapping = {}
-        for entry in entries:
-            print entry
-            genename = entry['xlink:title']
-            xrefs = self.get_xrefs(genename)
-             
-            uniprot = xrefs["UniProt"]["xkey"]
-            kegg = xrefs["EntrezGene"]["xkey"]
-            
+        names = [entry['xlink:title'] for entry in entries]
+        N = len(names)
+
+        # split query in sets of 100 names 
+
+        N = len(names)
+        n = int(ceil(N/100.))
+        print n
+        for i in range(0,n):
+            print i
+            query  = ";".join(names[i*n:(i+1)*n])
+            xml = self.get_xml(query)
+            genes = xml.findAll("gene")
+            for gene in genes:
+                res = self._get_xref(gene, None)
+                name = gene.attrs['symbol']
+                results[name] = res.copy()
+        return results
+
+
 
 
 

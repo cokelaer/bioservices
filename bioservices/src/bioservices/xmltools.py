@@ -5,7 +5,7 @@
 #
 #  Copyright (c) 2011-2013 - EMBL-EBI
 #
-#  File author(s): 
+#  File author(s):
 #      https://www.assembla.com/spaces/bioservices/team
 #
 #  Distributed under the GPLv3 License.
@@ -19,10 +19,9 @@
 #$Id$
 """This module includes common tools to manipulate XML files"""
 from __future__ import print_function
-
-
 import xml.etree.ElementTree as ET
 import bs4
+from bioservices import unicodefix 
 
 __all__ = ["easyXML"]
 
@@ -33,12 +32,12 @@ class easyXML(object):
     This class uses the standard xml module as well as the package BeautifulSoup
     to help introspecting the XML documents.
 
-    :: 
+    ::
 
         >>> from bioservices import *
         >>> n = ncbiblast.NCBIblast()
         >>> res = n.getParameters() # res is an instance of easyXML
-	>>> # You can retreive XML from this instance of easyXML and print the content
+        >>> # You can retreive XML from this instance of easyXML and print the content
         >>> # in a more human-readable way.
         >>> res.soup.findAll('id') # a Beautifulsoup instance is available
         >>> res.root # and the root using xml.etree.ElementTree
@@ -48,20 +47,31 @@ class easyXML(object):
         res['id']
 
     which is equivalent to::
-        
+
         res.soup.findAll('id')
 
     There is also aliases findAll and prettify.
 
     """
-    def __init__(self, data):
+    def __init__(self, data, fixing_unicode=False, encoding="utf-8"):
         """.. rubric:: Constructor
 
         :param data: an XML document format
+        :param fixing_unicode: use only with HGNC service to fix issue with the
+            XML returned by that particular service. No need to use otherwise.
+            See :class:`~bioservices.hgnc.HGNC` documentation for details.
+        :param encoding: default is utf-8 used. Used to fix the HGNC XML only.
 
         """
-        self.data = data[:]
-        self.root = ET.fromstring(data)
+        if fixing_unicode:
+            x = unicodefix.FixingUnicode(data, verbose=False, encoding=encoding)
+            self.data = x.fixed_string.encode("utf-8")
+            
+        else:
+            self.data = data[:]
+
+
+        self.root = ET.fromstring(self.data)
         self._soup = None
         self.prettify = self.soup.prettify
         self.findAll = self.soup.findAll
@@ -85,5 +95,5 @@ class easyXML(object):
 
     def __getitem__(self, i):
         return self.findAll(i)
-        
+
 
