@@ -48,6 +48,7 @@ Here is a list of Web Services that can already be accessed from **BioServices**
     bioservices.chembldb.ChEMBLdb
     bioservices.eutils.EUtils
     bioservices.kegg.Kegg
+    bioservices.hgnc.HGNC
     bioservices.miriam.Miriam
     bioservices.pdb.PDB
     bioservices.picr.PICR

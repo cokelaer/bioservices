@@ -14,6 +14,9 @@ from chebi import *
 import kegg
 from kegg import *
 
+import hgnc
+from hgnc import *
+
 import rhea
 from rhea import *
 
