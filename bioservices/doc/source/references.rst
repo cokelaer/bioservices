@@ -109,6 +109,16 @@ Kegg
     :undoc-members:
     :synopsis:
 
+HGNC
+=====
+
+.. automodule:: bioservices.hgnc
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
+
 Miriam
 ======================
 

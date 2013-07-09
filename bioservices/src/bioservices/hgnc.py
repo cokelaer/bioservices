@@ -13,197 +13,238 @@
 #  website: http://pythonhosted.org/bioservices/
 #
 ##############################################################################
-from bioservices import *
+from bioservices import RESTService, xmltools
+from xmltools import bs4
 from urllib2 import HTTPError
 
 
+__all__ = ["HGNC"]
+
+
 class HGNC(RESTService):
-    """
+    """Wrapping of the HGNC URL
+
+    ::
+
+        >>> from bioservices import *
+        >>> # Fetch XML document for gene ZAP70
+        >>> s = HGNC()
+        >>> xml = s.get_xml("ZAP70")
+        >>> # You can fetch several gene names:
+        >>> xml = s.get_xml("ZAP70;INSR")
+        >>> # Wrong gene name request returns an empty list
+        >>> s.get_xml("wrong")
+        []
+
+    For a single name, the following methods are available::
+
+        >>> # get the aliases of a given gene
+        >>> print(s.get_aliases("ZAP70"))
+        [u'ZAP-70', u'STD']
+        >>> # get UniProt accession code
+        >>> s.get_xrefs("ZAP70")['UniProt']['xkey']
+        'P43403'
+        >>> # get XML link to a UniProt cross-reference
+        >>> s.get_xrefs("ZAP70", "xml")['UniProt']['link']
+        ['http://www.uniprot.org/uniprot/P43403.xml']
+
+
+    You can access to the links of a cross reference as well:
+
+    values = s.get_xrefs("ZAP70")
+    s.onWeb(values['EntrezGene']['link'][0])
+
 
     :references: http://www.avatar.se/HGNC/doc/tutorial.html
 
     """
-    def __init__(self):
+    def __init__(self, verbose=False):
         url = "http://www.avatar.se/HGNC/wr/gene/"
-        super(RESTService,self).__init__("HGNC", url=url)
+        super(RESTService,self).__init__("HGNC", url=url, verbose=verbose)
+        self._always_return_list = False
+
+
+    def _set_return(self, mode):
+        assert mode in [False, True]
+        self._always_return_list = mode
+    def _get_return(self):
+        return self.always_return_list
 
     def get_xml(self, gene):
+        """Returns XML of a single gene or list of genes
+
+
+        :param str gene: a valid gene name. Several gene names can be concatenated with 
+            comma ; character (e.g., 'ZAP70;INSR')
+
+
+        .. doctest::
+
+            >>> res = s.fetchXML("ZAP70")
+            >>> res.findAll("alias")
+            >>> [x.text for x in res.findAll("alias")]
+
+        .. seealso:: :meth:`get_aliases`
+            
         """
-            res = s.fetchXML("ZAP70")
-            res.findAll("alias")
-            for x in res.findAll("alias"):
-                print(x.text)
-        """
+        
+        
         try:
-            res = self.request("%s.xml" % gene)
+            if ";" in gene:
+                res = self.request(self.url + "s/%s" % gene)
+            else:
+                res = self.request("%s.xml" % gene)
         except HTTPError:
             print("!!BioServices HTTPError caught in HGNC. Probably an invalid gene name")
-            res = ""
-        except Exception:
             
+            res = bs4.BeautifulSoup()
+        except Exception:
+            raise Exception    
         return res
 
+    def _get_attribute(self, gene, attribute):
+        res = self.get_xml(gene)
+        values = [x.text.strip() for x in res.findAll(attribute)][0]
+	if len(values) == 1:
+            return values[0]
+        else:
+            return values
+
     def get_aliases(self, gene):
-        """Get aliases of a given gene"""
-        res = self.request("%s.xml" % gene)
+        """Get aliases for a single gene name"""
+        res = self.get_xml(gene)
         aliases = [x.text for x in res.findAll("alias")]
         return aliases
 
     def get_name(self, gene):
-        res = self.request("%s.xml" % gene)
-        name = [x.text for x in res.findAll("name")][0]
+        """Get name for a single gene name"""
+        return self._get_attribute(gene, "name")
 
     def get_chromosome(self, gene):
-        pass
+        """Get chromosome for a single gene name"""
+        return self._get_attribute(gene, "chromosome")
 
-"""
+    def get_previous_symbols(self, gene):
+        """Get previous symbols for a single gene name"""
+        return self._get_attribute(gene, "previous_symbols")
 
-    <chromosome xlink:href="/HGNC/wr/chromosome/2q" xlink:title="2q">
-     2q11-q13
-    </chromosome>
+    def get_withdrawn_symbols(self, gene):
+        """Get withdrawn symbols for a single gene name"""
+        return self._get_attribute(gene, "withdrawn_symbols")
 
-    <previous_symbols>
-     <previous_symbol>
-      SRK
-     </previous_symbol>
-    </previous_symbols>
+    def get_previous_names(self, gene):
+        """Get previous names for a single gene name"""
+        return self._get_attribute(gene, "previous_names")
 
-    <withdrawn_symbols>
-     <withdrawn_symbol hgnc_id="11294">
-      SRK
-     </withdrawn_symbol>
-    </withdrawn_symbols>
+    def get_xrefs(self, gene, keep="html"):
+        """Get the cross references for a given single gene name
 
-    <previous_names>
-     <previous_name>
-      zeta-chain (TCR) associated protein kinase (70 kD)
-     </previous_name>
-    </previous_names>
+        ::
 
-    <xrefs>
-     <xref mapped="false" xdb="EntrezGene" xkey="7535">
-      <link format="html" mimetype="text/html"
-xlink:href="http://view.ncbi.nlm.nih.gov/gene/7535" xlink:title="EntrezGene"/>
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.ncbi.nlm.nih.gov/mapview/map_search.cgi?direct=on&amp;neighb=off&amp;taxid=9606&amp;query=(7535[id]+AND+gene[obj_type])"
-xlink:title="EntrezMapViewer"/>
-     </xref>
-     <xref mapped="true" xdb="GDB" xkey="433738">
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.gdb.org/gdb-bin/genera/accno?accessionNum=GDB:433738"
-xlink:title="GDB"/>
-     </xref>
-     <xref mapped="true" xdb="GENATLAS" xkey="ZAP70">
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.dsi.univ-paris5.fr/genatlas/gensearch.php?type=0&amp;SYMBOL=ZAP70"
-xlink:title="GENATLAS"/>
-     </xref>
-     <xref mapped="true" name="ZAP70" xdb="GeneCards" xkey="12858">
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.genecards.org/cgi-bin/carddisp.pl?id=12858&amp;id_type=hgnc"
-xlink:title="GeneCards"/>
-     </xref>
-     <xref mapped="true" xdb="GeneTests" xkey="ZAP70">
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.genetests.org/query?gene=ZAP70" xlink:title="GeneTests"/>
-     </xref>
-     <xref mapped="true" xdb="GoPubmed" xkey="ZAP70">
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.gopubmed.org/search?t=hgnc&amp;q=ZAP70"
-xlink:title="GoPubmed"/>
-     </xref>
-     <xref mapped="true" xdb="H-InvDB" xkey="ZAP70">
-     </xref>
-     <xref mapped="true" xdb="HCOP" xkey="ZAP70">
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.genenames.org/cgi-bin/hcop.pl?species_pair=Human+and+Any+species&amp;column=symbol&amp;query=ZAP70&amp;Search=Search"
-xlink:title="HCOP"/>
-     </xref>
-     <xref mapped="false" name="ZAP70" xdb="HGNC" xkey="12858">
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.genenames.org/data/hgnc_data.php?hgnc_id=HGNC:12858"
-xlink:title="HGNC"/>
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.avatar.se/HGNC/wr/gene/12858" xlink:title="HGNC/wr"/>
-      <link format="xml" mimetype="text/xml"
-xlink:href="http://www.avatar.se/HGNC/wr/gene/12858.xml" xlink:title="HGNC/wr"/>
-     </xref>
-     <xref mapped="false" xdb="Nucleotide" xkey="L05148">
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.ebi.ac.uk/cgi-bin/dbfetch?db=embl&amp;id=L05148&amp;format=embl&amp;style=html"
-xlink:title="EMBL"/>
-      <link format="xml" mimetype="text/xml"
-xlink:href="http://www.ebi.ac.uk/cgi-bin/dbfetch?db=embl&amp;id=L05148&amp;format=emblxml&amp;style=raw"
-xlink:title="EMBL"/>
-      <link format="fasta" mimetype="text/plain"
-xlink:href="http://www.ebi.ac.uk/cgi-bin/dbfetch?db=embl&amp;id=L05148&amp;format=fasta&amp;style=raw"
-xlink:title="EMBL"/>
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&amp;id=L05148"
-xlink:title="GenBank"/>
-      <link format="xml" mimetype="text/xml"
-xlink:href="http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&amp;uids=L05148&amp;dopt=tinyseq&amp;sendto=t"
-xlink:title="GenBank"/>
-      <link format="insdseq" mimetype="application/xml"
-xlink:href="http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&amp;uids=L05148&amp;dopt=gpc&amp;sendto=t"
-xlink:title="GenBank"/>
-      <link format="html" mimetype="text/html"
-xlink:href="http://genome.ucsc.edu/cgi-bin/hgTracks?Submit=Submit&amp;position=L05148"
-xlink:title="UCSCBrowser"/>
-      <link format="html" mimetype="text/html"
-xlink:href="http://genome.cse.ucsc.edu/cgi-bin/hgGene?org=Human&amp;hgg_gene=L05148&amp;hgg_chrom=none&amp;hgg_type=knownGene"
-xlink:title="UCSCIndex"/>
-     </xref>
-     <xref mapped="false" xdb="PubMed" xkey="1423621">
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=1423621"
-xlink:title="PubMed"/>
-      <link format="xml" mimetype="text/xml"
-xlink:href="http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?retmode=xml&amp;db=PubMed&amp;id=1423621"
-xlink:title="PubMed"/>
-     </xref>
-     <xref mapped="true" xdb="RefSeq" xkey="NM_001079">
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?val=NM_001079"
-xlink:title="RefSeq"/>
-     </xref>
-     <xref mapped="true" xdb="Treefam" xkey="12858">
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.treefam.org/cgi-bin/TFinfo.pl?xref=12858&amp;dbid=hgnc&amp;spec=9606"
-xlink:title="Treefam"/>
-     </xref>
-     <xref mapped="true" xdb="UniProt" xkey="P43403">
-      <link format="html" mimetype="text/html"
-xlink:href="http://www.uniprot.org/uniprot/P43403" xlink:title="UniProt"/>
-      <link format="xml" mimetype="text/xml"
-xlink:href="http://www.uniprot.org/uniprot/P43403.xml" xlink:title="UniProt"/>
-      <link format="fasta" mimetype="text/plain"
-xlink:href="http://www.uniprot.org/uniprot/P43403.fasta" xlink:title="UniProt"/>
-      <link format="txt" mimetype="application/octet-stream"
-xlink:href="http://www.uniprot.org/uniprot/P43403.txt" xlink:title="UniProt"/>
-      <link format="gff" mimetype="application/octet-stream"
-xlink:href="http://www.uniprot.org/uniprot/P43403.gff" xlink:title="UniProt"/>
-      <link format="rdf" mimetype="application/rdf+xml"
-xlink:href="http://www.uniprot.org/uniprot/P43403.rdf" xlink:title="UniProt"/>
-     </xref>
-     <xref mapped="true" xdb="Vega" xkey="ZAP70">
-      <link format="html" mimetype="text/html"
-xlink:href="http://vega.sanger.ac.uk/Homo_sapiens/geneview?gene=ZAP70"
-xlink:title="Vega"/>
-     </xref>
-    </xrefs>
-   </gene>
-  </hgnc-wr>
-"""
+
+            >>> databases = s.get_xrefs("ZAP70").keys()
+
+            >>> # get XML link to a UniProt cross-reference
+            >>> s.get_xrefs("ZAP70", "xml")['UniProt']['link']
+            ['http://www.uniprot.org/uniprot/P43403.xml']
+
+
+        """
+        assert keep in ["html", "xml", "fasta", "rdf", "txt", "gff"]
+        # returns list of dictionary that contains the attributes of each 
+        # reference as well as a list of links provided for each reference.
+
+        xml = self.get_xml(gene)
+
+        # get all dbs and build up a dict out of it
+        dbs =  [x.attrs['xdb'] for x in xml.findAll("xref")]
+        values =  dict([(this,{}) for this in dbs])
+        
+        # rescan the xml to get the other attributes
+        refs = [x.attrs for x in xml.findAll("xref")]
+        for ref in refs:
+            db = ref['xdb']
+            values[db] = ref.copy()
+            # this looks quite complicated so here is a bit of explanation:
+            # Each reference may have a few links. However, we are interested 
+            # only in this function by the HTML format. So, for a given database (res.findAll(xref)),
+            # we search for all links (findAll(link)) and for each link found, we keep only those where
+            # format is HTML. Finally; we get only the attribute 'xlink:href'
+            links = [y.attrs['xlink:href'] for y in [x for x in xml.findAll("xref") if x['xdb']==db][0].findAll("link") if y.attrs['format']==keep]
+            values[db]['link'] = links[:]
+
+        return values
+
+    def lookfor(self, pattern):
+        """Finds all genes that starts with a given pattern
+
+        :param str pattern: a string. Could be the wild character `*`
+        :return: list of dictionary. Each dictionary contains the 'acc', 
+            'xlink:href' and 'xlink:title' keys
+
+
+        .. doctest:: 
+       
+            >>> from bioservices import *
+            >>> s = HGNC()
+            >>> s.lookfor("ZAP")
+            [{'acc': 'HGNC:12858',
+            'xlink:href': '/HGNC/wr/gene/ZAP70',
+            'xlink:title': 'ZAP70'}]
+
+
+        This function may be used to count the number of entries::
+        
+
+            len(s.lookfor('*'))
+ 
+        """
+        params = {'search': 'symbol', 'value':pattern}
+        # note the extra s before ;index.xml 
+        xml = self.request(self.url + "s;index.xml?" + self.urlencode(params))
+        
+        res = [x.attrs for x in xml.findAll("gene")]
+        return res
+
+
+    def mapping(self, value):
+        """maps an identifier from a database onto HGNC database 
+
+        :param str value: a valid DB:id string (e.g. "UniProt:P36888")
+	:return: a list of dictionary with the keys 'acc', 'xlink:href', 'xlink:title'
+
+            >>> value = "UniProt:P43403"
+            >>> res = s.mapping(value)
+            >>> res[0]['xlink:title']
+            'ZAP70'
+            >>> res[0]['acc']
+            'HGNC:12858'
+
+        """
+        xml = self.request(self.url + "s;index.xml?" + self.urlencode({'search': 'xref', 'value':value}))
+        genes = xml.findAll("gene")
+        res = [g.attrs for g in genes]
+        return res
+            
+
+
+
+    def mapping2(self):
+        """.. warning:: in development"""
+        print("First, get all entries")
+        entries = self.lookfor('*')
+        mapping = {}
+        for entry in entries:
+            print entry
+            genename = entry['xlink:title']
+            xrefs = self.get_xrefs(genename)
+             
+            uniprot = xrefs["UniProt"]["xkey"]
+            kegg = xrefs["EntrezGene"]["xkey"]
+            
 
 
 
 
 
 
-
-
-
-
-    def getOutdatedSymbols(self, gene):
-        pass
