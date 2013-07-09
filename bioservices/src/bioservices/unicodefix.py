@@ -7,27 +7,16 @@ import unicodedata
 
 __all__ = ["FixingUnicode"]
 
-class A(object):
-    a = [3]
-    B = [1,2] + a
-    def __init__(self):
-        print self.B
-
-
 
 class FixingUnicode(object):
 
     def __init__(self, data, verbose=False, encoding="utf-8"):
         self.rawdata = data[:]  
-        print(1)
         self.unidata = self.rawdata.decode(encoding, "replace")
-        print(2)
         if verbose:
             badness = self.text_badness(self.unidata)
-            print(3)
             if badness > 0:
                 print("Input string has bad characters % s. Will be converted" % badness)
-        print(4)
         self.fixed_string = self.fix_bad_unicode(self.unidata)
 
 

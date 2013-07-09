@@ -265,33 +265,40 @@ class HGNC(RESTService):
         res = [g.attrs for g in genes]
         return res
 
-    def mapping_all(self ):
+    def mapping_all(self, entries=None):
         """Retrieves cross references for more than one entry
 
+        :param entries: list of values entries (e.g., returned by the :meth:`lookfor` method.)
+            if not provided, this method looks for all entries.
+        :returns: list of dictionaries with keys being all entry names. Values is a
+		dictionary of cross references.
 
-        :returns: list of dictionaries
+        .. warning:: takes 10 minutes
 
-        .. warning:: in development
         """
         from math import ceil
         results = {}
-        print("First, get all entries")
-        entries = self.lookfor('*')
+
+        if entries==None:
+            print("First, get all entries")
+            entries = self.lookfor('*')
+
         names = [entry['xlink:title'] for entry in entries]
         N = len(names)
 
         # split query in sets of 100 names 
 
+        dn = 300
         N = len(names)
-        n = int(ceil(N/100.))
-        print n
+        n = int(ceil(N/float(dn)))
         for i in range(0,n):
-            print i
-            query  = ";".join(names[i*n:(i+1)*n])
+            print("Completed ", i+1 , "/", n)
+            query  = ";".join(names[i*dn:(i+1)*dn])
             xml = self.get_xml(query)
             genes = xml.findAll("gene")
             for gene in genes:
                 res = self._get_xref(gene, None)
+                #acc = gene.attrs['acc'] not needed. can be access from ['HGNC']['xkey']
                 name = gene.attrs['symbol']
                 results[name] = res.copy()
         return results
