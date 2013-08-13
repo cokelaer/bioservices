@@ -5,6 +5,10 @@ Whats' new, what has changed
 Revision 1.0
 ------------------
 
+* 1.1.2:
+    * services.py: move print statements into loggin.warning
+	* add documentation and examples related to Galaxy/BioPython.
+
 * 1.1.1:
     * uniprot mapping function now returns a dictionary instead of a list
     * add new services: HGNC + doc + test

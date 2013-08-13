@@ -1,5 +1,5 @@
-Applications
-###############
+Combining BioServices with external tools
+##################################################
 
 .. contents::
 
@@ -14,6 +14,11 @@ installed them.
 
 
 .. include:: pymol.rst
+.. include:: biopython.rst
+.. include:: galaxy.rst
+
+
+
 .. .. include:: pyteomics.rst
 
 
@@ -21,6 +26,8 @@ installed them.
    :hidden:
 
    pymol.rst
+   biopython.rst
+   galaxy.rst
 
 
 ..   pyteomics.rst
