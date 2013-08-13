@@ -255,7 +255,7 @@ class WSDLService(Service):
                 self.serv = self.suds.service
                 self.serv.methods = serv.methods.copy()
         except Exception, e:
-            print("Could not connect to the service %s " % self.url)
+            logging.error("Could not connect to the service %s " % self.url)
             raise Exception
 
     def _get_methods(self):
@@ -355,7 +355,7 @@ class RESTService(Service):
                     try:
                         res = self.easyXML(res)
                     except Exception,e :
-                        print(e)
+                        logging.warning(e)
                         logging.warning("--Conversion to easyXML failed. returns the raw response"),
             self.last_response = res
             return res
