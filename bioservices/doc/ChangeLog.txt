@@ -4,12 +4,12 @@ Whats' new, what has changed
 
 Revision 1.0
 ------------------
-
-* 1.1.2:
-    * services.py: move print statements into loggin.warning
-	* add documentation and examples related to Galaxy/BioPython.
+* 1.1.2 in progress
+    * add biocarta, pfam modules (and htmltools. maybe not required.)
 
 * 1.1.1:
+    * services.py: move print statements into loggin.warning
+	* add documentation and examples related to Galaxy/BioPython.
     * uniprot mapping function now returns a dictionary instead of a list
     * add new services: HGNC + doc + test
 

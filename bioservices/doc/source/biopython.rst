@@ -9,7 +9,7 @@ BioServices to retrieve FASTA files and (ii) BioPython to play with the
 sequences.
 
 
-.. note:: of course you need to install BioPython
+.. note:: We assume you have installed BioPython (pip install biopython)
 
 First, let us retrieve two FASTA sequences and save them in 2 files::
 

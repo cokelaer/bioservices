@@ -25,7 +25,7 @@ directory called bioservices in ./tools::
 
     mkdir tools/bioservices
 
-In this directorys, we will create two files called **uniprot.py** that
+In this directory, we will create two files called **uniprot.py** that
 will contain the actual code that calls bioservices and a second XML file that will
 allows us to design the plugin layout.
 
