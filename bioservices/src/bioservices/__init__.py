@@ -38,6 +38,8 @@ from unichem import *
 import wsdbfetch
 from wsdbfetch import *
 
+import unicodefix
+
 import xmltools
 from xmltools import *
 

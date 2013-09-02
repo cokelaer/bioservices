@@ -96,6 +96,8 @@ class Reactome(WSDLService):
         """
 
             res = r.queryPathwaysForReferenceIdentifiers(["Q9Y266", "P17480", "P20248"])
+            res[0]
+            res[0].species.scientificName
 
         """
         results = self.serv.queryPathwaysForReferenceIdentifiers(list_ids)
@@ -120,8 +122,8 @@ class Reactome(WSDLService):
         """
         return self.serv.listTopLevelPathways()
 
-    def getMaxSizeInListObjects(self):
-        res = self.serv.getMaxSizeInListObjects
+    def getMaxSizeInListObjects(self, value):
+        res = self.serv.getMaxSizeInListObjects(value)
         return res
 
 """
@@ -131,10 +133,8 @@ class Reactome(WSDLService):
  u'listObjects',
  u'listPathwayParticipants',
  u'listPathwayParticipantsForId',
- u'listTopLevelPathways',
- u'loadPathwayForId',
+u'loadPathwayForId',
  u'loadPathwayForObject',
-
  u'queryById',
  u'queryByIds',
  u'queryByObject',

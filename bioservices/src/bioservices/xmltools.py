@@ -22,8 +22,11 @@ from __future__ import print_function
 import xml.etree.ElementTree as ET
 import bs4
 from bioservices import unicodefix 
+import urllib2
 
-__all__ = ["easyXML"]
+__all__ = ["easyXML", "readXML"]
+
+
 
 
 class easyXML(object):
@@ -62,16 +65,21 @@ class easyXML(object):
             See :class:`~bioservices.hgnc.HGNC` documentation for details.
         :param encoding: default is utf-8 used. Used to fix the HGNC XML only.
 
+
+        The data parameter must be a string containing the XML document. If you
+        have an URL instead, use :class:`readXML`
+
         """
         if fixing_unicode:
             x = unicodefix.FixingUnicode(data, verbose=False, encoding=encoding)
             self.data = x.fixed_string.encode("utf-8")
-            
         else:
             self.data = data[:]
 
-
-        self.root = ET.fromstring(self.data)
+        try:
+            self.root = ET.fromstring(self.data)
+        except:
+            self.root = self.data[:]
         self._soup = None
         self.prettify = self.soup.prettify
         self.findAll = self.soup.findAll
@@ -95,5 +103,21 @@ class easyXML(object):
 
     def __getitem__(self, i):
         return self.findAll(i)
+
+
+class readXML(easyXML):
+    """Read XML and converts to beautifulsoup data structure
+
+    easyXML accepts as input a string. This class accepts a filename instead
+    inherits from easyXML
+
+    .. seealso:: :class:`easyXML`
+
+    """
+    def __init__(self, filename, fixing_unicode=False, encoding="utf-8"):
+        url = urllib2.urlopen(filename, "r")
+        self.data = url.read()
+        super(readXML, self).__init__(self.data, fixing_unicode, encoding)
+
 
 
