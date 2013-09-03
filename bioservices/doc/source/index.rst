@@ -5,6 +5,10 @@
 BIOSERVICES: a Python package to access biological web services programmaticaly
 #################################################################################
 
+.. topic:: BioServices
+
+   .. image:: bioservices.png
+
 .. note:: Contributions to implement new wrappers are more than welcome. 
     See `BioServices wiki <https://www.assembla.com/spaces/bioservices/wiki>`_
     to join the development, and the :ref:`developer` on how to implement new
