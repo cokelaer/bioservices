@@ -44,6 +44,7 @@
 """
 from services import Service, RESTService
 import urllib2
+import urllib
 
 __all__ = ["UniProt"]
 
@@ -220,11 +221,10 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
 
 
         .. versionchanged:: 1.1.1 to return a dictionary insted of a list
+        .. versionchanged:: 1.1.2 the values for each key is now made of a list 
+            instead of strings so as to store more than one values.
 
         """
-        import urllib
-        #self.checkParam(fr, self._mapping.values())
-        #self.checkParam(to, self._mapping.values())
 
         url = self.url + '/mapping/'
         params = {'from':fr, 'to':to, 'format':format, 'query':query}
@@ -246,18 +246,20 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
         except:
             pass
 
-	# changes in version 1.1.1 returns a dictionary
+	    # changes in version 1.1.1 returns a dictionary instead of list
         del result[0]
         del result[0]
-       
         if len(result) == 0:
             return {}
         else:
+            # bug fix based on ticket #19 version 1.1.2
+            from collections import defaultdict
+            result_dict = defaultdict(list)
             keys = result[0::2]
-	    values = result[1::2]
-            result = dict(zip(keys, values))
-
-        return result
+            values = result[1::2]
+            for i, key in enumerate(keys):
+                result_dict[key].append(values[i])
+        return result_dict
 
     def searchUniProtId(self, uniprot_id, format="xml"):
         """Search for a uniprot ID in UniprotKB database
