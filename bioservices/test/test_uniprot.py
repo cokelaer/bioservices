@@ -8,7 +8,7 @@ class test_UniProt(UniProt):
     def test_mapping(self):
         res = self.mapping(fr="ACC+ID", to="KEGG_ID", query='P43403')
         print res
-        assert res == {'P43403':'hsa:7535'}
+        assert res == {'P43403':['hsa:7535']}
         try: 
             res = self.mapping(fr="AC", to="KEID", query='P434')
             assert False
