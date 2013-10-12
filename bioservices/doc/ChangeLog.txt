@@ -6,6 +6,8 @@ Revision 1.0
 ------------------
 * 1.1.2 in progress
     * add biocarta, pfam modules (and htmltools. maybe not required.)
+	* fix bug in uniprot.mapping to return list of values instead of a string
+	  (assembla ticket 19).
 
 * 1.1.1:
     * services.py: move print statements into loggin.warning
