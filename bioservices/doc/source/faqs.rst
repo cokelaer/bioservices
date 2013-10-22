@@ -81,3 +81,22 @@ You can use the socket module::
 
 After 5 seconds, the read() call will stop returning whatever has been read so
 far.
+
+
+KEGG service
+----------------
+
+Is it possible to get the pathway information for multiple proteins ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Currently there is no such function. You can only retrieve pathways  given a
+single protein Id. However, you can easily write such a function. Here is the
+code for 2 proteins::
+
+    >>> p1 = k.get_pathway_by_gene("7535", "hsa")   # correspond to ZAP70
+    >>> p2 = k.get_pathway_by_gene("6885", "hsa")   # 6885 correspond to MAP3K7
+    >>> [k1 for k1 in p1.keys() if k1 in p2.keys()]
+    ['hsa04660', 'hsa04064']
+
+
+There are 2 pathways containing the proteins 7535 and 6885.
