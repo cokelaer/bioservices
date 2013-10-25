@@ -497,7 +497,7 @@ prevented us from fulfilling your request. """)
             >>> from bioservices import *
             >>> s = ChEMBLdb(verbose=False)
             >>> print(s._bioactivities_example)
-            >>> resxmls = get_compounds_activities(s._bioactivities_example + '.xml')
+            >>> resxmls = s.get_compounds_activities(s._bioactivities_example + '.xml')
             >>> resjson = s.get_compounds_activities(s._bioactivities_example)
         """
         pass
@@ -589,13 +589,17 @@ prevented us from fulfilling your request. """)
 
 
     def get_all_targets(self):
-        """Get all targets
+        """Get all targets in a dictionary
 
-        :return: Target Record in XML or dictionary (if json requested)
+        :return: Target Record in a dictionary (default is json)
+          
 
-        If json format is requested, a dictionary is returned. The dictionary
-        has a unique key 'targets'. The value of that key is a list of dictionaries
-        keyed by:
+        The attribute :attr:`default_extension` is set to json so that
+        the returned objetc is a json format. You may set the attribute to
+        another format such as "XML"
+        
+        The returned dictionary has a unique key called **targets**.
+        The value of that key is a list of dictionaries with the following keys:
 
 
           * chemblId
@@ -613,9 +617,11 @@ prevented us from fulfilling your request. """)
             >>> s = ChEMBLdb(verbose=False)
             >>> res = s.get_all_targets()
         """
-        res = self.request(self.url + "/targets." + self.default_extension)
         if self.default_extension == "json":
+            res = self.request(self.url + "/targets." + self.default_extension, format="json")
             res = json.loads(res)
+        else:
+            res = self.request(self.url + "/targets." + self.default_extension, format="json")
         return res
 
 

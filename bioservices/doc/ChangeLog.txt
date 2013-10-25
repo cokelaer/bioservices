@@ -4,7 +4,11 @@ Whats' new, what has changed
 
 Revision 1.0
 ------------------
-* 1.1.2 in progress
+* 1.1.3
+    * fix bug in chembldb.get_all_targets() that was failing to return the
+	json/dictionary as expected.
+
+* 1.1.2
     * add biocarta, pfam modules (and htmltools. maybe not required.)
 	* fix bug in uniprot.mapping to return list of values instead of a string
 	  (assembla ticket 19).
