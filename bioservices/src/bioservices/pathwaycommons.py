@@ -451,7 +451,7 @@ class PathwayCommons(RESTService):
         if isinstance(uri, str):
             url += "?uri=" + uri
         elif isinstance(uri, list):
-            url += "?uri=" + uri
+            url += "?uri=" + uri[0]
             for u in uri[1:]:
                 url += "&uri=" + u
 
