@@ -137,6 +137,14 @@ NCBIblast
     :undoc-members:
     :synopsis:
 
+Pathway Commons
+=========================
+
+.. automodule:: bioservices.pathwaycommons
+    :members:
+    :undoc-members:
+    :synopsis:
+
 PDB module
 ========================
 
