@@ -7,6 +7,7 @@ Revision 1.0
 
 * 1.1.4
    * add pathway commons service
+   * add geneprof service
 
 * 1.1.3
     * fix bug in chembldb.get_all_targets() that was failing to return the

@@ -11,6 +11,9 @@ from biomodels import *
 import chebi
 from chebi import *
 
+import geneprof
+from geneprof import *
+
 import kegg
 from kegg import *
 
