@@ -301,7 +301,7 @@ class GeneProf(RESTService):
         #self._check_id_ds(Id)
         self._check_kargs(kargs, ["with_ats", "key"])
 
-        url = self.url + "/ds/%d." % Id + format_
+        url = self.url + "/ds/%s." % Id + format_
         params = self.urlencode(kargs)
         if len(params):
             params = params.replace("with_", "with-")
