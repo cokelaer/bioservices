@@ -54,10 +54,12 @@ Here is a list of Web Services that can already be accessed from **BioServices**
     bioservices.chebi.ChEBI
     bioservices.chembldb.ChEMBLdb
     bioservices.eutils.EUtils
+    bioservices.geneprof.GeneProf
     bioservices.kegg.Kegg
     bioservices.hgnc.HGNC
     bioservices.miriam.Miriam
     bioservices.pdb.PDB
+    bioservices.pathwaycommons.PathwayCommons
     bioservices.picr.PICR
     bioservices.quickgo.QuickGO
     bioservices.rhea.Rhea

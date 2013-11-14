@@ -92,6 +92,14 @@ EUtils
     :undoc-members:
     :synopsis:
 
+GeneProf
+============
+
+.. automodule:: bioservices.geneprof
+    :members:
+    :undoc-members:
+    :synopsis:
+
 QuickGO
 ================
 
