@@ -46,7 +46,7 @@ import json
 __all__ = ["PathwayCommons"]
 
 class PathwayCommons(RESTService):
-    """Interface to the `PathwayCommons <http://www.pathwaycommons.org/pc2>`_ service
+    """Interface to the `PathwayCommons <http://www.pathwaycommons.org/about>`_ service
 
 
     >>> from bioservices import *
@@ -230,7 +230,8 @@ class PathwayCommons(RESTService):
         :param str datasource: filter by data source (same as search)
         :param str organism: organism filter
 
-        :return: list of pathways
+        :return: dictionary with information about top pathways. Check the
+            "searchHit" key for information about "dataSource" for instance
 
     
         .. doctest::
@@ -284,8 +285,11 @@ class PathwayCommons(RESTService):
 
             >>> from bioservices import PathwayCommons
             >>> pc2 = PathwayCommons(verbose=False)
-            >>> res = pc2.get("col5a1")
-            >>> res = pc2.get("http://identifiers.org/uniprot/Q06609")
+            >>> pc2.idmapping("BRCA2")
+            {u'BRCA2': u'P51587'}
+            >>> pc2.idmapping(["TP53", "BRCA2"])
+            {"BRCA2":"P51587","TP53":"P04637"}
+
 
         """
         url = self.url + "/idmapping?id="
@@ -297,6 +301,7 @@ class PathwayCommons(RESTService):
                 for id_ in ids[1:]:
                     url += "&id=" + id_
         res = self.request(url)
+        res = json.loads(res)
         return res
 
 

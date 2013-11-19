@@ -51,7 +51,7 @@ class UniChem(RESTService):
 
     _url = "http://www.ebi.ac.uk/unichem/rest"
     def __init__(self, verbose=False):
-        """**Constructor**
+        """**Constructor `UniChem <https://www.ebi.ac.uk/unichem/>`_
 
         :param verbose: set to False to prevent informative messages
         """

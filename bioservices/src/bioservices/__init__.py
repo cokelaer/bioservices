@@ -78,3 +78,6 @@ from biomart import *
 
 import eutils
 from eutils import *
+
+import pathwaycommons
+from pathwaycommons import *
