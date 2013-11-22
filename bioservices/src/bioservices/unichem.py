@@ -50,7 +50,7 @@ from bioservices import RESTService
 class UniChem(RESTService):
 
     _url = "http://www.ebi.ac.uk/unichem/rest"
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=True):
         """**Constructor `UniChem <https://www.ebi.ac.uk/unichem/>`_
 
         :param verbose: set to False to prevent informative messages
