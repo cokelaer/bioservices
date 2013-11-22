@@ -3,16 +3,30 @@ from easydev import Logging
 import pandas as pd
 
 
-class Taxon(object):
-    """Give a taxon Id or species name
+class Taxon(Logging):
+    """Utility to search for information related to a taxon
     
-    
-    returns dictionary with convention in some databases.
+    Uses HGNC service to fetch information about a taxon.
 
-    Implemented for UniProt and HGNC
+        from bioservices.mapping.mappers import Taxon
+        t = Taxon()
+        t.search_by_taxon("9606")
+        {'Scientific Name': 'Homo sapiens', 'taxon': '9606'}
+
+    You can also pop up the Uniprot page using::
+
+        t.uniprot_onweb("9606")
+
+
+    A full list of taxons is available here::
+    
+        http://www.uniprot.org/taxonomy/?query=*&format=*
+
+
     """
     def __init__(self):
-        self.df = pd.DataFrame(index="taxon", columns=["Scientific Name"])
+        super(Taxon, self).__init__("INFO")
+        self.df = pd.DataFrame(index=[], columns=["Taxon", "Scientific Name"])
         self._eutils_service = EUtils()
 
     def search_by_taxon(self, taxon):
@@ -30,7 +44,35 @@ class Taxon(object):
             #self.df.append(res)
             return res
 
+    def info(self, taxon, lineage=False):
+        """Prints information about a Taxon
 
+        :param str taxon: taxon identifier 
+        :param bool lineage: prints lineage is set to True
+        """
+        ret = self._eutils_service.taxonomy(taxon)
+        print("Display Name: %s" % ret.Taxon.OtherNames.Name.DispName)
+        print("GenBank Common name: %s" % ret.Taxon.OtherNames.GenbankCommonName)
+        print("Taxon Id: %s " % ret.Taxon.TaxId)
+        if lineage:
+            print("Lineage:")
+            for i,x in enumerate(ret.Taxon.Lineage.split(";")):
+                print(i*" "+x)
+
+    def uniprot_onweb(self, taxon):
+        """Open Uniprot taxonomy page for a given taxon
+
+        :param str taxon: taxon identifier 
+        """
+        import webbrowser
+        import urllib2
+        try:
+            urllib2.urlopen('http://www.uniprot.org/taxonomy/%s' % taxon)
+            webbrowser.open("http://www.uniprot.org/taxonomy/%s" % taxon)
+        except urllib2.HTTPError, e:
+            print("Invalid taxon")
+        except urllib2.URLError, e:
+            print(e.args)
 
 
 class Mapper(Logging):
@@ -56,7 +98,6 @@ class Mapper(Logging):
         self.df = pd.DataFrame()
 
     def build_mapping(self):
-
         # build mapping using HGNC
         self.logging.info("Retrieving all information from HGNC")
         res = h.mapping_all()
@@ -65,13 +106,11 @@ class Mapper(Logging):
         df = pd.DataFrame(mapping, columns=['HGNC', 'UniProt'])
         self.df.append(df, ignore_index=True)
 
-
     def _check_uniprot_id(self):
         raise NotImplementedError
 
     def get_hgnc_from_uniprot(self, id_):
         return self._hgnc.mapping("UniProt:" + id_)
-
 
     def lookfor(self, name):
         res = {}
@@ -88,7 +127,6 @@ class Mapper(Logging):
         self.logging.info("calling uniprot service")
         thisres = self._uniprot_service.search("ZAP")
         print thisres        
-
 
     def entrez2uniprotID(name, mapper=None):
         """name must be a valid uniprot ID"""
@@ -117,7 +155,6 @@ class Mapper(Logging):
 
         """
         return self._uniprot_service.mapping(fr="ACC", to="REFSEQ_NT_ID", query="P31749")
-
 
     def kegg2uniprot_kegg(self, name):
         return self._kegg_service.conv("uniprot", name)
