@@ -171,6 +171,11 @@ class EUtils(WSDLService):
             '9606'
             >>> ret.Taxon.ScientificName
             'Homo sapiens'
+            >>> ret = s.taxonomy("9606,9605,111111111,9604")
+            >>> ret.Taxon[2].TaxId
+            '9604'
+
+
         """
         ret = self._efetch_taxonomy.serv.run_eFetch(db="taxonomy", id=Id)
         return ret 
