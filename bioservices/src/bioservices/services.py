@@ -26,9 +26,9 @@ from SOAPpy import SOAPProxy, WSDL
 import urllib
 import urllib2
 import platform
-import logging
+#import logging
 import easydev
-from  easydev import checkParam
+from  easydev import checkParam, Logging
 
 
 __all__ = ["Service", "WSDLService", "RESTService", "BioServicesError"]
@@ -41,7 +41,7 @@ class BioServicesError(Exception):
         return repr(self.value)
 
 
-class Service(object):
+class Service(Logging):
     """Base class for WSDL and REST classes
 
 
@@ -79,38 +79,21 @@ class Service(object):
         that only WARNING, ERROR and CRITICAL messages are shown.
 
         """
-        self._url = None
-        self.url = url
+        if verbose == True:
+            level = "INFO"
+        else:
+            level = "WARNING"
+        super(Service, self).__init__(level=level)
+
+        self._url = url
+        #self.url = url
         self.name = name
         self._easyXMLConversion = True
-
-        self._debugLevel = None
-        if verbose:
-            self.debugLevel = "INFO"
-        else:
-            self.debugLevel = "WARNING"
-        self.logging = logging
 
         # used by HGNC where some XML contains non-utf-8 characters !! 
         self._fixing_unicode = False
         self._fixing_encoding = "utf-8"
 
-    def _set_level(self, level):
-        valid_level = ["INFO", "DEBUG", "WARNING", "CRITICAL", "ERROR"]
-        if level in valid_level:
-            self._debugLevel = level
-        else:
-            raise ValueError("The level of debugging must be in %s " % valid_level)
-        # I'm not sure this is the best solution, but basicConfig can be called
-        # only once and populatse root.handlers list with one instance of
-        # logging.StreamHandler. So, I reset it before calling basicConfig so
-        # that it is effectively changing the logginh behaviour
-        logging.root.handlers = []
-        logging.basicConfig(level=self._debugLevel)
-    def _get_level(self):
-        return self._debugLevel
-    debugLevel = property(_get_level, _set_level, 
-        doc="One of INFO, DEBUG, WARNING, CRITICAL, ERROR")
 
     def _get_url(self):
         return self._url
