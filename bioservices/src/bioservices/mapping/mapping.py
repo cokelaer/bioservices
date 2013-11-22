@@ -1,5 +1,5 @@
 from bioservices import UniProt
-
+from easydev import Logging
 
 
 
@@ -15,7 +15,7 @@ class Mapping(object):
 
 
         Could use unichem, uniprot, kegg, chembldb
-
+        Could be HGNC
 
 
     """
