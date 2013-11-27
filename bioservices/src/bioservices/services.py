@@ -225,7 +225,7 @@ class WSDLService(Service):
         super(WSDLService, self).__init__(name, url, verbose=verbose)
 
         #self.serv = SOAPProxy(self.url) # what's that ? can we access to a method directly ?
-        logging.info("Initialising %s service (WSDL)" % self.name)
+        self.logging.info("Initialising %s service (WSDL)" % self.name)
 
         try:
             #: attribute to access to the methods provided by this WSDL service
@@ -238,7 +238,7 @@ class WSDLService(Service):
                 self.serv = self.suds.service
                 self.serv.methods = serv.methods.copy()
         except Exception, e:
-            logging.error("Could not connect to the service %s " % self.url)
+            self.logging.error("Could not connect to the service %s " % self.url)
             raise Exception
 
     def _get_methods(self):
@@ -279,17 +279,17 @@ class RESTService(Service):
         """
         super(RESTService, self).__init__(name, url, verbose=verbose)
         self.last_response = None
-        logging.info("Initialising %s service (REST)" % self.name)
+        self.logging.info("Initialising %s service (REST)" % self.name)
         try:
             import urllib
             urllib.urlopen(self.url)
         except Exception, e:
-            logging.critical("The URL (%s) provided cannot be reached" % self.url)
+            self.logging.critical("The URL (%s) provided cannot be reached" % self.url)
             print(e)
 
     def getUserAgent(self):
         import os
-        logging.info('getUserAgent: Begin')
+        self.logging.info('getUserAgent: Begin')
         urllib_agent = 'Python-urllib/%s' % urllib2.__version__
         clientRevision = ''
         clientVersion = ''
@@ -298,8 +298,8 @@ class RESTService(Service):
             platform.python_version(), platform.system(),
             urllib_agent
         )
-        logging.info('getUserAgent: user_agent: ' + user_agent)
-        logging.info('getUserAgent: End')
+        self.logging.info('getUserAgent: user_agent: ' + user_agent)
+        self.logging.info('getUserAgent: End')
         return user_agent
 
 
@@ -327,8 +327,8 @@ class RESTService(Service):
         else:
             url = self.url + "/" +  path
 
-        logging.info("REST.bioservices.%s request begins" % self.name)
-        logging.info("--Fetching url=%s" % url)
+        self.logging.info("REST.bioservices.%s request begins" % self.name)
+        self.logging.info("--Fetching url=%s" % url)
 
         try:
             res = urllib2.urlopen(url).read()
@@ -338,15 +338,15 @@ class RESTService(Service):
                     try:
                         res = self.easyXML(res)
                     except Exception,e :
-                        logging.warning(e)
-                        logging.warning("--Conversion to easyXML failed. returns the raw response"),
+                        self.logging.warning(e)
+                        self.logging.warning("--Conversion to easyXML failed. returns the raw response"),
             self.last_response = res
             return res
         except Exception, e:
-            logging.error(e)
-            logging.error("An exception occured while reading the URL")
-            logging.error(url)
-            logging.error("Error caught within bioservices. Invalid requested URL ? ")
+            self.logging.error(e)
+            self.logging.error("An exception occured while reading the URL")
+            self.logging.error(url)
+            self.logging.error("Error caught within bioservices. Invalid requested URL ? ")
             raise
 
     def requestPost(self, requestUrl, params, extra=None):
