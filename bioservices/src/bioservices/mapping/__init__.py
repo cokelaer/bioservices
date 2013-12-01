@@ -7,5 +7,5 @@ except:
 
 
 
-import genes
-import proteins
+#:import genes
+#import proteins

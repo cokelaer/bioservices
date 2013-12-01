@@ -81,3 +81,6 @@ from eutils import *
 
 import pathwaycommons
 from pathwaycommons import *
+
+import mapping
+import apps

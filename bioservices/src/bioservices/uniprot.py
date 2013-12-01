@@ -279,8 +279,25 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
         #if format not in _valid_formats:
         #    raise ValueError("invalid format provided. Use one of %s" % _valid_formats)
         url = self.url + "/uniprot/" + uniprot_id + '.' + format
-        res = self.request(url)
+        res = self.request(url, format=format)
         return res
+
+    def get_fasta(self, id_):
+        """Returns FASTA sequence
+
+
+        :param str id_:
+
+
+        :return: returns fasta sequence (string)
+        """
+        res = self.searchUniProtId(id_, format="fasta")
+        header = res.strip().split("\n")[0]
+        dummy_, id_, other_ = header.split("|")
+        sequence = "\n".join(res.strip().split("\n")[2:])
+        res = {}
+        res[id_] = sequence
+        return res[id_]
 
 
     def search(self, query, format="tab", columns=None,
