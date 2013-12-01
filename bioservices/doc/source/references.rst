@@ -226,4 +226,11 @@ Wikipathway
     :synopsis:
 
 
+Applications
+################
 
+
+.. automodule:: bioservices.apps.peptides
+    :members:
+    :undoc-members:
+    :synopsis:
