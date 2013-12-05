@@ -5,7 +5,8 @@ Whats' new, what has changed
 Revision 1.0
 ------------------
 
-* 1.1.4
+* 1.2.0
+   * add MUSCLE service
    * add pathway commons service
    * add geneprof service
    * uniprot add function to get uniprot fasta sequence

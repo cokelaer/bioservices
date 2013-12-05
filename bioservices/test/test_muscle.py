@@ -1,4 +1,4 @@
-from bioservices.dev.muscle import MUSCLE
+from bioservices.muscle import MUSCLE
 from bioservices import uniprot
 
 

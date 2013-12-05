@@ -128,7 +128,7 @@ HGNC
 MUSCLE
 ==============
 
-.. automodule:: bioservices.dev.muscle
+.. automodule:: bioservices.muscle
     :members:
     :undoc-members:
     :synopsis:

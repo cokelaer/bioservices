@@ -82,6 +82,10 @@ from eutils import *
 import pathwaycommons
 from pathwaycommons import *
 
+
+import muscle
+from muscle import *
+
 # sub packages inside bioservices.
 
 import mapping
