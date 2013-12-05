@@ -41,14 +41,43 @@ __all__ = ["QuickGO"]
 class QuickGO(RESTService):
     """Interface to the `QuickGO <http://www.ebi.ac.uk/QuickGO/WebServices.html>`_ service
 
+    Retrieve information given a GO identifier:
+
     .. doctest::
 
         >>> from bioservices import QuickGO
         >>> s = QuickGO()
         >>> res = s.Term("GO:0003824")
 
+    Retrieve information about a protein given its uniprot identifier, a
+    taxonomy number. Let us also retrisct the search to the UniProt database and
+    print only 3 columns of information (protein name, GO identifier and GO
+    name)::
+
+        print s.Annotation(protein="Q8IYB3", format="tsv", tax=9606,
+            source="UniProt", col="proteinName,goID,goName")
+
+    Here is the Term output for a given GO identifier::
+
+        >>> print s.Term("GO:0000016", format="obo")
+        [Term]
+        id: GO:0000016
+        name: lactase activity
+        def: "Catalysis of the reaction: lactose + H2O = D-glucose + D-galactose."
+        synonym: "lactase-phlorizin hydrolase activity" broad
+        synonym: "lactose galactohydrolase activity" exact
+        xref: EC:3.2.1.108
+        xref: MetaCyc:LACTASE-RXN
+        xref: RHEA:10079
+        is_a: GO:0004553 ! hydrolase activity, hydrolyzing O-glycosyl compounds
+
+
     """
     _goid_example = "GO:0003824"
+    _valid_col = ['proteinDB', 'proteinID', 'proteinSymbol', 'qualifier',
+            'goID', 'goName', 'aspect', 'evidence', 'ref', 'with', 'proteinTaxon',
+            'date', 'from', 'splice', 'proteinName', 'proteinSynonym', 'proteinType',
+            'proteinTaxonName', 'originalTermID', 'originalGOName']
 
     def __init__(self, verbose=True):
         """.. rubric:: Constructor
@@ -59,7 +88,7 @@ class QuickGO(RESTService):
         super(QuickGO, self).__init__(url="http://www.ebi.ac.uk/QuickGO",
             name="quickGO", verbose=verbose)
 
-    def Term(self, GOid, format="oboxml"):
+    def Term(self, goid, format="oboxml"):
         """Obtain Term information
 
 
@@ -80,13 +109,13 @@ class QuickGO(RESTService):
 
         """
         _valid_formats = ["mini", "obo", "oboxml"]
-        if GOid.startswith("GO:")==False:
+        if goid.startswith("GO:")==False:
             raise ValueError("GO id must start with 'GO:'")
 
         if format not in _valid_formats:
             raise ValueError("format provided is incorrect. Choose in %s" % _valid_formats)
 
-        url = self.url + "/GTerm?id=" + GOid
+        url = self.url + "/GTerm?id=" + goid
         #GO:0003824
         params = {'format':format}
         postData = self.urlencode(params)
@@ -112,6 +141,9 @@ class QuickGO(RESTService):
             which may not be sufficient for the data set that you are
             downloading. To bypass this default, and return the entire data set,
             specify a limit of -1).
+        :param str format: one of "gaf", "gene2go", "proteinList", "fasta",
+            "tsv" or "dict". The "dict" format is the default and is a
+            python dictionary.
         :param bool gz: gzips the downloaded file.
         :param str goid: GO identifiers either directly or indirectly
             (descendant GO identifiers) applied in annotations.
@@ -162,11 +194,7 @@ class QuickGO(RESTService):
 
 
         """
-        _valid_formats = ["gaf", "gene2go", "proteinList", "fasta", "tsv"]
-        _valid_col = ['proteinDB', 'proteinID', 'proteinSymbol', 'qualifier',
-            'goID', 'goName', 'aspect', 'evidence', 'ref', 'with', 'proteinTaxon',
-            'date', 'from', 'splice', 'proteinName', 'proteinSynonym', 'proteinType',
-            'proteinTaxonName', 'originalTermID', 'originalGOName']
+        _valid_formats = ["gaf", "gene2go", "proteinList", "fasta", "tsv", "dict"]
         _valid_db = ['UniProtKB', 'UniGene', 'Ensembl']
         _valid_aspect = ['P', 'F', 'C']
 
@@ -194,8 +222,7 @@ class QuickGO(RESTService):
 
         # aspect parameter
         if aspect != None:
-            if aspect not in _valid_aspect:
-                 raise ValueError("Invalid aspect (%s) must be in %s" % (aspect, _valid_aspect))
+            self.checkParam(aspect, _valid_aspect)
             params['aspect'] = aspect
 
         # aspect parameter
@@ -252,19 +279,26 @@ or a string (e.g., 'PUBMED:*') """)
             params['qualifier'] = qualifier
 
 
+
+
         # col parameter
         if format=="tsv":
             if col == None:
                 col = 'proteinDB,proteinID,proteinSymbol,qualifier,'
-                col += 'goID,goName,aspect,evidence,ref,with,proteinTaxon,date,from,splice'
+                col += 'goID,goName,aspect,evidence,ref,with,proteinTaxon,date,from,splice,'
+                col += 'proteinName,proteinSynonym,proteinType,proteinTaxonName,originalTermID,originalGOName'
+            else:
+                col = ",".join([x.strip() for x in col.split(",")])
+
             for c in col.split(','):
-                if c not in _valid_col:
-                    raise ValueError("col parameter error: found %s, which is not a valid value." % c)
+                self.checkParam(c, self._valid_col)
             params["col"] = col
-        if format!="tsv":
+        if format not in ["tsv", "dict"]:
             # col is provided but format is not appropriate
             if col!= None:
-                raise ValueError("You provided the 'col' parameter but the format is not correct. You should use the 'format=tsv")
+                raise ValueError("You provided the 'col' parameter but the format is not correct. You should use the format='tsv' or format='dict' ")
+
+
 
         postData = "&" + self.urlencode(params)
 
@@ -274,8 +308,71 @@ or a string (e.g., 'PUBMED:*') """)
 
         url += postData
         res = self.request(url, format="txt")
+
+
         return res
 
 
+    def Annotation_from_goid(self, goid, **kargs):
+        """Returns a DataFrame containing annotation on a given GO identifier
+
+        :param str protein: a GO identifier
+        :return: all outputs are stored into a Pandas.DataFrame data structure.
+
+        All parameters from :math:`Annotation` are also valid except **format** that 
+        is set to **tsv**  and cols that is made of all possible column names.
+
+        """
+        kargs["format"] = "tsv"
+        cols = ",".join (self._valid_col)
+        kargs['col'] = cols
+
+        data = self.Annotation(goid=goid, **kargs)
+        data = data.strip().split("\n")[1:]
+        res = {}
+        for c in cols.split(","):
+            res[c] = []
+
+        for entry in data:
+            values = entry.split("\t")
+            for k, v in zip(cols.split(","), values):
+                res[k].append(v)
+        try:
+            import pandas as pd
+            return pd.DataFrame(res)
+        except: 
+            self.logging.warning("Cannot return a DAtaFrame. Returns the list")
+            return res
+
+    def Annotation_from_protein(self, protein, **kargs):
+        """Returns a DataFrame containing annotation on a given protein
+
+        :param str protein: a protein name
+        :return: all outputs are stored into a Pandas.DataFrame data structure.
+
+        All parameters from :math:`Annotation` are also valid except **format** that 
+        is set to **tsv**  and cols that is made of all possible column names.
+
+        """
+        kargs["format"] = "tsv"
+        cols = ",".join (self._valid_col)
+        kargs['col'] = cols
+
+        data = self.Annotation(protein=protein, **kargs)
+        data = data.strip().split("\n")[1:]
+        res = {}
+        for c in cols.split(","):
+            res[c] = []
+
+        for entry in data:
+            values = entry.split("\t")
+            for k, v in zip(cols.split(","), values):
+                res[k].append(v)
+        try:
+            import pandas as pd
+            return pd.DataFrame(res)
+        except: 
+            self.logging.warning("Cannot return a DAtaFrame. Returns the list")
+            return res
 
 
