@@ -286,7 +286,17 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
         """Returns FASTA sequence
 
 
-        :param str id_:
+        :param str id_: Should be the entry name
+
+        For instance, in::
+
+            >>> print u.search("TEC1_YEAST", format="tab")
+            Entry  Entry name  Status  Protein names   Gene names  Organism          Length
+            P18412 TEC1_YEAST  reviewed    Ty transcription activator TEC1 TEC1 ROC1 YBR083W YBR0750   Saccharomyces cerevisiae (strain ATCC 204508 S288c) (Baker's yeast)486
+
+        .. warning:: one must use the first colum (Entry) instead of Entry name.
+            You don't get the same fasta file otherwise...
+
 
 
         :return: returns fasta sequence (string)
@@ -294,7 +304,7 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
         res = self.searchUniProtId(id_, format="fasta")
         header = res.strip().split("\n")[0]
         dummy_, id_, other_ = header.split("|")
-        sequence = "\n".join(res.strip().split("\n")[2:])
+        sequence = "\n".join(res.strip().split("\n")[1:])
         res = {}
         res[id_] = sequence
         return res[id_]
