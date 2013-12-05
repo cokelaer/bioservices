@@ -125,6 +125,13 @@ HGNC
     :undoc-members:
     :synopsis:
 
+MUSCLE
+==============
+
+.. automodule:: bioservices.dev.muscle
+    :members:
+    :undoc-members:
+    :synopsis:
 
 
 Miriam

@@ -69,7 +69,7 @@ Here is a list of Web Services that can already be accessed from **BioServices**
     bioservices.ncbiblast.NCBIblast
     bioservices.psicquic.PSICQUIC
     bioservices.wikipathway.Wikipathway
-
+    bioservices.dev.muscle.MUSCLE
 
 
 The links above refers to the official web site of each service (right column)
