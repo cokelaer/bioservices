@@ -5,7 +5,7 @@ from bioservices import uniprot
 def test_muscle():
     m = MUSCLE(verbose=False)
     m.parameters
-    m.parametersDetails("format")
+    m.getParametersDetails("format")
 
 
     u = uniprot.UniProt(verbose=False)
