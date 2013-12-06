@@ -283,28 +283,41 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
         return res
 
     def get_fasta(self, id_):
-        """Returns FASTA sequence
+        """Returns FASTA given a valid identifier
+
+        """
+        res = self.searchUniProtId(id_, format="fasta")
+        return res
+
+    def get_fasta_sequence(self, id_ , header=False):
+        """Returns FASTA sequence (Not FASTA)
 
 
         :param str id_: Should be the entry name
+        :param bool header: set to True to get rid of the  header (default is  False)
 
         For instance, in::
-
-            >>> print u.search("TEC1_YEAST", format="tab")
-            Entry  Entry name  Status  Protein names   Gene names  Organism          Length
-            P18412 TEC1_YEAST  reviewed    Ty transcription activator TEC1 TEC1 ROC1 YBR083W YBR0750   Saccharomyces cerevisiae (strain ATCC 204508 S288c) (Baker's yeast)486
-
-        .. warning:: one must use the first colum (Entry) instead of Entry name.
-            You don't get the same fasta file otherwise...
 
 
 
         :return: returns fasta sequence (string)
+
+        .. warning:: this is the sequence found in a fasta file, not the fasta
+            content itself. The difference is that the header may be removed and the
+            formatting of end of lines every 60 characters is removed.
+
         """
         res = self.searchUniProtId(id_, format="fasta")
-        header = res.strip().split("\n")[0]
-        dummy_, id_, other_ = header.split("|")
-        sequence = "\n".join(res.strip().split("\n")[1:])
+        header_ = res.strip().split("\n")[0]
+        dummy_, id2_, other_ = header_.split("|")
+
+        if id_ != id2_:
+            self.logging.warning("id found in the header does not match header in the fasta file")
+
+        if header == False:
+            sequence = "".join(res.strip().split("\n")[1:])
+        else:
+            sequence = "".join(res.strip().split("\n")[0:])
         res = {}
         res[id_] = sequence
         return res[id_]
