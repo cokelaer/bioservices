@@ -9,13 +9,14 @@ BIOSERVICES: a Python package to access biological web services programmaticaly
 
    .. image:: bioservices.png
 
-   :Citations: If you use BioServices, please cite *Cokelaer et al, Bioinformatics (2013)*. See `bioinformatics link <http://bioinformatics.oxfordjournals.org/content/early/2013/10/17/bioinformatics.btt547>`_ for details.
+   :Citations: If you use BioServices, please cite *Cokelaer et al, Bioinformatics (2013)*. See `bioinformatics link <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ for details.
 
 
 .. note:: Contributions to implement new wrappers are more than welcome. 
     See `BioServices wiki <https://www.assembla.com/spaces/bioservices/wiki>`_
     to join the development, and the :ref:`developer` on how to implement new
-    wrappers.
+    wrappers. Although contributors have their names in the header files, you
+    can also look at the :ref:`contributors` directly.
 
 .. toctree::
     :maxdepth: 2
@@ -58,6 +59,7 @@ Here is a list of Web Services that can already be accessed from **BioServices**
     bioservices.kegg.Kegg
     bioservices.hgnc.HGNC
     bioservices.miriam.Miriam
+    bioservices.muscle.MUSCLE
     bioservices.pdb.PDB
     bioservices.pathwaycommons.PathwayCommons
     bioservices.picr.PICR
@@ -69,7 +71,6 @@ Here is a list of Web Services that can already be accessed from **BioServices**
     bioservices.ncbiblast.NCBIblast
     bioservices.psicquic.PSICQUIC
     bioservices.wikipathway.Wikipathway
-    bioservices.muscle.MUSCLE
 
 
 The links above refers to the official web site of each service (right column)
@@ -127,6 +128,17 @@ References
 
     references
 
+    
+External links to BioServices
+#################################
+
+.. toctree::
+    :maxdepth: 2
+    :numbered:
+
+    external_references.rst
+
+
 
 FAQS
 ###########
@@ -135,3 +147,11 @@ FAQS
     :maxdepth: 1
 
     faqs
+
+
+Contributors
+################
+
+.. toctree::
+
+    contributors

@@ -7,6 +7,8 @@ Revision 1.0
 
 * 1.2.0
    * add MUSCLE service
+	* fix bug in get_fasta from uniprot class
+   * add aliases to quickGO to retrieve annotation
    * add pathway commons service
    * add geneprof service
    * uniprot add function to get uniprot fasta sequence
