@@ -9,8 +9,8 @@ def test_muscle():
 
 
     u = uniprot.UniProt(verbose=False)
-    f1 = u.searchUniProtId("P18812",format="fasta")
-    f2 = u.searchUniProtId("P18813",format="fasta")
+    f1 = u.get_fasta("P18812")
+    f2 = u.get_fasta("P18813")
 
 
     jobid = m.run(format="fasta", sequence=f1+f2, email="cokelaer@ebi.ac.uk")
