@@ -311,8 +311,6 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
         header_ = res.strip().split("\n")[0]
         dummy_, id2_, other_ = header_.split("|")
 
-        if id_ != id2_:
-            self.logging.warning("id found in the header does not match header in the fasta file")
 
         if header == False:
             sequence = "".join(res.strip().split("\n")[1:])
