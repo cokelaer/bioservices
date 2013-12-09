@@ -114,6 +114,7 @@ class GeneProf(RESTService):
         """
         super(GeneProf, self).__init__(name="GeneProf",
                 url="http://www.geneprof.org/GeneProf/api", verbose=verbose)
+        # why is it set to False ?
         self.easyXMLConversion = False
         self._default_extension = "json"
 
@@ -216,7 +217,7 @@ class GeneProf(RESTService):
         if len(params):
             params = params.replace("with_", "with-")
             url += "?"+ params
-        res = self.request(url)
+        res = self.request(url, format=format_)
         if format == "json":
             res = json.loads(res)
             res = res['experiments']
@@ -275,7 +276,7 @@ class GeneProf(RESTService):
             params = params.replace("with_", "with-")
             params = params.replace("only_user_ex", "only-user-ex")
             url += "?"+ params
-        res = self.request(url)
+        res = self.request(url, format=format_)
         if format == "json":
             res = json.loads(res)
         return res
@@ -306,7 +307,7 @@ class GeneProf(RESTService):
         if len(params):
             params = params.replace("with_", "with-")
             url += "?"+ params
-        res = self.request(url)
+        res = self.request(url, format=format_)
         if format == "json":
             res = json.loads(res)
         return res
@@ -337,7 +338,7 @@ class GeneProf(RESTService):
         """
         format_ = self._check_format(format)
         url = self.url + "/ds/pubref." + format_
-        res = self.request(url)
+        res = self.request(url, format=format_)
         if format_ == "json":
             res = json.loads(res)
             res = res['references']
@@ -369,7 +370,7 @@ class GeneProf(RESTService):
         """
         format_ = self._check_format(format)
         url = self.url + "/gene.info/list.samples/%s." % ref + format_
-        res = self.request(url)
+        res = self.request(url, format=format_)
 
         if format_ == "json":
             # TODO: special characters to be removed.
@@ -414,7 +415,16 @@ class GeneProf(RESTService):
         >>> res = g.search_genes("brca2 AND cancer AND reference", taxons="mouse")
 
 
+        XML output example::
 
+        >>> g.search_genes("sox2", taxons="9606", format="xml")
+        >>> geneIds = [x.find('numeric_id').text for x in res.findAll("genes")]
+
+        >>> g.search_genes("sox2", taxons="9606")
+        >>> geneIds = [x["numeric_id"] for x in res[0]['genes']]
+
+
+        .. seealso:: search_gene_ids
         """
         format_ = self._check_format(format)
         query = query.replace(" ", "+")
@@ -425,12 +435,25 @@ class GeneProf(RESTService):
         params = self.urlencode(params)
         if len(params):
             url += "?" +  params
-        res = self.request(url)
+        res = self.request(url, format=format_)
         if format_ == "json":
             # TODO: special characters to be removed.
             res = json.loads(res.replace("\\", ""))
+            res = res['matches_per_dataset']
         return res
 
+    def search_gene_ids(self, query, taxons):
+        """This is an alias to :meth:`search_genes` to retrieve Ids
+
+        geneIds = g.seqrch_gene_ids("nanog", "mouse")
+        """
+        results = self.search_genes(query, taxons)
+        geneIds = {}
+        for res in results:
+            ids = [x["numeric_id"] for x in res['genes']]
+            taxon = res["reference"]["taxon"]
+            geneIds[taxon] = ids
+        return geneIds
 
     def search_experiments(self, query, taxons=None, format="json"):
         """Search Experiments using  name, description and citations.
@@ -484,7 +507,7 @@ class GeneProf(RESTService):
         params = self.urlencode(params)
         if len(params):
             url += "?" +  params
-        res = self.request(url)
+        res = self.request(url, format=format_)
         if format_ == "json":
             # TODO: special characters to be removed.
             res = json.loads(res.replace("\\", ""))
@@ -532,7 +555,7 @@ class GeneProf(RESTService):
         params = self.urlencode(params)
         if len(params):
             url += "?" +  params
-        res = self.request(url)
+        res = self.request(url, format=format_)
         if format_ == "json":
             # TODO: special characters to be removed.
             res = json.loads(res.replace("\\", ""))
@@ -588,7 +611,7 @@ class GeneProf(RESTService):
         params = self.urlencode(params)
         if len(params):
             url += "?" +  params
-        res = self.request(url)
+        res = self.request(url, format=format_)
         if format_ == "json":
             # TODO: special characters to be removed.
             res = json.loads(res.replace("\\", ""))
@@ -636,7 +659,7 @@ class GeneProf(RESTService):
         url = self.url + "/gene.info/gp.id/%s/%s/%s." % (ref, idtype, Id)
         url += format_
 
-        res = self.request(url)
+        res = self.request(url, format=format_)
         if format_ == "json":
             # TODO: special characters to be removed.
             res = json.loads(res.replace("\\", ""))
@@ -678,7 +701,7 @@ class GeneProf(RESTService):
         format_ = self._check_format(format)
         url = self.url + "/gene.info/external.id/%s/%s/%s." % (ref, idtype, Id)
         url += format_
-        res = self.request(url)
+        res = self.request(url, format=format_)
         if format_ == "json":
             # TODO: special characters to be removed.
             res = json.loads(res.replace("\\", ""))
@@ -703,11 +726,22 @@ class GeneProf(RESTService):
         format_ = self._check_format(format)
         url = self.url + "/gene.info/list.id.types/%s." % ref
         url += format_
-        res = self.request(url)
+        res = self.request(url, format=format_)
         if format_ == "json":
             # TODO: special characters to be removed.
             res = json.loads(res.replace("\\", ""))
         return res
+
+
+    def get_expression(self, ref, Id, format="json", with_sample_info=False, type="RPKM"):
+        """Alias to get_gene_expression
+        
+        
+        
+        
+        """
+        return self.get_gene_expression(ref, Id, format=format, 
+                with_sample_info=with_sample_info, type=type)
 
 
     def get_gene_expression(self, ref, Id, format="json",
@@ -762,6 +796,22 @@ class GeneProf(RESTService):
 
             >>> g.get_gene_expression("mouse", "715", format="rdata", with_sample_info=True)
 
+
+        .. plot::
+            :include-source:
+            :width: 80%
+
+            >>> from bioservices import GeneProf
+            >>> import math
+            >>> from pylab import hist, title, xlabel, clf, show, ylabel
+            >>> g = geneprof.GeneProf()
+            >>> res = g.get_gene_expression("mouse", "715")
+            >>> rpkmValues = [x["RPKM"] for x in res]
+            >>> logValues = [math.log(x+1,2.) for x in rpkmValues]
+            >>> hist(logValues) 
+            >>> xlabel('RPKM'); ylabel('Count')
+            >>> plt.title( 'Histogram: 715')
+
         """
         format_ = self._check_format(format)
         type_ = type
@@ -776,11 +826,12 @@ class GeneProf(RESTService):
         params['type'] = type_
         params = self.urlencode(params)
         url += "?"+ params
-        res = self.request(url)
+        res = self.request(url, format=format_)
 
         if format_ == "json":
             # TODO: special characters to be removed.
             res = json.loads(res.replace("\\", ""))
+            res = res['values']
         return res
 
     def get_targets_tf(self,ref,Id,format="json", ats="C_NAME",
@@ -859,7 +910,7 @@ class GeneProf(RESTService):
         params = self.urlencode(params)
         url += "?"+ params
 
-        res = self.request(url)
+        res = self.request(url, format=format_)
 
         if format_ == "json":
             # TODO: special characters to be removed.
@@ -937,7 +988,7 @@ class GeneProf(RESTService):
         params = self.urlencode(params)
         url += "?"+ params
 
-        res = self.request(url)
+        res = self.request(url, format=format_)
 
         if format_ == "json":
             # TODO: special characters to be removed.
@@ -1021,7 +1072,7 @@ class GeneProf(RESTService):
         params = self.urlencode(params)
         url += "?"+ params
 
-        res = self.request(url)
+        res = self.request(url, format=format_)
 
         if format_ == "json":
             # TODO: special characters to be removed.
@@ -1088,7 +1139,7 @@ class GeneProf(RESTService):
         params = self.urlencode(params)
         url += "?"+ params
 
-        res = self.request(url)
+        res = self.request(url, format=format_)
 
         if format_ == "json":
             # TODO: special characters to be removed.
@@ -1167,7 +1218,7 @@ class GeneProf(RESTService):
         params = self.urlencode(params)
         url += "?"+ params
 
-        res = self.request(url)
+        res = self.request(url, format=format_)
 
         if format_ == "json":
             # TODO: special characters to be removed.
@@ -1238,7 +1289,7 @@ class GeneProf(RESTService):
         params = self.urlencode(params)
         url += "?"+ params
 
-        res = self.request(url)
+        res = self.request(url, format=format_)
 
         if format_ == "json":
             # TODO: special characters to be removed.
@@ -1305,7 +1356,7 @@ class GeneProf(RESTService):
         if len(params):
             params = self.urlencode(params)
             url += "?" + params
-        res = self.request(url)
+        res = self.request(url, format=format_)
         return res
 
     def get_chromosome_names(self, Id, format="json", key=None):
@@ -1356,7 +1407,7 @@ class GeneProf(RESTService):
             params['key'] = key
             params = self.urlencode(params)
             url += "?" + params
-        res = self.request(url)
+        res = self.request(url, format=format_)
         return res
 
 
@@ -1441,7 +1492,7 @@ class GeneProf(RESTService):
             params['key'] = key
             params = self.urlencode(params)
             url += "?" + params
-        res = self.request(url)
+        res = self.request(url, format=format_)
         return res
 
     def get_wig_files(self, Id, chromosome=None, key=None, frag_length=-1,
@@ -1518,7 +1569,7 @@ class GeneProf(RESTService):
             params['key'] = key
             params = self.urlencode(params)
             url += "?" + params
-        res = self.request(url)
+        res = self.request(url, format=format_)
         return res
 
 
@@ -1553,7 +1604,7 @@ class GeneProf(RESTService):
             params['key'] = key
             params = self.urlencode(params)
             url += "?" + params
-        res = self.request(url)
+        res = self.request(url, format=format_)
         return res
 
     def get_fastq(self, Id, key=None):
@@ -1573,6 +1624,6 @@ class GeneProf(RESTService):
             params['key'] = key
             params = self.urlencode(params)
             url += "?" + params
-        res = self.request(url)
+        res = self.request(url, format=format_)
         return res
 

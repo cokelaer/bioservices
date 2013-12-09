@@ -152,7 +152,8 @@ import webbrowser
 import copy
 
 
-__all__ = ["Kegg", "KeggParser"]
+__all__ = ["KEGG", "Kegg", "KeggParser"]
+
 
 class Kegg(RESTService):
     """Interface to the `KEGG <http://www.genome.jp/kegg/pathway.html>`_ service
@@ -1531,3 +1532,6 @@ class KeggParser(Kegg):
 
 
 
+class KEGG(Kegg):
+    def __init__(self, verobse=False):
+        super(Kegg, self).__init__(name="Kegg", url="http://rest.kegg.jp", verbose=verbose)
