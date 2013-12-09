@@ -6,6 +6,7 @@ Revision 1.0
 ------------------
 
 * 1.2.0
+   * Kegg class has now an alias called KEGG
    * add MUSCLE service
 	* fix bug in get_fasta from uniprot class
    * add aliases to quickGO to retrieve annotation
