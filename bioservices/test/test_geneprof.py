@@ -19,9 +19,9 @@ def test_1():
     g.get_list_experiment_samples("human", format="txt")
     g.get_list_experiment_samples("human", format="rdata")
 
-    g.search_genes("sox2")['total_results']
-    g.search_genes("sox2", taxons="9606")['total_results']
-    g.search_genes("sox2", taxons="9606, 10090")['total_results']
+    g.search_genes("sox2")
+    g.search_genes("sox2", taxons="9606")
+    g.search_genes("sox2", taxons="9606, 10090")
     res = g.search_genes("brca2 AND cancer AND reference", taxons="mouse")
 def test_2():
     g = GeneProf(verbose=False)
