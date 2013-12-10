@@ -4,14 +4,13 @@ WSDL/SOAP or REST protocols).
 
 The primary goal of **BioServices** is to use Python as a glue language to provide
 a programmatic access to several Bioinformatics Web Services. By doing so, elaboration of  new
-applications that combine several of the wrapped Web Services should be
-fostered.
+applications that combine several of the wrapped Web Services is fostered.
 
 One of the main philosophy of **BioServices** is to make use of the existing
 biological databases (not to re-invent new databases) and to alleviates the
 needs for expertise in Web Services for the developers/users.
 
-So far, BioServices provides wrappers for 18 Web Services including 
+BioServices provides access to 25 Web Services including 
 
 * `BioModels <http://www.ebi.ac.uk/biomodels-main/>`_
 * `KEGG <http://www.genome.jp/kegg/pathway.html>`_
@@ -19,10 +18,12 @@ So far, BioServices provides wrappers for 18 Web Services including
 * `quickGO <http://www.ebi.ac.uk/QuickGO/WebServices.html>`_
 * `PSICQUIC <http://code.google.com/p/psicquic/>`_
 * `WikiPathway <http://www.wikipathways.org/index.php/WikiPathways>`_
-* and more (e.g., UniChem, ChEMBL, EUtils, ...). Up-to-date list of Web Services is 
-  provided within the `documentation <http://pythonhosted.org/bioservices/>`_.
+* and more (e.g., UniChem, ChEMBL, EUtils, GeneProf, PathwayCommons). 
 
-Here is just a little example using the UniProt Web Service to search for the zap70 specy in human
+qn up-to-date list of Web Services is provided within 
+the online `documentation <http://pythonhosted.org/bioservices/>`_.
+
+Here is a little example using the UniProt Web Service to search for the zap70 specy in human
 organism::
 
     >>> from bioservices import UniProt
