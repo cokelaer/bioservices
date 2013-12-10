@@ -233,11 +233,22 @@ Wikipathway
     :synopsis:
 
 
-Applications
-################
+Applications and extra tools
+##################################
 
 
 .. automodule:: bioservices.apps.peptides
+    :members:
+    :undoc-members:
+    :synopsis:
+
+.. automodule:: bioservices.apps.fasta
+    :members:
+    :undoc-members:
+    :synopsis:
+
+ 
+.. automodule:: bioservices.apps.taxonomy
     :members:
     :undoc-members:
     :synopsis:

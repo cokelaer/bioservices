@@ -14,7 +14,7 @@ Here below you will find a couple of examples related to GeneProf.
 
 
 Histogram expression data
-============================
+--------------------------------------
 :Reference: https://www.geneprof.org/GeneProf/media/bpsm-2013/
 
 
@@ -50,7 +50,7 @@ In the example below, we use geneprof to
 
 
 Transcription factor network of stem cells
-===============================================
+-------------------------------------------------------
 
 :References: https://www.geneprof.org/GeneProf/media/recomb-2013/
 
@@ -74,29 +74,28 @@ and visualise the final network. Please use with care::
     >>> for i, entry in enumerate(samples): 
     ...     print("progress %s/%s" % (i+1, len(samples)))
 
-    ...    # keep only entries that have cell type "embryonic stem cell" in the celltype
-    ...    if "Gene" in entry.keys() and "Cell_Type" in entry.keys() and\
-    ...        entry["Cell_Type"]=="embryonic stem cell":
+    ...     # keep only entries that have cell type "embryonic stem cell" in the celltype
+    ...     if "Gene" in entry.keys() and "Cell_Type" in entry.keys() and entry["Cell_Type"]=="embryonic stem cell":
     ...
-    ...     # aliases
-    ...     sampleId = entry['sample_id']
-    ...     gene = entry["Gene"]
+    ...         # aliases
+    ...         sampleId = entry['sample_id']
+    ...         gene = entry["Gene"]
 
-    ...     # get gene id and save mapping in a dictionary to be used later
-    ...     geneId = g.get_gene_id("mouse",  "C_NAME", gene)['ids']
-    ...      mapgene[geneId[0]] = gene 
+    ...         # get gene id and save mapping in a dictionary to be used later
+    ...         geneId = g.get_gene_id("mouse",  "C_NAME", gene)['ids']
+    ...         mapgene[geneId[0]] = gene 
 
-    ...     # get targets and print them
-    ...     targets =  g.get_targets_by_experiment_sample("mouse", sampleId)
+    ...         # get targets and print them
+    ...         targets =  g.get_targets_by_experiment_sample("mouse", sampleId)
 
-    ...     # could be simplied inside the geneprof.py module
-    ...     if 'targets' in targets.keys():
-    ...         targets = targets['targets']
+    ...         # could be simplied inside the geneprof.py module
+    ...         if 'targets' in targets.keys():
+    ...             targets = targets['targets']
 
-    ...     # print the results
-    ...     for x in targets:
-    ...         print gene, geneId[0], " ", x['feature_id']
-    ...     graph[gene] = [x['feature_id'] for x in targets]
+    ...         # print the results
+    ...         for x in targets:
+    ...             print gene, geneId[0], " ", x['feature_id']
+    ...         graph[gene] = [x['feature_id'] for x in targets]
 
     >>> # The graph saved in the graph variables is quite large. Let us simplified keeping target that
     >>> # are in the list of genes only
@@ -110,20 +109,18 @@ and visualise the final network. Please use with care::
 
 
 Finally, you can look at the graph with your favorite tool such as Cytoscape, Gephi. 
-I tried to visualise it within CellNopt, which is not dedicated to Network visualisation but contains
-a small interface to graphviz quite suitable to visualise small network::
 
-    >>> from cellnopt.core import CNOgraph
+Here below, I'm using a basic graph visualisation tool implemented in `CellNOpt <http://www.cellnopt.org>`_, which is not dedicated
+for Network visualisation but contains a small interface to graphviz useful in this context (it has a python interface)::
+
+    >>> from cellnopt.core import CNOGraph
     >>> c = CNOGraph()
     >>> for k in simple_graph.keys():
     ...     for v in simple_graph[k]:
     ...         c.add_edge(k, v, link="+")
     >>> c.centrality_degree()
     >>> c.degree_histogram()
-    >>> c.plotdot(prog="fdp", node_attribute="degree")
     >>> c.graph['graph'] = {"splines":"true", "size":(20,20), "dpi":200, "fixedsize":True}
-    >>> c.plotdot(prog="fdp", node_attribute="degree")
-    >>> c.centrality_degree()
     >>> c.graph['node'] = {"width":.01, "height":.01, 'size':0.01, "fontsize":8}
     >>> c.plotdot(prog="fdp", node_attribute="degree")
 
@@ -132,16 +129,18 @@ a small interface to graphviz quite suitable to visualise small network::
 
 
 Integrating expression data in pathways
-==========================================
+-------------------------------------------------------
 
-:Reference: 
+:References: https://www.geneprof.org/GeneProf/media/recomb-2013/
 
 This is another example from the reference above but based on tools available in bioservices so as to  overlaid highthroughput gene expression
 onto pathways and models from KEGG database.
 
 ::
 
-    >>> from bioservices import KeggParser, GeneProf, uniProt
+    >>> from bioservices import KeggParser, GeneProf, UniProt
+    >>> import StringIO
+    >>> import pandas
     >>> g = GeneProf()
     >>> k = KeggParser()
     >>> u = UniProt()
@@ -154,23 +153,46 @@ onto pathways and models from KEGG database.
     >>> gene_data = rnaseq['log2FC Lymphoma / EmbryonicKidney']
     >>> gene_names = rnaseq['Ensembl Gene ID']
 
-    # pick example workflows:
-    data(demo.paths)
+    >>> # generate a pathway diagram for the KEGG path hsa05202 ("Transcriptional 
+    >>> # misregulation in cancers") with fold change values from the RNA-seq data above:
+    >>> # get pathway
+    >>> res = k.parsePathway(k.get("hsa05202"))
+    >>> # extract gene and build up a list of identifiers for uniprot mapping
+    >>> keggids = ["hsa:"+x for x in res['gene'].keys()]
 
-    # generate a pathway diagram for the KEGG path hsa05202 ("Transcriptional 
-    # misregulation in cancers") with fold change values from the RNA-seq data above:
+    >>> ensemblids = {}
+    >>> for id_ in keggids:
+    ...     res = k.parse(k.get(id_))['dblinks']
+    ...     if 'Ensembl' in res.keys(): 
+    ...         print id_, res['Ensembl']
+    ...         ensemblids[id_] = res['Ensembl']
+    ...     else:
+    ...         if "UniProt" in res.keys():
+    ...             ids = res['UniProt'].split()[0]
+    ...             m = u.mapping("ACC", "ENSEMBL_ID", query=ids)
+    ...             if len(m): ensemblids[id_] = m[ids][0]
+    ...         pass # no links to ensembl DB found
 
-    # get pathway
-    res = k.parsePathway(k.get("hsa05202"))
-    # extract gene and build up a list of identifiers for uniprot mapping
-    keggids = ["hsa:"+x for x in res['gene'].keys()]
+    
+    >>> found = [x for x in ensemblids.values() if x in [str(y) for y in gene_names]]
+    >>> indices = [i for i, x in enumerate(rnaseq['Ensembl Gene ID']) if x in found]
 
-    # convert to uniprot using uniprot mapping
-    uniprotids = u.mapping(fr="KEGG_ID", to="ID", query=",".join(keggids))
-    # to fix: to get get not only first value but all of them:
-    ensgids = u.mapping(fr="ID", to="ENSEMBL_ID", query=",".join([x[0] for x in uniprotids.values()]))
+    >>> data = rnaseq.ix[indices][['Ensembl Gene ID', 'log2FC Lymphoma / EmbryonicKidney']]
 
-    k.show_pathway("hsa05202", dcolor="white", keggid={4297:'blue'})
+    >>> low = data[data['log2FC Lymphoma / EmbryonicKidney']<0]
+    >>> geneid_low = list(low['Ensembl Gene ID'])
+    >>> up = data[data['log2FC Lymphoma / EmbryonicKidney']>0]
+    >>> geneid_up = list(up['Ensembl Gene ID'])
+
+    >>> keggid_low = [this for this in keggids if ensemblids[this] in geneid_low]
+    >>> keggid_up = [this for this in keggids if ensemblids[this] in geneid_up]
+
+    >>> colors = {}
+    >>> for id_ in keggid_low:
+    ...    colors[id_[4:]] = "blue"
+    >>> for id_ in keggid_up:
+    ...    colors[id_[4:]] = "red"
+    >>> k.show_pathway("hsa05202", dcolor="white", keggid=colors)
 
 pathview(gene.data = gene.data, pathway.id="05202", species="hsa", cpd.idtype="ENSEMBL", gene.idtype="ENSEMBL", na.col='lightgrey', low=list(gene='darkblue',cpd='darkblue'), mid=list(gene='gold',cpd='gold'), high=list(gene='darkred',cpd='darkred'), limit = list(gene = 3, cpd = 3), width=3200, height=2400)
 

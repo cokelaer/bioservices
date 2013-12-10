@@ -148,6 +148,13 @@ FAQS
 
     faqs
 
+ChangeLog
+###############
+
+.. toctree:: 
+    :maxdepth: 1
+
+    ChangeLog.rst
 
 Contributors
 ################

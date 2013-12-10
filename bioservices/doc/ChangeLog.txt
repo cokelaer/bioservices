@@ -31,8 +31,7 @@ Revision 1.0
     * add new services: HGNC + doc + test
 
 * 1.1.0:
-    * in psicquic when performing the conversion, we now use a try/except since
-	  some fields (in rare case) may be missing
+    * in psicquic when performing the conversion, we now use a try/except since some fields (in rare case) may be missing
 	* add faqs in the doc + update of the README and metadata.
 	* fix typo in the list of uniprot mapping
 	* Use BeautifulSoup4 instead of 3
@@ -42,17 +41,16 @@ Revision 1.0
 	* kegg.conv method now returns a dictionary instead of list of tuples.
 
 * 1.0.4
-    * add a draft version of PDB just to be able to fetch PDB data and use it
-      with external tool such as PyMOL as shown in the new pymol.rst
-      documentation.
+	* 	add a draft version of PDB just to be able to fetch PDB data and use it
+		with external tool such as PyMOL as shown in the new pymol.rst
+	  	documentation.
 	* add a missing docstring in uniprot +  check to/fr parameters in UniProt.mapping
 	  method.
 	* Fix a typo in PSICQUIC module.
 	
 
 * 1.0.3
-    * uniprot.UniPort.search method: default value of the parameter format is
-      now "tab"
+    * uniprot.UniPort.search method: default value of the parameter format is now "tab"
 	* fix 1 quickgo test
 	* a few documentation updates in biomart/uniprot/chembldb and tutorial.
 
@@ -68,10 +66,6 @@ Revision 1.0
     * add chemspider draft
 	* complete eutils 
 
-* 1.0.1: 
-    update metadata
-
-=======
 * 1.0.1
     * Add miriam module
     * Add arrayexpress 
@@ -109,8 +103,8 @@ Revision 0.9
 * 0.9.1: fix typo in biomodel. add uniprot search method. add keggParser class
 
 * 0.9.0: Stable version of bioservices including the following services:
-BioModels, Kegg, Reactome, Chembl, PICR, QuickGO, Rhea, UniProt,
-WSDbfetch, NCBIblast, PSICQUIC, Wikipath
+	BioModels, Kegg, Reactome, Chembl, PICR, QuickGO, Rhea, UniProt,
+	WSDbfetch, NCBIblast, PSICQUIC, Wikipath
 
 
 Up to Revision 0.5
@@ -128,7 +122,5 @@ Up to Revision 0.5
 * 0.3.0: add reactome + uniprot.
 * 0.2.0: finalise biomodels and add picr service + test for biomdodel service..
 * 0.1.0: add database and kegg modules + its documentation and tests
-
-
 
 
