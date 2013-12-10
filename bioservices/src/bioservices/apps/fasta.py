@@ -149,7 +149,7 @@ class FASTA(object):
         """Fetches FASTA from uniprot and loads into attrbiute :attr:`fasta`
         
         :param str id_: a given uniprot identifier
-        :returns the FASTA contents
+        :returns: the FASTA contents
 
         
         """
@@ -191,8 +191,7 @@ class FASTA(object):
 
         :return: nothing
        
-        .. warning:: If more than one FASTA is contained in the file, an error
-        is raised
+        .. warning:: If more than one FASTA is contained in the file, an error is raised
         """
         fh = open(filename, "r")
         data = fh.read()

@@ -32,7 +32,7 @@ class test_hgnc():
     def test_mapping(self):
         value = "UniProt:P43403"
         res = self.s.mapping(value)
-        res['xlink:title'] == "ZAP70"
+        res[0]['xlink:title'] == "ZAP70"
 
 
 

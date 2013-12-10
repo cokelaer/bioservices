@@ -4,7 +4,8 @@ from bioservices.geneprof import GeneProf
 
 def test_geneprof():
     g = GeneProf(verbose=False)
-    res = g.get_list_experiments(with_outputs=True)
+    #res = g.get_list_experiments(with_outputs=True)
+    res = g.get_list_experiments(with_outputs=False)
     len(res)>0
     res = g.get_metadata_experiment("3")
 

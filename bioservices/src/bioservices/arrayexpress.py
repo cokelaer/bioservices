@@ -125,7 +125,7 @@ class ArrayExpress(RESTService):
 
         """
         super(ArrayExpress, self).__init__(name="ArrayExpress",
-            url="http://www.ebi.ac.uk/arrayexpress/", verbose=verbose)
+            url="http://www.ebi.ac.uk/arrayexpress", verbose=verbose)
         self.easyXMLConversion = True
         self._format = "xml"
 
@@ -288,14 +288,15 @@ class ArrayExpress(RESTService):
             Files available for %s experiment are %s """ % (experiment, files)
 
         url = self.url + "/files/" + experiment + "/" + filename
-        res = self.request(url)
 
         if save:
+            res = self.request(url, format="txt")
             f = open(filename,"w")
             f.write(res)
             f.close()
         else:
-           return  res
+            res = self.request(url)
+            return  res
 
     def retrieveFilesFromExperiment(self, experiment):
         """Given an experiment, returns the list of files found in its description

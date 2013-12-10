@@ -157,6 +157,7 @@ class UniProt(RESTService):
     """Interface to the `UniProt <http://www.uniprot.org>`_ service
 
     .. rubric:: Identifiers mapping between databases:
+
     ::
 
         >>> from bioservices import UniProt

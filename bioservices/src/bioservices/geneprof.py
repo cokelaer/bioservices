@@ -1363,7 +1363,7 @@ class GeneProf(RESTService):
         The names in genome databases use to refer to chromosomes, even
         of well-known organisms, are not always the same. For example, the
         mitochondrial (pseudo-)chromosome is usally called 'chrMT' in Ensembl,
-        but 'chrM' in the UCSC databases. The data as `BED <get_bed_files>`_
+        but 'chrM' in the UCSC databases. The data as :meth:`get_bed_files`
         or as `WIG <get_wig_files>`_ might therefore require you to rename
         the experiments in the
         output, before using them with other applications. 
@@ -1406,9 +1406,8 @@ class GeneProf(RESTService):
             with_track_description=True, only_distinct=False):
         """Retrieve Genomic Data as compressed BED Files (gzipped)
 
-        Retrieves genomic data as `BED
-        <http://genome.ucsc.edu/FAQ/FAQformat.html#format1>`_  files in
-        compressed gzipped format. It works only for datasets with type
+        Retrieves genomic data as `BED <http://genome.ucsc.edu/FAQ/FAQformat.html#format1>`_  
+        files in compressed gzipped format. It works only for datasets with type
         GENOMIC_REGIONS  i.e. those containing genomic data! The dataset of
         interest is identified by its GeneProf accession ID (something of the
         form  gpDS_XXX_XXX_XXX_X). You can get a list of datasets belonging to a

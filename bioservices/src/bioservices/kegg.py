@@ -1528,8 +1528,11 @@ class KeggParser(Kegg):
             data = output['aaseq']
             output['aaseq'] = {data[0]: reduce(lambda x,y:x+y, data[1:])}
         if "dblinks" in output.keys():
-            data = output['dblinks']
-            output['dblinks'] = {k[0:-1]:v for k,v in output['dblinks'].iteritems()}
+            try:
+                data = output['dblinks']
+                output['dblinks'] = {k[0:-1]:v for k,v in output['dblinks'].iteritems()}
+            except:
+                pass
 
         return output
 

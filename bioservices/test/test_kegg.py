@@ -28,7 +28,7 @@ class TestKegg(object):
         self.ws.conv("ncbi-gi","hsa:10458+ece:Z5100")
 
     def test_info(self):
-        self.ws.info()
+        self.ws.info("kegg")
         self.ws.info("brite")
 
     def test_list(self):

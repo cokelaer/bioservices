@@ -160,8 +160,7 @@ class PSICQUIC(RESTService):
         >>> res = s.query("intact", "zap70")
         >>> len(res) # there are 11 interactions found
         11
-        >>> # Let us look at the second one in particular:
-        >>> for x in res[1].split("\t"): 
+        >>> for x in res[1]: 
         ...     print x
         uniprotkb:O95169
         uniprotkb:P43403
@@ -630,9 +629,6 @@ class PSICQUIC(RESTService):
         keep_self_loop=False, verbose=True):
         """Remove entries with a None and keep only those with the keep pattern
 
-
-
-
         """
         if verbose:print("Before removing anything: ", len(data))
 
@@ -745,10 +741,13 @@ class PSICQUIC(RESTService):
                             else:
                                 # we should be here since the queries are populated
                                 # if not already in the mapping dictionary
-                                if x == mapping.keys():
+                                if x not in res.keys():
                                     raise ValueError(x)
-                                index = res.index(x)
-                                mapping[x] = res[index+1]
+                                if len(res[x])==1:
+                                    mapping[x] = res[x][0]
+                                else:
+                                    self.logging.warning("psicquic mapping found more than 1 id. keep first one")
+                                    mapping[x] = res[x][0]
                     else:
                         for x in this_query:
                             mapping[x] = k + ":" + x
