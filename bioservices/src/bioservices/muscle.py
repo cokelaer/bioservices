@@ -71,7 +71,7 @@ class MUSCLE(RESTService):
         >>> f2 = u.get_fasta("P18412")
         >>> m = MUSCLE(verbose=False)
         >>> jobid = m.run(format="fasta", sequence=f1+f2, email="name@provider")
-        >>> s.getResult(jobid, "out")
+        >>> m.getResult(jobid, "out")
 
     """
 
