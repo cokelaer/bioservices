@@ -83,7 +83,7 @@ class HGNC(RESTService):
 
     """
     def __init__(self, verbose=False):
-        url = "http://www.avatar.se/HGNC/wr/gene/"
+        url = "http://www.avatar.se/HGNC/wr/gene"
         super(RESTService,self).__init__("HGNC", url=url, verbose=verbose)
         self._always_return_list = False
 
