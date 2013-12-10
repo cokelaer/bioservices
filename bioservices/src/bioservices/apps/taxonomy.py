@@ -3,14 +3,17 @@ from easydev import Logging
 import pandas as pd
 
 
+__all__ = ["Taxon"]
+
 class Taxon(Logging):
     """Utility to search for information related to a taxon
     
     Uses HGNC service to fetch information about a taxon.
+    ::
 
-        from bioservices.mapping.mappers import Taxon
-        t = Taxon()
-        t.search_by_taxon("9606")
+        >>> from bioservices.apps.taxonomy import Taxon
+        >>> t = Taxon()
+        >>> t.search_by_taxon("9606")
         {'Scientific Name': 'Homo sapiens', 'taxon': '9606'}
 
     You can also pop up the Uniprot page using::
@@ -23,6 +26,7 @@ class Taxon(Logging):
         http://www.uniprot.org/taxonomy/?query=*&format=*
 
 
+    .. versionadded:: 1.2.0
     """
     def __init__(self):
         super(Taxon, self).__init__("INFO")
