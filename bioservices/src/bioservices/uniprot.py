@@ -156,17 +156,13 @@ mapping = {"UniProtKB AC/ID":"ACC+ID",
 class UniProt(RESTService):
     """Interface to the `UniProt <http://www.uniprot.org>`_ service
 
-    .. warning:: for the time being, this class only provide interface to 
-        * the identifier mapping service
-        * search of a UniProtKB identifier
-        * some experimental interface to the full search 
-
-    Example::
+    .. rubric:: Identifiers mapping between databases:
+    ::
 
         >>> from bioservices import UniProt
         >>> u = UniProt(verbose=False)
-        >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403')
-        ['FromACC', 'ToKEGG_ID', 'P43403', 'hsa:7535']
+        >>> u.mapping("ACC", "KEGG_ID", query='P43403')
+        defaultdict(<type 'list'>, {'P43403': ['hsa:7535']})
         >>> res = u.search("P43403")
 
         # Returns sequence on the ZAP70_HUMAN accession Id
@@ -183,33 +179,31 @@ class UniProt(RESTService):
         super(UniProt, self).__init__(name="UniProt", url=UniProt._url, verbose=verbose)
 
 
-    def mapping(self, fr="ID", to="KEGG_ID", format="tab", query="P13368"):
+    def mapping(self, fr="ID", to="KEGG_ID",  query="P13368", format="tab"):
         """This is an interface to the UniProt mapping service
 
 
         :param fr: the source database identifier. See :attr:`_mapping`.
         :param to: the targetted database identifier. See :attr:`_mapping`.
-        :param format: the output format (default is tabulated "tab")
         :param query: a string containing one or more IDs separated by a space
+            It can also be a list of strings.
+        :param format: the output format (default is tabulated "tab")
+            only tab should be used for now.
         :return: a list. The first element is the source database Id. The second
             is the targetted source identifier. Following elements are alternate
             of one the entry and its mapped Id. If a query has several mapped
             Ids, the query is repeated (see example with PDB mapping here below)
-
-
-e.g., ["From:ID", "to:PDB_ID", "P43403"]
-
+            e.g., ["From:ID", "to:PDB_ID", "P43403"]
 
         ::
 
-            >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403')
-            ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535']
-            >>> u.mapping(fr="ACC", to="KEGG_ID", query='P43403 P00958')
-            ['From:ACC', 'To:KEGG_ID', 'P43403', 'hsa:7535', 'P00958', 'sce:YGR264C']
-            >>> u.mapping(fr="ID", to="PDB_ID", query="P43403", format="tab")
-            ['From:ID', 'To:PDB_ID', 'P43403', '1FBV', 'P43403', '1M61', 'P43403', '1U59',
-            'P43403', '2CBL', 'P43403', '2OQ1', 'P43403', '2OZO', 'P43403', '2Y1N',
-            'P43403', '4A4B', 'P43403', '4A4C']
+            >>> u.mapping("ACC", "KEGG_ID", 'P43403')
+            defaultdict(<type 'list'>, {'P43403': ['hsa:7535']})
+            >>> u.mapping("ACC", "KEGG_ID", 'P43403 P00958')
+            defaultdict(<type 'list'>, {'P00958': ['sce:YGR264C'], 'P43403': ['hsa:7535']})
+            >>> u.mapping("ID", "PDB_ID", "P43403", format="tab")
+            defaultdict(<type 'list'>, {'P43403': ['1FBV', '1M61', '1U59',
+            '2CBL', '2OQ1', '2OZO', '2Y1N', '3ZNI', '4A4B', '4A4C', '4K2R']})
 
 
 
@@ -220,22 +214,20 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
         :URL: http://www.uniprot.org/mapping/
 
 
-        .. versionchanged:: 1.1.1 to return a dictionary insted of a list
+        .. versionchanged:: 1.1.1 to return a dictionary instaed of a list
         .. versionchanged:: 1.1.2 the values for each key is now made of a list 
             instead of strings so as to store more than one values.
+        .. versionchanged:: 1.2.0 input query can also be a list of strings
+            instead of just a string
 
         """
-
         url = self.url + '/mapping/'
+
+        if isinstance(query, list):
+            query = " ".join(query)
         params = {'from':fr, 'to':to, 'format':format, 'query':query}
-        data = urllib.urlencode(params)
-        self.logging.info(data)
-        request = urllib2.Request(url, data)
-        # 2 following lines are optional
-        contact = ""
-        request.add_header('User-Agent', 'Python contact')
-        response = urllib2.urlopen(request)
-        result = response.read(200000) # TODO: do we want to cut the results ?? 
+        params = self.urlencode(params)
+        result = self._request_timeout(url+"?"+params, format=format)
 
         # let us improve the output a little bit using a list instead of a
         # string
@@ -253,8 +245,10 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
             return {}
         else:
             # bug fix based on ticket #19 version 1.1.2
+            # the default dict set empty list for all keys by default
             from collections import defaultdict
             result_dict = defaultdict(list)
+
             keys = result[0::2]
             values = result[1::2]
             for i, key in enumerate(keys):
@@ -267,11 +261,11 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
         :param str uniprot: a valid uniprotKB ID
         :param str format: expected output format amongst xml, txt, fasta, gff, rdf
 
-
         ::
 
             >>> u = UniProt()
             >>> res = u.searchUniProtId("P09958", format="xml")
+
 
         """
         _valid_formats = ['txt', 'xml', 'rdf', 'gff', 'fasta']
@@ -283,42 +277,33 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
         return res
 
     def get_fasta(self, id_):
-        """Returns FASTA given a valid identifier
-
+        """Returns FASTA string given a valid identifier
+        
+        
+        .. seealso:: :mod:`bioservices.apps.fasta` for dedicated tools to
+            manipulate FASTA
         """
-        res = self.searchUniProtId(id_, format="fasta")
-        return res
+        from bioservices.apps.fasta import FASTA
+        f = FASTA()
+        f.get_fasta(id_)
+        return f.fasta
+        
 
-    def get_fasta_sequence(self, id_ , header=False):
+    def get_fasta_sequence(self, id_):
         """Returns FASTA sequence (Not FASTA)
 
-
         :param str id_: Should be the entry name
-        :param bool header: set to True to get rid of the  header (default is  False)
-
-        For instance, in::
-
-
-
         :return: returns fasta sequence (string)
 
         .. warning:: this is the sequence found in a fasta file, not the fasta
-            content itself. The difference is that the header may be removed and the
+            content itself. The difference is that the header is removed and the
             formatting of end of lines every 60 characters is removed.
 
         """
-        res = self.searchUniProtId(id_, format="fasta")
-        header_ = res.strip().split("\n")[0]
-        dummy_, id2_, other_ = header_.split("|")
-
-
-        if header == False:
-            sequence = "".join(res.strip().split("\n")[1:])
-        else:
-            sequence = "".join(res.strip().split("\n")[0:])
-        res = {}
-        res[id_] = sequence
-        return res[id_]
+        from bioservices.apps.fasta import FASTA
+        f = FASTA()
+        f.load_fasta(id_)
+        return f.sequence
 
 
     def search(self, query, format="tab", columns=None,
@@ -454,3 +439,7 @@ e.g., ["From:ID", "to:PDB_ID", "P43403"]
                          'Organism' : e,
                          'Length' : f}
         return newres
+
+
+
+

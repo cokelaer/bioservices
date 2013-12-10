@@ -349,6 +349,28 @@ class RESTService(Service):
             self.logging.error("Error caught within bioservices. Invalid requested URL ? ")
             raise
 
+    def _request_timeout(self, path, format="xml", baseUrl=True, trials=3):
+        import socket
+        socket.setdefaulttimeout(5.)
+        level = self.debugLevel
+        self.debugLevel="ERROR"
+        res = None
+        for i in range(0,trials):
+            try:
+                res = self.request(path, format=format, baseUrl=baseUrl)
+            except socket.timeout:
+                print("Time out. Trying again %s/%s" % (i+1, trials))
+            except Exception:
+                raise Exception
+            else:
+                break
+        if res == None:
+            self.logging.error("URL could not be fetched %s" % path)
+        return res
+            
+
+
+
     def requestPost(self, requestUrl, params, extra=None):
         """request with a POST method.
 
