@@ -7,9 +7,10 @@ BIOSERVICES: a Python package to access biological web services programmaticaly
 
 .. topic:: BioServices
 
-   .. image:: bioservices.png
+    .. image:: bioservices.png
+        :width: 50%
 
-   :Citations: If you use BioServices, please cite *Cokelaer et al, Bioinformatics (2013)*. See `bioinformatics link <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ for details.
+    :Citations: If you use BioServices, please cite *Cokelaer et al, Bioinformatics (2013)*. See `bioinformatics link <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ for details.
 
 
 .. note:: Contributions to implement new wrappers are more than welcome. 
@@ -128,8 +129,9 @@ References
 
     references
 
-    
-External links to BioServices
+
+
+Others
 #################################
 
 .. toctree::
@@ -137,28 +139,6 @@ External links to BioServices
     :numbered:
 
     external_references.rst
-
-
-
-FAQS
-###########
-
-.. toctree:: 
-    :maxdepth: 1
-
     faqs
-
-ChangeLog
-###############
-
-.. toctree:: 
-    :maxdepth: 1
-
     ChangeLog.rst
-
-Contributors
-################
-
-.. toctree::
-
     contributors

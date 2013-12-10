@@ -236,18 +236,29 @@ Wikipathway
 Applications and extra tools
 ##################################
 
+Web services have lots of overlap amongst themselves. For instance, fetching a FASTA sequence 
+can be done using many different services. Yet, once a FASTA is retrieved, one may want to perform additional tasks or save the FASTA into a file or whatever repetitive functionalities not included in Web Services anymore.
 
+The goal of this sub-package is to provide convenient tools, which are not web services per se but that makes use of one or several Web Services already available within BioServices.
+
+.. warning:: this is experimental and was added in version 1.2.0 so it may change quite a lot.
+
+Peptides
+============
 .. automodule:: bioservices.apps.peptides
     :members:
     :undoc-members:
     :synopsis:
 
+FASTA
+=======
 .. automodule:: bioservices.apps.fasta
     :members:
     :undoc-members:
     :synopsis:
 
- 
+Taxonomy
+=============
 .. automodule:: bioservices.apps.taxonomy
     :members:
     :undoc-members:

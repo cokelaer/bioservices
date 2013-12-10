@@ -1,6 +1,11 @@
 GeneProf tutorial
 =====================
 
+.. topic:: GeneProf tutorial
+
+    .. versionadded:: 1.2.0
+    .. sectionauthor:: Thomas Cokelaer, Dec 2013
+
 `GeneProf <http://www.geneprof.org/GeneProf/index.jsp>`_ is a web-based, graphical software suite that allows users to analyse data produced using high-throughput sequencing platforms (RNA-seq and ChIP-seq; "Next-Generation Sequencing" or NGS): Next-gen analysis for next-gen data
 
 
@@ -133,8 +138,13 @@ Integrating expression data in pathways
 
 :References: https://www.geneprof.org/GeneProf/media/recomb-2013/
 
+
+
 This is another example from the reference above but based on tools available in bioservices so as to  overlaid highthroughput gene expression
 onto pathways and models from KEGG database.
+
+Fold changes in lymphoma vs. kidney
+on selected KEGG pathways
 
 ::
 
@@ -145,21 +155,19 @@ onto pathways and models from KEGG database.
     >>> k = KeggParser()
     >>> u = UniProt()
 
-    >>> # load ENCODE RNA-seq
+    >>> # load ENCODE RNA-seq into a DataFrame for later
     >>> data = g.get_data("11_683_28_1", "txt")
     >>> rnaseq = pandas.read_csv(StringIO.StringIO(data), sep="\t")
-    
-    >>> # pick out the log2 fold change values for visualization:
-    >>> gene_data = rnaseq['log2FC Lymphoma / EmbryonicKidney']
     >>> gene_names = rnaseq['Ensembl Gene ID']
 
-    >>> # generate a pathway diagram for the KEGG path hsa05202 ("Transcriptional 
-    >>> # misregulation in cancers") with fold change values from the RNA-seq data above:
-    >>> # get pathway
+    >>> # get a pathway diagram for the KEGG path hsa05202 ("Transcriptional 
+    >>> # misregulation in cancers")
     >>> res = k.parsePathway(k.get("hsa05202"))
-    >>> # extract gene and build up a list of identifiers for uniprot mapping
+    >>> # extract KEGG identifiers corresponding to the genes found in the pathway
     >>> keggids = ["hsa:"+x for x in res['gene'].keys()]
 
+    >>> # we need to map the KEGG Ids to Ensembl Ids. We will use KEGG mapping and uniprot mapping
+    >>> # for cases where the former does not have associated mapping.
     >>> ensemblids = {}
     >>> for id_ in keggids:
     ...     res = k.parse(k.get(id_))['dblinks']
@@ -173,29 +181,38 @@ onto pathways and models from KEGG database.
     ...             if len(m): ensemblids[id_] = m[ids][0]
     ...         pass # no links to ensembl DB found
 
-    
+    >>> # what are the KEGG id transformed into Ensembl Ids that are in the ENCODE data set ?
     >>> found = [x for x in ensemblids.values() if x in [str(y) for y in gene_names]]
     >>> indices = [i for i, x in enumerate(rnaseq['Ensembl Gene ID']) if x in found]
-
+    >>>
+    >>> # now, we can pick out the log2 fold change values for visualization:
     >>> data = rnaseq.ix[indices][['Ensembl Gene ID', 'log2FC Lymphoma / EmbryonicKidney']]
-
-    >>> low = data[data['log2FC Lymphoma / EmbryonicKidney']<0]
+    >>> # and keep only those that have a negative or positive value
+    >>> mid = 1.5
+    >>> low = data[data['log2FC Lymphoma / EmbryonicKidney']<-mid]
     >>> geneid_low = list(low['Ensembl Gene ID'])
-    >>> up = data[data['log2FC Lymphoma / EmbryonicKidney']>0]
+    >>> up = data[data['log2FC Lymphoma / EmbryonicKidney']>mid]
     >>> geneid_up = list(up['Ensembl Gene ID'])
+    >>> mid = data[abs(data['log2FC Lymphoma / EmbryonicKidney'])<mid]
+    >>> geneid_mid = list(mid['Ensembl Gene ID'])
 
+    >>> # now that we have the genes (in ensembl format), we need the kegg id 
     >>> keggid_low = [this for this in keggids if ensemblids[this] in geneid_low]
+    >>> keggid_mid = [this for this in keggids if ensemblids[this] in geneid_mid]
     >>> keggid_up = [this for this in keggids if ensemblids[this] in geneid_up]
-
+    >>> # it is now time to look at the expression on the diagram
     >>> colors = {}
-    >>> for id_ in keggid_low:
-    ...    colors[id_[4:]] = "blue"
-    >>> for id_ in keggid_up:
-    ...    colors[id_[4:]] = "red"
+    >>> for id_ in keggids:  colors[id_[4:]] = "gray,"
+    >>> for id_ in keggid_low: colors[id_[4:]] = "blue,"
+    >>> for id_ in keggid_up:  colors[id_[4:]] = "orange,"
+    >>> for id_ in keggid_mid: colors[id_[4:]] = "yellow,"
     >>> k.show_pathway("hsa05202", dcolor="white", keggid=colors)
 
-pathview(gene.data = gene.data, pathway.id="05202", species="hsa", cpd.idtype="ENSEMBL", gene.idtype="ENSEMBL", na.col='lightgrey', low=list(gene='darkblue',cpd='darkblue'), mid=list(gene='gold',cpd='gold'), high=list(gene='darkred',cpd='darkred'), limit = list(gene = 3, cpd = 3), width=3200, height=2400)
+The last command will popup the KEGG diagram with the expression data on top of the diagram, as shown in the following picture:
 
+.. image:: geneprof_kegg_expression.png
+    :width: 100%
+    
 
 
 
