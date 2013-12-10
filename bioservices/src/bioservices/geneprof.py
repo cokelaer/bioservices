@@ -40,6 +40,7 @@
        -- GeneProf home page, Nov 2013
 
 
+.. versionadded:: 1.2.0
 
 Data is freely available, under the license terms of each contributing database.
 
@@ -81,6 +82,7 @@ class GeneProf(RESTService):
     .. warning:: there may be a limitation on the number of request per day
 
 
+    .. versionadded:: 1.2.0
     """
 
     _valid_format = ["json", "txt", "xml", "rdata"]
@@ -164,18 +166,9 @@ class GeneProf(RESTService):
 
 
     def get_list_experiments(self, format="json", **kargs):
-        """Use this web service to retrieve a list of GeneProf experiments.
-
-        'Experiments' are what GeneProf calls each individual data analysis
-        project. An experiment typically consists of a set of input data
-        (e.g. raw high-throughput sequencing reads), some experimental sample
-        annotation, an analysis workflow and a selection of main outputs.
-        Please check the manual for further information
-        about experiments. This web service simply retrieves a list of all the
-        experiments available in the database along with a range of metadata.
+        """Retrieves a list of GeneProf experiments.
 
         :param str format: format of the output
-
         :param bool with-ats: Include descriptions for all datasets'
             annotation types (data columns).
         :param bool with-samples: Include information about the sample
@@ -202,11 +195,9 @@ class GeneProf(RESTService):
             experiments = g.get_list_experiments(with_outputs=True)
 
         """
-
-        if format == None:
-            format = self.default_extension
-        self.checkParam(format, self._valid_format)
-        url = self.url + "/exp/list." + format
+        
+        format_ = self._check_format(format)
+        url = self.url + "/exp/list." + format_
 
         for key in kargs.keys():
             if key not in ["with_ats", "with_samples", "with_inputs",
@@ -734,7 +725,7 @@ class GeneProf(RESTService):
 
 
     def get_expression(self, ref, Id, format="json", with_sample_info=False, type="RPKM"):
-        """Alias to get_gene_expression
+        """Alias to :meth:`get_gene_expression`
         
         
         
@@ -749,7 +740,9 @@ class GeneProf(RESTService):
         """Get Gene Expression Values for a Gene
 
         Retrieves gene expression values for a gene based on public RNA-seq data
-        in the GeneProf databases. GeneProf's databases contain many
+        in the GeneProf databases. 
+        
+        GeneProf's databases contain many
         pre-calculated gene expression values stemming from a reanalyses of a
         large collection of RNA-seq (and similar) experiments. Use this web
         service to retrieve all the expression values for a single gene of
@@ -804,13 +797,14 @@ class GeneProf(RESTService):
             >>> from bioservices import GeneProf
             >>> import math
             >>> from pylab import hist, title, xlabel, clf, show, ylabel
-            >>> g = geneprof.GeneProf()
+            >>> g = GeneProf()
             >>> res = g.get_gene_expression("mouse", "715")
             >>> rpkmValues = [x["RPKM"] for x in res]
             >>> logValues = [math.log(x+1,2.) for x in rpkmValues]
             >>> hist(logValues) 
             >>> xlabel('RPKM'); ylabel('Count')
-            >>> plt.title( 'Histogram: 715')
+            >>> title( 'Histogram: 715')
+            >>> show()
 
         """
         format_ = self._check_format(format)
@@ -1362,7 +1356,7 @@ class GeneProf(RESTService):
     def get_chromosome_names(self, Id, format="json", key=None):
         """Get Chromosome Names
 
-        retrieve the IDs and names of all chromosomes in a genomic dataset. This
+        Retrieve the IDs and names of all chromosomes in a genomic dataset. This
         service can only be used for genomic datasets, i.e. for datasets with
         type GENOMIC_REGIONS or REFERENCE.
 
@@ -1372,11 +1366,8 @@ class GeneProf(RESTService):
         but 'chrM' in the UCSC databases. The data as `BED <get_bed_files>`_
         or as `WIG <get_wig_files>`_ might therefore require you to rename
         the experiments in the
-        output, before using them with other applications. This web service
-        retrieves the identifiers and names of all chromosomes used in a genomic
-        dataset. You can inspect those and see whether any change will be
-        required.
-
+        output, before using them with other applications. 
+        
         :param str Id: The identifier of the dataset of interest. Either the
             entire accession ID (e.g. gpDS_11_385_44_1) or just the
             dataset-specific part (e.g. 11_385_44_1).
@@ -1385,7 +1376,7 @@ class GeneProf(RESTService):
         Get all chromosomes for the mouse reference dataset in plain text
         format::
 
-            >>> g.get_chromosome_name("pub_mm_ens58_ncbim37", format="txt")
+            >>> g.get_chromosome_names("pub_mm_ens58_ncbim37", format="txt")
 
         Get all chromosomes for the human reference dataset in JSON format::
 
@@ -1492,7 +1483,7 @@ class GeneProf(RESTService):
             params['key'] = key
             params = self.urlencode(params)
             url += "?" + params
-        res = self.request(url, format=format_)
+        res = self.request(url, format="txt")
         return res
 
     def get_wig_files(self, Id, chromosome=None, key=None, frag_length=-1,
@@ -1604,14 +1595,13 @@ class GeneProf(RESTService):
             params['key'] = key
             params = self.urlencode(params)
             url += "?" + params
-        res = self.request(url, format=format_)
+        res = self.request(url)
         return res
 
     def get_fastq(self, Id, key=None):
         """Sequence Data as FASTQ Files (FASTQ)
 
         Same as :meth:`get_fasta` but for FASTQ format.
-
 
         Retrieve unprocessed Tag-seq sequence data from gpDS_11_385_6_1:
 
@@ -1624,6 +1614,6 @@ class GeneProf(RESTService):
             params['key'] = key
             params = self.urlencode(params)
             url += "?" + params
-        res = self.request(url, format=format_)
+        res = self.request(url)
         return res
 
