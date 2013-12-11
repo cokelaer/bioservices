@@ -1225,9 +1225,23 @@ class KeggParser(Kegg):
             parser = self.parseRclass(res)
         elif "Enzyme" in dbentry: 
             parser = self.parseEnzyme(res)
+        elif "tRNA" in dbentry:
+            parser = self.parsetRNA(res)
         else:
             raise NotImplementedError("Entry %s not yet implemented" % dbentry)
         return parser
+
+    def parsetRNA(self, res):
+        """parse a tRNA entry
+
+        .. versionadded:: 1.2.0
+
+        """
+        flatfile = ["ENTRY", "NAME", "DEFINITION", "ORTHOLOGY", "ORGANISM", "PATHWAY",
+                "CLASS", "POSITION", "DBLINKS", "NTSEQ"]
+        parser = self._parse(res, flatfile)
+        return parser
+
 
     def parseDrug(self, res):
         """Parses a drug entry
@@ -1540,5 +1554,34 @@ class KeggParser(Kegg):
 
 
 class KEGG(Kegg):
-    def __init__(self, verobse=False):
-        super(Kegg, self).__init__(name="Kegg", url="http://rest.kegg.jp", verbose=verbose)
+    def __init__(self, verbose=False):
+        super(Kegg, self).__init__(name="KEGG", url="http://rest.kegg.jp", verbose=verbose)
+
+class KeggTools(Kegg):
+    """
+
+    k = kegg.KeggTools()
+    k.load_genes("hsa")
+    k.dbentries = []
+    for i, this in enumerate(k.genes[0:50]):
+        res = k.scan_genes(i)
+        print float(i)/len(k.genes)
+        k.dbentries.append(res)
+
+
+
+    """
+    def __init__(self, verbose=False, organism="hsa"):
+        self.kegg = Kegg()
+        self.parser = KeggParser()
+        print("initialisation")
+
+    def load_genes(self, organism):
+        res = self.parser.list(organism)
+        self.genes =  [x.split("\t")[0] for x in res.strip().split("\n")]
+        return self.genes
+
+
+
+    def scan_genes(self, i):
+        return self.parser.parse(self.kegg.get(self.genes[i]))
