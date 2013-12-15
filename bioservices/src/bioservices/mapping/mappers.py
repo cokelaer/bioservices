@@ -95,4 +95,66 @@ class Mapper(Logging):
 
 
 
+    def get_all_uniprot_from_kegg(self):
+        print("takes a couple of minutes")
+        mk2u_kegg = self._kegg_service.conv("hsa", "uniprot")
+
+    def get_all_uniprot_acc(self):
+        raise NotImplementedError
+
+
+    def kegg2uniprot_info(self):
+        mk2u_kegg = self.kegg2uniprot_kegg("hsa", "uniprot")
+        mu2k_kegg = self.uniprot2kegg_kegg("uniprot", "hsa")
+        kp = KeggParser()
+        res = kp.parse(kp.get("hsa:51124"))['dblinks']
+
+
+
+    def build_mapping2(self, mk2u_kegg=None):
+        if mk2u_kegg == None:
+            mk2u_kegg = self._kegg_service.conv("hsa", "uniprot")
+            
+
+        keys, values = mk2u_kegg.keys, mk2u_kegg.values()
+
+        N = len(mk2u_kegg.keys())
+
+        df = pd.DataFrame({
+                "uniprot_kegg":mk2u_kegg.keys(), 
+                "KEGG_kegg":mk2u_kegg.values()}, 
+                "Ensembl_kegg": [None] * N,
+                index=[x[3:] for x in mk2u_kegg.keys()])
+
+        # Get more infor from KEGG using the dblinks only.
+        for keggid in mk2u_kegg.iteritems():
+            #check if it does not exist already
+            res = kp.parse(kp.get(keggid))['dblinks']
+            if "Ensembl" in res.keys():
+                pass
+            elif "HGNC" in res.keys():
+                pass
+            elif 'HPRD' in res.keys():
+                pass
+            elif 'NCBI-GI' in res.keys(): 
+                pass
+            elif 'NCBI-GeneID' in res.keys():
+                pass
+            elif  'OMIM' in res.keys():
+                pass
+            elif   'UniProt' in res.keys(): 
+                pass
+            elif  'Vega' in res.keys():
+                pass
+            else:
+                raise NotImplementedError
+
+
+
+        return df
+
+
+
+
+
 
