@@ -320,6 +320,8 @@ class RESTService(Service):
 
         .. note:: this is a HTTP GET request 
         """
+        import socket
+        socket.setdefaulttimeout(1000)
         if path.startswith(self.url):
             url = path
         elif baseUrl == False:
@@ -349,9 +351,10 @@ class RESTService(Service):
             self.logging.error("Error caught within bioservices. Invalid requested URL ? ")
             raise
 
-    def _request_timeout(self, path, format="xml", baseUrl=True, trials=3):
+    def _request_timeout(self, path, format="xml", baseUrl=True, trials=3,
+            timeout=5):
         import socket
-        socket.setdefaulttimeout(5.)
+        socket.setdefaulttimeout(timeout)
         level = self.debugLevel
         self.debugLevel="ERROR"
         res = None

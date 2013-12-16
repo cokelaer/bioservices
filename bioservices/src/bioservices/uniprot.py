@@ -180,7 +180,8 @@ class UniProt(RESTService):
         super(UniProt, self).__init__(name="UniProt", url=UniProt._url, verbose=verbose)
 
 
-    def mapping(self, fr="ID", to="KEGG_ID",  query="P13368", format="tab"):
+    def mapping(self, fr="ID", to="KEGG_ID",  query="P13368", format="tab",
+            trials=3, timeout=10):
         """This is an interface to the UniProt mapping service
 
 
@@ -228,7 +229,8 @@ class UniProt(RESTService):
             query = " ".join(query)
         params = {'from':fr, 'to':to, 'format':format, 'query':query}
         params = self.urlencode(params)
-        result = self._request_timeout(url+"?"+params, format=format)
+        result = self._request_timeout(url+"?"+params, format=format,
+                timeout=timeout, trials=trials)
 
         # let us improve the output a little bit using a list instead of a
         # string
@@ -255,6 +257,51 @@ class UniProt(RESTService):
             for i, key in enumerate(keys):
                 result_dict[key].append(values[i])
         return result_dict
+
+    def multi_mapping(self, fr="ID", to="KEGG_ID", query="P13368",
+        format="tab", Nmax=300, timeout=10, trials=3):
+        """Calls mapping several times and concatenates results
+
+        The reson for this method is that if a query is too long then the 
+        :meth:`mapping` method will fail. In such cases, you can use 
+        :meth:`multi_mapping` instead. It will call :meth:`mapping` several 
+        times and returns a unique dictionary instead of multiple ones if 
+        you were to call :math:`mapping` yourself several times.
+
+        """
+        if isinstance(query, list)==False:
+            query = [query]
+
+        unique_entry_names = list(set(query))
+
+        if len(unique_entry_names)>Nmax:
+            unique_entry_names = list(unique_entry_names)
+            print("There are more than %s unique species. Using multi stage uniprot mapping" % Nmax)
+            mapping = {}
+            # we need to split
+            # this is a hack rigt now but could be put inside bioservices
+            N, rest = divmod(len(unique_entry_names), Nmax)
+            if rest>0:
+                N+=1
+            for i in range(0,N):
+                i1 = i*Nmax
+                i2 = (i+1)*Nmax
+                if i2>len(unique_entry_names):
+                    i2 = len(unique_entry_names)
+                query=",".join(unique_entry_names[i1:i2])
+                this_mapping = self.mapping(fr=fr, to=to, query=query,
+                        trials=trials, timeout=timeout)
+                for k,v in this_mapping.iteritems():
+                    mapping[k] = v
+                print(str(i+1./N*100) + "%% completed")
+        else:
+            #query=",".join([x+"_" + species for x in unique_entry_names])
+            query=",".join(unique_entry_names)
+            mapping = self.mapping(fr=fr, to=to, query=query,
+                    timeout=timeout, trials=trials)
+        return mapping
+
+
 
     def searchUniProtId(self, uniprot_id, format="xml"):
         """Search for a uniprot ID in UniprotKB database
@@ -406,7 +453,7 @@ class UniProt(RESTService):
         params = self.urlencode(params)
         
         #res = s.request("/uniprot/?query=zap70+AND+organism:9606&format=xml", params)
-        trials = 1
+        trials = 3
         while trials<maxTrials:
             try:
                 res = self.request("uniprot/?query=%s" % query + "&" + params, "txt")
