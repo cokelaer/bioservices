@@ -2,7 +2,7 @@
 
 
 #################################################################################
-BIOSERVICES: a Python package to access biological web services programmaticaly
+BIOSERVICES: a Python package to access biological web services programmatically
 #################################################################################
 
 .. topic:: BioServices
