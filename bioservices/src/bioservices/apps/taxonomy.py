@@ -1,6 +1,10 @@
 from bioservices import *
 from easydev import Logging
-import pandas as pd
+
+try:
+    import pandas as pd
+except:
+    pass
 
 
 __all__ = ["Taxon"]
