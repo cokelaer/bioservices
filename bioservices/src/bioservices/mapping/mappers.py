@@ -1,3 +1,4 @@
+import time
 from bioservices import *
 from easydev import Logging
 try:
@@ -13,8 +14,20 @@ class Mapper(Logging):
 
         uniprot
 
+
+    m = Mapper()
+    # HGNC
+    df_hgnc = m.get_all_hgnc_into_df()
+    df_hgnc.to_pickle("mapper_hgnc.dat")
+
+    # KEGG
+    df_kegg1 = m.get_all_kegg_into_df1()
+    df_kegg2 = m.get_all_kegg_into_df2()
+
+    uniq_keggid = 
+
     """
-    kegg_dblinks  = ["Ensembl", "HGNC", "HPRD", "NCBI-GI", "OMIM", "NCBI-GeneID", "UniProt", "Vega"]
+    kegg_dblinks  = ["IMGT", "Ensembl", "HGNC", "HPRD", "NCBI-GI", "OMIM", "NCBI-GeneID", "UniProt", "Vega"]
     hgnc_dblink =  ['EC','Ensembl', 'EntrezGene', 'GDB', 'GENATLAS',
             'GeneCards', 'GeneTests', 'GoPubmed', 'H-InvDB', 'HCDM', 'HCOP',
             'HGNC', 'HORDE', 'IMGT_GENE_DB', 'INTERFIL', 'IUPHAR', 'KZNF',
@@ -27,16 +40,18 @@ class Mapper(Logging):
         self.logging.info("Initialising the services")
         self.logging.info("... uniprots")
         self._uniprot_service = UniProt()
+
         self.logging.info("... KEGG")
-        self._kegg_service = KeggParser()
+        self._kegg_service = KeggParser(verbose=False)
+
         self.logging.info("... HGNC")
         self._hgnc_service = HGNC()
+
         self.logging.info("... UniChem")
         self._unichem_service = UniChem()
-        self.logging.debug
 
-
-
+        self.logging.info("...BioDBNet")
+        self._biodbnet = BioDBNet()
 
     def _uniprot2refseq(self, name):
         """
@@ -48,46 +63,6 @@ class Mapper(Logging):
 
         """
         return self._uniprot_service.mapping(fr="ACC", to="REFSEQ_NT_ID", query="P31749")
-
-    def get_all_hgnc_into_df(self):
-        """keys are unique Gene names"""
-        print("Fetching the data from HGNC first. May take a few minutes")
-        data = self._hgnc_service.mapping_all()
-        # simplify to get a dictionary of dictionary
-        data = {k1:{k2:v2['xkey'] for k2,v2 in data[k1].iteritems()} for k1 in data.keys()}
-        dfdata = pd.DataFrame(data)
-        dfdata = dfdata.transpose()
-        # rename to tag with "HGNC"
-        dfdata.columns = [this + "__HGNC_mapping" for this id dfdata.columns]
-        self._df_hgnc = dfdata.copy()
-        print("a dataframe was built using HGNC data set and saved in attributes  self._df_hgnc")
-        return self._df_hgnc
-
-    def get_all_kegg_into_df(self):
-        print("Fetching mapping uniprot/kegg using KEGG service")
-        mk2u = self._kegg_service.conv("hsa", "uniprot")
-        mu2k = self._kegg_service.conv("uniprot", "hsa")
-
-
-        keys, values = mk2u_kegg.keys, mk2u_kegg.values()
-
-        import time
-        t2 = time.time()
-        keys, values = mk2u_kegg.keys, mk2u_kegg.values()
-        N = len(mk2u_kegg.keys())
-
-        # the common columns
-        data = {
-                "uniprot__KEGG_conv":mk2u_kegg.keys(), 
-                "KEGG___KEGG_conv":mk2u_kegg.values()}
-
-        # columns that will be filled via KEGG
-        for this in self.kegg_dblinks:
-            data.update({"%s_kegg" % this: [None] * N})
-
-        df = pd.DataFrame(data,
-                index=[x[3:] for x in mk2u_kegg.keys()])
-        self._df_kegg = df.copy()
 
     def _update_uniprot_xref(self, df, 
             xref=["HGNC_ID", "ENSEMBLE_ID",  "P_ENTREZGENEID"]):
@@ -109,52 +84,10 @@ class Mapper(Logging):
                     if index in res.keys():
                         df.ix[index]["%s__uniprot_mapping" % ref] = res[index]
 
-
-
-    def _update_dblinks_kegg(self, df, N=None):
-        # Get more infor from KEGG using the dblinks only.
-        keggids = df.KEGG_kegg
-        if N == None:
-            N = len(keggids)
-
-        buffer_ = {}
-
-        count = 0
-        for index,keggid in zip(df.index, df.KEGG_kegg):
-            count+=1
-            print(count,index, keggid)
-            #check if it does not exist already
-            if keggid in buffer_.keys():
-                res = buffer_[keggid]
-                print("-------------------------used buffer")
-            else:
-                res = self._kegg_service.parse(self._kegg_service.get(keggid))['dblinks']
-            for key in res.keys():
-                if key in self.kegg_dblinks:
-                    # fill df_i,j
-                    df.ix[index][key+"_kegg"] = res[key]
-                else:
-                    raise NotImplementedError("Found an unknown key in KEGG dblink:%s" % key)
-            if count > N:
-                break
-        return df
-
-
-
-    def save(self, filename):
-        pass
-
-    def load(self, filename):
-        pass
-
-
     def get_data_from_biodbnet(self, df_hgnc):
         """keys are unique Gene names
         
-        
-        
         input is made of the df based on HGNC data web services
-
 
         uniprot accession are duplicated sometimes. If som this is actually the
         iprimary accession entry and all secondary ones.
@@ -170,8 +103,128 @@ class Mapper(Logging):
         res2 = b.db2db("Gene Symbol", ["HGNC ID", "UniProt Accession", "UniProt Entry Name", "UniProt Protein Name", "KEGG Gene ID", "Ensembl Gene ID"], 
                 res.keys()[0:2000])
 
-        
         import pandas as pd
         import StringIO
         c = pd.read_csv(StringIO.StringIO(res2), delimiter="\t", index_col="Gene Symbol")
         return c
+
+
+class MapperBase(object):
+    def __init__(self):
+        pass
+
+    def build_dataframe(self):
+        raise NotImplementedError
+
+    def to_csv(self):
+        raise NotImplementedError
+
+    def read_csv(self)
+        raise NotImplementedError
+
+
+class HGNCMapper(object):
+    hgnc_dblink =  ['EC','Ensembl', 'EntrezGene', 'GDB', 'GENATLAS',
+            'GeneCards', 'GeneTests', 'GoPubmed', 'H-InvDB', 'HCDM', 'HCOP',
+            'HGNC', 'HORDE', 'IMGT_GENE_DB', 'INTERFIL', 'IUPHAR', 'KZNF',
+            'MEROPS', 'Nucleotide', 'OMIM', 'PubMed', 'RefSeq', 'Rfam',
+            'Treefam', 'UniProt', 'Vega', 'miRNA', 'snoRNABase']
+    def __init__(self):
+        self._hgnc_service = HGNC()
+        self.df = self.build_dataframe()
+
+    def build_dataframe(self):
+        """keys are unique Gene names"""
+        print("Fetching the data from HGNC first. May take a few minutes")
+        t1 = time.time()
+        data = self._hgnc_service.mapping_all()
+        # simplify to get a dictionary of dictionary
+        data = {k1:{k2:v2['xkey'] for k2,v2 in data[k1].iteritems()} for k1 in data.keys()}
+        dfdata = pd.DataFrame(data)
+        dfdata = dfdata.transpose()
+        # rename to tag with "HGNC"
+        dfdata.columns = [this + "__HGNC_mapping" for this in dfdata.columns]
+        self._df_hgnc = dfdata.copy()
+        t2 = time.time()
+        print("a dataframe was built using HGNC data set and saved in attributes  self._df_hgnc")
+        print("Took %s seconds" % t2-t1)
+        return self._df_hgnc
+
+
+
+class KEGGMapper(object):
+    """
+
+    """
+    kegg_dblinks  = ["IMGT", "Ensembl", "HGNC", "HPRD", "NCBI-GI", "OMIM", "NCBI-GeneID", "UniProt", "Vega"]
+    def __init__(self):
+        self._kegg_service = KeggParser(verbose=False)
+
+        print("Reading all data")
+        self.alldata = self.load_all_kegg_entries()
+        self.entries = sorted(self.alldata.keys())
+        self.df = self.build_dataframe()
+
+    def build_dataframe(self):
+
+        names = ['class', 'definition', 'disease', 'drug_target',
+                'module', 'motif', 'name', 'orthology', 'pathway', 'position', 'structure']
+
+        N = len(self.entries)
+        # build an empty dataframe with relevant names
+        data = {}
+        # for the dblinks
+        for this in self.kegg_dblinks:
+            data.update({"%s_kegg" % this: [None] * N})
+
+        # and other interesting entries
+        for name in names:
+            #e.g. name == position
+            data[name] = [self.alldata[entry][name] if name in self.alldata[entry].keys() else None for entry in self.entries]
+
+        df = pd.DataFrame(data, index=self.entries)
+
+        # scan again to fill the df with dblinks
+        for index, entry in enumerate(self.entries):
+            res = self.alldata[entry]['dblinks']
+            for key in res.keys():
+                if key in self.kegg_dblinks:
+                    # fill df_i,j
+                    df.ix[entry][key+"_kegg"] = res[key]
+                else:
+                    raise NotImplementedError("Found an unknown key in KEGG dblink:%s" % key)
+
+        return df
+
+    def load_all_kegg_entries(self, filename="kegg_gene.dat"):
+        if os.path.isfile(filename):
+            import pickle
+            results = pickle.load(open(filename, "r"))
+            return results
+        # TODO:
+        # donwload from a URL  
+        print("could not find kegg data. fetching data from website")
+        names = self._kegg_service.list("hsa")
+
+        # Fetches the KEGG results using multicore to send several requests at the same time
+        import easydev
+        mc = easydev.multicore.MultiProcessing()
+        def func(name):
+            id_ = self._kegg_service.get(name)
+            res = self._kegg_service.parse(id_)
+            return res
+        for name in names:
+            mc.add_job(func, name)
+        mc.run()
+
+        # here are the entries to be used as keys
+        entries = ["hsa:"+x['entry'].split()[0] for x in mc.results]
+
+        results = {}
+        for entry, result in zip(entries, mc.results):
+            results[entry] = result
+
+        import pickle
+        pickle.dump(results, open("kegg_gene.dat","w"))
+
+        return results
