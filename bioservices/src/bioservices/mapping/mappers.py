@@ -131,24 +131,24 @@ class HGNCMapper(object):
             'Treefam', 'UniProt', 'Vega', 'miRNA', 'snoRNABase']
     def __init__(self):
         self._hgnc_service = HGNC()
+        self.alldata = self.load_all_hgnc(self)
         self.df = self.build_dataframe()
 
-    def build_dataframe(self):
+    def load_all_hgnc(self):
         """keys are unique Gene names"""
-        print("Fetching the data from HGNC first. May take a few minutes")
-        t1 = time.time()
-        data = self._hgnc_service.mapping_all()
+        print("Fetching the data from HGNC first. May take a few minutes"),
+        self.alldata = self._hgnc_service.mapping_all()
+        print("done")
+
+    def build_dataframe(self):
         # simplify to get a dictionary of dictionary
-        data = {k1:{k2:v2['xkey'] for k2,v2 in data[k1].iteritems()} for k1 in data.keys()}
+        data = {k1:{k2:v2['xkey'] for k2,v2 in self.alldata[k1].iteritems()} for k1 in self.alldata.keys()}
         dfdata = pd.DataFrame(data)
         dfdata = dfdata.transpose()
         # rename to tag with "HGNC"
         dfdata.columns = [this + "__HGNC_mapping" for this in dfdata.columns]
-        self._df_hgnc = dfdata.copy()
-        t2 = time.time()
         print("a dataframe was built using HGNC data set and saved in attributes  self._df_hgnc")
-        print("Took %s seconds" % t2-t1)
-        return self._df_hgnc
+        return dfdata
 
 
 
