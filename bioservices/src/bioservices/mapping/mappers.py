@@ -1,12 +1,12 @@
 import time
-from bioservices import *
+from bioservices import Kegg, UniProt, KeggParser, UniChem, BioDBNet, HGNC
 from easydev import Logging
 try:
     import pandas as pd
 except:
     pass
 
-
+import  os
 
 
 class Mapper(Logging):
@@ -119,7 +119,7 @@ class MapperBase(object):
     def to_csv(self):
         raise NotImplementedError
 
-    def read_csv(self)
+    def read_csv(self):
         raise NotImplementedError
 
 
@@ -157,10 +157,11 @@ class KEGGMapper(object):
 
     """
     kegg_dblinks  = ["IMGT", "Ensembl", "HGNC", "HPRD", "NCBI-GI", "OMIM", "NCBI-GeneID", "UniProt", "Vega"]
-    def __init__(self):
-        self._kegg_service = KeggParser(verbose=False)
+    def __init__(self, verbose=True):
+        self._kegg_service = KeggParser(verbose=verbose)
 
         print("Reading all data")
+        print("new version")
         self.alldata = self.load_all_kegg_entries()
         self.entries = sorted(self.alldata.keys())
         self.df = self.build_dataframe()
@@ -203,28 +204,50 @@ class KEGGMapper(object):
             return results
         # TODO:
         # donwload from a URL  
-        print("could not find kegg data. fetching data from website")
+        print("could not find kegg data. fetching data from website if possible")
+        print("Fetchning list of genes for hsa")
         names = self._kegg_service.list("hsa")
-
+        names = names.strip().split("\n")
+        names = [x.split("\t")[0] for x in names]
         # Fetches the KEGG results using multicore to send several requests at the same time
-        import easydev
-        mc = easydev.multicore.MultiProcessing()
-        def func(name):
-            id_ = self._kegg_service.get(name)
-            res = self._kegg_service.parse(id_)
-            return res
-        for name in names:
-            mc.add_job(func, name)
-        mc.run()
 
+        print(names)
+        mc = test_func(names)
+        self.mcresults = mc.results
         # here are the entries to be used as keys
-        entries = ["hsa:"+x['entry'].split()[0] for x in mc.results]
+        entries = ["hsa:"+x['entry'].split()[0] for x in self.mcresults]
 
         results = {}
-        for entry, result in zip(entries, mc.results):
+        for entry, result in zip(entries, self.mcresults):
             results[entry] = result
 
-        import pickle
-        pickle.dump(results, open("kegg_gene.dat","w"))
 
+        #import pickle
+        #pickle.dump(results, open("kegg_gene.dat","w"))
         return results
+
+from bioservices import KeggParser
+kegg = KeggParser(verbose=False)
+
+def test_func(names):
+    from easydev import MultiProcessing
+    t = MultiProcessing(verbose=False, maxcpu=8)
+    for name in names:
+        t.add_job(keggfunc, name)
+    t.run()
+    return t
+
+def keggfunc(name):
+    global kegg
+    try:
+        id_ = kegg.get(name)
+        res = kegg.parse(id_)
+        return res
+    except:
+        return None
+
+
+
+
+
+
