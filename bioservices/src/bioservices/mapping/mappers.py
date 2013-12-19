@@ -116,11 +116,11 @@ class MapperBase(object):
     def build_dataframe(self):
         raise NotImplementedError
 
-    def to_csv(self):
-        raise NotImplementedError
+    def to_csv(self, filename):
+        self.df.to_csv(filename)
 
-    def read_csv(self):
-        raise NotImplementedError
+    def read_csv(self, filename):
+        self.df = pd.read_csv(filename)
 
 
 class HGNCMapper(object):
@@ -129,16 +129,20 @@ class HGNCMapper(object):
             'HGNC', 'HORDE', 'IMGT_GENE_DB', 'INTERFIL', 'IUPHAR', 'KZNF',
             'MEROPS', 'Nucleotide', 'OMIM', 'PubMed', 'RefSeq', 'Rfam',
             'Treefam', 'UniProt', 'Vega', 'miRNA', 'snoRNABase']
-    def __init__(self):
+    def __init__(self, filename=None):
         self._hgnc_service = HGNC()
-        self.alldata = self.load_all_hgnc(self)
-        self.df = self.build_dataframe()
+        if filename == None:
+            self.alldata = self.load_all_hgnc()
+            self.df = self.build_dataframe()
+        else:
+            self.read_csv(filename)
 
     def load_all_hgnc(self):
         """keys are unique Gene names"""
         print("Fetching the data from HGNC first. May take a few minutes"),
-        self.alldata = self._hgnc_service.mapping_all()
+        alldata = self._hgnc_service.mapping_all()
         print("done")
+        return alldata
 
     def build_dataframe(self):
         # simplify to get a dictionary of dictionary
