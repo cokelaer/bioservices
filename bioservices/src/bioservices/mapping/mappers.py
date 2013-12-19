@@ -164,11 +164,29 @@ class KEGGMapper(object):
     def __init__(self, verbose=True):
         self._kegg_service = KeggParser(verbose=verbose)
 
-        print("Reading all data")
-        print("new version")
-        self.alldata = self.load_all_kegg_entries()
-        self.entries = sorted(self.alldata.keys())
-        self.df = self.build_dataframe()
+        print("Loading all gene identifiers for HSA")
+        names = self._kegg_service.list("hsa")
+        names = names.strip().split("\n")
+        names = [x.split("\t")[0] for x in names]
+        self._names = names[:]
+
+        print("Fetching all data")
+        self.alldata = {}
+        self.load_all_kegg_entries()
+
+        print("Building the dataframe")
+        try:
+            self.df = self.build_dataframe()
+        except:
+            print("error in build_dataframe")
+
+    def _get_names(self):
+        return self._names
+    names = property(_get_names)
+
+    def _get_entries(self):
+        return sorted(self.alldata.keys())
+    entries = property(_get_entries)
 
     def build_dataframe(self):
 
@@ -198,7 +216,6 @@ class KEGGMapper(object):
                     df.ix[entry][key+"_kegg"] = res[key]
                 else:
                     raise NotImplementedError("Found an unknown key in KEGG dblink:%s" % key)
-
         return df
 
     def load_all_kegg_entries(self, filename="kegg_gene.dat"):
@@ -209,26 +226,26 @@ class KEGGMapper(object):
         # TODO:
         # donwload from a URL  
         print("could not find kegg data. fetching data from website if possible")
-        print("Fetchning list of genes for hsa")
-        names = self._kegg_service.list("hsa")
-        names = names.strip().split("\n")
-        names = [x.split("\t")[0] for x in names]
         # Fetches the KEGG results using multicore to send several requests at the same time
+        found = self.alldata.keys()
+        names = [x for x in self.names if x not in found]
+        print("Fetching %s enties" % len(names))
 
-        print(names)
+
         mc = test_func(names)
-        self.mcresults = mc.results
+        self.mcresults = mc.results.copy()
         # here are the entries to be used as keys
-        entries = ["hsa:"+x['entry'].split()[0] for x in self.mcresults]
+        try:
+            entries = ["hsa:"+x['entry'].split()[0] for x in self.mcresults if x]
 
-        results = {}
-        for entry, result in zip(entries, self.mcresults):
-            results[entry] = result
-
+            for entry, result in zip(entries, self.mcresults):
+                self.alldata[entry] = result
+        except:
+            print("something wrng happened while scaning mcresults")
 
         #import pickle
         #pickle.dump(results, open("kegg_gene.dat","w"))
-        return results
+        
 
 from bioservices import KeggParser
 kegg = KeggParser(verbose=False)
