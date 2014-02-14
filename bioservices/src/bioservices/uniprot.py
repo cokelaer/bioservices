@@ -42,9 +42,9 @@
 .. http://www.uniprot.org/docs/pkinfam
 
 """
-from services import Service, RESTService
-import urllib2
-import urllib
+from services import RESTService
+import pandas as pd
+import StringIO
 
 __all__ = ["UniProt"]
 
@@ -172,6 +172,14 @@ class UniProt(RESTService):
     """
     _mapping = mapping.copy()
     _url = "http://www.uniprot.org"
+    _valid_columns = ['citation', 'clusters', 'comments','database',
+                'domains','domain', 'ec','id','entry name','existence',
+        		'families', 'features', 'genes', 'go', 'go-id', 'interpro', 
+                'interactor', 'keywords', 'keyword-id', 'last-modified', 
+                'length', 'organism', 'organism-id', 'pathway', 'protein names', 
+                'reviewed', 'score', 'sequence', '3d', 'subcellular locations', 
+                'taxonomy', 'tools', 'version', 'virus hosts']  
+    
     def __init__(self, verbose=True):
         """**Constructor**
 
@@ -360,21 +368,19 @@ class UniProt(RESTService):
 
         :param str query: query must be a valid uniprot query.
             See http://www.uniprot.org/help/text-search, http://www.uniprot.org/help/query-fields 
+            See also example below
         :param str format: a valid format amongst html, tab, xls, asta, gff,
             txt, xml, rdf, list, rss. If tab or xls, you can also provide the 
             columns argument.  (default is tab)
         :param str columns: comma-separated list of values. Works only if fomat 
-            is tab or xlsFor UnitProtKB, the possible columns are:
-            citation, clusters, comments, database, domains, domain, ec, id, entry name
-            existence, families, features, genes, go, go-id, interpro, interactor,
-            keywords, keyword-id, last-modified, length, organism, organism-id, 
-            pathway, protein names, reviewed, score, sequence, 3d, 
-            subcellular locations, taxon, tools, version, virus hosts. The
-            column database must be follows by the database name in brackets
-            (e.g. "database(PDB)")
-        :param bool include:  include isoform sequences when the format
-            parameter is fasta. Include description when format is rdf. 
-        :param sort: by score by default. Set to None to bypass this behaviour
+            is tab or xls. For UnitProtKB, some possible columns are:
+            id, entry name, length, organism. Some column name must be followed by 
+            database name (e.g., "database(PDB)"). Again, see uniprot website 
+            for more details. See also :attr:`~bioservices.uniprot.UniProt._valid_columns` 
+            for the full list of column keyword.
+        :param bool include: include isoform sequences when the format
+            parameter is fasta. Include description when format is rdf.
+        :param str sort: by score by default. Set to None to bypass this behaviour
         :param bool compress: gzip the results
         :param int limit: Maximum number of results to retrieve.
         :param int offset:  Offset of the first result, typically used together
@@ -382,8 +388,8 @@ class UniProt(RESTService):
         :param int maxTrials: this request is unstable, so we may want to try
             several time.
 
-        To obtain the list of uniprot ID returned by the search of zap70 can be retrieved as follows
-        ::
+        To obtain the list of uniprot ID returned by the search of zap70 can be 
+        retrieved as follows::
 
             >>> u.search('zap70+AND+organism:9606', format='list')
             >>> u.search("zap70+and+taxonomy:9606", format="tab", limit=3, 
@@ -395,11 +401,15 @@ class UniProt(RESTService):
 
         other examples::
 
-            u.search("ZAP70+AND+organism:9606", limit=3, columns="id,database(PDB)")
+            >>> u.search("ZAP70+AND+organism:9606", limit=3, columns="id,database(PDB)")
 
 
         .. warning:: this function request seems a bit unstable (UniProt web issue ?)
             so we repeat the request if it fails
+            
+        .. warning:: some columns although valid may not return anything, not even in 
+            the header: 'score', 'taxonomy', 'tools'. this is a uniprot feature, 
+            not bioservices.
         """
         params = {}
 
@@ -410,13 +420,7 @@ class UniProt(RESTService):
 
         if columns!=None:
             self.checkParam(format, ["tab","xls"])
-            _valid_columns = ['citation', 'clusters', 'comments','database',
-                'domains','domain', 'ec','id','entry name','existence',
-        		'families', 'features', 'genes', 'go', 'go-id', 'interpro', 
-                'interactor', 'keywords', 'keyword-id', 'last-modified', 
-                'length', 'organism', 'organism-id', 'pathway', 'protein names', 
-                'reviewed', 'score', 'sequence', '3d', 'subcellular locations', 
-                'taxonomy', 'tools', 'version', 'virus hosts']
+            
             # remove unneeded spaces before/after commas if any
             if "," in columns:
                 columns = [x.strip() for x in columns.split(",")]
@@ -427,7 +431,7 @@ class UniProt(RESTService):
                 if col.startswith("database(") == True:
                     pass
                 else:
-                    self.checkParam(col, _valid_columns)
+                    self.checkParam(col, self._valid_columns)
 
             # convert back to a string as expected by uniprot
             params['columns'] = ",".join([x.strip() for x in columns])
@@ -489,5 +493,81 @@ class UniProt(RESTService):
         return newres
 
 
+    def uniref(self, query):
+        """Calls UniRef service 
+        
+        >>> u = UniProt()
+        >>> df = u.uniref("member:Q03063")
+        >>> df.Size
+        
+
+        """
+        res = self.request("uniref/?"+self.urlencode({"query":query})+"&format=tab", format="txt")
+        res = pd.read_csv(StringIO.StringIO(res.strip()), sep="\t")
+        return res
+        
+    def get_df(self, entries):
+        """Given a list of uniprot entries, this method returns a dataframe with all possible columns
+        
+        :return dataframe with indices being the uniprot id (e.g. DIG1_YEAST)
+        
+        .. todo:: cleanup the content of the data frame to replace strings 
+            separated by ; into a list of strings. e.g. the Gene Ontology IDs
+        """
+        if isinstance(entries, str):
+            entries = [entries]
+        elif isinstance(entries, list):
+            pass
+        else:
+            raise TypeError("queries must be a list of strings or a string")
+        import StringIO
+        output = None
+        for i, entry in enumerate(entries):
+            self.logging.info("fetching information for %s" % entry)
+            res = self.search(entry, format="tab", columns=",".join(self._valid_columns))
+            if len(res)==0:
+                self.logging.warning("entry %s not found" % entry)
+            else:
+                df = pd.read_csv(StringIO.StringIO(res), sep="\t")
+                if i==0: # works in a shell but not systematic... pd.isnull(output)
+                    output = df.copy()
+                else: #append
+                    #TODO: any more efficient way of appending ? keep in mind 
+                    # that df may have length > 1
+                    output= output.append(df, ignore_index=True)
+   
+                
+        # to transform into list:
+        columns = ['PubMed ID', 'Comments', u'Domains', 'Protein families', 
+                   'Gene names', 'Gene ontology (GO)', 'Gene ontology IDs', 
+                   'InterPro', 'Interacts with', 'Keywords',  
+                   'Subcellular location']
+        for col in columns:
+            try:
+                res = output[col].apply(lambda x:[this.strip() for this in str(x).split(";") if this!="nan"])
+                output[col] = res
+            except:
+                self.logging.warning("column could not be parsed. %s" %col)
+            
+        return output
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
 
 
