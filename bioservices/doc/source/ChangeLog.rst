@@ -6,6 +6,9 @@ Revision 1.2
 --------------
 * 1.2.2:
    * NEW Service: :class:`bioservices.biodbnet.BioDBNet`
+   * uniprot: add multi_mapping method to use mapping method on large queries and
+     added timeout/trials inside uniprot functions
+
 
 
 * 1.2.1:

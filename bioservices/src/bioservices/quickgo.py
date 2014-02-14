@@ -38,6 +38,7 @@ from bioservices.services import RESTService
 
 __all__ = ["QuickGO"]
 
+
 class QuickGO(RESTService):
     """Interface to the `QuickGO <http://www.ebi.ac.uk/QuickGO/WebServices.html>`_ service
 
@@ -50,7 +51,7 @@ class QuickGO(RESTService):
         >>> res = s.Term("GO:0003824")
 
     Retrieve information about a protein given its uniprot identifier, a
-    taxonomy number. Let us also retrisct the search to the UniProt database and
+    taxonomy number. Let us also restrict the search to the UniProt database and
     print only 3 columns of information (protein name, GO identifier and GO
     name)::
 
