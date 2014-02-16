@@ -377,3 +377,31 @@ or a string (e.g., 'PUBMED:*') """)
             return res
 
 
+
+class GeneOntology():
+    """
+
+
+    Given a list of GO terms, read them with QuickGO and convert them to a database.
+
+    [Term]
+    id: GO:0031655
+    name: negative regulation of heat dissipation
+    def: "Any process that stops, prevents, or reduces the rate or extent of heat dissipation."
+    synonym: "downregulation of heat dissipation" exact
+    synonym: "inhibition of heat dissipation" narrow
+    synonym: "down-regulation of heat dissipation" exact
+    synonym: "down regulation of heat dissipation" exact
+    is_a: GO:0031654 ! regulation of heat dissipation
+    is_a: GO:0032845 ! negative regulation of homeostatic process
+    is_a: GO:0051241 ! negative regulation of multicellular organismal process
+
+
+    """
+    def __init__(self):
+        self._quickgo = QuickGO(verbose=False)
+
+    def getGOTerm(self, goid):
+        return self._quickgo.Term(goid, format="obo")
+
+

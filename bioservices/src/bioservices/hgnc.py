@@ -286,7 +286,7 @@ class HGNC(RESTService):
         names = [entry['xlink:title'] for entry in entries]
         N = len(names)
 
-        # split query in sets of 100 names 
+        # split query in sets of 300 names 
 
         dn = 300
         N = len(names)
