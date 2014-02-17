@@ -523,7 +523,7 @@ class UniProt(RESTService):
         import StringIO
         output = None
         for i, entry in enumerate(entries):
-            self.logging.info("fetching information for %s" % entry)
+            self.logging.info("fetching information {}/{} for {}".format(i+1, len(entries),entry))
             res = self.search(entry, format="tab", columns=",".join(self._valid_columns))
             if len(res)==0:
                 self.logging.warning("entry %s not found" % entry)
@@ -548,26 +548,9 @@ class UniProt(RESTService):
                 output[col] = res
             except:
                 self.logging.warning("column could not be parsed. %s" %col)
-            
+        # Sequences are splitted into chunks of 10 characters. let us rmeove the
+        # spaces:
+        output.Sequence = output['Sequence'].apply(lambda x: x.replace(" ",""))
         return output
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
 
 
