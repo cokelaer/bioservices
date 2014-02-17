@@ -79,11 +79,7 @@ class Service(Logging):
         that only WARNING, ERROR and CRITICAL messages are shown.
 
         """
-        if verbose == True:
-            level = "INFO"
-        else:
-            level = "WARNING"
-        super(Service, self).__init__(level=level)
+        super(Service, self).__init__(level=verbose)
 
         self._url = url
         #self.url = url
@@ -329,8 +325,8 @@ class RESTService(Service):
         else:
             url = self.url + "/" +  path
 
-        self.logging.info("REST.bioservices.%s request begins" % self.name)
-        self.logging.info("--Fetching url=%s" % url)
+        self.logging.debug("REST.bioservices.%s request begins" % self.name)
+        self.logging.debug("--Fetching url=%s" % url)
 
         try:
             res = urllib2.urlopen(url).read()
