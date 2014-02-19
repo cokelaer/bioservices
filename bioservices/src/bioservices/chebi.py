@@ -20,7 +20,7 @@
 
 """This module provides a class :class:`ChEBI` 
 
-.. topic:: What is ChEMBLdb
+.. topic:: What is ChEBI
 
     :URL:  https://www.ebi.ac.uk/chebi/init.do
     :WSDL: http://www.ebi.ac.uk/webservices/chebi/2.0/webservice

@@ -51,6 +51,7 @@ Here is a list of Web Services that can already be accessed from **BioServices**
     :nosignatures:
 
     bioservices.arrayexpress.ArrayExpress
+    bioservices.biodbnet.BioDBNet
     bioservices.biomodels.BioModels
     bioservices.biomart.BioMart
     bioservices.chebi.ChEBI

@@ -34,6 +34,15 @@ ArrayExpress
     :undoc-members:
     :synopsis:
 
+BioDBnet
+============
+
+.. automodule:: bioservices.biodbnet
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
 
 BioGrid
 ====================

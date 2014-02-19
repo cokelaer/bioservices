@@ -9,6 +9,7 @@ class MultiFASTA(object):
 
     Here, we load some FASTA using UniProt web service::
 
+        >>> from bioservices import MultiFASTA
         >>> mf = MultiFASTA()
         >>> mf.load_fasta("P43408")
         >>> mf.load_fasta("P21318")
@@ -20,7 +21,7 @@ class MultiFASTA(object):
     
     And the sequences in the same order can be accessed::
 
-        >>> len(mf.sequences)
+        >>> len(mf)
         2
 
     Each FASTA is stored in :attr:`fasta`, which is a dictionary where each
@@ -44,7 +45,7 @@ class MultiFASTA(object):
 
         >>> from bioservices.apps import MultiFASTA
         >>> f = MultiFASTA()
-        >>> f.read_fasta()
+        >>> f.load_fasta(["P43403", "P43410"])
         >>> f.df.Size.hist()
 
     """
@@ -54,6 +55,9 @@ class MultiFASTA(object):
 
         # an ordered dictionary to store the fasta contents
         self._fasta = OrderedDict()
+
+    def __len__(self):
+        return len(self._fasta)
 
     def _get_fasta(self):
         return self._fasta
@@ -379,6 +383,7 @@ class FASTA(object):
             raise ValueError("""It looks like your FASTA file contains more than
             one FASTA. You must use MultiFASTA class instead""")
         self._fasta = data[:]
+        self._fasta = self._fasta[0]
         if self.dbtype not in self.known_dbtypes:
             print("Only sp and gi header are recognised so far but sequence and header are loaded")
 

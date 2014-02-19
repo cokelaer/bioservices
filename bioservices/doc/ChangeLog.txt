@@ -5,6 +5,14 @@ Whats' new, what has changed
 Revision 1.0
 ------------------
 
+* 1.2.3
+    * updating some apps (fasta,peptides, taxon) in bioservices.apps directory
+	* Improves UniProt module by adding a dataframe export where performing a search
+	* added the BioDBnet service.
+	* added Pathway Common
+	* fixed UniChem: add new database identifiers and fix interpretation of the output
+
+
 * 1.2.0
    * Kegg class has now an alias called KEGG
    * add MUSCLE service

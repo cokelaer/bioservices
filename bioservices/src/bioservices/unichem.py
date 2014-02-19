@@ -36,22 +36,23 @@
 
 
 """
-
-
-
-
-
-
 from bioservices import RESTService
 
 
-
-
 class UniChem(RESTService):
+    """Interface to the `UniChem <http://www.ebi.ac.uk/unichem/>`_ service
+
+    .. doctest::
+
+            >>> from bioservices import UniChem
+            >>> u = UniChem()
+
+
+"""
 
     _url = "http://www.ebi.ac.uk/unichem/rest"
-    def __init__(self, verbose=True):
-        """**Constructor** `UniChem <https://www.ebi.ac.uk/unichem/>`_
+    def __init__(self, verbose=False):
+        """**Constructor** UniChem
 
         :param verbose: set to False to prevent informative messages
         """
@@ -72,8 +73,44 @@ class UniChem(RESTService):
             "patents":13,
             "fdasrc":14,
             "surechem":15,
-            "pharmgkb":17
+            "pharmgkb":17,
+            "hmdb":18,
+            "selleck":20,
+            "pubchem_tpharma":21,
+            "pubchem":22,
+            "mcule":23,
             }# there was no 16 when I looked at the web site June 2013
+
+        maxid_service = int(self.get_all_src_ids()[-1]['src_id'])
+        maxid_bioservices = max(self.source_ids.values())
+        if maxid_bioservices != maxid_service:
+            self.logging.warning("UniChem has added new source. "+ 
+                    "Please update the source_ids attribute in bioservices")
+
+    def _get_id(self, id_):
+        """id_ can be a number or a name
+        :return: the id number
+        """
+        if id_ in self.source_ids.keys():
+            srcid = self.source_ids[id_]
+        elif id_ in self.source_ids.values():
+            srcid = easydev.swapdict(source_ids)[id_]
+        else:
+            raise ValueError("unrecognised src_id parameter. " +
+                    "You must provide either a valid name or a valid identifier." +
+                    "from the following dictionary" + 
+                    "{}".format(self.source_ids))
+
+    def _interpret(self, res, mode="json"):
+        import json
+        try:
+            if mode == "json":
+                return json.loads(res)
+            elif mode == "eval":
+                return eval(str(res))
+        except:
+            self.logging.warning("could not interpret the result of the request")
+            return res
 
     def get_source_id(self, src_id):
         """Returns the source id given a source name or source id
@@ -127,10 +164,10 @@ class UniChem(RESTService):
             target = self.get_source_id(target)
             query += "/%s" % target
 
-        res = self.request(query)
+        res = self.request(query, "eval")
 
         # the json string returned can be evaluated in Python.
-        res = eval(res)
+        res = self._interpret(res)
         return res
 
     def get_src_compound_ids_all_from_src_compound_id(self, src_compound_id,
@@ -154,8 +191,11 @@ class UniChem(RESTService):
 
         ::
 
-            >>> get_src_compound_ids_all_from_src_compound_id("CHEMBL12", "chembl")
-            >>> get_src_compound_ids_all_from_src_compound_id("CHEMBL12", "chembl", "chebi")
+            >>> res = get_src_compound_ids_all_from_src_compound_id("CHEMBL12", "chembl")
+            >>> res = get_src_compound_ids_all_from_src_compound_id("CHEMBL12", "chembl", "chebi")
+
+        The second call returns an empty list because there is no mapping of the
+        requested element onto the chebi database.
 
         """
         src_id = self.get_source_id(src_id)
@@ -163,10 +203,10 @@ class UniChem(RESTService):
         if target:
             query += "/%s" % self.source_ids[target]
 
-        res = self.request(query)
+        res = self.request(query, "eval")
 
         # the json string returned can be evaluated in Python.
-        res = eval(res)
+        res = self._interpret(res)
         return res
 
     def get_mapping(self, source, target):
@@ -189,7 +229,7 @@ class UniChem(RESTService):
         query = "mapping/%s/%s/" % (self.source_ids[source], self.source_ids[target])
         res = self.request(query)
         # evaluation the string as a list
-        res = eval(res)
+        res = self._interpret(res, "eval")
         # convert to a convenient dictionary
         mapping = [(x[str(self.source_ids[source])], x[str(self.source_ids[target])]) for x in res]
         mapping = dict(mapping)
@@ -208,7 +248,7 @@ class UniChem(RESTService):
         """
         query = "inchikey/%s" % inchikey
         res = self.request(query)
-        res = eval(res)
+        res = self._interpret(res, "eval")
         return res
 
     def get_src_compound_ids_all_from_inchikey(self, inchikey):
@@ -226,7 +266,7 @@ class UniChem(RESTService):
         """
         query = "inchikey_all/%s" % inchikey
         res = self.request(query)
-        res = eval(res)
+        res = self._interpret(res, "eval")
         return res
 
     def get_all_src_ids(self):
@@ -240,7 +280,7 @@ class UniChem(RESTService):
 
         """
         res = self.request("src_ids")
-        res = eval(res)
+        res = self._interpret(res, "eval")
         return res
 
 
@@ -271,7 +311,7 @@ class UniChem(RESTService):
         src_id = self.get_source_id(src_id)
         query = "sources/%s" % src_id
         res = self.request(query)
-        res = eval(res)
+        res = self._interpret(res, "eval")
         res = dict(res[0])
         return res
 
@@ -291,7 +331,7 @@ class UniChem(RESTService):
         src_id = self.get_source_id(src_id)
         query = "structure/%s/%s" % (src_compound_id, src_id)
         res = self.request(query)
-        res = eval(res)
+        res = self._interpret(res, "eval")
         res = res[0]
         return res
 
@@ -311,7 +351,7 @@ class UniChem(RESTService):
         src_id = self.get_source_id(src_id)
         query = "structure_all/%s/%s" % (src_compound_id, src_id)
         res = self.request(query)
-        res = eval(res)
+        res = self._interpret(res, "eval")
         res = res[0]
         return res
 
@@ -343,7 +383,7 @@ class UniChem(RESTService):
         to_src_id = self.get_source_id(to_src_id)
         query = "src_compound_id_url/%s/%s/%s" % (src_compound_id, src_id, to_src_id)
         res = self.request(query)
-        res = eval(res)
+        res = self._interpret(res, "eval")
         res = [x['url'] for x in res]
         return res
 
@@ -368,8 +408,10 @@ class UniChem(RESTService):
 
         ::
 
-            >>> get_src_compound_ids_all_from_obsolete("DB07699", "2")
-            >>> get_src_compound_ids_all_from_obsolete("DB07699", "2", "1")
+            >>> from bioservices import UniChem
+            >>> u = UniChem()
+            >>> u.get_src_compound_ids_all_from_obsolete("DB07699", "2")
+            >>> u.get_src_compound_ids_all_from_obsolete("DB07699", "2", "1")
         """
         src_id = self.get_source_id(src_id)
         query = "src_compound_id_all_obsolete/%s/%s" % (obsolete_src_compound_id, src_id)
@@ -380,7 +422,7 @@ class UniChem(RESTService):
         res = self.request(query)
 
         # the json string returned can be evaluated in Python.
-        res = eval(res)
+        res = self._interpret(res, "eval")
         return res
 
 
@@ -422,7 +464,7 @@ class UniChem(RESTService):
         """
         query = "verbose_inchikey/%s" % inchikey
         res = self.request(query)
-        res = eval(res)
+        res = self._interpret(res, "eval")
         return res
 
     def get_auxiliary_mappings(self, src_id):
@@ -454,7 +496,7 @@ class UniChem(RESTService):
         if info['aux_for_url'] == '1':
             query = "mappingaux/%s" % src_id
             res = self.request(query)
-            #res = eval(res)
+            #res = self_interpret(res)
             return res
         else:
             self.logging.warning("This function accepts src_id that have auxiliary data only")

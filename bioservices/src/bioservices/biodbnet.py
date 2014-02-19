@@ -5,7 +5,7 @@
 #
 #  Copyright (c) 2011-2013 - EBI-EMBL
 #
-#  File author(s): 
+#  File author(s):
 #      https://www.assembla.com/spaces/bioservices/team
 #
 #  Distributed under the GPLv3 License.
@@ -22,9 +22,9 @@
 
 .. topic:: What is BioDBNet ?
 
-    :URL: http://www.ebi.ac.uk/biomodels-main/
-    :Service: http://www.ebi.ac.uk/biomodels-main/services/BioDBNetWebServices?wsdl
-    :Citations: http://www.ncbi.nlm.nih.gov/pubmed/20587024    
+    :URL: http://biodbnet.abcc.ncifcrf.gov/
+    :Service: http://biodbnet.abcc.ncifcrf.gov/webServices
+    :Citations:  Mudunuri,U., Che,A., Yi,M. and Stephens,R.M. (2009) bioDBnet: the biological database network. Bioinformatics, 25, 555-556
 
     .. highlights::
 
@@ -38,7 +38,6 @@
         -- From BioDBNet website, Dec. 2012
 
 
-Some keywords used in this module:
 
 
 """
@@ -48,25 +47,20 @@ import SOAPpy
 __all__ = ["BioDBNet"]
 
 
-
-
 class BioDBNet(WSDLService):
-    """Interface to the `BioDBNet <http://www.ebi.ac.uk/biomodels>`_ service 
+    """Interface to the `BioDBNet <http://biodbnet.abcc.ncifcrf.gov/>`_ service
 
     ::
 
         >>> from bioservices import *
         >>> s = BioDBNet()
-        >>> model = s.getModelSBMLById('BIOMD0000000299')
-
-    The number of models available can be retrieved easily as well as the model IDs::
-
-        >>> len(s)
-        >>> s.modelsId
 
     Most of the BioDBNet WSDL are available. There are functions added to
     the original interface such as :meth:`extra_getReactomeIds`.
 
+    Use :meth:`db2db` to convert from 1 database to some databases.
+    Use :meth:`dbReport` to get the convertion from one database to all
+    databases.
 
     """
     _url = 'http://biodbnet.abcc.ncifcrf.gov/webServices/bioDBnet.wsdl'
@@ -108,17 +102,24 @@ class BioDBNet(WSDLService):
         """Retrieves the models which are associated to the provided Taxonomy text.
 
         :param str text: free (Taxonomy based) text
-        :return:  list of model identifiers 
+        :return:  list of model identifiers
 
-        input_db = 'Ensembl Gene ID' 
-        output_db = ['Gene Symbol, Ensembl Protein ID']
-        inputValues = 'ENSG00000121410, ENSG00000171428' 
+        ::
+
+            >>> from bioservices import BioDBNet
+            >>> input_db = 'Ensembl Gene ID'
+            >>> output_db = ['Gene Symbol']
+            >>> input_values = ['ENSG00000121410, ENSG00000171428']
+            >>> print(s.db2db(input_db, output_db, input_values, 9606)
+            Ensembl Gene ID Gene Symbol
+            ENSG00000121410 A1BG
+            ENSG00000171428 NAT1
 
         """
         inputValues = self._interpret_input_db(inputValues)
         outputs = self._interpret_output_db(input_db, output_db)
 
-        #dbPath = 'Ensembl Gene ID->Gene ID->Homolog - Mouse Gene ID->Ensembl Gene ID' 
+        #dbPath = 'Ensembl Gene ID->Gene ID->Homolog - Mouse Gene ID->Ensembl Gene ID'
         #getDirectOutputsForInput method
         #directOutputResult = self.getDirectOutputsForInput(input_db)
 
@@ -126,22 +127,22 @@ class BioDBNet(WSDLService):
         if taxon:
             taxonId = str(taxon)
             params = SOAPpy.structType({'input': input_db, 'inputValues':
-                inputValues, 'outputs': outputs, 'taxonId': taxonId}) 
+                inputValues, 'outputs': outputs, 'taxonId': taxonId})
         else:
 
-            params = SOAPpy.structType({'input': input, 'inputValues': 
+            params = SOAPpy.structType({'input': input, 'inputValues':
                 inputValues, 'outputs': outputs, 'taxonId': ''})
 
         res = self.serv.db2db(params)
-
+        return res
 
     def dbFind(self, input_db, inputValues, taxon="9606"):
         inputValues = self._interpret_input_db(inputValues)
         taxonId = str(taxon)
         params = SOAPpy.structType({'input': input_db, 'inputValues':
-            inputValues, 'taxonId': taxonId}) 
+            inputValues, 'taxonId': taxonId})
         return self.serv.dbFind(params)
-        
+
 
     def dbOrtho(self, input_db, output_db, inputValues, input_taxon, output_taxon):
         raise NotImplementedError
@@ -154,15 +155,32 @@ class BioDBNet(WSDLService):
         params = SOAPpy.structType({'input': input, 'output': output,
             'inputValues': inputValues,  'inputTaxon': taxon1, 'outputTaxon':
             taxon2})
-        
+
         return self.serv.dbOrtho(params)
 
-    def dbReport(self, input_db, inputValues, taxon=9606):
+    def dbReport(self, input_db, inputValues, taxon=9606, output="raw"):
+        """Returns report
+
+        :param output: returns dataframe if set to dataframe
+
+        ::
+
+            s.dbReport("Ensembl Gene ID", ['ENSG00000121410', 'ENSG00000171428'])
+
+
+        """
         inputValues = self._interpret_input_db(inputValues)
         taxonId = str(taxon)
         params = SOAPpy.structType({'input': input_db, 'inputValues':
-            inputValues, 'taxonId': taxonId}) 
-        return self.serv.dbReport(params)
+            inputValues, 'taxonId': taxonId})
+        res = self.serv.dbReport(params)
+        if output == "dataframe":
+            import pandas as pd
+            import StringIO
+            df = pd.readcsv(stringIO.StringIO(res.strip()), sep="\t")
+            return df
+        else:
+            return res
 
     def dbWalk(self , dbPath, inputValues, taxon=9606):
         dbPath = 'Ensembl Gene ID->Gene ID->Homolog - Mouse Gene ID->Ensembl Gene ID'
@@ -176,9 +194,22 @@ class BioDBNet(WSDLService):
         return self.serv.getDirectOutputsForInput(input_db).split(",")
 
     def getInputs(self):
+        """Return list of possible input database
+
+        ::
+
+            s.getInputs()
+        """
         return self.serv.getInputs().split(",")
 
     def getOutputsForInput(self, input_db):
+        """Return list of possible output database for a given input database
+
+        ::
+
+            s.getOutputsForInput("UniProt Accession")
+
+        """
         if input_db not in self.getInputs():
             raise ValueError("Invalid input database provided")
         return self.serv.getOutputsForInput(input_db).split(",")
