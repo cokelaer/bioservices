@@ -3,11 +3,12 @@ from __future__ import print_function
 from __future__ import division
 
 import pkg_resources
+__version__ = "$Rev: "
 try:
     version = pkg_resources.require("bioservices")[0].version
     __version__ = version
 except:
-    version = __version__
+    version = ""
 
 
 try:
