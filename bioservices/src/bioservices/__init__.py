@@ -8,7 +8,7 @@ try:
     version = pkg_resources.require("bioservices")[0].version
     __version__ = version
 except:
-    version = ""
+    version = __version__
 
 
 try:
