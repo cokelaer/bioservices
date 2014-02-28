@@ -18,9 +18,10 @@ BioServices provides access to 25 Web Services including
 * `quickGO <http://www.ebi.ac.uk/QuickGO/WebServices.html>`_
 * `PSICQUIC <http://code.google.com/p/psicquic/>`_
 * `WikiPathway <http://www.wikipathways.org/index.php/WikiPathways>`_
-* and more (e.g., UniChem, ChEMBL, EUtils, GeneProf, PathwayCommons). 
+* and more (e.g., UniChem, ChEMBL, EUtils, GeneProf, PathwayCommons, BioDBNet,
+* UniChem). 
 
-qn up-to-date list of Web Services is provided within 
+an up-to-date list of Web Services is provided within 
 the online `documentation <http://pythonhosted.org/bioservices/>`_.
 
 Here is a little example using the UniProt Web Service to search for the zap70 specy in human

@@ -4,12 +4,20 @@ Whats' new, what has changed
 
 Revision 1.2
 --------------
+
+* 1.2.4: fixing typo in the init that fails bioservices ito be used if pkg_resources is not available.
+
+* 1.2.3
+    * updating some apps (fasta,peptides, taxon) in bioservices.apps directory
+	* Improves UniProt module by adding a dataframe export where performing a search
+	* added the BioDBnet service.
+	* added Pathway Common
+	* fixed UniChem: add new database identifiers and fix interpretation of the output 
+
 * 1.2.2:
    * NEW Service: :class:`bioservices.biodbnet.BioDBNet`
    * uniprot: add multi_mapping method to use mapping method on large queries and
      added timeout/trials inside uniprot functions
-
-
 
 * 1.2.1:
   * same as 1.2.0 but fixed missing mapping and apps directory in the
@@ -18,7 +26,7 @@ Revision 1.2
 * 1.2.0
    * Kegg class has now an alias called KEGG
    * NEW Services: :class:`bioservices.muscle.MUSCLE`
-	* fix bug in get_fasta from uniprot class
+   * fix bug in get_fasta from uniprot class
    * add aliases to quickGO to retrieve annotation
    * NEW Service: :class:`bioservices.pathwaycommons.PathwayCommons`
    * NEW Service: :class:`bioservices.geneprof.GeneProf` service

@@ -4,7 +4,9 @@ import tempfile
 
 def test_fasta():
     f = FASTA()
+    f.load_fasta(None)
     f.load_fasta("P43403")
+    f.load_fasta("P43403") # already there 
     f.header
     f.gene_name
     f.sequence
@@ -19,6 +21,17 @@ def test_fasta():
 
 def test_multi_fasta():
     f = MultiFASTA()
+    try:
+        f.fasta
+        assert False
+    except:
+        assert True
+    try:
+        f.header
+        assert False
+    except:
+        assert True
+
     f.load_fasta("P43403")
     f.load_fasta("P43408")
     assert len(f) == 2

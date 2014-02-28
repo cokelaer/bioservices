@@ -4,6 +4,7 @@ from bioservices.uniprot import *
 class test_UniProt(UniProt):
     def __init__(self):
         super(test_UniProt, self).__init__(verbose=False)
+        self.debugLevel = "ERROR"
 
     def test_mapping(self):
         res = self.mapping(fr="ACC+ID", to="KEGG_ID", query='P43403')
@@ -36,4 +37,13 @@ class test_UniProt(UniProt):
         self.search("ZAP70_HUMAN", format="tab", columns="sequence", limit=1)
 
         self.quick_search("ZAP70")
+
+
+    def test_uniref(self):
+        df = self.uniref("member:Q03063")
+        df.Size
+
+    def test_get_df(self):
+        df = self.get_df(["P43403"])
+
 

@@ -8,7 +8,7 @@ import glob
 
 _MAJOR               = 1
 _MINOR               = 2
-_MICRO               = 2
+_MICRO               = 4
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -23,7 +23,7 @@ metainfo = {
     'description':'Access to Biological Web Services from Python' ,
     'platforms' : ['Linux', 'Unix', 'MacOsX', 'Windows'],
     'keywords' : [
-        "BioServices", "Web Services", "Biology", "ChEBI", "UniChem", "Kegg", "KEGG", "BioModels",
+        "BioServices", "WebServices", "Biology", "BioDBNet", "ChEBI", "UniChem", "Kegg", "KEGG", "BioModels",
         "EUtils", "UniProt", "PICR", "ArrayExpress", "MUSCLE", "QuickGO", "PDB", "PSICQUIC", "Blast",
         "BioMART", "BioGRID", "MIRIAM", "BioMart", "GeneProf", "EUtils", "ChEMBL", "ChemSpider", 
         "HGNC", "PathwayCommons"],
