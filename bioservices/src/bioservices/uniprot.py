@@ -43,7 +43,10 @@
 
 """
 from services import RESTService
-import pandas as pd
+try:
+    import pandas as pd
+except:
+    print("pandas library is not installed. Not all functionalities will be  available")
 import StringIO
 
 __all__ = ["UniProt"]
