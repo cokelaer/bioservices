@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id: kegg.py 226 2013-07-08 07:05:14Z cokelaer $
+#$Id$
 """This module provides a class :class:`~PathwayCommons`
 
 .. topic:: What is PathwayCommons ?

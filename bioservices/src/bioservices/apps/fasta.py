@@ -5,7 +5,7 @@ __all__ = ["FASTA", "MultiFASTA"]
 
 
 class MultiFASTA(object):
-    """Class to manipulate several several FASTA items 
+    """Class to manipulate several several FASTA items
 
     Here, we load some FASTA using UniProt web service::
 
@@ -13,12 +13,12 @@ class MultiFASTA(object):
         >>> mf = MultiFASTA()
         >>> mf.load_fasta("P43408")
         >>> mf.load_fasta("P21318")
-        
+
     You can then get back to your accession entries as follows ::
 
         >>> mf.ids
         ['P43408', 'P21318']
-    
+
     And the sequences in the same order can be accessed::
 
         >>> len(mf)
@@ -41,7 +41,7 @@ class MultiFASTA(object):
 
     .. plot::
         :width: 50%
-        :include-source: 
+        :include-source:
 
         >>> from bioservices.apps import MultiFASTA
         >>> f = MultiFASTA()
@@ -131,11 +131,11 @@ class FASTA(object):
         VETSSDEILMRRLGDATRNRDIELTSDIDEHQFMNRCAAMAYGVLTGATVKIIKNRDGLL
         DKAVEELISVLK
 
-    The format is made of a header and a sequence. Any FASTA can be read 
+    The format is made of a header and a sequence. Any FASTA can be read
     and the pair of header/sequence retrieved from the :attr:`sequence` and
-    :attr:`header` attributes. However, headers differ from one database to 
-    another one and interpretation is not implemented except for SWISS-PROT. 
-    Identifiers can be retrieved whatsoever. 
+    :attr:`header` attributes. However, headers differ from one database to
+    another one and interpretation is not implemented except for SWISS-PROT.
+    Identifiers can be retrieved whatsoever.
 
     You can read a FASTA sequence from a local file or download one from UniProt
 
@@ -155,15 +155,15 @@ class FASTA(object):
         >>> f.df
 
     The columns stored in the dataframe encompase:
-    
+
         * **Accession** that is taken from the header (e.g., P43403 from uniprot)
         * **Sequence**, a copy of the FASTA sequence
-        * **Size**,  the length of the sequence. 
-        * **Database**, the database type found in the header (e.g., sp for 
-          SWISS-PROT; see below for a list of database and their header format). 
+        * **Size**,  the length of the sequence.
+        * **Database**, the database type found in the header (e.g., sp for
+          SWISS-PROT; see below for a list of database and their header format).
         * Some column such as **Organism** are filled only for some database
         * **Identififers** is the begining of the header.
-    
+
     .. seealso:: :class:`MultiFASTA` for multi FASTA manipulation.
     .. addedversion: 1.2.0 maybe merged with :class:`MulitFASTA` class
 
@@ -242,16 +242,16 @@ class FASTA(object):
             return header.split(" ")[0].split("|")[2]
     name = property(_get_name_sp)
 
-    # for 
+    # for
     def _get_df(self):
         df = pd.DataFrame({
             "Identifiers": [self.identifier],
             "Accession": [self.accession],
             "Entry": [self.entry],
             "Database": [self.dbtype],
-            "Organism": [self.organism], 
-            "PE": [self.PE], 
-            "SV": [self.SV], 
+            "Organism": [self.organism],
+            "PE": [self.PE],
+            "SV": [self.SV],
             "Sequence": [self.sequence],
             "Header": [self.header],
             "Size": [len(self.sequence)]})
@@ -261,9 +261,9 @@ class FASTA(object):
     def _get_info_from_header(self, prefix):
         if prefix not in self.header:
             return None
-        # finds the prefix 
+        # finds the prefix
         index = self.header.index(prefix+"=")
-        # remove it 
+        # remove it
         name = self.header[index:][3:]
         # figure out if there is anothe = sign to split the string
         # otherwise, the prefix we looked for is the last one anyway
@@ -278,26 +278,26 @@ class FASTA(object):
 
     def _get_gene_name(self):
         return self._get_info_from_header("GN")
-    gene_name = property(_get_gene_name, 
+    gene_name = property(_get_gene_name,
         doc="returns gene name from GN keyword found in the header if any")
 
     def _get_organism(self):
         return self._get_info_from_header("OS")
-    organism = property(_get_organism, 
+    organism = property(_get_organism,
         doc="returns organism from OS keyword found in the header if any")
 
     def _get_PE(self):
         pe = self._get_info_from_header("PE")
         if pe is not None:
             return int(pe)
-    PE = property(_get_PE, 
+    PE = property(_get_PE,
         doc="returns PE keyword found in the header if any")
 
     def _get_SV(self):
         sv = self._get_info_from_header("SV")
         if sv is not None:
             return int(sv)
-    SV = property(_get_SV, 
+    SV = property(_get_SV,
         doc="returns SV keyword found in the header if any")
 
     def __str__(self):
@@ -307,10 +307,10 @@ class FASTA(object):
 
     def get_fasta(self, id_):
         """Fetches FASTA from uniprot and loads into attrbiute :attr:`fasta`
-        
+
         :param str id_: a given uniprot identifier
         :returns: the FASTA contents
-        
+
         """
         print("get_fasta is deprecated. Use load_fasta instead")
         from bioservices import UniProt
@@ -340,12 +340,12 @@ class FASTA(object):
             self._fasta = res[:]
         except:
             pass
-        
-        
+
+
 
     def save_fasta(self, filename):
         """Save FASTA file into a filename
-        
+
         :param str data: the FASTA contents
         :param str filename: where to save it
         """
@@ -358,7 +358,7 @@ class FASTA(object):
 
     def read_fasta(self, filename):
         """Reads a FASTA file and loads it
-        
+
         Type::
 
             >>> f = FASTA()
@@ -366,7 +366,7 @@ class FASTA(object):
             >>> f.fasta
 
         :return: nothing
-       
+
         .. warning:: If more than one FASTA is contained in the file, an error is raised
         """
         fh = open(filename, "r")
@@ -390,7 +390,7 @@ class FASTA(object):
 
     def _interpret(self, data):
         # cleanup the data in case of empty spaces or \n characters
-        return data 
+        return data
 
 
 

@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id: uniprot.py 226 2013-07-08 07:05:14Z cokelaer $
+#$Id$
 """Interface to some part of the UniProt web service
 
 .. topic:: What is UniProt ?

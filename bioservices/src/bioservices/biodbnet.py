@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id: biomodels.py 207 2013-06-12 15:48:05Z cokelaer $
+#$Id$
 """This module provides a class :class:`~BioDBNet` to access to BioDBNet WS.
 
 
@@ -37,8 +37,8 @@
 
         -- From BioDBNet website, Dec. 2012
 
-
-
+    .. versionadded:: 1.2.3
+    .. sectionauthor:: Thomas Cokelaer, Feb 2014
 
 """
 from bioservices.services import WSDLService

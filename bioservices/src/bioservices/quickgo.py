@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id: $
+#$Id$
 """Interface to the quickGO interface
 
 .. topic:: What is quickGO

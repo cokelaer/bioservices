@@ -180,7 +180,7 @@ class UniProt(RESTService):
                 'reviewed', 'score', 'sequence', '3d', 'subcellular locations', 
                 'taxonomy', 'tools', 'version', 'virus hosts']  
     
-    def __init__(self, verbose=True):
+    def __init__(self, verbose=False):
         """**Constructor**
 
         :param verbose: set to False to prevent informative messages

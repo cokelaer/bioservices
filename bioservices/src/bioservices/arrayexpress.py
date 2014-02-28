@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id: kegg.py 156 2013-02-17 22:45:39Z cokelaer $
+#$Id$
 """Interface to the ArrayExpress web Service.
 
 .. topic:: What is ArrayExpress ?

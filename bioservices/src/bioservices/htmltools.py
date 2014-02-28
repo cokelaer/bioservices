@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id: xmltools.py 230 2013-07-09 17:12:59Z cokelaer $
+#$Id$
 """This module includes common tools to manipulate HTML files"""
 from __future__ import print_function
 from HTMLParser import HTMLParser

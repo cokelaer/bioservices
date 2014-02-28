@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id: kegg.py 55 2013-01-11 17:17:31Z cokelaer $
+#$Id$
 """This module provides a class :class:`~Kegg` that allows an easy access to all the
 WDSL Kegg interface as well as additional methods to obtain statistics about the
 Kegg database. See below for details about the functionalities available and the

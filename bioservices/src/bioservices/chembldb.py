@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id: biomodels.py 141 2013-02-06 10:22:25Z cokelaer $
+#$Id$
 
 """This module provides a class :class:`ChEMBLdb` 
 

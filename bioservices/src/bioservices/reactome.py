@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id: $
+#$Id$
 """Interface to the Reactome webs services
 
 :STATUS: in progress/draft don't use !
