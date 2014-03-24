@@ -342,7 +342,7 @@ or a string (e.g., 'PUBMED:*') """)
             import pandas as pd
             return pd.DataFrame(res)
         except: 
-            self.logging.warning("Cannot return a DAtaFrame. Returns the list")
+            self.logging.warning("Cannot return a DataFrame. Returns the list. If you want the dataframe, install pandas library")
             return res
 
     def Annotation_from_protein(self, protein, **kargs):

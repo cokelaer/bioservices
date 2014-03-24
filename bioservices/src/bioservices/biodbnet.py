@@ -175,7 +175,10 @@ class BioDBNet(WSDLService):
             inputValues, 'taxonId': taxonId})
         res = self.serv.dbReport(params)
         if output == "dataframe":
-            import pandas as pd
+            try:
+                import pandas as pd
+            except:
+                print("Pandas library is not installed. dataframe are not  available")
             import StringIO
             df = pd.readcsv(stringIO.StringIO(res.strip()), sep="\t")
             return df
