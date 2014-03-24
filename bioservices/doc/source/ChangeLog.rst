@@ -5,6 +5,8 @@ Whats' new, what has changed
 Revision 1.2
 --------------
 
+* 1.2.5: add try/except for pandas library.
+
 * 1.2.4: fixing typo in the init that fails bioservices ito be used if pkg_resources is not available.
 
 * 1.2.3
@@ -20,8 +22,7 @@ Revision 1.2
      added timeout/trials inside uniprot functions
 
 * 1.2.1:
-  * same as 1.2.0 but fixed missing mapping and apps directory in the
-    disatribution available on pypi
+  * same as 1.2.0 but fixed missing mapping and apps directory in the distribution available on pypi
 
 * 1.2.0
    * Kegg class has now an alias called KEGG

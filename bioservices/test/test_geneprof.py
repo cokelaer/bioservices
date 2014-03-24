@@ -1,4 +1,5 @@
 from bioservices.geneprof import GeneProf
+DEBUG = True
 
 
 
@@ -13,6 +14,8 @@ def test_geneprof():
     g.get_metadata_dataset("11_12_122_1", with_ats=True)
 
 def test_1():
+    if DEBUG == True:
+        return
     g = GeneProf(verbose=False)
     g.get_list_reference_datasets()
 
@@ -24,7 +27,10 @@ def test_1():
     g.search_genes("sox2", taxons="9606")
     g.search_genes("sox2", taxons="9606, 10090")
     res = g.search_genes("brca2 AND cancer AND reference", taxons="mouse")
+
 def test_2():
+    if DEBUG == True:
+        return
     g = GeneProf(verbose=False)
     g.search_experiments("sox2")
     g.search_experiments("citation:cancer")
@@ -37,6 +43,8 @@ def test_2():
     g.search_samples("human")
 
 def test_3():
+    if DEBUG == True:
+        return
     g = GeneProf(verbose=False)
     g.get_gene_id("mouse", "C_ENSG", "ENSMUSG00000059552")
     g.get_gene_id("human", "C_RSEQ", "NM_005657")
