@@ -30,15 +30,15 @@ From the previous command, only one mart has been found. It is called
 CosmicMart, from which we can retrieve the datasets::
 
     >>> s.datasets("CosmicMart")
-    ['COSMIC60', 'COSMIC61', 'COSMIC59']
+    ['COSMIC67', 'COSMIC68', 'COSMIC66']
 
 The are lots of entries in such datasets and we want to restrict our request
 using filters and attributes. Let us use the "COSMIC60" dataset. The following
 commands can help you in figuring out what are the valid names of attributes and
 filters to be used::
 
-    >>> s.attributes("COSMIC60")
-    >>> s.filters("COSMIC60")
+    >>> s.attributes("COSMIC67")
+    >>> s.filters("COSMIC67")
 
 They  return list of dictionaries that provide the identifiers (keys of the
 dictionary) and information about the identifier (e.g. descriptive name).
@@ -46,12 +46,12 @@ dictionary) and information about the identifier (e.g. descriptive name).
 For instance, if you want to add the gene name in the list of attributes, you will need to know its
 identifier. If you look at the dictionary you will find the "gene_name" key that contains::
 
-    >>> b.attributes("COSMIC60")["gene_name"]
+    >>> s.attributes("COSMIC67")["gene_name"]
     ['Gene Name',
      '',
      'naive_attributes',
      'html,txt,csv,tsv,xls',
-     'COSMIC60__MART__MAIN',
+     'COSMIC67__MART__MAIN',
      'gene_name']
 
 So if you want to add the **Gene Name** attribute, you must use the
@@ -61,14 +61,14 @@ dictionary returned by filters(). For instance, the "Mutated Sample" filter
 given by the "samp_gene_mutated" identifier returns a list, which second element
 contains the list of valid values (here y or n character)::
 
-    >>> s.filters("COSMIC60")
+    >>> s.filters("COSMIC67")
     ['Mutated Sample',
      '[y,n]',
      '',
      'naive_filters',
      'list',
      '=',
-     'COSMIC60__MART__MAIN',
+     'COSMIC67__MART__MAIN',
      'samp_gene_mutated']
 
 
@@ -94,7 +94,7 @@ It is now time to create the XML request by adding attributes/filters and the
 dataset::
 
     >>> # add the dataset
-    >>> s.add_dataset_to_xml("COSMIC60")
+    >>> s.add_dataset_to_xml("COSMIC67")
 
     >>> # add the attributes
     >>> s.add_attribute_to_xml("id_sample")
@@ -109,7 +109,7 @@ dataset::
     >>> # add the filters
     >>> s.add_filter_to_xml("samp_gene_mutated", "y")
     >>> s.add_filter_to_xml("site_primary", "breast")
-    >>> s.add_filter_to_xml("validation_status", "verified"
+    >>> s.add_filter_to_xml("validation_status", "verified")
 
 
 You can create the XML request that will be send::
