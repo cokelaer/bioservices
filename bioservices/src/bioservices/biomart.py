@@ -161,9 +161,25 @@ class BioMart(RESTService):
     """
 
 
-    def __init__(self, verbose=False):
-        """.. rubric:: Constructor"""
-        url = "http://www.biomart.org/biomart/martservice"
+    def __init__(self, verbose=False, host=None):
+        """.. rubric:: Constructor
+        
+        
+        By default, the URL used for the biomart service is::
+        
+            http://www.biomart.org/biomart/martservice
+            
+        Sometimes, the server is down, in which case you may want to use another
+        one (e.g., www.ensembl.org). To do so, use the **host** parameter.
+        
+        :param str host: a valid host (e.g. "www.ensembl.org")
+        
+        
+        """
+        if host == None:
+            host = "www.biomart.org"
+        url = "http://%s/biomart/martservice" % host
+        
         super(BioMart, self).__init__("BioMart", url=url, verbose=verbose)
         self._names = None
         self._databases = None

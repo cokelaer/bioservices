@@ -22,13 +22,17 @@
 """
 from __future__ import print_function
 
-from SOAPpy import SOAPProxy, WSDL
+import sys
+import socket
 import urllib
 import urllib2
 import platform
-#import logging
+
+from SOAPpy import  WSDL
+# from SOAPPy import SOAPProxy
+
 import easydev
-from  easydev import checkParam, Logging
+from  easydev import  Logging
 
 
 __all__ = ["Service", "WSDLService", "RESTService", "BioServicesError"]
@@ -89,7 +93,6 @@ class Service(Logging):
         # used by HGNC where some XML contains non-utf-8 characters !! 
         self._fixing_unicode = False
         self._fixing_encoding = "utf-8"
-
 
     def _get_url(self):
         return self._url
@@ -154,7 +157,6 @@ easyXML object (Default behaviour).""")
         """
         if isinstance(params, dict)==False:
             raise TypeError("Params must be a dictionary.")
-        import urllib
         postData = urllib.urlencode(params)
         return postData
 
@@ -171,7 +173,7 @@ easyXML object (Default behaviour).""")
             checkParam(aboolean, [True, False])
             checkParam(mode, ["mean", "std", "skew"])
         """        
-        easydev.tools.checkParam(param, valid_values)
+        easydev.tools.check_param_in_list(param, valid_values)
 
     def __str__(self):
         txt = "This is an instance of %s service" % self.name
@@ -233,7 +235,7 @@ class WSDLService(Service):
                 self.suds = Client(self.url)
                 self.serv = self.suds.service
                 self.serv.methods = serv.methods.copy()
-        except Exception, e:
+        except Exception:
             self.logging.error("Could not connect to the service %s " % self.url)
             raise Exception
 
@@ -256,7 +258,6 @@ class WSDLService(Service):
         doc="set the dumpSOAPIn mode of the SOAP proxy (0/1)")
 
 
-
 class RESTService(Service):
     """Class to manipulate REST service
 
@@ -264,7 +265,6 @@ class RESTService(Service):
     :class:`Service`.
 
     """
-
     def __init__(self, name, url=None, verbose=True):
         """.. rubric:: Constructor
 
@@ -287,7 +287,7 @@ class RESTService(Service):
         import os
         self.logging.info('getUserAgent: Begin')
         urllib_agent = 'Python-urllib/%s' % urllib2.__version__
-        clientRevision = ''
+        #clientRevision = ''
         clientVersion = ''
         user_agent = 'EBI-Sample-Client/%s (%s; Python %s; %s) %s' % (
             clientVersion, os.path.basename( __file__ ), 
@@ -298,9 +298,7 @@ class RESTService(Service):
         self.logging.info('getUserAgent: End')
         return user_agent
 
-
-
-    def request(self, path, format="xml", baseUrl=True):
+    def request(self, path, format="xml", baseUrl=True, timeout=1000):
         """Send a request via an URL to the web service.
 
         :param str path: the request will be formed as self.url+/+path 
@@ -313,11 +311,12 @@ class RESTService(Service):
             would prefer to provide the entire URL yourself (e.g. in psicquic service)
             If so, set this baseUrl argument to False. 
 
-
         .. note:: this is a HTTP GET request 
+        
+        .. seealso:: for developers see also the :meth:`_request_timeout`
+            if the site is down or busy.
         """
-        import socket
-        socket.setdefaulttimeout(1000)
+        socket.setdefaulttimeout(timeout)
         if path.startswith(self.url):
             url = path
         elif baseUrl == False:
@@ -349,14 +348,14 @@ class RESTService(Service):
 
     def _request_timeout(self, path, format="xml", baseUrl=True, trials=3,
             timeout=5):
-        import socket
-        socket.setdefaulttimeout(timeout)
+        """used by uniprot for now"""
         level = self.debugLevel
         self.debugLevel="ERROR"
         res = None
         for i in range(0,trials):
             try:
-                res = self.request(path, format=format, baseUrl=baseUrl)
+                res = self.request(path, format=format, baseUrl=baseUrl, 
+                                   timeout=timeout)
             except socket.timeout:
                 print("Time out. Trying again %s/%s" % (i+1, trials))
             except Exception:
@@ -365,11 +364,9 @@ class RESTService(Service):
                 break
         if res == None:
             self.logging.error("URL could not be fetched %s" % path)
+        self.debuLevel = level
         return res
             
-
-
-
     def requestPost(self, requestUrl, params, extra=None):
         """request with a POST method.
 
@@ -385,7 +382,6 @@ class RESTService(Service):
         .. note:: this is a HTTP POST request 
         .. note:: use only by ::`ncbiblast` service so far.
         """
-        import sys
         requestData = urllib.urlencode(params)
         print(requestData)
         if extra != None:
@@ -433,6 +429,3 @@ def get_bioservices_env(section, option):
         if value=="":
             raise ValueError("No token found for chemspider. Create one on http//www.chemspider.com and provide it when creating instance of ChemSpider")
         return value
-
-
-

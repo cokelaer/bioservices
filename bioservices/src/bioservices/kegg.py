@@ -258,7 +258,7 @@ class Kegg(RESTService):
 
         .. doctest::
 
-            >>> from bioservices import *
+            >>> from bioservices import Kegg
             >>> s = Kegg()
             >>> s.code2Tnumber("hsa")
             'T01001'
@@ -271,7 +271,7 @@ class Kegg(RESTService):
 
         .. doctest::
 
-            >>> from bioservices import *
+            >>> from bioservices import Kegg
             >>> s = Kegg()
             >>> s.Tnumber2code("T01001")
             'hsa'
@@ -287,6 +287,8 @@ class Kegg(RESTService):
 
         ::
 
+            >>> from bioservices import Kegg
+            >>> s = Kegg()
             >>> s.isOrganism("hsa")
             True
 
@@ -1104,8 +1106,16 @@ class Kegg(RESTService):
                 if type1!='gene' or type2!='gene':
                     continue
                 if uniprot:
-                    name1 = self.conv("uniprot", name1)[1][0]
-                    name2 = self.conv("uniprot", name2)[1][0]
+                    try:
+                        # FIXME  sometimes, there are more than one name
+                        name1 = name1.split()[0]
+                        name2 = name2.split()[0]
+                        name1 = self.conv("uniprot", name1)[name1]
+                        name2 = self.conv("uniprot", name2)[name2]
+                    except Exception:
+                        print(name1)
+                        print(name2)
+                        raise Exception
                 #print(name1, 1, name2)
                 sif.append([name1, 1, name2])
             elif  rel['name'] == 'inhibition':
@@ -1120,8 +1130,10 @@ class Kegg(RESTService):
                 if type1!='gene' or type2!='gene':
                     continue
                 if uniprot:
-                    name1 = self.conv("uniprot", name1)[1][0]
-                    name2 = self.conv("uniprot", name2)[1][0]
+                    name1 = name1.split()[0]
+                    name2 = name2.split()[0]
+                    name1 = self.conv("uniprot", name1)[name1]
+                    name2 = self.conv("uniprot", name2)[name2]
                 #print(name1, -1, name2)
                 sif.append([name1, -1, name2])
             else:

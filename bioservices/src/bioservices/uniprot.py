@@ -4,7 +4,7 @@
 #
 #  Copyright (c) 2011-2013 - EBI-EMBL
 #
-#  File author(s): 
+#  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
 #      https://www.assembla.com/spaces/bioservices/team
 #
@@ -42,6 +42,7 @@
 .. http://www.uniprot.org/docs/pkinfam
 
 """
+import StringIO
 from services import RESTService
 try:
     import pandas as pd
@@ -52,7 +53,7 @@ import StringIO
 __all__ = ["UniProt"]
 
 
-mapping = {"UniProtKB AC/ID":"ACC+ID", 
+mapping = {"UniProtKB AC/ID":"ACC+ID",
     "UniProtKB": "ACC",
     "UniProtKB": "ID",
     "UniParc": "UPARC",
@@ -64,7 +65,7 @@ mapping = {"UniProtKB AC/ID":"ACC+ID",
     "PIR": "PIR",
     "UniGene": "UNIGENE_ID",
     "Entrez Gene (GeneID)": "P_ENTREZGENEID",
-    "GI number*":"P_GI", 
+    "GI number*":"P_GI",
     "IPI": "P_IPI",
     "RefSeq Protein": "P_REFSEQ_AC",
     "RefSeq Nucleotide": "REFSEQ_NT_ID",
@@ -177,12 +178,12 @@ class UniProt(RESTService):
     _url = "http://www.uniprot.org"
     _valid_columns = ['citation', 'clusters', 'comments','database',
                 'domains','domain', 'ec','id','entry name','existence',
-        		'families', 'features', 'genes', 'go', 'go-id', 'interpro', 
-                'interactor', 'keywords', 'keyword-id', 'last-modified', 
-                'length', 'organism', 'organism-id', 'pathway', 'protein names', 
-                'reviewed', 'score', 'sequence', '3d', 'subcellular locations', 
-                'taxonomy', 'tools', 'version', 'virus hosts']  
-    
+                'families', 'features', 'genes', 'go', 'go-id', 'interpro',
+                'interactor', 'keywords', 'keyword-id', 'last-modified',
+                'length', 'organism', 'organism-id', 'pathway', 'protein names',
+                'reviewed', 'score', 'sequence', '3d', 'subcellular locations',
+                'taxonomy', 'tools', 'version', 'virus hosts']
+
     def __init__(self, verbose=False):
         """**Constructor**
 
@@ -228,7 +229,7 @@ class UniProt(RESTService):
 
 
         .. versionchanged:: 1.1.1 to return a dictionary instaed of a list
-        .. versionchanged:: 1.1.2 the values for each key is now made of a list 
+        .. versionchanged:: 1.1.2 the values for each key is now made of a list
             instead of strings so as to store more than one values.
         .. versionchanged:: 1.2.0 input query can also be a list of strings
             instead of just a string
@@ -252,7 +253,7 @@ class UniProt(RESTService):
         except:
             pass
 
-	    # changes in version 1.1.1 returns a dictionary instead of list
+        # changes in version 1.1.1 returns a dictionary instead of list
         del result[0]
         del result[0]
         if len(result) == 0:
@@ -273,10 +274,10 @@ class UniProt(RESTService):
         format="tab", Nmax=300, timeout=10, trials=3):
         """Calls mapping several times and concatenates results
 
-        The reson for this method is that if a query is too long then the 
-        :meth:`mapping` method will fail. In such cases, you can use 
-        :meth:`multi_mapping` instead. It will call :meth:`mapping` several 
-        times and returns a unique dictionary instead of multiple ones if 
+        The reson for this method is that if a query is too long then the
+        :meth:`mapping` method will fail. In such cases, you can use
+        :meth:`multi_mapping` instead. It will call :meth:`mapping` several
+        times and returns a unique dictionary instead of multiple ones if
         you were to call :math:`mapping` yourself several times.
 
         """
@@ -337,8 +338,8 @@ class UniProt(RESTService):
 
     def get_fasta(self, id_):
         """Returns FASTA string given a valid identifier
-        
-        
+
+
         .. seealso:: :mod:`bioservices.apps.fasta` for dedicated tools to
             manipulate FASTA
         """
@@ -346,7 +347,7 @@ class UniProt(RESTService):
         f = FASTA()
         f.get_fasta(id_)
         return f.fasta
-        
+
 
     def get_fasta_sequence(self, id_):
         """Returns FASTA sequence (Not FASTA)
@@ -370,16 +371,16 @@ class UniProt(RESTService):
         """Provide some interface to the uniprot search interface.
 
         :param str query: query must be a valid uniprot query.
-            See http://www.uniprot.org/help/text-search, http://www.uniprot.org/help/query-fields 
+            See http://www.uniprot.org/help/text-search, http://www.uniprot.org/help/query-fields
             See also example below
         :param str format: a valid format amongst html, tab, xls, asta, gff,
-            txt, xml, rdf, list, rss. If tab or xls, you can also provide the 
+            txt, xml, rdf, list, rss. If tab or xls, you can also provide the
             columns argument.  (default is tab)
-        :param str columns: comma-separated list of values. Works only if fomat 
+        :param str columns: comma-separated list of values. Works only if fomat
             is tab or xls. For UnitProtKB, some possible columns are:
-            id, entry name, length, organism. Some column name must be followed by 
-            database name (e.g., "database(PDB)"). Again, see uniprot website 
-            for more details. See also :attr:`~bioservices.uniprot.UniProt._valid_columns` 
+            id, entry name, length, organism. Some column name must be followed by
+            database name (e.g., "database(PDB)"). Again, see uniprot website
+            for more details. See also :attr:`~bioservices.uniprot.UniProt._valid_columns`
             for the full list of column keyword.
         :param bool include: include isoform sequences when the format
             parameter is fasta. Include description when format is rdf.
@@ -391,11 +392,11 @@ class UniProt(RESTService):
         :param int maxTrials: this request is unstable, so we may want to try
             several time.
 
-        To obtain the list of uniprot ID returned by the search of zap70 can be 
+        To obtain the list of uniprot ID returned by the search of zap70 can be
         retrieved as follows::
 
             >>> u.search('zap70+AND+organism:9606', format='list')
-            >>> u.search("zap70+and+taxonomy:9606", format="tab", limit=3, 
+            >>> u.search("zap70+and+taxonomy:9606", format="tab", limit=3,
             ...    columns="entry name,length,id, genes")
             Entry name  Length  Entry   Gene names
             CBLB_HUMAN  982 Q13191  CBLB RNF56 Nbla00127
@@ -409,9 +410,9 @@ class UniProt(RESTService):
 
         .. warning:: this function request seems a bit unstable (UniProt web issue ?)
             so we repeat the request if it fails
-            
-        .. warning:: some columns although valid may not return anything, not even in 
-            the header: 'score', 'taxonomy', 'tools'. this is a uniprot feature, 
+
+        .. warning:: some columns although valid may not return anything, not even in
+            the header: 'score', 'taxonomy', 'tools'. this is a uniprot feature,
             not bioservices.
         """
         params = {}
@@ -423,7 +424,7 @@ class UniProt(RESTService):
 
         if columns!=None:
             self.checkParam(format, ["tab","xls"])
-            
+
             # remove unneeded spaces before/after commas if any
             if "," in columns:
                 columns = [x.strip() for x in columns.split(",")]
@@ -444,7 +445,7 @@ class UniProt(RESTService):
 
         if compress == True:
             params['compress'] = 'yes'
- 
+
         if sort:
             self.checkParam(sort, ["score"])
             params['sort'] = sort
@@ -458,7 +459,7 @@ class UniProt(RESTService):
                 params['limit'] = limit
 
         params = self.urlencode(params)
-        
+
         #res = s.request("/uniprot/?query=zap70+AND+organism:9606&format=xml", params)
         trials = 3
         while trials<maxTrials:
@@ -484,9 +485,9 @@ class UniProt(RESTService):
         # else populate a dictionary
         newres = {}
         for line in res.split("\n")[1:-1]:
-            print line
+            #print line
             Entry, a,b,c,d,e,f = line.split("\t")
-            print Entry, a, b, c, d, e, f
+            #print Entry, a, b, c, d, e, f
             newres[Entry] = { 'Entry name': a,
                          'Status': b,
                          'Protein names': c,
@@ -497,24 +498,24 @@ class UniProt(RESTService):
 
 
     def uniref(self, query):
-        """Calls UniRef service 
-        
+        """Calls UniRef service
+
         >>> u = UniProt()
         >>> df = u.uniref("member:Q03063")
         >>> df.Size
-        
+
 
         """
         res = self.request("uniref/?"+self.urlencode({"query":query})+"&format=tab", format="txt")
         res = pd.read_csv(StringIO.StringIO(res.strip()), sep="\t")
         return res
-        
+
     def get_df(self, entries):
         """Given a list of uniprot entries, this method returns a dataframe with all possible columns
-        
+
         :return dataframe with indices being the uniprot id (e.g. DIG1_YEAST)
-        
-        .. todo:: cleanup the content of the data frame to replace strings 
+
+        .. todo:: cleanup the content of the data frame to replace strings
             separated by ; into a list of strings. e.g. the Gene Ontology IDs
         """
         if isinstance(entries, str):
@@ -523,7 +524,6 @@ class UniProt(RESTService):
             pass
         else:
             raise TypeError("queries must be a list of strings or a string")
-        import StringIO
         output = None
         for i, entry in enumerate(entries):
             self.logging.info("fetching information {}/{} for {}".format(i+1, len(entries),entry))
@@ -535,15 +535,15 @@ class UniProt(RESTService):
                 if i==0: # works in a shell but not systematic... pd.isnull(output)
                     output = df.copy()
                 else: #append
-                    #TODO: any more efficient way of appending ? keep in mind 
+                    #TODO: any more efficient way of appending ? keep in mind
                     # that df may have length > 1
                     output= output.append(df, ignore_index=True)
-   
-                
+
+
         # to transform into list:
-        columns = ['PubMed ID', 'Comments', u'Domains', 'Protein families', 
-                   'Gene names', 'Gene ontology (GO)', 'Gene ontology IDs', 
-                   'InterPro', 'Interacts with', 'Keywords',  
+        columns = ['PubMed ID', 'Comments', u'Domains', 'Protein families',
+                   'Gene names', 'Gene ontology (GO)', 'Gene ontology IDs',
+                   'InterPro', 'Interacts with', 'Keywords',
                    'Subcellular location']
         for col in columns:
             try:

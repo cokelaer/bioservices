@@ -2,8 +2,21 @@ Whats' new, what has changed
 ================================
 
 
-Revision 1.0
+Revision 1.2
 ------------------
+
+* 1.2.6:
+	* fixing bug report 22 related to KEGG.pathway2sif function that was	failing.
+	* add option in biomart to use different host. This is to fix an issue where
+      biomart hangs forever. This was reported by Daniel D bug report 23 on
+	  assembla.
+
+
+* 1.2.5: 
+    * add try/except for pandas library.
+
+* 1.2.4: 
+    * fixing typo in the init that fails bioservices ito be used if pkg_resources is not available.
 
 * 1.2.3
     * updating some apps (fasta,peptides, taxon) in bioservices.apps directory
@@ -12,16 +25,26 @@ Revision 1.0
 	* added Pathway Common
 	* fixed UniChem: add new database identifiers and fix interpretation of the output
 
+* 1.2.2:
+   * NEW Service: :class:`bioservices.biodbnet.BioDBNet`
+   * uniprot: add multi_mapping method to use mapping method on large queries and
+     added timeout/trials inside uniprot functions
+
+* 1.2.1:
+  * same as 1.2.0 but fixed missing mapping and apps directory in the distribution available on pypi
 
 * 1.2.0
    * Kegg class has now an alias called KEGG
-   * add MUSCLE service
-	* fix bug in get_fasta from uniprot class
+   * NEW Services: :class:`bioservices.muscle.MUSCLE`
+   * fix bug in get_fasta from uniprot class
    * add aliases to quickGO to retrieve annotation
-   * add pathway commons service
-   * add geneprof service
+   * NEW Service: :class:`bioservices.pathwaycommons.PathwayCommons`
+   * NEW Service: :class:`bioservices.geneprof.GeneProf` service
    * uniprot add function to get uniprot fasta sequence
    * add apps.peptides module
+
+Revision 1.1
+------------------
 
 * 1.1.3
     * fix bug in chembldb.get_all_targets() that was failing to return the
@@ -36,8 +59,10 @@ Revision 1.0
     * services.py: move print statements into loggin.warning
 	* add documentation and examples related to Galaxy/BioPython.
     * uniprot mapping function now returns a dictionary instead of a list
-    * add new services: HGNC + doc + test
+    * NEW Service : class:`bioservices.hgnc.HGNC` + doc + test
 
+Revision 1.1
+------------------
 * 1.1.0:
     * in psicquic when performing the conversion, we now use a try/except since some fields (in rare case) may be missing
 	* add faqs in the doc + update of the README and metadata.
@@ -47,6 +72,9 @@ Revision 1.0
 	* add the UniChem  Web Service.
 	* logging ERROR in Service when data cannot be converted to XML is now a simple warning
 	* kegg.conv method now returns a dictionary instead of list of tuples.
+
+Revision 1.0
+------------------
 
 * 1.0.4
 	* 	add a draft version of PDB just to be able to fetch PDB data and use it

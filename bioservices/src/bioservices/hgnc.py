@@ -80,6 +80,8 @@ class HGNC(RESTService):
 
 
     :references: http://www.avatar.se/HGNC/doc/tutorial.html
+    
+    .. warning:: this is actually the HGNC/wr website. Maybe not the official. 
 
     """
     def __init__(self, verbose=False):

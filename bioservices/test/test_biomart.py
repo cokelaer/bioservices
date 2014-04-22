@@ -3,6 +3,8 @@ import unittest
 
 
 def test_general():
+    # test another host
+    s = BioMart(host="www.ensembl.org")
     s = BioMart()
     #s.registry()
     s.datasets("ensembl")

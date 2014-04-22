@@ -63,7 +63,7 @@ class TestKegg(object):
 
 
 
-class _TestKeggALL(object):
+class TestKeggALL(object):
 
     @classmethod
     def setup_class(klass):

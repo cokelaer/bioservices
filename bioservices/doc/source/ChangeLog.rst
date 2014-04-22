@@ -3,18 +3,27 @@ Whats' new, what has changed
 
 
 Revision 1.2
---------------
+------------------
 
-* 1.2.5: add try/except for pandas library.
+* 1.2.6:
+	* fixing bug report 22 related to KEGG.pathway2sif function that was	failing.
+	* add option in biomart to use different host. This is to fix an issue where
+      biomart hangs forever. This was reported by Daniel D bug report 23 on
+	  assembla.
 
-* 1.2.4: fixing typo in the init that fails bioservices ito be used if pkg_resources is not available.
+
+* 1.2.5: 
+    * add try/except for pandas library.
+
+* 1.2.4: 
+    * fixing typo in the init that fails bioservices ito be used if pkg_resources is not available.
 
 * 1.2.3
     * updating some apps (fasta,peptides, taxon) in bioservices.apps directory
 	* Improves UniProt module by adding a dataframe export where performing a search
 	* added the BioDBnet service.
 	* added Pathway Common
-	* fixed UniChem: add new database identifiers and fix interpretation of the output 
+	* fixed UniChem: add new database identifiers and fix interpretation of the output
 
 * 1.2.2:
    * NEW Service: :class:`bioservices.biodbnet.BioDBNet`
@@ -52,6 +61,8 @@ Revision 1.1
     * uniprot mapping function now returns a dictionary instead of a list
     * NEW Service : class:`bioservices.hgnc.HGNC` + doc + test
 
+Revision 1.1
+------------------
 * 1.1.0:
     * in psicquic when performing the conversion, we now use a try/except since some fields (in rare case) may be missing
 	* add faqs in the doc + update of the README and metadata.
