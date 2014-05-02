@@ -7,9 +7,7 @@ Revision 1.2
 
 * 1.2.6:
 	* fixing bug report 22 related to KEGG.pathway2sif function that was	failing.
-	* add option in biomart to use different host. This is to fix an issue where
-      biomart hangs forever. This was reported by Daniel D bug report 23 on
-	  assembla.
+	* add option in biomart to use different host. This is to fix an issue where biomart hangs forever. This was reported by Daniel D bug report 23 on assembla.
 
 
 * 1.2.5: 
