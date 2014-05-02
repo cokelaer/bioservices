@@ -185,6 +185,9 @@ class FASTA(object):
     NCBI Reference Sequence           ref|accession|locus
     Local Sequence identifier         lcl|identifier
     ================================= ====================================
+
+
+    The :meth::`load_fasta` relies on UniProt service.
     """
 
     known_dbtypes = ["sp", "gi"]
@@ -321,6 +324,7 @@ class FASTA(object):
 
     def load(self, id_):
         self.load_fasta(id_)
+
     def load_fasta(self, id_):
         """Fetches FASTA from uniprot and loads into attribute :attr:`fasta`
 
@@ -340,7 +344,6 @@ class FASTA(object):
             self._fasta = res[:]
         except:
             pass
-
 
 
     def save_fasta(self, filename):

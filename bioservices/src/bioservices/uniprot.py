@@ -345,7 +345,7 @@ class UniProt(RESTService):
         """
         from bioservices.apps.fasta import FASTA
         f = FASTA()
-        f.get_fasta(id_)
+        f.load_fasta(id_)
         return f.fasta
 
 
@@ -513,10 +513,12 @@ class UniProt(RESTService):
     def get_df(self, entries):
         """Given a list of uniprot entries, this method returns a dataframe with all possible columns
 
-        :return dataframe with indices being the uniprot id (e.g. DIG1_YEAST)
+        :return: dataframe with indices being the uniprot id (e.g. DIG1_YEAST)
 
         .. todo:: cleanup the content of the data frame to replace strings
             separated by ; into a list of strings. e.g. the Gene Ontology IDs
+
+        .. warning:: requires pandas library
         """
         if isinstance(entries, str):
             entries = [entries]
