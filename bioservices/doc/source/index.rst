@@ -116,9 +116,15 @@ User guide
     applications.rst
     developers.rst
 
+Examples (notebooks)
+####################
 
 .. toctree::
     :maxdepth: 2
+    :numbered:
+
+    notebooks.rst
+
 
 References
 ##################

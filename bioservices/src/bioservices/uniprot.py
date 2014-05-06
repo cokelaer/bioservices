@@ -192,7 +192,7 @@ class UniProt(RESTService):
         super(UniProt, self).__init__(name="UniProt", url=UniProt._url, verbose=verbose)
 
 
-    def mapping(self, fr="ID", to="KEGG_ID",  query="P13368", format="tab",
+    def mapping(self, fr="ID", to="KEGG_ID",  query="P13368", 
             trials=3, timeout=10):
         """This is an interface to the UniProt mapping service
 
@@ -201,8 +201,8 @@ class UniProt(RESTService):
         :param to: the targetted database identifier. See :attr:`_mapping`.
         :param query: a string containing one or more IDs separated by a space
             It can also be a list of strings.
-        :param format: the output format (default is tabulated "tab")
-            only tab should be used for now.
+        :param format: The output being a dictionary, this parameter is
+            deprecated and not used anymore
         :return: a list. The first element is the source database Id. The second
             is the targetted source identifier. Following elements are alternate
             of one the entry and its mapped Id. If a query has several mapped
@@ -215,7 +215,7 @@ class UniProt(RESTService):
             defaultdict(<type 'list'>, {'P43403': ['hsa:7535']})
             >>> u.mapping("ACC", "KEGG_ID", 'P43403 P00958')
             defaultdict(<type 'list'>, {'P00958': ['sce:YGR264C'], 'P43403': ['hsa:7535']})
-            >>> u.mapping("ID", "PDB_ID", "P43403", format="tab")
+            >>> u.mapping("ID", "PDB_ID", "P43403")
             defaultdict(<type 'list'>, {'P43403': ['1FBV', '1M61', '1U59',
             '2CBL', '2OQ1', '2OZO', '2Y1N', '3ZNI', '4A4B', '4A4C', '4K2R']})
 
@@ -239,7 +239,7 @@ class UniProt(RESTService):
 
         if isinstance(query, list):
             query = " ".join(query)
-        params = {'from':fr, 'to':to, 'format':format, 'query':query}
+        params = {'from':fr, 'to':to, 'format': "tab", 'query':query}
         params = self.urlencode(params)
         result = self._request_timeout(url+"?"+params, format=format,
                 timeout=timeout, trials=trials)
