@@ -94,6 +94,8 @@ class Service(Logging):
         self._fixing_unicode = False
         self._fixing_encoding = "utf-8"
         self.timeout = 1000
+        self.trials = 5
+
 
     def _get_url(self):
         return self._url
@@ -300,30 +302,6 @@ class RESTService(Service):
         return user_agent
 
 
-    def requests_get(self, query, format="xml", baseUrl=True):
-        raise NotImplementedError
-        if path.startswith(self.url):
-            url = path
-        elif baseUrl == False:
-            url = path
-        else:
-            url = self.url + "/" +  path
-
-        self.logging.debug("REST.bioservices.%s request begins" % self.name)
-        self.logging.debug("--Fetching url=%s" % url)
-
-        import requests
-        res = requests.request("GET", url)
-        if format=="xml":
-            if self.easyXMLConversion:
-                #logging.warning("--Conversion to easyXML"),
-                try:
-                    res = self.easyXML(res)
-                except Exception,e :
-                    self.logging.warning(e)
-                    self.logging.warning("--Conversion to easyXML failed. returns the raw response"),
-        return res
-
     def request(self, path, format="xml", baseUrl=True):
         """Send a request via an URL to the web service.
 
@@ -345,7 +323,22 @@ class RESTService(Service):
         .. note:: you can set the timeout of the connection, which is 1000
             seconds by default by changing the :attr:`timeout`.
         """
-        socket.setdefaulttimeout(self.timeout)
+        level = self.debugLevel
+        self.debugLevel="ERROR"
+
+        for i in range(0, self.trials):
+            res = self._get_request(path, format=format, baseUrl=baseUrl)
+            if res != None:
+                break
+            import time
+            self.logging.warning("request seemed to have failed. Trying again")
+            time.sleep(1)
+
+        # get back the parameters
+        self.debugLevel = level
+        return res
+
+    def _get_request(self, path, format="xml", baseUrl=True):
         if path.startswith(self.url):
             url = path
         elif baseUrl == False:
@@ -380,33 +373,7 @@ class RESTService(Service):
             self.logging.error("An exception occured while reading the URL")
             self.logging.error(url)
             self.logging.error("Error caught within bioservices. Invalid requested URL ? ")
-            self._exception = e
-            raise Exception
 
-    def _request_timeout(self, path, format="xml", baseUrl=True, trials=3,
-            timeout=5):
-        """used by uniprot for now"""
-        level = self.debugLevel
-        self.debugLevel="ERROR"
-        res = None
-        save_timeout = self.timeout 
-        self.timeout = timeout
-        for i in range(0,trials):
-            try:
-                res = self.request(path, format=format, baseUrl=baseUrl)
-            except socket.timeout:
-                self.logging.warning("Time out. Trying again %s/%s" % (i+1, trials))
-            except Exception, e:
-                print(e.message)
-                self.logging.warning("Unknown error")
-                raise Exception
-            else:
-                break
-        self.timeout = save_timeout
-        if res == None:
-            self.logging.error("URL could not be fetched %s" % path)
-        self.debuLevel = level
-        return res
 
     def requestPost(self, requestUrl, params, extra=None):
         """request with a POST method.

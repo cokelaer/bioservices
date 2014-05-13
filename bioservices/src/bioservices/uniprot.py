@@ -191,10 +191,11 @@ class UniProt(RESTService):
         :param verbose: set to False to prevent informative messages
         """
         super(UniProt, self).__init__(name="UniProt", url=UniProt._url, verbose=verbose)
+        self.timeout = 10
 
 
     def mapping(self, fr="ID", to="KEGG_ID",  query="P13368",
-            trials=3, timeout=10):
+            trials=3, ):
         """This is an interface to the UniProt mapping service
 
 
@@ -242,20 +243,18 @@ class UniProt(RESTService):
             query = " ".join(query)
         params = {'from':fr, 'to':to, 'format': "tab", 'query':query}
         params = self.urlencode(params)
-        result = self._request_timeout(url+"?"+params, format=format,
-                timeout=timeout, trials=trials)
+        result = self.request(url+"?"+params, format=format)
 
-        result = result.split()
-
+        
         # changes in version 1.1.1 returns a dictionary instead of list
         try:
+            result = result.split()
             del result[0]
             del result[0]
         except:
             print("results seems empty...try again")
-            print result
-            print("---")
-            raise Exception
+            print {}
+            
         if len(result) == 0:
             return {}
         else:
@@ -271,7 +270,7 @@ class UniProt(RESTService):
         return result_dict
 
     def multi_mapping(self, fr="ID", to="KEGG_ID", query="P13368",
-        format="tab", Nmax=300, timeout=10, trials=3):
+        format="tab", Nmax=200 ):
         """Calls mapping several times and concatenates results
 
         The reson for this method is that if a query is too long then the
@@ -300,18 +299,15 @@ class UniProt(RESTService):
                 i2 = (i+1)*Nmax
                 if i2>len(unique_entry_names):
                     i2 = len(unique_entry_names)
-                print i1, i2, len(unique_entry_names[i1:i2])
                 query=",".join(unique_entry_names[i1:i2])
-                this_mapping = self.mapping(fr=fr, to=to, query=query,
-                        trials=trials, timeout=timeout)
+                this_mapping = self.mapping(fr=fr, to=to, query=query)
                 for k,v in this_mapping.iteritems():
                     mapping[k] = v
                 print(str((i+1.)/N*100.) + "%% completed")
         else:
             #query=",".join([x+"_" + species for x in unique_entry_names])
             query=",".join(unique_entry_names)
-            mapping = self.mapping(fr=fr, to=to, query=query,
-                    timeout=timeout, trials=trials)
+            mapping = self.mapping(fr=fr, to=to, query=query)
         return mapping
 
 
@@ -468,16 +464,7 @@ class UniProt(RESTService):
         params = self.urlencode(params)
 
         #res = s.request("/uniprot/?query=zap70+AND+organism:9606&format=xml", params)
-        trials = 3
-        while trials<maxTrials:
-            try:
-                res = self.request("uniprot/?query=%s" % query + "&" + params, "txt")
-                trials = maxTrials + 1
-            except:
-                self.logging.warning("Trying again...")
-                import time
-                time.sleep(2)
-                trials += 1
+        res = self.request("uniprot/?query=%s" % query + "&" + params, "txt")
         return res
 
 
