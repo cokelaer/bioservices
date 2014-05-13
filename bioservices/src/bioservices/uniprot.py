@@ -42,6 +42,7 @@
 .. http://www.uniprot.org/docs/pkinfam
 
 """
+import types
 import StringIO
 from services import RESTService
 try:
@@ -192,7 +193,7 @@ class UniProt(RESTService):
         super(UniProt, self).__init__(name="UniProt", url=UniProt._url, verbose=verbose)
 
 
-    def mapping(self, fr="ID", to="KEGG_ID",  query="P13368", 
+    def mapping(self, fr="ID", to="KEGG_ID",  query="P13368",
             trials=3, timeout=10):
         """This is an interface to the UniProt mapping service
 
@@ -244,18 +245,17 @@ class UniProt(RESTService):
         result = self._request_timeout(url+"?"+params, format=format,
                 timeout=timeout, trials=trials)
 
-        # let us improve the output a little bit using a list instead of a
-        # string
-        try:
-            result = result.split()
-            result[0]+=':'+fr
-            result[1]+=':'+to
-        except:
-            pass
+        result = result.split()
 
         # changes in version 1.1.1 returns a dictionary instead of list
-        del result[0]
-        del result[0]
+        try:
+            del result[0]
+            del result[0]
+        except:
+            print("results seems empty...try again")
+            print result
+            print("---")
+            raise Exception
         if len(result) == 0:
             return {}
         else:
@@ -288,7 +288,7 @@ class UniProt(RESTService):
 
         if len(unique_entry_names)>Nmax:
             unique_entry_names = list(unique_entry_names)
-            print("There are more than %s unique species. Using multi stage uniprot mapping" % Nmax)
+            self.logging.info("There are more than %s unique species. Using multi stage uniprot mapping" % Nmax)
             mapping = {}
             # we need to split
             # this is a hack rigt now but could be put inside bioservices
@@ -300,12 +300,13 @@ class UniProt(RESTService):
                 i2 = (i+1)*Nmax
                 if i2>len(unique_entry_names):
                     i2 = len(unique_entry_names)
+                print i1, i2, len(unique_entry_names[i1:i2])
                 query=",".join(unique_entry_names[i1:i2])
                 this_mapping = self.mapping(fr=fr, to=to, query=query,
                         trials=trials, timeout=timeout)
                 for k,v in this_mapping.iteritems():
                     mapping[k] = v
-                print(str(i+1./N*100) + "%% completed")
+                print(str((i+1.)/N*100.) + "%% completed")
         else:
             #query=",".join([x+"_" + species for x in unique_entry_names])
             query=",".join(unique_entry_names)
@@ -407,6 +408,12 @@ class UniProt(RESTService):
 
             >>> u.search("ZAP70+AND+organism:9606", limit=3, columns="id,database(PDB)")
 
+        You can also do a search on several keywords. This is especially useful
+        if you have a list of known entry names.::
+
+            >>> u.search("ZAP70_HUMAN+or+CBL_HUMAN", format="tab", limit=3,
+            ...    columns="entry name,length,id, genes")
+            Entry name  Length  Entry   Gene names
 
         .. warning:: this function request seems a bit unstable (UniProt web issue ?)
             so we repeat the request if it fails
@@ -510,10 +517,15 @@ class UniProt(RESTService):
         res = pd.read_csv(StringIO.StringIO(res.strip()), sep="\t")
         return res
 
-    def get_df(self, entries):
+    def get_df(self, entries, nChunk=200):
         """Given a list of uniprot entries, this method returns a dataframe with all possible columns
 
+
+        :param entruies: list of valid entry name. if list is too large (about
+        >200), you need to split the list
+        :param chunk:
         :return: dataframe with indices being the uniprot id (e.g. DIG1_YEAST)
+
 
         .. todo:: cleanup the content of the data frame to replace strings
             separated by ; into a list of strings. e.g. the Gene Ontology IDs
@@ -522,26 +534,36 @@ class UniProt(RESTService):
         """
         if isinstance(entries, str):
             entries = [entries]
-        elif isinstance(entries, list):
-            pass
         else:
-            raise TypeError("queries must be a list of strings or a string")
+            entries = list(set(entries))
         output = None
-        for i, entry in enumerate(entries):
-            self.logging.info("fetching information {}/{} for {}".format(i+1, len(entries),entry))
-            res = self.search(entry, format="tab", columns=",".join(self._valid_columns))
+
+        self.logging.info("fetching information from uniprot for {} entries".format(len(entries)))
+
+        nChunk = min(nChunk, len(entries))
+        N, rest = divmod(len(entries), nChunk)
+        for i in range(0,N+1):
+            print("{}/{}".format(i+1,N))
+            this_entries = entries[i*nChunk:(i+1)*nChunk]
+            if len(this_entries):
+                res = self.search("+or+".join(this_entries), format="tab",
+                        columns=",".join(self._valid_columns))
+            else:
+                continue
             if len(res)==0:
-                self.logging.warning("entry %s not found" % entry)
+                 self.logging.warning("some entries %s not found" % entries)
             else:
                 df = pd.read_csv(StringIO.StringIO(res), sep="\t")
-                if i==0: # works in a shell but not systematic... pd.isnull(output)
+                #output.append(df)
+                if isinstance(output, types.NoneType):
                     output = df.copy()
-                else: #append
-                    #TODO: any more efficient way of appending ? keep in mind
-                    # that df may have length > 1
-                    output= output.append(df, ignore_index=True)
+                else:
+                    output = output.append(df, ignore_index=True)
 
-
+        # you may end up with duplicated...
+        output.drop_duplicates(inplace=True)
+        # you may have new entries...
+        output = output[output.Entry.apply(lambda x: x in entries)]
         # to transform into list:
         columns = ['PubMed ID', 'Comments', u'Domains', 'Protein families',
                    'Gene names', 'Gene ontology (GO)', 'Gene ontology IDs',
@@ -556,6 +578,7 @@ class UniProt(RESTService):
         # Sequences are splitted into chunks of 10 characters. let us rmeove the
         # spaces:
         output.Sequence = output['Sequence'].apply(lambda x: x.replace(" ",""))
+
         return output
 
 

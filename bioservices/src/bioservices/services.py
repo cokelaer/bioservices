@@ -4,7 +4,7 @@
 #
 #  Copyright (c) 2011-2013 - EBI-EMBL
 #
-#  File author(s): 
+#  File author(s):
 #      https://www.assembla.com/spaces/bioservices/team
 #
 #  Distributed under the GPLv3 License.
@@ -67,19 +67,19 @@ class Service(Logging):
         :param bool verbose: prints informative messages if True (default is
             True)
 
-        All instances have an attribute called :attr:`~Service.logging` that is an instance 
-        of the :mod:`logging` module. It can be used to print information, warning, 
+        All instances have an attribute called :attr:`~Service.logging` that is an instance
+        of the :mod:`logging` module. It can be used to print information, warning,
         error messages::
 
             self.logging.info("informative message")
             self.logging.warning("warning message")
             self.logging.error("error message")
- 
-        The attribute :attr:`~Service.debugLevel`  can be used to set the behaviour 
-        of the logging messages. If the argument verbose is True, the debugLebel 
-        is set to INFO. If verbose if False, the debugLevel is set to WARNING. 
-        However, you can use the :attr:`debugLevel` attribute to change it to 
-        one of DEBUG, INFO, WARNING, ERROR, CRITICAL. debugLevel=WARNING means 
+
+        The attribute :attr:`~Service.debugLevel`  can be used to set the behaviour
+        of the logging messages. If the argument verbose is True, the debugLebel
+        is set to INFO. If verbose if False, the debugLevel is set to WARNING.
+        However, you can use the :attr:`debugLevel` attribute to change it to
+        one of DEBUG, INFO, WARNING, ERROR, CRITICAL. debugLevel=WARNING means
         that only WARNING, ERROR and CRITICAL messages are shown.
 
         """
@@ -90,9 +90,10 @@ class Service(Logging):
         self.name = name
         self._easyXMLConversion = True
 
-        # used by HGNC where some XML contains non-utf-8 characters !! 
+        # used by HGNC where some XML contains non-utf-8 characters !!
         self._fixing_unicode = False
         self._fixing_encoding = "utf-8"
+        self.timeout = 1000
 
     def _get_url(self):
         return self._url
@@ -109,7 +110,7 @@ class Service(Logging):
         if type(value) != bool:
             raise TypeError("value must be a boolean value (True/False)")
         self._easyXMLConversion = value
-    easyXMLConversion = property(_get_easyXMLConversion, 
+    easyXMLConversion = property(_get_easyXMLConversion,
         _set_easyXMLConversion, doc="""If True, xml output from a request are converted to
 easyXML object (Default behaviour).""")
 
@@ -142,7 +143,7 @@ easyXML object (Default behaviour).""")
         :param dict params: a dictionary. Keys are parameters.
 
         The pair of key/value are converted into a single string by concatenated
-        the "&key=value" string for each key/value in the dictionary. 
+        the "&key=value" string for each key/value in the dictionary.
 
         ::
 
@@ -152,7 +153,7 @@ easyXML object (Default behaviour).""")
 
         .. note:: returns "a=1&b=2" or "b=2&a=1" since dictionary are not ordered. Note
             that the first parameter is not preceded by a & sign that you will need
-            to add. 
+            to add.
 
         """
         if isinstance(params, dict)==False:
@@ -161,7 +162,7 @@ easyXML object (Default behaviour).""")
         return postData
 
     def checkParam(self, param, valid_values):
-        """Simple utility to check that a parameter has a valid value 
+        """Simple utility to check that a parameter has a valid value
 
         :param param:
         :param valid_values:
@@ -172,7 +173,7 @@ easyXML object (Default behaviour).""")
 
             checkParam(aboolean, [True, False])
             checkParam(mode, ["mean", "std", "skew"])
-        """        
+        """
         easydev.tools.check_param_in_list(param, valid_values)
 
     def __str__(self):
@@ -214,7 +215,7 @@ class WSDLService(Service):
 
         The :attr:`serv` give  access to all WSDL functionalities of the service.
 
-        The :attr:`methods` is an alias to self.serv.methods and returns 
+        The :attr:`methods` is an alias to self.serv.methods and returns
         the list of functionalities.
 
         """
@@ -247,14 +248,14 @@ class WSDLService(Service):
         return self.serv.soapproxy.config.dumpSOAPOut
     def _set_dump_out(self, value):
         self.serv.soapproxy.config.dumpSOAPOut = value
-    dumpOut = property(_get_dump_out, _set_dump_out, 
+    dumpOut = property(_get_dump_out, _set_dump_out,
         doc="set the dumpSOAPOut mode of the SOAP proxy (0/1)")
 
     def _get_dump_in(self):
         return self.serv.soapproxy.config.dumpSOAPIn
     def _set_dump_in(self, value):
         self.serv.soapproxy.config.dumpSOAPIn = value
-    dumpIn = property(_get_dump_in, _set_dump_in, 
+    dumpIn = property(_get_dump_in, _set_dump_in,
         doc="set the dumpSOAPIn mode of the SOAP proxy (0/1)")
 
 
@@ -290,7 +291,7 @@ class RESTService(Service):
         #clientRevision = ''
         clientVersion = ''
         user_agent = 'EBI-Sample-Client/%s (%s; Python %s; %s) %s' % (
-            clientVersion, os.path.basename( __file__ ), 
+            clientVersion, os.path.basename( __file__ ),
             platform.python_version(), platform.system(),
             urllib_agent
         )
@@ -298,25 +299,9 @@ class RESTService(Service):
         self.logging.info('getUserAgent: End')
         return user_agent
 
-    def request(self, path, format="xml", baseUrl=True, timeout=1000):
-        """Send a request via an URL to the web service.
 
-        :param str path: the request will be formed as self.url+/+path 
-        :param str format: If the expected output is in XML
-            format then it will be converted with :meth:`easyXML`. If the 
-            returned document is not in XML, format should be set to any other 
-            value.
-        :param str baseUrl: By default, the path argument is appended to the 
-            :attr:`url` attribute (the main REST URL). However, sometimes, you
-            would prefer to provide the entire URL yourself (e.g. in psicquic service)
-            If so, set this baseUrl argument to False. 
-
-        .. note:: this is a HTTP GET request 
-        
-        .. seealso:: for developers see also the :meth:`_request_timeout`
-            if the site is down or busy.
-        """
-        socket.setdefaulttimeout(timeout)
+    def requests_get(self, query, format="xml", baseUrl=True):
+        raise NotImplementedError
         if path.startswith(self.url):
             url = path
         elif baseUrl == False:
@@ -326,6 +311,54 @@ class RESTService(Service):
 
         self.logging.debug("REST.bioservices.%s request begins" % self.name)
         self.logging.debug("--Fetching url=%s" % url)
+
+        import requests
+        res = requests.request("GET", url)
+        if format=="xml":
+            if self.easyXMLConversion:
+                #logging.warning("--Conversion to easyXML"),
+                try:
+                    res = self.easyXML(res)
+                except Exception,e :
+                    self.logging.warning(e)
+                    self.logging.warning("--Conversion to easyXML failed. returns the raw response"),
+        return res
+
+    def request(self, path, format="xml", baseUrl=True):
+        """Send a request via an URL to the web service.
+
+        :param str path: the request will be formed as self.url+/+path
+        :param str format: If the expected output is in XML
+            format then it will be converted with :meth:`easyXML`. If the
+            returned document is not in XML, format should be set to any other
+            value.
+        :param str baseUrl: By default, the path argument is appended to the
+            :attr:`url` attribute (the main REST URL). However, sometimes, you
+            would prefer to provide the entire URL yourself (e.g. in psicquic service)
+            If so, set this baseUrl argument to False.
+
+        .. note:: this is a HTTP GET request
+
+        .. seealso:: for developers see also the :meth:`_request_timeout`
+            if the site is down or busy.
+
+        .. note:: you can set the timeout of the connection, which is 1000
+            seconds by default by changing the :attr:`timeout`.
+        """
+        socket.setdefaulttimeout(self.timeout)
+        if path.startswith(self.url):
+            url = path
+        elif baseUrl == False:
+            url = path
+        else:
+            url = self.url + "/" +  path
+
+        self.logging.debug("REST.bioservices.%s request begins" % self.name)
+        self.logging.debug("--Fetching url=%s" % url)
+
+        if len(url)> 2000:
+            print(url)
+            raise ValueError("URL length (%s) exceeds 2000. Please use a differnt URL" % len(url))
 
         try:
             res = urllib2.urlopen(url).read()
@@ -339,12 +372,16 @@ class RESTService(Service):
                         self.logging.warning("--Conversion to easyXML failed. returns the raw response"),
             self.last_response = res
             return res
+        except socket.timeout:
+            self.logging.warning("Time out. consider increasing the timeout attribute (currently set to {})".format(self.timeout))
+            raise socket.timeout
         except Exception, e:
             self.logging.error(e)
             self.logging.error("An exception occured while reading the URL")
             self.logging.error(url)
             self.logging.error("Error caught within bioservices. Invalid requested URL ? ")
-            raise
+            self._exception = e
+            raise Exception
 
     def _request_timeout(self, path, format="xml", baseUrl=True, trials=3,
             timeout=5):
@@ -352,21 +389,25 @@ class RESTService(Service):
         level = self.debugLevel
         self.debugLevel="ERROR"
         res = None
+        save_timeout = self.timeout 
+        self.timeout = timeout
         for i in range(0,trials):
             try:
-                res = self.request(path, format=format, baseUrl=baseUrl, 
-                                   timeout=timeout)
+                res = self.request(path, format=format, baseUrl=baseUrl)
             except socket.timeout:
-                print("Time out. Trying again %s/%s" % (i+1, trials))
-            except Exception:
+                self.logging.warning("Time out. Trying again %s/%s" % (i+1, trials))
+            except Exception, e:
+                print(e.message)
+                self.logging.warning("Unknown error")
                 raise Exception
             else:
                 break
+        self.timeout = save_timeout
         if res == None:
             self.logging.error("URL could not be fetched %s" % path)
         self.debuLevel = level
         return res
-            
+
     def requestPost(self, requestUrl, params, extra=None):
         """request with a POST method.
 
@@ -379,7 +420,7 @@ class RESTService(Service):
         .. todo:: parameter paranName with a list of values [v1,v2] can be interpreted as
             paramName=v1&paramName=v2
 
-        .. note:: this is a HTTP POST request 
+        .. note:: this is a HTTP POST request
         .. note:: use only by ::`ncbiblast` service so far.
         """
         requestData = urllib.urlencode(params)
@@ -410,7 +451,7 @@ def get_bioservices_env(section, option):
     import ConfigParser
     cf = ConfigParser.ConfigParser()
 
-    homedir = os.getenv("HOME") 
+    homedir = os.getenv("HOME")
     bioservices_home = homedir + os.sep + ".bioservices"
     config_file = bioservices_home + os.sep + "bioservices.cfg"
 

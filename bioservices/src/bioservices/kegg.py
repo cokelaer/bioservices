@@ -412,7 +412,7 @@ class Kegg(RESTService):
             url = url + "/" + organism
 
 
-        res = self.request(url)
+        res = self.request(url, "txt")
         return res
 
     def find(self, database, query, option=None):
