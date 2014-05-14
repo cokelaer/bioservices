@@ -1559,7 +1559,7 @@ class GeneProf(RESTService):
             params['key'] = key
             params = self.urlencode(params)
             url += "?" + params
-        res = self.request(url, format=format_)
+        res = self.request(url, format="txt")
         return res
 
 

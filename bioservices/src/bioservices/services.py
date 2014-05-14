@@ -93,9 +93,16 @@ class Service(Logging):
         # used by HGNC where some XML contains non-utf-8 characters !!
         self._fixing_unicode = False
         self._fixing_encoding = "utf-8"
-        self.timeout = 1000
+        self._timeout = 1000
         self.trials = 5
 
+
+    def _set_timeout(self, timeout):
+        self._timeout = timeout
+        socket.setdefaulttimeout(float(timeout))
+    def _get_timeout(self):
+        return self._timeout
+    timeout = property(_get_timeout, _set_timeout)
 
     def _get_url(self):
         return self._url
@@ -323,19 +330,21 @@ class RESTService(Service):
         .. note:: you can set the timeout of the connection, which is 1000
             seconds by default by changing the :attr:`timeout`.
         """
-        level = self.debugLevel
-        self.debugLevel="ERROR"
+        #level = self.debugLevel
+        #self.debugLevel="ERROR"
 
+        #try:
         for i in range(0, self.trials):
             res = self._get_request(path, format=format, baseUrl=baseUrl)
             if res != None:
                 break
             import time
-            self.logging.warning("request seemed to have failed. Trying again")
+            self.logging.warning("request seemed to have failed. Trying again trial {}/{}".format(i+1, self.trials))
             time.sleep(1)
-
+        #except Exception:
+        #    self.debugLevel = level
         # get back the parameters
-        self.debugLevel = level
+        #self.debugLevel = level
         return res
 
     def _get_request(self, path, format="xml", baseUrl=True):
@@ -367,12 +376,11 @@ class RESTService(Service):
             return res
         except socket.timeout:
             self.logging.warning("Time out. consider increasing the timeout attribute (currently set to {})".format(self.timeout))
-            raise socket.timeout
         except Exception, e:
-            self.logging.error(e)
-            self.logging.error("An exception occured while reading the URL")
-            self.logging.error(url)
-            self.logging.error("Error caught within bioservices. Invalid requested URL ? ")
+            self.logging.debug(e)
+            self.logging.debug("An exception occured while reading the URL")
+            self.logging.debug(url)
+            self.logging.debug("Error caught within bioservices. Invalid requested URL ? ")
 
 
     def requestPost(self, requestUrl, params, extra=None):

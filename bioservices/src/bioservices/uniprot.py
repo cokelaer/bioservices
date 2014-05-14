@@ -156,6 +156,11 @@ mapping = {"UniProtKB AC/ID":"ACC+ID",
 }
 
 
+def _precision(x,digit=2):
+    x = int(x*pow(10,digit))
+    x/=pow(10.,digit)
+    return x
+
 
 
 class UniProt(RESTService):
@@ -194,8 +199,7 @@ class UniProt(RESTService):
         self.timeout = 10
 
 
-    def mapping(self, fr="ID", to="KEGG_ID",  query="P13368",
-            trials=3, ):
+    def mapping(self, fr="ID", to="KEGG_ID",  query="P13368"):
         """This is an interface to the UniProt mapping service
 
 
@@ -245,16 +249,16 @@ class UniProt(RESTService):
         params = self.urlencode(params)
         result = self.request(url+"?"+params, format=format)
 
-        
+
         # changes in version 1.1.1 returns a dictionary instead of list
         try:
             result = result.split()
             del result[0]
             del result[0]
         except:
-            print("results seems empty...try again")
-            print {}
-            
+            self.logging.warning("Results seems empty...returning empty dictionary.")
+            return {}
+
         if len(result) == 0:
             return {}
         else:
@@ -270,7 +274,7 @@ class UniProt(RESTService):
         return result_dict
 
     def multi_mapping(self, fr="ID", to="KEGG_ID", query="P13368",
-        format="tab", Nmax=200 ):
+        format="tab", Nmax=100 ):
         """Calls mapping several times and concatenates results
 
         The reson for this method is that if a query is too long then the
@@ -303,7 +307,7 @@ class UniProt(RESTService):
                 this_mapping = self.mapping(fr=fr, to=to, query=query)
                 for k,v in this_mapping.iteritems():
                     mapping[k] = v
-                print(str((i+1.)/N*100.) + "%% completed")
+                self.logging.info(str(_precision((i+1.)/N*100.,2)) + "%% completed")
         else:
             #query=",".join([x+"_" + species for x in unique_entry_names])
             query=",".join(unique_entry_names)
@@ -504,7 +508,7 @@ class UniProt(RESTService):
         res = pd.read_csv(StringIO.StringIO(res.strip()), sep="\t")
         return res
 
-    def get_df(self, entries, nChunk=200):
+    def get_df(self, entries, nChunk=100, organism=None):
         """Given a list of uniprot entries, this method returns a dataframe with all possible columns
 
 
@@ -523,25 +527,27 @@ class UniProt(RESTService):
             entries = [entries]
         else:
             entries = list(set(entries))
-        output = None
+        output = pd.DataFrame()
 
         self.logging.info("fetching information from uniprot for {} entries".format(len(entries)))
 
         nChunk = min(nChunk, len(entries))
         N, rest = divmod(len(entries), nChunk)
         for i in range(0,N+1):
-            print("{}/{}".format(i+1,N))
             this_entries = entries[i*nChunk:(i+1)*nChunk]
             if len(this_entries):
-                res = self.search("+or+".join(this_entries), format="tab",
+                self.logging.info("uniprot.get_df {}/{}".format(i+1,N))
+                query = "+or+".join(this_entries)
+                if organism:
+                    query += "+and+"+organism
+                res = self.search(query, format="tab",
                         columns=",".join(self._valid_columns))
             else:
-                continue
+                break
             if len(res)==0:
                  self.logging.warning("some entries %s not found" % entries)
             else:
                 df = pd.read_csv(StringIO.StringIO(res), sep="\t")
-                #output.append(df)
                 if isinstance(output, types.NoneType):
                     output = df.copy()
                 else:
@@ -550,7 +556,7 @@ class UniProt(RESTService):
         # you may end up with duplicated...
         output.drop_duplicates(inplace=True)
         # you may have new entries...
-        output = output[output.Entry.apply(lambda x: x in entries)]
+        #output = output[output.Entry.apply(lambda x: x in entries)]
         # to transform into list:
         columns = ['PubMed ID', 'Comments', u'Domains', 'Protein families',
                    'Gene names', 'Gene ontology (GO)', 'Gene ontology IDs',
