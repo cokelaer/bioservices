@@ -27,6 +27,7 @@ import socket
 import urllib
 import urllib2
 import platform
+import requests
 
 from SOAPpy import  WSDL
 # from SOAPPy import SOAPProxy
@@ -96,6 +97,7 @@ class Service(Logging):
         self._timeout = 1000
         self.trials = 5
 
+        
 
     def _set_timeout(self, timeout):
         self._timeout = timeout
@@ -208,6 +210,13 @@ easyXML object (Default behaviour).""")
         webbrowser.open(url)
 
 
+    def get(self, url=None, params=None, headers=None):
+        if url == None:
+            url = self.url
+        res = requests.get(url, params=params, headers=headers)
+        return res
+
+
 class WSDLService(Service):
     """Class dedicated to the web services based on WSDL/SOAP protocol.
 
@@ -307,6 +316,9 @@ class RESTService(Service):
         self.logging.info('getUserAgent: user_agent: ' + user_agent)
         self.logging.info('getUserAgent: End')
         return user_agent
+
+
+
 
 
     def request(self, path, format="xml", baseUrl=True):
