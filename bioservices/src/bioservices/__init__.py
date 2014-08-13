@@ -12,9 +12,11 @@ except:
 
 
 try:
+    # This is not striclty speaking required to run and use bioservices
+    # However, some functions and python notebooks included in bioservices do
     import pandas as pd
 except:
-    print("BioServices v%s warning: pandas is not installed on your system" % version)
+    print("BioServices %s warning: pandas is not installed on your system." % version)
     print("Some features requires this library and future version of BioServices may use it.")
 
 
