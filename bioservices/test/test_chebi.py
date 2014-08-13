@@ -7,7 +7,7 @@ from bioservices import ChEBI
 def test_chebi():
     ch = ChEBI()
     ch.getCompleteEntity("CHEBI:10102")
-    res = ch.conv("CHEBI:10102", "ChEMBL COMPOUND")
+    res = ch.conv("CHEBI:10102", "ChEMBL")
     assert res == ["521332"]
     try:
         res = ch.conv("CHEBI:10102", "wrong db")
