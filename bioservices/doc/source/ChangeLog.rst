@@ -2,7 +2,7 @@ Whats' new, what has changed
 ================================
 
 
-Revision 1.2
+Revision 1.3
 ------------------
 
 
@@ -12,12 +12,15 @@ Revision 1.2
     the code significantly because (i) requests is faster (ii) trials and sleep time
     are managed as they should unlike the previous hack (iii) requests_cache is
     also used (iv) also asynchronous requests have been implemented. 
-  * NEW chembldb renamed to chembl 
-    * it has been updated to inherit from REST class instead of RESTService (so it
-      uses requests package). All functions are now taking as input either a string or list
-      of strings
-    * chembldb: get_assay_by_chemblId renamed in get_assays_by_chemblId
-    * renamed  get_target_by_refSeqId into get_target_by_refseq
+  * NEW chembldb renamed to :class:`bioservices.chembl.ChEMBL`
+      * it has been updated to inherit from REST class instead of RESTService (so 
+        it uses requests package). All functions are now taking as input either a 
+        string or list of strings
+      * chembldb: get_assay_by_chemblId renamed in get_assays_by_chemblId
+      * renamed  get_target_by_refSeqId into get_target_by_refseq
+
+Revision 1.3
+------------------
 
 * 1.2.6:
 	* fixing bug report 22 related to KEGG.pathway2sif function that was	failing.
@@ -38,12 +41,12 @@ Revision 1.2
 	* fixed UniChem: add new database identifiers and fix interpretation of the output
 
 * 1.2.2:
-   * NEW Service: :class:`bioservices.biodbnet.BioDBNet`
-   * uniprot: add multi_mapping method to use mapping method on large queries and
-     added timeout/trials inside uniprot functions
+    * NEW Service: :class:`bioservices.biodbnet.BioDBNet`
+    * uniprot: add multi_mapping method to use mapping method on large queries and
+      added timeout/trials inside uniprot functions
 
 * 1.2.1:
-  * same as 1.2.0 but fixed missing mapping and apps directory in the distribution available on pypi
+    * same as 1.2.0 but fixed missing mapping and apps directory in the distribution available on pypi
 
 * 1.2.0
    * Kegg class has now an alias called KEGG

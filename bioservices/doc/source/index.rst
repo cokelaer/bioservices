@@ -45,7 +45,7 @@ The first release of **BioServices** provides a wrapping to more than 18 Web
 Services (more if we consider **BioMart** and **PSICQUIC** portals that link to
 many other Web Services). 
 
-Here is a list of Web Services that can already be accessed from **BioServices**:
+Here are some Web Services available in **BioServices**:
 
 .. autosummary::
     :nosignatures:
@@ -53,32 +53,17 @@ Here is a list of Web Services that can already be accessed from **BioServices**
     bioservices.arrayexpress.ArrayExpress
     bioservices.biodbnet.BioDBNet
     bioservices.biomodels.BioModels
-    bioservices.biomart.BioMart
-    bioservices.chebi.ChEBI
     bioservices.chembl.ChEMBL
-    bioservices.eutils.EUtils
-    bioservices.geneprof.GeneProf
     bioservices.kegg.Kegg
     bioservices.hgnc.HGNC
-    bioservices.miriam.Miriam
     bioservices.muscle.MUSCLE
     bioservices.pdb.PDB
-    bioservices.pathwaycommons.PathwayCommons
-    bioservices.picr.PICR
-    bioservices.quickgo.QuickGO
-    bioservices.rhea.Rhea
-    bioservices.unichem.UniChem
     bioservices.uniprot.UniProt
-    bioservices.wsdbfetch.WSDbfetch
     bioservices.ncbiblast.NCBIblast
-    bioservices.psicquic.PSICQUIC
     bioservices.wikipathway.Wikipathway
 
 
-The links above refers to the official web site of each service (right column)
-and our reference guide (left column) that provides an exhaustive documentation.
-For tutorials and quick start please follow the links below. 
-
+Full list is available in the User Guide and Reference here below.
 
 
 .. _installation:
@@ -124,6 +109,7 @@ Examples (notebooks)
     :numbered:
 
     notebooks.rst
+
 
 
 References

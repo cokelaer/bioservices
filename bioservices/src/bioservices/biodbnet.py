@@ -50,6 +50,7 @@ __all__ = ["BioDBNet"]
 class BioDBNet(WSDLService):
     """Interface to the `BioDBNet <http://biodbnet.abcc.ncifcrf.gov/>`_ service
 
+
     ::
 
         >>> from bioservices import *

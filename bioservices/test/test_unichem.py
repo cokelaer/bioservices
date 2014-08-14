@@ -40,8 +40,8 @@ class test_Chembl(UniChem):
         assert self.get_source_information(['chembl', 'drugbank'])[0]['name']=="chembl"
 
     def test_get_all_compound_ids_from_src_id(self):
-        res = self.get_all_compound_ids_from_src_id("CHEMBL12", "chembl")
-        res = self.get_all_compound_ids_from_src_id("CHEMBL12", "chembl", "chebi")
+        res = self.get_all_compound_ids_from_all_src_id("CHEMBL12", "chembl")
+        res = self.get_all_compound_ids_from_all_src_id("CHEMBL12", "chembl", "chebi")
 
 
     def test_mapping(self):

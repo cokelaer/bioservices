@@ -36,7 +36,7 @@
 
         -- ChemSpider home page, March 2013
 """
-from bioservices import RESTService
+from bioservices import RESTService, get_bioservices_env
 
 
 class ChemSpider(RESTService):
@@ -60,9 +60,8 @@ class ChemSpider(RESTService):
     """
     def __init__(self, verbose=False, token=None):
         if token == None:
-            import services
             try:
-                token = services.get_bioservices_env("chemspider", "token")
+                token = get_bioservices_env("chemspider", "token")
             except Exception,e:
                 raise Exception(e)
         self._token = None

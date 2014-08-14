@@ -23,6 +23,9 @@ except:
 import services
 from services import *
 
+import settings
+from settings import *
+
 import biomodels
 from biomodels import *
 
