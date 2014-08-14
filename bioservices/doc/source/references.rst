@@ -42,8 +42,6 @@ BioDBnet
     :undoc-members:
     :synopsis:
 
-
-
 BioGrid
 ====================
 
@@ -77,10 +75,10 @@ ChEBI
     :synopsis:
 
 
-ChEMBLdb
+ChEMBL
 ==========
 
-.. automodule:: bioservices.chembldb
+.. automodule:: bioservices.chembl
     :members:
     :undoc-members:
     :synopsis:

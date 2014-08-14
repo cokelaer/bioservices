@@ -20,6 +20,11 @@ BioModels
 
 Here is a ipython notebook dedicated to BioModels, which can be downloaded :download:`notebook/BioModels.ipynb` or view its results on `biomodels nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/BioModels.ipynb>`_
 
+ChEMBL
+----------
+
+Here is a ipython notebook dedicated to ChEMBL, which can be downloaded :download:`notebook/ChEMBL.ipynb` or view its results on `chembl nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/ChEMBL.ipynb>`_
+
 KEGG
 ---------
 

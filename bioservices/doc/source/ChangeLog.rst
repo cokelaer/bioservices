@@ -5,6 +5,20 @@ Whats' new, what has changed
 Revision 1.2
 ------------------
 
+
+* 1.3.0
+
+  * NEW added new class to access REST using requests instead of urllib2. This speeds up 
+    the code significantly because (i) requests is faster (ii) trials and sleep time
+    are managed as they should unlike the previous hack (iii) requests_cache is
+    also used (iv) also asynchronous requests have been implemented. 
+  * NEW chembldb renamed to chembl 
+    * it has been updated to inherit from REST class instead of RESTService (so it
+      uses requests package). All functions are now taking as input either a string or list
+      of strings
+    * chembldb: get_assay_by_chemblId renamed in get_assays_by_chemblId
+    * renamed  get_target_by_refSeqId into get_target_by_refseq
+
 * 1.2.6:
 	* fixing bug report 22 related to KEGG.pathway2sif function that was	failing.
 	* add option in biomart to use different host. This is to fix an issue where biomart hangs forever. This was reported by Daniel D bug report 23 on assembla.
