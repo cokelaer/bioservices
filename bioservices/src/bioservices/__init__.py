@@ -72,6 +72,8 @@ from quickgo import *
 
 import chembldb
 from chembldb import *
+import chembl
+from chembl import *
 
 import picr
 from picr import *

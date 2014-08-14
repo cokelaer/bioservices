@@ -58,14 +58,6 @@ class ChEBI(WSDLService):
         super(ChEBI, self).__init__(name="ChEBI", url=ChEBI._url, 
             verbose=verbose, lib="suds")
 
-
-        """[x[0] for x in res.DatabaseLinks if x[1].startswith("chEMBL")]
-        [x[0] for x in res.DatabaseLinks if x[1].startswith("ChEMBL")][116485]
-        [x[0] for x in res.DatabaseLinks if x[1].startswith("KEGG")]
-        [C07481, D00528]"""
-        #res = ch.service.getCompleteEntity("CHEBI:27732")
-        #ch = Client('http://www.ebi.ac.uk/webservices/chebi/2.0/webservice?wsdl')
-
     def getCompleteEntity(self, chebiId):
         """Retrieves the complete entity including synonyms, database links and
 chemical structures, using the ChEBI identifier.
@@ -81,7 +73,8 @@ chemical structures, using the ChEBI identifier.
             >>> res.mass
             194.19076
 
-        you can extract names from other sources::
+        The returned structure is the raw object returned by the API.
+        You can extract names from other sources for instance::
 
             >>> [x[0] for x in res.DatabaseLinks if x[1].startswith("KEGG")]
             [C07481, D00528]
@@ -105,10 +98,9 @@ chemical structures, using the ChEBI identifier.
 
         ::
 
-            >>> ch.conv("CHEBI:10102", "ChEMBL COMPOUND")
-            [521332]
+            >>> ch.conv("CHEBI:10102", "KEGG COMPOUND accession")
+            ['C07484']
 
-        .. note:: thi
         """
         res = self.serv.getCompleteEntity(chebiId)
         db = [x[1] for x in res.DatabaseLinks]
@@ -146,7 +138,7 @@ chemical structures, using the ChEBI identifier.
 
         .. seealso:: :meth:`getCompleteEntity`
         """
-        self.checkParam(searchCategory, ["ALL", "SMILES", "CHEBI ID", 
+        self.devtools.check_param_in_list(searchCategory, ["ALL", "SMILES", "CHEBI ID", 
             "CHEBI NAME", "DEFINITION", "ALL NAMES", "IUAPC", "MASS", 
             "FORMULA", "INCHI", "INCHI KEY"])
         res = self.serv.getLiteEntity(search, searchCategory, maximumResults, stars)
@@ -173,7 +165,6 @@ chemical structures, using the ChEBI identifier.
         res = self.serv.getUpdatedPolymer(chebiId, index1, index2, index3)
         return res
 
-
     def getCompleteEntityByList(self, chebiIdList=[]):
         """Given a list of ChEBI accession numbers, retrieve the complete Entities. 
 
@@ -192,7 +183,6 @@ chemical structures, using the ChEBI identifier.
         """
         res = self.serv.getOntologyParents(chebiId)
         return res
-
 
     def getOntologyChildren(self, chebiId):
         """Retrieves the ontology children of an entity including the relationship type
@@ -218,14 +208,14 @@ chemical structures, using the ChEBI identifier.
             >>> ch.getAllOntologyChildrenInPath("CHEBI:27732", "has part")
 
         """
-        self.checkParam(relationshipType, ["is a", "has part", "has role", 
+        self.devtools.check_param_in_list(relationshipType, 
+             ["is a", "has part", "has role", 
             "is conjugate base of", "is conjugate acid of", "is tautomer of",
             "is enantiomer of", "has functional parent", "has parent hybride",
             "is substituent group of"])
         res = self.serv.getAllOntologyChildrenInPath(chebiId, relationshipType, 
             onlyWithChemicalStructure)
         return res
-
 
     def getStructureSearch(self, structure, mode="MOLFILE",
         structureSearchCategory="SIMILARITY", totalResults=50,
@@ -239,7 +229,8 @@ chemical structures, using the ChEBI identifier.
         :param str structureSearchCategory: category of the search. Can be
             "SIMILARITY", "SUBSTRUCTURE", "IDENTITY"
         :param int totalResults: limit the number of results to 50 (default)
-        :param tanimotoCuoff: limit results to scores higher than this parameter
+        :param tanimotoCuoff: limit results to scores higher than this 
+            parameter
 
         ::
 
@@ -248,8 +239,9 @@ chemical structures, using the ChEBI identifier.
             >>> ch.getStructureSearch(smiles, "SMILES", "SIMILARITY", 3, 0.25)
         """
 
-        self.checkParam(structureSearchCategory, ["SIMILARITY", "SUBSTRUCTURE","IDENTITY"])
-        self.checkParam(mode, ["MOLFILE", "SMILES", "CML"])
+        self.devtools.check_param_in_list(structureSearchCategory, 
+                ["SIMILARITY", "SUBSTRUCTURE","IDENTITY"])
+        self.devtools.check_param_in_list(mode, ["MOLFILE", "SMILES", "CML"])
 
         res = self.serv.getStructureSearch(structure, mode, 
             structureSearchCategory, totalResults, tanimotoCutoff)

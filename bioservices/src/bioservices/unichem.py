@@ -38,8 +38,9 @@
 """
 from bioservices import RESTService
 
-
-class UniChem(RESTService):
+#from web_resource import REST, WebResource
+from services import REST
+class UniChem(REST):
     """Interface to the `UniChem <http://www.ebi.ac.uk/unichem/>`_ service
 
     .. doctest::
@@ -51,12 +52,13 @@ class UniChem(RESTService):
 """
 
     _url = "http://www.ebi.ac.uk/unichem/rest"
-    def __init__(self, verbose=False):
+
+    def __init__(self, verbose=False, cache=False):
         """**Constructor** UniChem
 
         :param verbose: set to False to prevent informative messages
         """
-        super(UniChem, self).__init__(name="UniChem", url=UniChem._url, verbose=verbose)
+        super(UniChem, self).__init__(name="UniChem", url=UniChem._url, verbose=verbose, cache=cache)
         self.source_ids = {
             "chembl":1, 
             "drugbank":2,
@@ -80,39 +82,23 @@ class UniChem(RESTService):
             "pubchem":22,
             "mcule":23,
             }# there was no 16 when I looked at the web site June 2013
+        self.source_names = self.devtools.swapdict(self.source_ids)
 
-        maxid_service = int(self.get_all_src_ids()[-1]['src_id'])
+        maxid_service = max(self.get_all_src_ids())
         maxid_bioservices = max(self.source_ids.values())
         if maxid_bioservices != maxid_service:
             self.logging.warning("UniChem has added new source. "+ 
                     "Please update the source_ids attribute in bioservices")
 
-    def _get_id(self, id_):
-        """id_ can be a number or a name
-        :return: the id number
-        """
-        if id_ in self.source_ids.keys():
-            srcid = self.source_ids[id_]
-        elif id_ in self.source_ids.values():
-            srcid = easydev.swapdict(source_ids)[id_]
+    def _process(self, query, frmt, request):
+        self.devtools.check_param_in_list(frmt, ["json", "xml", None])
+        if isinstance(query, str) or isinstance(query, int):
+            res = self.get(request % query, frmt=frmt)
         else:
-            raise ValueError("unrecognised src_id parameter. " +
-                    "You must provide either a valid name or a valid identifier." +
-                    "from the following dictionary" + 
-                    "{}".format(self.source_ids))
+            res = self.get([request % x for x in query], frmt=frmt)
+        return res
 
-    def _interpret(self, res, mode="json"):
-        import json
-        try:
-            if mode == "json":
-                return json.loads(res)
-            elif mode == "eval":
-                return eval(str(res))
-        except:
-            self.logging.warning("could not interpret the result of the request")
-            return res
-
-    def get_source_id(self, src_id):
+    def _get_source_id(self, src_id):
         """Returns the source id given a source name or source id
 
         Check that the source id is correct by looking at the :attr:`source_ids`
@@ -136,6 +122,10 @@ class UniChem(RESTService):
         return src_id
 
     def get_src_compound_ids_from_src_compound_id(self, src_compound_id, src_id, target=None):
+        self.logging.warning("Deprecated. Please use get_compounds_from_source")
+        return self.get_src_compound_ids_from_src_id(src_compound_id, src_id, target=target)
+
+    def get_compound_ids_from_src_id(self, src_compound_id, src_id, target=None):
         """Obtain a list of all src_compound_ids from all sources which are
         CURRENTLY assigned to the same structure as a currently assigned query
         src_compound_id. 
@@ -145,32 +135,35 @@ class UniChem(RESTService):
         additional (optional) argument (a valid src_id), then results will be restricted
         to only the source specified with this optional argument.
 
-        :param str src_compound_id: a valid compound identifier
+        :param str src_compound_id: a valid compound identifier (list is possible as well)
         :param str src_id: one of the valid database ids. See :attr:`source_ids`.
         :param str,int target: database identifier (name or id) to map to.
 
-        :return: list of two element arrays, containing 'src_compound_id' and 'src_id',
-            or (if optional 'to_src_id' is specified) list of 'src_compound_id's.
+        :return: list of dictionaries with the 'src_compound_id' and 'src_id' keys.
+            or (if optional *target* is specified, a list with only 'src_compound_id' keys).
 
         ::
 
-            >>> get_src_compound_ids_from_src_compound_id("CHEMBL12", "chembl")
-            >>> get_src_compound_ids_from_src_compound_id("CHEMBL12", "chembl", "chebi")
+            >>> get_compound_ids_from_src_id("CHEMBL12", "chembl")
+            >>> get_compound_ids_from_src_id("CHEMBL12", "chembl", "chebi")
+            [{'src_compound_id': '49575'}]
 
         """
-        src_id = self.get_source_id(src_id)
-        query = "src_compound_id/%s/%s" % (src_compound_id, src_id)
+        src_id = self._get_source_id(src_id)
+        request = "src_compound_id/%s/" + "%s" %src_id
         if target:
-            target = self.get_source_id(target)
-            query += "/%s" % target
-
-        res = self.request(query, "eval")
-
-        # the json string returned can be evaluated in Python.
-        res = self._interpret(res)
+            target = self._get_source_id(target)
+            request += "/%s" % target
+        res = self._process(src_compound_id, "json", request)
         return res
 
     def get_src_compound_ids_all_from_src_compound_id(self, src_compound_id,
+        src_id, target=None):
+        self.logging.warning("Deprecated us get_compound_ids")
+        return self.get_all_compound_ids_from_all_src_id(src_compound_id, 
+                src_id, target=target)
+
+    def get_all_compound_ids_from_all_src_id(self, src_compound_id,
         src_id, target=None):
         """Obtain a list of all src_compound_ids from all sources (including
         BOTH current AND obsolete assignments) to the same structure as a currently
@@ -181,32 +174,30 @@ class UniChem(RESTService):
         adding an additional (optional) argument (a valid src_id), then results will be
         restricted to only the source specified with this optional argument.
 
-        :param str src_compound_id: a valid compound identifier
+        :param str src_compound_id: a valid compound identifier (or list)
         :param source: one of the valid database ids. See :attr:`source_ids`.
-        :param target: return answer for a specific target database only. Valid
-            database ids can be found in :attr:`source_ids`.
+        :param target: if provided, return answer for a specific target database only. Otherwise
+            return answer for all database found in :attr:`source_ids`.
+
         :return: list of three element arrays, containing 'src_compound_id' and 'src_id',
             and 'Assignment', or (if optional 'to_src_id' is specified) list of two element
             arrays, containing 'src_compound_id' and 'Assignment'.
 
         ::
 
-            >>> res = get_src_compound_ids_all_from_src_compound_id("CHEMBL12", "chembl")
-            >>> res = get_src_compound_ids_all_from_src_compound_id("CHEMBL12", "chembl", "chebi")
+            >>> res = s.get_all_compound_ids_from_src_id("CHEMBL12", "chembl")
+            >>> s.get_all_compound_ids_from_src_id("CHEMBL12", "chembl", "chebi")
+            [{u'assignment': u'1', u'src_compound_id': u'49575'}]
 
-        The second call returns an empty list because there is no mapping of the
-        requested element onto the chebi database.
+        The second call may return an empty list if there is no target from chebi.
 
         """
-        src_id = self.get_source_id(src_id)
-        query = "src_compound_id_all/%s/%s" % (src_compound_id, src_id)
+        src_id = self._get_source_id(src_id)
+        request = "src_compound_id_all/%s/" + "%s" % src_id
         if target:
-            query += "/%s" % self.source_ids[target]
-
-        res = self.request(query, "eval")
-
-        # the json string returned can be evaluated in Python.
-        res = self._interpret(res)
+            target = self._get_source_id(target)
+            request += "/%s" % target
+        res = self._process(src_compound_id, "json", request)
         return res
 
     def get_mapping(self, source, target):
@@ -223,13 +214,13 @@ class UniChem(RESTService):
             >>> get_mapping("kegg_ligand", "chembl")
 
         """
-        self.checkParam(source, self.source_ids.keys())
-        self.checkParam(target, self.source_ids.keys())
+        self.devtools.check_param_in_list(source, self.source_ids.keys())
+        self.devtools.check_param_in_list(target, self.source_ids.keys())
 
         query = "mapping/%s/%s/" % (self.source_ids[source], self.source_ids[target])
-        res = self.request(query)
+        res = self.get(query, frmt=None)
         # evaluation the string as a list
-        res = self._interpret(res, "eval")
+        res = eval(res)
         # convert to a convenient dictionary
         mapping = [(x[str(self.source_ids[source])], x[str(self.source_ids[target])]) for x in res]
         mapping = dict(mapping)
@@ -239,23 +230,23 @@ class UniChem(RESTService):
         """Obtain a list of all src_compound_ids (from all sources) which are
             CURRENTLY assigned to a query InChIKey
 
-        :param str inchikey: input source identified by its InChiKey
-        :return: list of two element arrays, containing 'src_compound_id' and 'src_id'.
+        :param str inchikey: input source identified by its InChiKey (or list)
+        :return: list of dictionaries containing 'src_compound_id' and 'src_id' keys
+            (or list of list of dictionaries if input is a list).
 
         ::
 
             >>> uni.get_src_compound_ids_from_inchikey("AAOVKJBEBIDNHE-UHFFFAOYSA-N")
         """
-        query = "inchikey/%s" % inchikey
-        res = self.request(query)
-        res = self._interpret(res, "eval")
+        res = self._process(inchikey, "json", "inchikey/%s")
         return res
 
     def get_src_compound_ids_all_from_inchikey(self, inchikey):
         """Description:  Obtain a list of all src_compound_ids (from all sources) which
         have current AND obsolete assignments to a query InChIKey
 
-        :param str inchikey: input source identified by its InChiKey
+        :param str inchikey: input source identified by its InChiKey (or list)
+            (or list of list of dictionaries if input is a list).
         :return: list of two element arrays, containing 'src_compound_id' and 'src_id'.
             and 'Assignment'.
 
@@ -264,9 +255,7 @@ class UniChem(RESTService):
             >>> uni.get_src_compound_ids_all_from_inchikey("AAOVKJBEBIDNHE-UHFFFAOYSA-N")
 
         """
-        query = "inchikey_all/%s" % inchikey
-        res = self.request(query)
-        res = self._interpret(res, "eval")
+        res = self._process(inchikey, "json", "inchikey_all/%s")
         return res
 
     def get_all_src_ids(self):
@@ -279,24 +268,24 @@ class UniChem(RESTService):
             >>> uni.get_all_src_ids()
 
         """
-        res = self.request("src_ids")
-        res = self._interpret(res, "eval")
+        res = self.get("src_ids", frmt=None)
+        res = [x['src_id'] for x in eval(res)]
         return res
-
 
     def get_source_information(self, src_id):
         """Description:  Obtain all information on a source by querying with a source id
 
-        :param int src_id: identifier of a source database. 
-        :return: dictionary containing:
+        :param int src_id: valid identifiers (values or keys of :attr:`source_ids` e.g. 
+            chebi, chembl,0,1). could also be a list of those identifiers.
+        :return: dictionary (or list of dictionaries) with following keys:
 
             * src_id (the src_id for this source),
             * src_url (the main home page of the source),
             * name (the unique name for the source in UniChem, always lower case),
             * name_long (the full name of the source, as defined by the source),
             * name_label (A name for the source suitable for use as a 'label' for the source
-                within a web-page. Correct case setting for source, and always less than 30
-                characters),
+              within a web-page. Correct case setting for source, and always less than 30
+              characters),
             * description (a description of the content of the source),
             * base_id_url_available (an flag indicating whether this source provides a valid
             * base_id_url for creating cpd-specific links [1=yes, 0=no]).
@@ -304,15 +293,21 @@ class UniChem(RESTService):
             * identifier f    rom this source to the end of this url to create a valid url to a
             * specific page for this cpd], unless aux_for_url=1),
             * aux_for_url (A flag to indicate whether the aux_src field should be used to create 
-                hyperlinks instead of the src_compound_id [1=yes, 0=no]
+              hyperlinks instead of the src_compound_id [1=yes, 0=no]
 
-        Example:  https://www.ebi.ac.uk/unichem/rest/sources/1"""
-
-        src_id = self.get_source_id(src_id)
-        query = "sources/%s" % src_id
-        res = self.request(query)
-        res = self._interpret(res, "eval")
-        res = dict(res[0])
+        ::
+        
+            >>> res = get_source_information("chebi")
+        
+        """
+        if isinstance(src_id, list):
+            src_id = [self._get_source_id(this) for this in src_id]
+            res = self._process(src_id, "json", "sources/%s")
+            res = [x[0] for x in res]
+        else:
+            src_id = self._get_source_id(src_id)
+            res = self._process(src_id, "json", "sources/%s")
+            res = res[0]
         return res
 
     def get_structure(self, src_compound_id, src_id):
@@ -328,11 +323,13 @@ class UniChem(RESTService):
             >>> uni.get_structure("CHEMBL12", "chembl")
 
         """
-        src_id = self.get_source_id(src_id)
-        query = "structure/%s/%s" % (src_compound_id, src_id)
-        res = self.request(query)
-        res = self._interpret(res, "eval")
-        res = res[0]
+        src_id = self._get_source_id(src_id)
+        request = "structure/%s" + "/%s" % src_id
+        res = self._process(src_compound_id, "json", request)
+        # the output is a list but looks like there is only 1 item
+        # TODO check that there is indeed only 1 output.
+        if len(res) == 1:
+            return res[0]
         return res
 
     def get_structure_all(self, src_compound_id, src_id):
@@ -348,12 +345,13 @@ class UniChem(RESTService):
             >>> uni.get_structure_all("CHEMBL12", "chembl")
 
         """
-        src_id = self.get_source_id(src_id)
-        query = "structure_all/%s/%s" % (src_compound_id, src_id)
-        res = self.request(query)
-        res = self._interpret(res, "eval")
-        res = res[0]
+        src_id = self._get_source_id(src_id)
+        request = "structure_all/%s" + "/%s" % src_id
+        res = self._process(src_compound_id, "json", request)
+        if len(res) == 1:
+            return res[0]
         return res
+
 
     def get_src_compound_id_url(self, src_compound_id, src_id, to_src_id):
         """Obtain a list of URLs for all src_compound_ids
@@ -379,12 +377,14 @@ class UniChem(RESTService):
 
 
         """
-        src_id = self.get_source_id(src_id)
-        to_src_id = self.get_source_id(to_src_id)
-        query = "src_compound_id_url/%s/%s/%s" % (src_compound_id, src_id, to_src_id)
-        res = self.request(query)
-        res = self._interpret(res, "eval")
-        res = [x['url'] for x in res]
+        src_id = self._get_source_id(src_id)
+        to_src_id = self._get_source_id(to_src_id)
+        request = "src_compound_id_url/%s" + "/%s/%s" % (src_id, to_src_id)
+        res = self._process(src_compound_id, "json", request)
+        if isinstance(src_compound_id, list): 
+            res = [x[0]['url'] for x in res]
+        else:
+            res = res[0]['url']
         return res
 
     def get_src_compound_ids_all_from_obsolete(self, obsolete_src_compound_id,
@@ -405,7 +405,6 @@ class UniChem(RESTService):
             'assignment' and 'UCI', or (if optional 'to_src_id' is specified) list of
             three element arrays, containing 'src_compound_id', 'Assignment' and 'UCI'.
 
-
         ::
 
             >>> from bioservices import UniChem
@@ -413,22 +412,19 @@ class UniChem(RESTService):
             >>> u.get_src_compound_ids_all_from_obsolete("DB07699", "2")
             >>> u.get_src_compound_ids_all_from_obsolete("DB07699", "2", "1")
         """
-        src_id = self.get_source_id(src_id)
-        query = "src_compound_id_all_obsolete/%s/%s" % (obsolete_src_compound_id, src_id)
+        src_id = self._get_source_id(src_id)
+        request = "src_compound_id_all_obsolete/%s" + "/%s" % (src_id)
         if to_src_id:
-            to_src_id = self.get_source_id(to_src_id)
-            query += "/%s" % to_src_id
-
-        res = self.request(query)
-
-        # the json string returned can be evaluated in Python.
-        res = self._interpret(res, "eval")
+            to_src_id = self._get_source_id(to_src_id)
+            request += "/%s" % to_src_id
+        res = self._process(obsolete_src_compound_id, "json", request)
         return res
 
 
     def get_verbose_src_compound_ids_from_inchikey(self, inchikey):
-        """Description:  Obtain all src_compound_ids (from all sources) which are CURRENTLY
-        assigned to a query InChIKey. However, these are returned as part of the
+        """Obtain all src_compound_ids (from all sources) 
+        
+        which are CURRENTLY assigned to a query InChIKey. However, these are returned as part of the
         following data structure: A list of sources containing these src_compound_ids,
         including source description, base_id_url, etc. One element in this list is a
         list of the src_compound_ids currently assigned to the query InChIKey.
@@ -441,35 +437,35 @@ class UniChem(RESTService):
             * name (the unique name for the source in UniChem, always lower case),
             * name_long (the full name of the source, as defined by the source),
             * name_label (A name for the source suitable for use as a 'label' for the source
-                within a web-page. Correct case setting for source, and always less than 30
-                characters),
+              within a web-page. Correct case setting for source, and always less than 30
+              characters),
             * description (a description of the content of the source),
             * base_id_url_available (an flag indicating whether this source provides a valid
             * base_id_url for creating cpd-specific links [1=yes, 0=no]).
             * base_id_url (the base url for constructing hyperlinks to this source [append an
             * identifier from this source to the end of this url to create a valid url to a
-                specific pag    e for this cpd], unless aux_for_url=1),
+              specific pag    e for this cpd], unless aux_for_url=1),
             * aux_for_url (A flag to indicate whether the aux_src field should be used to
-                create hyperlinks instead of the src_compound_id [1=yes, 0=no] ,
+              create hyperlinks instead of the src_compound_id [1=yes, 0=no] ,
             * src_compound_id (a list of src_compound_ids from this source which are currently
-                assigned to the query InChIKey.
+              assigned to the query InChIKey.
             * aux_src (a list of src-compound_id keys mapping to corresponding auxiliary data
-                (url_id:value), for creating links if aux_for_url=1. Only shown if
-                aux_for_url=1).
+              (url_id:value), for creating links if aux_for_url=1. Only shown if
+              aux_for_url=1).
 
         ::
 
+            >>> uni.get_verbose_src_compound_ids_from_inchikey("QFFGVLORLPOAEC-SNVBAGLBSA-N")
+            >>> # Note that this one is not valid anymore
             >>> uni.get_verbose_src_compound_ids_from_inchikey("ZUITABIAKMVPG-UHFFFAOYSA-N")
 
         """
-        query = "verbose_inchikey/%s" % inchikey
-        res = self.request(query)
-        res = self._interpret(res, "eval")
+        res = self._process(inchikey, "json", "verbose_inchikey/%s")
         return res
 
     def get_auxiliary_mappings(self, src_id):
         """For a single source, obtain a mapping between all current
-            src_compound_ids to their corresponding auxiliary data if any.
+        src_compound_ids to their corresponding auxiliary data if any.
 
         Some instances of UniChem may contain sources that create URLs
         for compound-specific pages by using strings or identifiers (called 'auxiliary
@@ -477,10 +473,8 @@ class UniChem(RESTService):
         not very common, but is dealt with in UniChem by use of an additional mapping
         step for these sources. This function returns such mapping. 
 
-        .. warning:: this method may return very large data sets, and may therefore take a
-            very long time to retrieve. A much faster method of retrieving this same data
-            set is to download the pre-cached, gzipped mapping file for the source of
-            interest from the `Auxiliary Data Mapping page <https://www.ebi.ac.uk/unichem/wholesourcemap>`_
+        .. warning:: this method may return very large data sets. you will need to change 
+            TIMEOUT to a larger value. 
 
         :param int src_id: corresponding database identifier (name or id).
         :return: list of two element arrays, containing 'src_compound_id' and 'auxiliary data'.
@@ -490,14 +484,14 @@ class UniChem(RESTService):
             >>> uni.get_auxiliary_mappings(15)
 
         """
-
-        src_id = self.get_source_id(src_id)
+        src_id = self._get_source_id(src_id)
         info = self.get_source_information(src_id)
-        if info['aux_for_url'] == '1':
-            query = "mappingaux/%s" % src_id
-            res = self.request(query)
-            #res = self_interpret(res)
-            return res
-        else:
+
+        if info['aux_for_url'] != '1':
             self.logging.warning("This function accepts src_id that have auxiliary data only")
+
+        request = "mappingaux/%s"
+        res = self._process(src_id, "json", request)
+        return res
+
 

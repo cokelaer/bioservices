@@ -155,7 +155,6 @@ mapping = {"UniProtKB AC/ID":"ACC+ID",
     "NextBio": "NEXTBIO_ID"
 }
 
-
 def _precision(x,digit=2):
     x = int(x*pow(10,digit))
     x/=pow(10.,digit)
@@ -314,8 +313,6 @@ class UniProt(RESTService):
             mapping = self.mapping(fr=fr, to=to, query=query)
         return mapping
 
-
-
     def searchUniProtId(self, uniprot_id, format="xml"):
         """Search for a uniprot ID in UniprotKB database
 
@@ -349,7 +346,6 @@ class UniProt(RESTService):
         f.load_fasta(id_)
         return f.fasta
 
-
     def get_fasta_sequence(self, id_):
         """Returns FASTA sequence (Not FASTA)
 
@@ -365,7 +361,6 @@ class UniProt(RESTService):
         f = FASTA()
         f.load_fasta(id_)
         return f.sequence
-
 
     def search(self, query, format="tab", columns=None,
         include=False,sort="score", compress=False, limit=None, offset=None, maxTrials=10):
@@ -471,8 +466,6 @@ class UniProt(RESTService):
         res = self.request("uniprot/?query=%s" % query + "&" + params, "txt")
         return res
 
-
-
     def quick_search(self, query, include=False,sort="score", limit=None):
 
         res = self.search(query, "tab", include=include, sort=sort, limit=limit)
@@ -494,14 +487,12 @@ class UniProt(RESTService):
                          'Length' : f}
         return newres
 
-
     def uniref(self, query):
         """Calls UniRef service
 
         >>> u = UniProt()
         >>> df = u.uniref("member:Q03063")
         >>> df.Size
-
 
         """
         res = self.request("uniref/?"+self.urlencode({"query":query})+"&format=tab", format="txt")

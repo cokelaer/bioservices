@@ -36,21 +36,19 @@
 
         -- From ChEMBL web page Dec 2012
 
-
-
-
 """
-#import urllib2,  json,
 import os
 from bioservices.services import RESTService, REST
 import webbrowser
+
+__all__ = ["ChEMBL"]
 
 
 class ChEMBL(REST):
     """Interface to `ChEMBL <http://www.ebi.ac.uk/chembldb/index.php>`_
 
-
     Here is a quick example to retrieve a target given its ChEMBL Id
+
     .. doctest::
 
         >>> from bioservices import ChEMBL
@@ -59,14 +57,17 @@ class ChEMBL(REST):
         >>> resjson['proteinAccession']
         'Q12809'
 
+    By default, most methods return dictionaries (converted from json objects returned 
+    by the ChEMBL API), however, you can also set the format to be XML.
 
     """
     _url = "https://www.ebi.ac.uk/chemblws/"
+
     _chemblId_example = "CHEMBL1"
     _inChiKey_example = "QFFGVLORLPOAEC-SNVBAGLBSA-N"
     _smiles_example = "COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56"
     _smiles_struct_example = "C\C(=C/C=C/C(=C/C(=O)O)/C)\C=C\C1=C(C)CCCC1(C)C"
-    _smiles_similar_example = _smiles_example + "/90"
+    _smiles_similar_example = _smiles_example 
     _image_chemblId_example = "CHEMBL192"
     _bioactivities_example = "CHEMBL2"
     _target_chemblId_example = "CHEMBL2477"
@@ -90,9 +91,9 @@ class ChEMBL(REST):
         return res
 
     def status(self):
-        """ Check API status
+        """Return the API status
 
-        :return: Response is the string 'UP' if services are running
+        :return: Response is the string 'UP' if the service is running
         """
         res = self.get("status", frmt="json")
         return res['status']
@@ -102,25 +103,19 @@ class ChEMBL(REST):
 
         :param query: a compound ChEMBLId or a list of those ones.
             if the identifier is invalid, the number 404 is returned.
-        :param str frmt: the output format (json or xml) (defaults to json)
-        :return: Compound Record (dictionary from the returned json object). If
+        :param str frmt: json or xml (Default to json)
+        :return: Compound Record (dictionary). If
             the query is a list of identifiers, a list of compound records is 
             returned.
 
-        If json format is requested, a dictionary is returned with the following 
-        keys:
+        If json format is requested, a dictionary is returned. Here are some of the keys:
 
          * acdLogd
-         * acdLogp
-         * alogp
          * chemblId
          * knownDrug
-         * medChemFriendly
          * molecularFormula
          * molecularWeight
-         * numRo5Violations
          * passesRuleOfThree
-         * rotatableBonds
          * smiles
          * stdInChiKey
 
@@ -129,7 +124,6 @@ class ChEMBL(REST):
             >>> from bioservices import *
             >>> s = ChEMBL(verbose=False)
             >>> print (s._chemblId_example)
-            >>> resxml = s.get_compounds_by_chemblId(s._chemblId_example, frmt="xml")
             >>> resjson = s.get_compounds_by_chemblId(s._chemblId_example)
 
         """
@@ -138,6 +132,9 @@ class ChEMBL(REST):
 
     def get_compounds_by_chemblId_form(self, query, frmt="json"):
         """
+
+        :param query: valid chembl identifier (or list)
+        :param str frmt: json or xml (Default to json)
 
         See :meth:`get_compounds_by_chemblId` for full doc.
 
@@ -152,30 +149,31 @@ class ChEMBL(REST):
         res = self._process(query, frmt, "compounds/%s/form")
         return res
 
-
     def get_compounds_by_chemblId_drug_mechanism(self, query, frmt="json"):
         """
 
+        :param query: valid chembl identifier (or list)
+        :param str frmt: json or xml (Default to json)
+
         See :meth:`get_compounds_by_chemblId` for full doc.
 
-        CHEMBL3
-
-        [{u'chemblId': u'CHEMBL1347191', u'parent': False},
-         {u'chemblId': u'CHEMBL1558', u'parent': False},
-         {u'chemblId': u'CHEMBL2', u'parent': True}]
+        ::
+        
+            >>> s.get_compounds_by_chemblId_drug_mechanism("CHEMBL3")
+            [{u'chemblId': u'CHEMBL1347191', u'parent': False},
+            {u'chemblId': u'CHEMBL1558', u'parent': False},
+            {u'chemblId': u'CHEMBL2', u'parent': True}]
 
         """
-        res = self._process(query, frmt, "compounds/%s/drugMechamism")
+        res = self._process(query, frmt, "compounds/%s/drugMechanism")
         return res
 
     def get_individual_compounds_by_inChiKey(self, query, frmt="json"):
         """Get individual compound by standard InChi Key
 
-        :param str query: a valid InChi key or a list of those ones.
-            A ".json" or ".xml" extension can be added to bypass default
-            :attr:`default_extension`.
-        :return: Compound Record in XML or dictionary (if json requested). If
-            query os a list/tuple, a  tuple of compound records is returned.
+        :param str query: a valid InChi key or a list.
+        :param str frmt: json or xml (Default to json)
+        :return: Compound Record as a dictionary (or list of dictionaries)
 
         In addition to the keys returned in :meth:`get_compounds_by_chemblId`,
         the following keys are returned:
@@ -192,7 +190,6 @@ class ChEMBL(REST):
             >>> s = ChEMBL(verbose=False)
             >>> print(s._inChiKey_example)
             QFFGVLORLPOAEC-SNVBAGLBSA-N
-            >>> resxml = s.get_individual_compounds_by_inChiKey(s._inChiKey_example, "xml")
             >>> resjson = s.get_individual_compounds_by_inChiKey(s._inChiKey_example)
         """
         res = self._process(query, frmt, "compounds/stdinchikey/%s")
@@ -202,8 +199,7 @@ class ChEMBL(REST):
         """Get list of compounds by Canonical SMILES
 
         :param str query: a valid compound ChEMBLId or a list of those ones.
-            A ".json" or ".xml" extension can be added to bypass default
-            :attr:`default_extension`.
+        :param str frmt: json or xml (Default to json)
         :return: Compound Record in XML or dictionary (if json requested). If
             query os a list/tuple, a  tuple of compound records is returned.
 
@@ -216,13 +212,13 @@ class ChEMBL(REST):
             >>> from bioservices import *
             >>> s = ChEMBL(verbose=False)
             >>> print(s._smiles_example)
-            >>> resxml = s.get_compounds_by_SMILES(s._smiles_example + ".xml")
             >>> resjson = s.get_compounds_by_SMILES(s._smiles_example)
         """
         res = self._process(query, frmt, "compounds/smiles/%s")
         return res
 
     def get_compounds_containing_SMILES(self, query, frmt="json"):
+        """Deprecated. Use get_compounds_substructure"""
         self.logging.error("Deprecated. Use get_compounds_substructure")
 
     def get_compounds_substructure(self, query, frmt="json"):
@@ -230,8 +226,7 @@ class ChEMBL(REST):
         by the given Canonical SMILES
 
         :param str query: a valid SMILES string or a list of those ones.
-            A ".json" or ".xml" extension can be added to bypass default
-            :attr:`default_extension`.
+        :param str frmt: json or xml (Default to json)
         :return: see :meth:`get_compounds_by_SMILES`
 
 
@@ -251,14 +246,10 @@ class ChEMBL(REST):
         The similarity is at a cutoff percentage score (minimum value=70%, maximum value=100%).
 
         :param str query: a valid SMILES string or a list of those ones.
-            A ".json" or ".xml" extension can be added to bypass default
-            :attr:`default_extension`.
-            The SMILE string must be followed by a slash character and the
-            expected similarity (e.g., "/90").
+        :param str frmt: json or xml (Default to json)
         :return: Compound records. See :meth:`get_compounds_by_chemblId`
 
-        In addition to the keys returned in :meth:`get_compounds_by_chemblId`,
-        the following keys are returned:
+        Each dictionary has a set of keys amongst which:
 
          * acdAcidicPka
          * acdBasicPka
@@ -270,9 +261,10 @@ class ChEMBL(REST):
             >>> from bioservices import *
             >>> s = ChEMBL(verbose=False)
             >>> print(s._smiles_similar_example)
-            >>> resjson = s.get_compounds_similar_to_SMILES(s._smiles_example + "/100")
+            >>> resjson = s.get_compounds_similar_to_SMILES(s._smiles_example, "100")
             >>> resjson = s.get_compounds_similar_to_SMILES(s._smiles_similar_example)
         """
+        self.devtools.check_range(similarity, 70, 100)
         res = self._process(query, frmt, "compounds/similarity/%s/"+str(similarity))
         return res
 
@@ -283,15 +275,9 @@ class ChEMBL(REST):
         :param str query: a valid compound ChEMBLId or a list/tuple of valid compound ChEMBLIds.
         :param int dimensions: optional argument. An integer z (:math:`1 \leq z \leq 500`)
             giving the dimensions of the image.
-        :param file_out: Can be True | False | a string | list of strings. If
-            True, the images are automatically saved to home current work directory with the
-            name of compound.
-            If False, the images are not saved.
-            If string and query is also a string, the image is saved to the path contained into the string.
-            If string and query is a list, a list of paths is created using file_out as a seed.
-            If list with different length of query, is completed with False's to be the same length
-            If both file_out and query are lists with the same length, the image corresponding to ith query
-            is saved using ith path into fiel_out.
+        :param save: 
+        :param view:
+        :param engine: Defaults to rdkit. Implemented for the future but only one value for now.
         :param bool view: show the image. If True the images are opened.
         :return: the path (list of paths) used to save the figure (figures) (different from Chembl API)
 
@@ -341,28 +327,18 @@ class ChEMBL(REST):
     def get_compounds_activities(self, query, frmt="json"):
         """Get individual compound bioactivities
 
-        :param str query: Compound ChEMBLId with optional extension. This is different from
-            the API!! API is compounds/%s/bioactivities.json here we need to provide json if
-            we want json output. So query must be CHEMBL2.json (or use
-            default_extension
+        :param str query: valid chembl identifier (or list)
+        :param str frmt: json or xml (Default to json)
         :return: Bioactivity records in XML or dictionary (if json requested)
 
-        If json format is requested, a dictionary is returned. The dictionary
-        has a unique key 'bioactivities'. The value of that key is a lsit of bioactivity
-        records. Each bioactivity record is a dictionary keyed by:
+        If json format is requested, a dictionary is returned. Here are some
+        of the keys:
 
          * activity_comment
-         * assay_chemblid
          * assay_description
-         * assay_type
-         * bioactivity_type
-         * ingredient_cmpd_chemblid
          * name_in_reference
-         * operator
          * organism
-         * parent_cmpd_chemblid
          * reference
-         * target_chemblid
          * target_confidence
          * target_name
          * units
@@ -373,7 +349,6 @@ class ChEMBL(REST):
             >>> from bioservices import *
             >>> s = ChEMBL(verbose=False)
             >>> print(s._bioactivities_example)
-            >>> resxmls = s.get_compounds_activities(s._bioactivities_example + '.xml')
             >>> resjson = s.get_compounds_activities(s._bioactivities_example)
         """
         res = self._process(query, frmt, "compounds/%s/bioactivities")
@@ -382,22 +357,17 @@ class ChEMBL(REST):
     def get_target_by_chemblId(self, query, frmt="json"):
         """Get target by ChEMBLId
 
-        :param str query: a target ChEMBLId. A ".json" or ".xml" extension
-            can be added to bypass default :attr:`default_extension`
         :param str query: target ChEMBLId
+        :param str frmt: json or xml (Default to json)
         :return: Target Record in XML or dictionary (if json requested)
 
-        If json format is requested, a dictionary is returned. The dictionary
-        has a unique key 'target'. The value of that key is another dictionary
-        keyed by:
+        If json format is requested, a dictionary is returned. Here are 
+        some of dictionary's keys:
 
          * target
-         * description
          * geneNames
          * organism
-         * preferredName
          * proteinAccession
-         * synonyms
          * targetType
 
         ::
@@ -405,7 +375,6 @@ class ChEMBL(REST):
             >>> from bioservices import *
             >>> s = ChEMBL(verbose=False)
             >>> print(s._target_chemblId_example)
-            >>> resxml = s.get_target_by_chemblId(s._target_chemblId_example + '.xml')
             >>> resjson = s.get_target_by_chemblId(s._target_chemblId_example)
         """
         res = self._process(query, frmt, "targets/%s")
@@ -414,16 +383,15 @@ class ChEMBL(REST):
     def get_target_by_uniprotId(self, query, frmt="json"):
         """Get individual target by UniProt Accession Id
 
-        :param str query: a valid uniprot accession Id. A ".json" or ".xml" extension
-            can be added to bypass default :attr:`default_extension`
-        :return: see :meth:get_target_by_chemblId
+        :param str query: a valid uniprot accession Id.
+        :param str frmt: json or xml (Default to json)
+        :return: see :meth:`get_target_by_chemblId`
 
         ::
 
             >>> from bioservices import *
             >>> s = ChEMBL(verbose=False)
             >>> print(s._target_chemblId_example)
-            >>> resxmls = s.get_target_by_uniprotId(s._target_uniprotId_example + '.xml')
             >>> resjson = s.get_target_by_uniprotId(s._target_uniprotId_example)
         """
         res = self._process(query, frmt, "targets/uniprot/%s")
@@ -433,13 +401,14 @@ class ChEMBL(REST):
     def get_target_by_refseq(self, query, frmt='json'):
         """Get individual target by RefSeq Accession identifier
 
-        .. warning:: not yet working. Example on the Chembl website is not working.
-
-        :param str query: a valid RefSea accession Id
+        :param str query: a valid RefSeq accession Id
+        :param str frmt: json or xml (Default to json)
         :return: Target Record
 
+        .. warning:: this method works but I could not find any example to validate it.
+            NP_001128722 provided on chembl blogspot does not work.
+            NP_015325 from the ChEMBL API does not work either.
 
-        .. existing one: NP_015325
         """
         res = self._process(query, frmt, "targets/refseq/%s")
         return res
@@ -447,8 +416,9 @@ class ChEMBL(REST):
     def get_target_bioactivities(self, query, frmt="json"):
         """Get individual target bioactivities
 
-        :param str query: a valid target ChEMBLId. A ".json" or ".xml" extension
-            can be added to bypass default :attr:`default_extension`
+        :param str query: a valid target ChEMBLId.
+        :param str frmt: json or xml (Default to json)
+
         :return: see :meth:`get_compounds_activities`
 
         ::
@@ -456,7 +426,6 @@ class ChEMBL(REST):
             >>> from bioservices import *
             >>> s = ChEMBL(verbose=False)
             >>> print(s._target_bioactivities_example)
-            >>> resxml = s.get_target_bioactivities(s._target_bioactivities_example + '.xml')
             >>> resjson = s.get_target_bioactivities(s._target_bioactivities_example)
         """
         res = self._process(query, frmt, "targets/%s/bioactivities")
@@ -465,15 +434,11 @@ class ChEMBL(REST):
     def get_all_targets(self, frmt="json"):
         """Get all targets in a dictionary
 
+        :param str frmt: json or xml (Default to json)
         :return: Target Record in a dictionary (default is json)
 
-
-        The attribute :attr:`default_extension` is set to json so that
-        the returned objetc is a json format. You may set the attribute to
-        another format such as "XML"
-
-        The returned dictionary has a unique key called **targets**.
-        The value of that key is a list of dictionaries with the following keys:
+        The returned list contains a dictionary for each **target**.
+        Here are some keys contained in the dictionaries:
 
           * chemblId
           * description
@@ -491,19 +456,19 @@ class ChEMBL(REST):
             >>> res = s.get_all_targets()
         """
         self.devtools.check_param_in_list(frmt, ["json", "xml"])
-        res = self.get("targets", frmt=frmt)
+        res = self.get("targets." + frmt, frmt=frmt)
         return res
 
     def get_assays_by_chemblId(self, query, frmt="json"):
         """Get assay by ChEMBLId
 
-        :param str query: a valid assay ChEMBLId. A ".json" or ".xml" extension
-            can be added to bypass default :attr:`default_extension`
-        :return: Assay record in XML or dictionary (if json requested)
+        :param str query: a valid assay ChEMBLId.
+        :param str frmt: json or xml (Default to json)
+        :return: Assay record as a dictionary (if json requested)
+            (list of dictionaries if input is a list)
 
-        If json format is requested, a dictionary is returned. The dictionary
-        has a unique key 'assay'. The value of that key is another dictionary
-        keyed by:
+        If json format is requested, a dictionary is returned. 
+        with some of the following keys:
 
          * assayDescription
          * assayOrganism
@@ -519,30 +484,29 @@ class ChEMBL(REST):
             >>> s = ChEMBL(verbose=False)
             >>> print(s._assays_example)
             CHEMBL1217643
-            >>> resxml = s.get_assays_by_chemblId(s._assays_example + '.xml')
             >>> resjson = s.get_assays_by_chemblId(s._assays_example)
 
         """
         res = self._process(query, frmt, "assays/%s")
+        #res = res[0]
         return res
 
     def get_assays_bioactivities(self, query, frmt="json"):
         """Get individual assay bioactivities
 
-        :param str query: a valid assay ChEMBLId. A ".json" or ".xml" extension
-            can be added to bypass default :attr:`default_extension`
-        :return: Bioactivity records for a given assay in XML or dictionary
-            (if json requested). See :meth:`get_compounds_activities`
+        :param str query: a valid assay ChEMBLId.
+        :param str frmt: json or xml (Default to json)
+        :return: Bioactivity records for a given assay (dictionary)
 
         ::
 
             >>> from bioservices import *
             >>> s = ChEMBL(verbose=False)
             >>> print(s._assays_example)
-            >>> resxml = s.get_assays_bioactivities(s._assays_example + '.xml')
             >>> resjson = s.get_assays_bioactivities(s._assays_example)
         """
         res = self._process(query, frmt, "assays/%s/bioactivities")
+        res = res[0]
         return res
 
     def inspect(self, query, item_type):
