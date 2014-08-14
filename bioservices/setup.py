@@ -7,8 +7,8 @@ import glob
 
 
 _MAJOR               = 1
-_MINOR               = 2
-_MICRO               = 6
+_MINOR               = 3
+_MICRO               = 0
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -43,6 +43,12 @@ metainfo = {
 
 
 
+with open('README.txt') as f:
+    readme = f.read()
+with open('HISTORY.rst') as f:
+    history = f.read()
+
+
 setup(
     name             = 'bioservices',
     version          = version,
@@ -50,7 +56,7 @@ setup(
     maintainer_email = metainfo['authors']['Cokelaer'][1],
     author           = metainfo['authors']['Cokelaer'][0],
     author_email     = metainfo['authors']['Cokelaer'][1],
-    long_description = open("README.txt").read(),
+    long_description = readme + '\n\n' + history,
     keywords         = metainfo['keywords'],
     description = metainfo['description'],
     license          = metainfo['license'],
@@ -63,7 +69,7 @@ setup(
     package_dir = {'':'src'},
     packages = ['bioservices', 'bioservices.apps', 'bioservices.mapping'],
     #package_dir  = package_dir,
-    install_requires = ["easydev>=0.6.4", "beautifulsoup4", "SOAPpy", "suds"],
+    install_requires = ["grequests", "requests", "requests_cache", "easydev>=0.6.4", "beautifulsoup4", "SOAPpy", "suds"],
     )
 
 
