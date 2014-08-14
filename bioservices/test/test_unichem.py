@@ -1,76 +1,80 @@
 from bioservices import UniChem
+from settings import CACHING
 
 
 
+class test_Chembl(UniChem):
+    def __init__(self):
+        super(test_Chembl, self).__init__(verbose=False, cache=CACHING)
 
-def test_unichem_src_compound():
-    uni = UniChem()
-    uni.get_src_compound_ids_from_src_compound_id("CHEMBL12", "chembl", "chebi")
-    uni.get_src_compound_ids_all_from_src_compound_id("CHEMBL12", "chembl","drugbank")
-    #[{'assignment': '1', 'src_compound_id': 'DB00829'},
-    #{'assignment': '0', 'src_compound_id': 'DB07699'}]
+    def test_get_compound_ids_from_src_id(self):
+        res1 = self.get_compound_ids_from_src_id("CHEMBL2", "chembl", "chebi")
+        res2 = self.get_compound_ids_from_src_id(["CHEMBL2"], "chembl", "chebi")
+        assert res1 == res2[0]
+        assert res1 == [{u'src_compound_id': u'8364'}]
+        assert res2[0] == [{u'src_compound_id': u'8364'}]
 
+    def test_get_all_src_ids(self):
+        assert len(self.get_all_src_ids())>=23
 
-def test_unichem_src_compound_from_inchikey():
-    uni = UniChem()
-    uni.get_src_compound_ids_from_inchikey("AAOVKJBEBIDNHE-UHFFFAOYSA-N")
-    uni.get_src_compound_ids_all_from_inchikey("AAOVKJBEBIDNHE-UHFFFAOYSA-N")
+    def test_get_source_id(self):
+        assert self._get_source_id("chembl") == 1
+        assert self._get_source_id("1") == 1
+        assert self._get_source_id(1) == 1
 
+        try:
+            self._get_source_id("wrong")
+            assert False
+        except:
+            assert True
 
-def test_mapping():
-    uni = UniChem()
-    res1 = uni.get_mapping("kegg_ligand", "chembl")
-    assert len(res1)>0
+        try:
+            self._get_source_id("20000")
+            assert False
+        except:
+            assert True
 
-def test_src_ids():
-    uni = UniChem()
-    uni.get_all_src_ids()
-    uni.get_source_information("chembl")
+    def test_get_src_information(self):
+        assert self.get_source_information("chebi")['name'] == "chebi"
 
+        assert self.get_source_information(['chembl', 'drugbank'])[0]['name']=="chembl"
 
-def test_structure():
-    uni = UniChem()
-    uni.get_structure("CHEMBL12", "chembl")
-    uni.get_structure_all("CHEMBL12", "chembl")
-
-
-def test_get_source_id():
-    uni = UniChem()
-    assert uni.get_source_id("chembl") == 1
-    assert uni.get_source_id("1") == 1
-    assert uni.get_source_id(1) == 1
-
-    try:
-        uni.get_source_id("wrong")
-        assert False
-    except:
-        assert True
-
-    try:
-        uni.get_source_id("20000")
-        assert False
-    except:
-        assert True
-
-def test_get_src_compound_ids_all_from_obsolete():
-    uni = UniChem()
-    res = uni.get_src_compound_ids_all_from_obsolete("DB07699", 2)
-    res = uni.get_src_compound_ids_all_from_obsolete("DB07699", 2, "chembl")
-
-def test_get_verbose_src_compound_ids_fron_inchikey():
-    uni = UniChem()
-    uni.get_verbose_src_compound_ids_from_inchikey("GZUITABIAKMVPG-UHFFFAOYSA-N")
+    def test_get_all_compound_ids_from_src_id(self):
+        res = self.get_all_compound_ids_from_src_id("CHEMBL12", "chembl")
+        res = self.get_all_compound_ids_from_src_id("CHEMBL12", "chembl", "chebi")
 
 
-def test_get_src_compoundid_url():
-    uni = UniChem()
-    uni.get_src_compound_id_url("CHEMBL12", "chembl", "drugbank")
+    def test_mapping(self):
+        res = self.get_mapping("kegg_ligand", "chembl")
+        assert len(res)>0
+
+    def test_get_src_compound_ids_from_inchikey(self):
+        self.get_src_compound_ids_from_inchikey("AAOVKJBEBIDNHE-UHFFFAOYSA-N")
+        self.get_src_compound_ids_from_inchikey(["AAOVKJBEBIDNHE-UHFFFAOYSA-N"])
+        #self.get_src_compound_ids_all_from_inchikey("AAOVKJBEBIDNHE-UHFFFAOYSA-N")
+        #self.get_src_compound_ids_all_from_inchikey(["AAOVKJBEBIDNHE-UHFFFAOYSA-N"])
+
+    def test_structure(self):
+        self.get_structure("CHEMBL12", "chembl")
+        self.get_structure(["CHEMBL12"], "chembl")
+        self.get_structure_all("CHEMBL12", "chembl")
 
 
-def test_get_auxiliary_mapping():
-    # this does nothing (behaviour of the function)
-    uni = UniChem()
-    res = uni.get_auxiliary_mappings(1)
-    # this returns something but takes lots of time so it is commented
-    #res = uni.get_auxiliary_mappings(15)
+    def test_get_src_compound_id_url(self):
+        self.get_src_compound_id_url("CHEMBL12", "chembl", "drugbank")
+        self.get_src_compound_id_url(["CHEMBL12"], "chembl", "drugbank")
+
+
+    def test_get_src_compound_ids_all_from_obsolete(self):
+        self.get_src_compound_ids_all_from_obsolete("DB07699", "2")[0]
+        self.get_src_compound_ids_all_from_obsolete("DB07699", "2", "2")[0]
+
+    def test_get_verbose_src_compound_ids_from_inchikey(self):
+        assert self.get_verbose_src_compound_ids_from_inchikey("GZUITABIAKMVPG-UHFFFAOYSA-N") != 400
+        assert self.get_verbose_src_compound_ids_from_inchikey("QFFGVLORLPOAEC-SNVBAGLBSA-N") != 400 
+
+    def test_get_auxiliary_mapping(self):
+        self.TIMEOUT = 1000
+        res = self.get_auxiliary_mappings(1)
+        assert len(res)>0
 

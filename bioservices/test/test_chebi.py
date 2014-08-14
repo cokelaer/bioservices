@@ -7,8 +7,9 @@ from bioservices import ChEBI
 def test_chebi():
     ch = ChEBI()
     ch.getCompleteEntity("CHEBI:10102")
-    res = ch.conv("CHEBI:10102", "ChEMBL")
-    assert res == ["521332"]
+    res = ch.conv("CHEBI:10102", "KEGG COMPOUND accession")
+    assert res == ['C07484']
+
     try:
         res = ch.conv("CHEBI:10102", "wrong db")
         assert False
@@ -44,7 +45,9 @@ def test_polymer():
 def test_completelist():
     ch = ChEBI()
     names = [x.chebiAsciiName for x in ch.getCompleteEntityByList(["CHEBI:27732","CHEBI:36707"])]
-    assert names == ["caffeine", "2-acetyl-1-alkyl-sn-glycero-3-phosphocholine"]
+
+    names = [str(x) for x in names]
+    assert names == ["caffeine", "2-acetyl-1-alkyl-sn-glycero-3-phosphocholine(1+)"]
 
 def test_search():
     ch = ChEBI()
