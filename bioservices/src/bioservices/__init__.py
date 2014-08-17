@@ -10,7 +10,6 @@ try:
 except:
     version = __version__
 
-
 try:
     # This is not striclty speaking required to run and use bioservices
     # However, some functions and python notebooks included in bioservices do
@@ -20,11 +19,12 @@ except:
     print("Some features requires this library and future version of BioServices may use it.")
 
 
-import services
-from services import *
 
 import settings
 from settings import *
+
+import services
+from services import *
 
 import biomodels
 from biomodels import *

@@ -16,10 +16,7 @@
 #
 ##############################################################################
 #$Id$
-"""
-
-
-"""
+"""Modules with common tools to access web resources"""
 from __future__ import print_function
 
 import sys
@@ -59,6 +56,7 @@ class DevTools(object):
         easydev.check_param_in_list(param, valid_values)
     def swapdict(self,d):
         return easydev.swapdict(d)
+
 
 class Service(Logging):
     """Base class for WSDL and REST classes
@@ -102,6 +100,13 @@ class Service(Logging):
         super(Service, self).__init__(level=verbose)
 
         self._url = url
+        try:
+            if self.url != None:
+                import urllib
+                urllib.urlopen(self.url)
+        except Exception, e:
+            self.logging.critical("The URL (%s) provided cannot be reached" % self.url)
+            print(e)
         #self.url = url
         self.name = name
         self._easyXMLConversion = True
@@ -293,6 +298,12 @@ class RESTService(Service):
     You can request an URL with this class that also inherits from
     :class:`Service`.
 
+
+
+    For debugging:
+
+    * last_response contains 
+
     """
     def __init__(self, name, url=None, verbose=True):
         """.. rubric:: Constructor
@@ -305,12 +316,6 @@ class RESTService(Service):
         super(RESTService, self).__init__(name, url, verbose=verbose)
         self.last_response = None
         self.logging.info("Initialising %s service (REST)" % self.name)
-        try:
-            import urllib
-            urllib.urlopen(self.url)
-        except Exception, e:
-            self.logging.critical("The URL (%s) provided cannot be reached" % self.url)
-            print(e)
 
     def getUserAgent(self):
         import os
@@ -359,7 +364,7 @@ class RESTService(Service):
             import time
             self.logging.warning("request seemed to have failed.")
             if i!=self.trials-1:
-                self.trials("Trying again trial {}/{}".format(i+1, self.trials))
+                print("Trying again trial {}/{}".format(i+1, self.trials))
             time.sleep(self.timesleep)
         #except Exception:
         #    self.debugLevel = level
@@ -459,15 +464,14 @@ import grequests        # use asynchronous requests with gevent
 class REST(Service):
     """
 
-    The ideas (sync/async) and code using requests were inspiread from the chembl
+    The ideas (sync/async) and code using requests were inspired from the chembl
     python wrapper but significantly changed.
-
 
     Get one value::
     
         >>> from bioservices import REST
         >>> s = REST("test", "https://www.ebi.ac.uk/chemblws")
-        >>> res = s.get_one("targets/CHEMBL2476", "json")
+        >>> res = s.get_one("targets/CHEMBL2476.json", "json")
         >>> res['organism']
         u'Homo sapiens'
 
@@ -484,6 +488,11 @@ class REST(Service):
         >>> # the CACHING on, you can retrieve previous requests:
         >>> s.get_one("targets/CHEMBL2476")
 
+
+    Advantages of requests over urllib
+
+    requests length is not limited to 2000 characters
+    http://www.g-loaded.eu/2008/10/24/maximum-url-length/
     """
     content_types = {
         'json': 'application/json',
@@ -506,6 +515,10 @@ class REST(Service):
             #import requests_cache
             self.logging.info("Using local cache %s" % self.CACHE_NAME)
             requests_cache.install_cache(self.CACHE_NAME)
+
+
+        from bioservices.settings import BioServicesConfig
+        self.settings = BioServicesConfig()
 
     def delete_cache(self):
         import os
