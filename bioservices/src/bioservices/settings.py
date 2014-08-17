@@ -5,11 +5,14 @@ Created on Fri Aug  8 15:31:34 2014
 @author: cokelaer
 """
 import os
-from easydev import DynamicConfigParser
+from easydev import DynamicConfigParser, underline
 import sys
 import tempfile
 import copy
 import types
+import shutil
+
+import appdirs
 
 __all__ = ["get_bioservices_env", "defaultParams", "BioServicesConfig"]
 
@@ -51,11 +54,6 @@ def get_bioservices_env(section, option):
 
 
 
-class Params(dict):
-    def __init__(self):
-        pass
-
-import appdirs
 
 class ConfigReadOnly(object):
     """A generic Config file handler
@@ -85,12 +83,14 @@ class ConfigReadOnly(object):
             self._default_params = copy.deepcopy(default_params)
             self.params = copy.deepcopy(default_params)
 
-            # usefule tool to handle XDG config file, path and parameters
+            # useful tool to handle XDG config file, path and parameters
             self.appdirs = appdirs.AppDirs(self.name)
             self.config_parser = DynamicConfigParser()
             # Now, create the missing directories if needed
             self.init() # and read the user config file updating params if needed
-            
+
+
+
     def read_user_config_file_and_update_params(self):
         """Read the configuration file and update parameters
 
@@ -110,7 +110,18 @@ class ConfigReadOnly(object):
 
         
         """
-        self.config_parser.read(self.user_config_file_path)
+        try:
+            self.config_parser.read(self.user_config_file_path)
+        except IOError:
+            
+            msg = "Welcome to %s" % self.name.capitalize()
+            print(underline(msg))
+            print("It looks like you do not have a configuration file.")
+            print("We are creating one with default values in %s ." % self.user_config_file_path)
+            print("Done")
+            self.create_default_config_file()
+
+        # now, update the params attribute if needed
         for section in self.config_parser.sections():
             dic = self.config_parser.section2dict(section)
             for key in dic.keys():
@@ -175,7 +186,7 @@ class ConfigReadOnly(object):
             print("Creating directory %s " % sdir)
             try:
                 self._mkdirs(sdir)
-            except:
+            except Exception:
                 print("Could not create the path %s " % sdir)
                 return None
         return sdir
@@ -183,22 +194,30 @@ class ConfigReadOnly(object):
     def _get_config_dir(self):
         sdir = self.appdirs.user_config_dir
         return self._get_and_create(sdir)
-    user_config_dir = property(_get_config_dir)
+    user_config_dir = property(_get_config_dir, 
+            doc="return directory of this configuration file")
 
     def _get_cache_dir(self):
         sdir = self.appdirs.user_cache_dir
         return self._get_and_create(sdir)
-    user_cache_dir = property(_get_cache_dir)
+    user_cache_dir = property(_get_cache_dir,
+            doc="return directory of the cache")
 
     def _get_config_file_path(self):
         return self.user_config_dir + os.sep +self.config_file
-    user_config_file_path = property(_get_config_file_path)
+    user_config_file_path = property(_get_config_file_path,
+            doc="return configuration filename (with fullpath)")
 
     def _get_config_file(self):
         return self.name + ".cfg"
-    config_file = property(_get_config_file)
+    config_file = property(_get_config_file, 
+            doc="config filename (without path)")
 
     def init(self):
+        """Reads the user_config_file and update params.
+        Creates the directories for config and cache if they do not exsits 
+
+        """
         # Let us create the directories by simply getting these 2 attributes:
         try:
             _ = self.user_config_dir
@@ -221,7 +240,6 @@ class ConfigReadOnly(object):
                 print("""Trying to save the current config file {} into a backup file {}\n but it exists already. Please remove the backup file first or set the 'force' parameter to True""".format(self.user_config_file_path, filename))
                 return
             else:
-                import shutil
                 shutil.copy(self.user_config_file_path, filename)
 
         # Now, we can rewrite the configuration file
