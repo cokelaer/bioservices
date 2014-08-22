@@ -54,6 +54,10 @@ import StringIO
 __all__ = ["UniProt"]
 
 
+# TODO:: falt files to get list of identifiers
+# http://www.ebi.ac.uk/uniprot/database/download.html 
+# grep sp uniprot_sprot.fasta  | grep HUMAN | awk '{print substr($1, 12, length($1))}'
+
 mapping = {"UniProtKB AC/ID":"ACC+ID",
     "UniProtKB": "ACC",
     "UniProtKB": "ID",

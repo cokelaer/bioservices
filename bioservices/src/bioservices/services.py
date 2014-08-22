@@ -68,8 +68,15 @@ class Service(Logging):
 
     response_codes = {
         200 : 'OK',
-        400 : 'Bad Request',
-        404 : 'Not found'}
+        400 : 'Bad Request. There is a problem with your input',
+        404 : 'Not found. The resource you requests does not exist',
+        410 :  'Gone. The resource you requested was removed.',
+        500 : 'Internal server error. Most likely a temporary problem',
+        503 : 'Service not available. The server is being updated, try again  later'
+        }
+
+
+
     _error_codes = [400, 404]
 
     def __init__(self, name, url=None, verbose=True):
