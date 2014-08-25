@@ -93,9 +93,9 @@ class UniChem(REST):
     def _process(self, query, frmt, request):
         self.devtools.check_param_in_list(frmt, ["json", "xml", None])
         if isinstance(query, str) or isinstance(query, int):
-            res = self.get(request % query, frmt=frmt)
+            res = self.http_get(request % query, frmt=frmt)
         else:
-            res = self.get([request % x for x in query], frmt=frmt)
+            res = self.http_get([request % x for x in query], frmt=frmt)
         return res
 
     def _get_source_id(self, src_id):
@@ -218,7 +218,7 @@ class UniChem(REST):
         self.devtools.check_param_in_list(target, self.source_ids.keys())
 
         query = "mapping/%s/%s/" % (self.source_ids[source], self.source_ids[target])
-        res = self.get(query, frmt=None)
+        res = self.http_get(query, frmt=None)
         # evaluation the string as a list
         res = eval(res)
         # convert to a convenient dictionary
@@ -268,7 +268,7 @@ class UniChem(REST):
             >>> uni.get_all_src_ids()
 
         """
-        res = self.get("src_ids", frmt=None)
+        res = self.http_get("src_ids", frmt=None)
         res = [x['src_id'] for x in eval(res)]
         return res
 
