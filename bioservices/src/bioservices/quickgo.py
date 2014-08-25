@@ -34,12 +34,12 @@
 """
 from __future__ import print_function
 
-from bioservices.services import RESTService
+from bioservices.services import REST, RESTService
 
 __all__ = ["QuickGO"]
 
 
-class QuickGO(RESTService):
+class QuickGO(REST):
     """Interface to the `QuickGO <http://www.ebi.ac.uk/QuickGO/WebServices.html>`_ service
 
     Retrieve information given a GO identifier:
@@ -80,20 +80,20 @@ class QuickGO(RESTService):
             'date', 'from', 'splice', 'proteinName', 'proteinSynonym', 'proteinType',
             'proteinTaxonName', 'originalTermID', 'originalGOName']
 
-    def __init__(self, verbose=True):
+    def __init__(self, verbose=True, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose: print informative messages.
 
         """
         super(QuickGO, self).__init__(url="http://www.ebi.ac.uk/QuickGO",
-            name="quickGO", verbose=verbose)
+            name="quickGO", verbose=verbose, cache=cache)
 
-    def Term(self, goid, format="oboxml"):
+    def Term(self, goid, frmt="oboxml"):
         """Obtain Term information
 
 
-        :param str format: the output format (mini, obo, oboxml).
+        :param str frmt: the output format (mini, obo, oboxml).
 
         The format can be:
 
@@ -109,29 +109,16 @@ class QuickGO(RESTService):
 
 
         """
-        _valid_formats = ["mini", "obo", "oboxml"]
+        self.devtools.check_param_in_list(frmt, ["mini", "obo", "oboxml"])
         if goid.startswith("GO:")==False:
             raise ValueError("GO id must start with 'GO:'")
 
-        if format not in _valid_formats:
-            raise ValueError("format provided is incorrect. Choose in %s" % _valid_formats)
-
-        url = self.url + "/GTerm?id=" + goid
-        #GO:0003824
-        params = {'format':format}
-        postData = self.urlencode(params)
-        url += "&" + postData
-
-        if format in ["oboxml"]:
-            res = self.request(url, format="xml")
-        else:
-            res = self.request(url, format=format)
+        params = {'id':goid, 'format':frmt}
+        res = self.http_get("GTerm", frmt="xml", params=params)
 
         return res
 
-
-
-    def Annotation(self, goid=None, protein=None, format="gaf", limit=10000,
+    def Annotation(self, goid=None, protein=None, frmt="gaf", limit=10000,
         gz=False, col=None, db=None, aspect=None, relType=None, termUse=None,
         evidence=None, source=None, ref=None,  tax=None, qualifier=None, q=None, _with=None):
         """Calling the Annotation service
@@ -142,8 +129,8 @@ class QuickGO(RESTService):
             which may not be sufficient for the data set that you are
             downloading. To bypass this default, and return the entire data set,
             specify a limit of -1).
-        :param str format: one of "gaf", "gene2go", "proteinList", "fasta",
-            "tsv" or "dict". The "dict" format is the default and is a
+        :param str frmt: one of "gaf", "gene2go", "proteinList", "fasta",
+            "tsv" or "dict". The "dict" frmt is the default and is a
             python dictionary.
         :param bool gz: gzips the downloaded file.
         :param str goid: GO identifiers either directly or indirectly
@@ -187,9 +174,9 @@ class QuickGO(RESTService):
 
         ::
 
-            >>> print s.Annotation(protein='P12345', format='tsv', col="ref,evidence",
+            >>> print s.Annotation(protein='P12345', frmt='tsv', col="ref,evidence",
             ... ref='PMID:*')
-            >>> print s.Annotation(protein='P12345,Q4VCS5', format='tsv', 
+            >>> print s.Annotation(protein='P12345,Q4VCS5', frmt='tsv', 
             ...     col="ref,evidence",ref='PMID:,Reactome:')
 
 
@@ -203,10 +190,10 @@ class QuickGO(RESTService):
             raise TypeError("limit parameter must be an integer greater than zero")
 
         # fill params with parameters that have default values.
-        params = {'format':format, 'limit':limit}
+        params = {'format':frmt, 'limit':limit}
 
         # beginning of the URL
-        url = self.url + "/GAnnotation?"
+        url = "GAnnotation?"
 
         # what is the ID being provided. We can have only one of:
         # protein, goid
@@ -270,7 +257,6 @@ Invalid parameter: source parameters must be a list of strings ['PUBMED']
 or a string (e.g., 'PUBMED:*') """)
             params['ref'] = ref
 
-
         if qualifier:
             #NOT, colocalizes_with, contributes_to
             if isinstance(qualifier, list):
@@ -279,11 +265,8 @@ or a string (e.g., 'PUBMED:*') """)
                 pass
             params['qualifier'] = qualifier
 
-
-
-
         # col parameter
-        if format=="tsv":
+        if frmt=="tsv":
             if col == None:
                 col = 'proteinDB,proteinID,proteinSymbol,qualifier,'
                 col += 'goID,goName,aspect,evidence,ref,with,proteinTaxon,date,from,splice,'
@@ -294,25 +277,20 @@ or a string (e.g., 'PUBMED:*') """)
             for c in col.split(','):
                 self.checkParam(c, self._valid_col)
             params["col"] = col
-        if format not in ["tsv", "dict"]:
+
+        if frmt not in ["tsv", "dict"]:
             # col is provided but format is not appropriate
             if col!= None:
-                raise ValueError("You provided the 'col' parameter but the format is not correct. You should use the format='tsv' or format='dict' ")
+                raise ValueError("You provided the 'col' parameter but the format is not correct. You should use the frmt='tsv' or frmt='dict' ")
 
-
-
-        postData = "&" + self.urlencode(params)
 
         # gz parameter. do not expect values so need to be added afterwards.
         if gz==True:
             url+='&gz'
 
-        url += postData
-        res = self.request(url, format="txt")
-
+        res = self.http_get(url, frmt="txt", params=params)
 
         return res
-
 
     def Annotation_from_goid(self, goid, **kargs):
         """Returns a DataFrame containing annotation on a given GO identifier
@@ -324,7 +302,7 @@ or a string (e.g., 'PUBMED:*') """)
         is set to **tsv**  and cols that is made of all possible column names.
 
         """
-        kargs["format"] = "tsv"
+        kargs["frmt"] = "tsv"
         cols = ",".join (self._valid_col)
         kargs['col'] = cols
 
@@ -355,7 +333,7 @@ or a string (e.g., 'PUBMED:*') """)
         is set to **tsv**  and cols that is made of all possible column names.
 
         """
-        kargs["format"] = "tsv"
+        kargs["frmt"] = "tsv"
         cols = ",".join (self._valid_col)
         kargs['col'] = cols
 
@@ -402,6 +380,6 @@ class GeneOntology():
         self._quickgo = QuickGO(verbose=False)
 
     def getGOTerm(self, goid):
-        return self._quickgo.Term(goid, format="obo")
+        return self._quickgo.Term(goid, frmt="obo")
 
 
