@@ -45,13 +45,13 @@
 """
 from __future__ import print_function
 
-from services import RESTService
+from services import REST
 
 __all__ = ["Rhea"]
 
 
 
-class Rhea(RESTService):
+class Rhea(REST):
     """Interface to the `Rhea <http://www.ebi.ac.uk/rhea/rest/1.0/>`_ service
 
     You can search by compound name, ChEBI ID, reaction ID, cross reference
@@ -80,7 +80,7 @@ class Rhea(RESTService):
 
     """
     _url = "http://www.ebi.ac.uk/rhea/rest"
-    def __init__(self, version="1.0",  verbose=True):
+    def __init__(self, version="1.0",  verbose=True, cache=False):
         """.. rubric:: Rhea constructor
 
         :param str version: the current version of the interface (1.0)
@@ -91,17 +91,16 @@ class Rhea(RESTService):
             >>> from bioservices import Rhea
             >>> r = Rhea()
         """
-        super(Rhea, self).__init__(name="Rhea", url=Rhea._url, 
-            verbose=verbose)
+        super(Rhea2, self).__init__(name="Rhea", url=Rhea._url, 
+            verbose=verbose, cache=cache)
         self.version = version
         self.format_entry = ["cmlreact", "biopax2", "rxn"]
 
-    def search(self, query, format=None):
+    def search(self, query, frmt=None):
         """Search for reactions
 
         :param str query: the search term using format parameter
         :param str format: the biopax2 or cmlreact format (default)
-
 
         :Returns: An XML document containing the reactions with undefined
             direction, with links to the corresponding bi-directional ones.
@@ -111,7 +110,7 @@ class Rhea(RESTService):
 
             >>> r = Rhea()
             >>> r.search("caffeine")  # id 10280
-            >>> r.search("caffeine", format="biopax2")  # id 10280
+            >>> r.search("caffeine", frmt="biopax2")  # id 10280
 
         The output is in XML format. This page from the Rhea web site explains 
         what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of 
@@ -125,37 +124,39 @@ class Rhea(RESTService):
         if _format not in ["biopax2", "cmlreact"]:
             raise ValueError("format must be either cmlreact (default) or biopax2")
 
-        url = self.url + "/" + self.version + "/ws/reaction/%s?q=" % _format
+        url = self.version + "/ws/reaction/%s?q=" % _format
         url += query
 
-        response = self.request(url)
+        response = self.http_get(url, frmt="xml")
+        response = self.easyXML(response)
         return response
 
 
-    def entry(self, id, format):
+    def entry(self, id, frmt):
         """Retrieve a concrete reaction for the given id in a given format
 
         :param int id: the id of a reaction
         :param format: can be rxn, biopax2, or cmlreact
         :Returns: An XML document containing the reactions with undefined
             direction, with links to the corresponding bi-directional ones.
-            The format is easyXML.
+            The format is easyXML. If frmt is rnx, 
 
         ::
 
-            >>> print r.entry(10281, format="rxn")
+            >>> print r.entry(10281, frmt="rxn")
 
         The output is in XML format. This page from the Rhea web site explains 
         what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of 
         the XML file.
         """
-        self.checkParam(format, self.format_entry)
-        url = self.url + "/" + self.version + "/ws/reaction/%s/%s" % (format, id)
+        self.devtools.check_param_in_list(frmt, self.format_entry)
+        url = self.version + "/ws/reaction/%s/%s" % (frmt, id)
 
-        if format=="rxn":
-            response = self.request(url, format)
+        if frmt=="rxn":
+            response = self.http_get(url, frmt=frmt)
         else:
-            response = self.request(url)
+            response = self.http_get(url, frmt="xml")
+            response = self.easyXML(res)
         return response
 
 
