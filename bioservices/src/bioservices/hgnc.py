@@ -36,15 +36,14 @@
 
 
 """
-from bioservices import RESTService, xmltools
+from bioservices import REST, xmltools
 from xmltools import bs4
 from urllib2 import HTTPError
-
 
 __all__ = ["HGNC"]
 
 
-class HGNC(RESTService):
+class HGNC(REST):
     """Interface to the `HGNC <http://www.genenames.org>`_ service
 
 
@@ -84,9 +83,11 @@ class HGNC(RESTService):
     .. warning:: this is actually the HGNC/wr website. Maybe not the official. 
 
     """
-    def __init__(self, verbose=False):
-        url = "http://www.avatar.se/HGNC/wr/gene"
-        super(RESTService,self).__init__("HGNC", url=url, verbose=verbose)
+    def __init__(self, verbose=False, cache=False):
+        url = "http://www.avatar.se/HGNC/wr/"
+        super(HGNC, self).__init__("HGNC", url=url, verbose=verbose, cache=cache)
+
+
         self._always_return_list = False
 
         #: Force XML to be checked for unicode consistency see :class:`Service`
@@ -121,9 +122,10 @@ class HGNC(RESTService):
         """
         try:
             if ";" in gene:
-                res = self.request(self.url + "s/%s" % gene)
+                res = self.http_get("genes/%s" % gene, )
             else:
-                res = self.request("%s.xml" % gene)
+                res = self.http_get("gene/%s.xml" % gene)
+            #res = bs4.BeautifulSoup(res)
         except HTTPError:
             print("!!BioServices HTTPError caught in HGNC. Probably an invalid gene name")
 
