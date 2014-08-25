@@ -85,11 +85,12 @@ class ConfigReadOnly(object):
 
             # useful tool to handle XDG config file, path and parameters
             self.appdirs = appdirs.AppDirs(self.name)
+
+            # useful tool to handle the config ini file
             self.config_parser = DynamicConfigParser()
+
             # Now, create the missing directories if needed
             self.init() # and read the user config file updating params if needed
-
-
 
     def read_user_config_file_and_update_params(self):
         """Read the configuration file and update parameters
@@ -269,7 +270,25 @@ class BioServicesConfig(ConfigReadOnly):
                 default_params=defaultParams)
 
 
-
+    # some aliases
+    def _get_caching(self):
+        return self.params['cache.on'][0]
+    CACHING = property(_get_caching)
+    def _get_fast_save(self):
+        return self.params['cache.fast'][0]
+    FAST_CACHE = property(_get_fast_save)
+    def _get_async_concurrent(self):
+        return self.params['general.async_concurrent'][0]
+    CONCURRENT = property(_get_async_concurrent)
+    def _get_async_threshold(self):
+        return self.params['general.async_threshold'][0]
+    ASYNC_THRESHOLD = property(_get_async_threshold)
+    def _get_timeout(self):
+        return self.params['general.timeout'][0]
+    TIMEOUT = property(_get_timeout)
+    def _get_max_retries(self):
+        return self.params['general.max_retries'][0]
+    MAX_RETRIES = property(_get_max_retries)
 
 
 
