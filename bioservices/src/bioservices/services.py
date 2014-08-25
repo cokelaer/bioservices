@@ -32,7 +32,7 @@ import easydev
 from  easydev import  Logging
 
 
-__all__ = ["Service", "WSDLService", "RESTService", "BioServicesError"]
+__all__ = ["Service", "WSDLService", "RESTService", "BioServicesError", "REST"]
 
 
 class BioServicesError(Exception):
@@ -200,7 +200,6 @@ easyXML object (Default behaviour).""")
         postData = urllib.urlencode(params)
         return postData
 
-
     def checkParam(self, param, valid_values):
         """Simple utility to check that a parameter has a valid value
 
@@ -299,7 +298,26 @@ class WSDLService(Service):
         doc="set the dumpSOAPIn mode of the SOAP proxy (0/1)")
 
 
-class RESTService(Service):
+class RESTbase(Service):
+    def __init__(self, name, url=None, verbose=True):
+        super(RESTbase, self).__init__(name, url, verbose=verbose)
+        self.logging.info("Initialising %s service (REST)" % self.name)
+        self.last_response = None
+
+    def http_get(self):
+        raise NotImplementedError
+
+    def http_post(self):
+        raise NotImplementedError
+
+    def http_put(self):
+        raise NotImplementedError
+
+    def http_delete(self):
+        raise NotImplementedError
+
+
+class RESTService(RESTbase):
     """Class to manipulate REST service
 
     You can request an URL with this class that also inherits from
@@ -321,8 +339,6 @@ class RESTService(Service):
 
         """
         super(RESTService, self).__init__(name, url, verbose=verbose)
-        self.last_response = None
-        self.logging.info("Initialising %s service (REST)" % self.name)
 
     def getUserAgent(self):
         import os
@@ -378,6 +394,9 @@ class RESTService(Service):
         # get back the parameters
         #self.debugLevel = level
         return res
+
+    def http_get(self, path, format="xml", baseUrl=True):
+        return self.request(path, format=format, baseUrl=baseUrl)
 
     def _get_request(self, path, format="xml", baseUrl=True):
         if path.startswith(self.url):
@@ -468,7 +487,8 @@ import grequests        # use asynchronous requests with gevent
 # one should use a session instance when calling grequests.get, which we do
 # here below
 
-class REST(Service):
+
+class REST(RESTbase):
     """
 
     The ideas (sync/async) and code using requests were inspired from the chembl
@@ -510,22 +530,17 @@ class REST(Service):
     def __init__(self, name, url=None, verbose=True, cache=False):
         super(REST, self).__init__(name, url, verbose=verbose)
         self.CACHE_NAME = self.name+"_bioservices_database"
-        self._CACHING = cache
-        self.FAST_SAVE = True
-        self.CONCURRENT = 50    # 5 seems to give the bes results
-        self.ASYNC_TRESHOLD = 10
-        self.TIMEOUT = 10.0
-        self.MAX_RETRIES = 3
 
         self._session = None
-        if self.CACHING:
+
+        from bioservices.settings import BioServicesConfig
+        self.settings = BioServicesConfig()
+
+        if self.settings.CACHING:
             #import requests_cache
             self.logging.info("Using local cache %s" % self.CACHE_NAME)
             requests_cache.install_cache(self.CACHE_NAME)
 
-
-        from bioservices.settings import BioServicesConfig
-        self.settings = BioServicesConfig()
 
     def delete_cache(self):
         import os
@@ -558,7 +573,7 @@ class REST(Service):
         """
         self.logging.debug("Creating session (uncached version)")
         self._session = requests.Session()
-        adapter = requests.adapters.HTTPAdapter(max_retries=self.MAX_RETRIES)
+        adapter = requests.adapters.HTTPAdapter(max_retries=self.settings.MAX_RETRIES)
         #, pool_block=True does not work with asynchronous requests
         self._session.mount('http://', adapter)
         self._session.mount('https://', adapter)
@@ -571,14 +586,15 @@ class REST(Service):
             #import requests_cache
             self.logging.debug("No cached session created yet. Creating one")
             self._session = requests_cache.CachedSession(self.CACHE_NAME,
-                         backend='sqlite', fast_save=self.FAST_SAVE)
+                         backend='sqlite', fast_save=self.settings.FAST_SAVE)
         return self._session
 
+   
     def _get_caching(self):
-        return self._CACHING
+        return self.settings.params['cache.on']
     def _set_caching(self, caching):
         self.checkParam(caching, [True ,False])
-        self._CACHING = caching
+        self.settings.params['cache.on'] = caching
         # reset the session, which will be automatically created if we 
         # access to the session attribute
         self._session = None
@@ -626,16 +642,16 @@ class REST(Service):
     def _apply(self, iterable, fn, *args, **kwargs):
         return [fn(x, *args, **kwargs) for x in iterable if x is not None]
 
-    def _get_async(self, keys, frmt='json', retry=0):
+    def _get_async(self, keys, frmt='json', params={}):
         session = self._get_session()
         try:
             # build the requests
             urls = self._get_all_urls(keys, frmt)
             self.logging.debug("grequests.get processing" )
-            rs = (grequests.get(url, session=session)  for key,url in zip(keys, urls))
+            rs = (grequests.get(url, session=session, params=params)  for key,url in zip(keys, urls))
             # execute them
             self.logging.debug("grequests.map call" )
-            ret = grequests.map(rs, size=min(self.CONCURRENT, len(keys)))
+            ret = grequests.map(rs, size=min(self.settings.CONCURRENT, len(keys)))
             self.last_response = ret
             self.logging.debug("grequests.map call done" )
             return ret
@@ -646,29 +662,38 @@ class REST(Service):
     def _get_all_urls(self, keys, frmt=None):
         return ('%s/%s' % (self.url, query) for query in keys)
 
-    def get_async(self, keys, frmt='json' ):
-        ret = self._get_async(keys, frmt)
+    def get_async(self, keys, frmt='json', params={} ):
+        ret = self._get_async(keys, frmt, params=params)
         return self._apply(ret, self._interpret_returned_request, frmt)
 
     def get_sync(self, keys, frmt='json'):
         return [self.get_one(**{'frmt': frmt, 'query': key }) for key in keys]
 
-    def get(self, query, frmt='json'):
-        if isinstance(query, list) and len(query) > self.ASYNC_TRESHOLD:
+    def http_get(self, query, frmt='json', params={}):
+        """
+
+        * query is the suffix that will be appended to the main url attribute.
+        * query is either a string or a list of strings.
+        * if list is larger than ASYNC_THRESHOLD, use asynchronous call.
+
+
+        """
+        if isinstance(query, list) and len(query) > self.settings.ASYNC_THRESHOLD:
             self.logging.debug("Running async call for a list")
-            return self.get_async(query, frmt)
-        if isinstance(query, list) and len(query) <= self.ASYNC_TRESHOLD:
+            return self.get_async(query, frmt, params=params)
+        if isinstance(query, list) and len(query) <= self.settings.ASYNC_THRESHOLD:
             self.logging.debug("Running sync call for a list")
-            return self.get_sync(query, frmt)
+            return [self.get_one(**{'frmt': frmt, 'query': key, 'params':params }) for key in query]
+            #return self.get_sync(query, frmt)
         # OTHERWISE
         self.logging.debug("Running single call")
-        return self.get_one(**{'frmt': frmt, 'query': query})
+        return self.get_one(**{'frmt': frmt, 'query': query, 'params':params})
 
-    def get_one(self, query, frmt='json'):
+    def get_one(self, query, frmt='json', params={}):
         url = '%s/%s' % (self.url, query)
         self.logging.debug(url)
         try:
-            res = self.session.get(url, **{'timeout':self.TIMEOUT})
+            res = self.session.get(url, **{'timeout':self.settings.TIMEOUT, 'params':params})
             self.last_response = res
             res = self._interpret_returned_request(res, frmt)
             return res
