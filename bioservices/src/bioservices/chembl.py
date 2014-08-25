@@ -85,9 +85,9 @@ class ChEMBL(REST):
         self.devtools.check_param_in_list(frmt, ["json", "xml"])
         request = request + "." + frmt
         if isinstance(query, str):
-            res = self.get(request % query, frmt=frmt)
+            res = self.http_get(request % query, frmt=frmt)
         else:
-            res = self.get([request % x for x in query], frmt=frmt)
+            res = self.http_get([request % x for x in query], frmt=frmt)
         return res
 
     def status(self):
@@ -95,7 +95,7 @@ class ChEMBL(REST):
 
         :return: Response is the string 'UP' if the service is running
         """
-        res = self.get("status", frmt="json")
+        res = self.http_get("status", frmt="json")
         return res['status']
 
     def get_compounds_by_chemblId(self, query, frmt="json"):
@@ -310,7 +310,7 @@ class ChEMBL(REST):
             #url=self.url+'compounds/%s/image' % query
             if dimensions is not None:
                 req += '?engine=%s&dimensions=%s'%(engine, dimensions)
-            target_data = self.get(req, frmt=None)
+            target_data = self.http_get(req, frmt=None)
             
             file_out = os.getcwd()
             file_out += '/%s.png' % query
@@ -456,7 +456,7 @@ class ChEMBL(REST):
             >>> res = s.get_all_targets()
         """
         self.devtools.check_param_in_list(frmt, ["json", "xml"])
-        res = self.get("targets." + frmt, frmt=frmt)
+        res = self.http_get("targets." + frmt, frmt=frmt)
         return res
 
     def get_assays_by_chemblId(self, query, frmt="json"):
@@ -530,7 +530,7 @@ class ChEMBL(REST):
 
     def version(self):
         """Return version of the API on the server"""
-        res = self.get("status", frmt="json")
+        res = self.http_get("status", frmt="json")
         return res['version']
 
 
