@@ -40,7 +40,7 @@ class TestPICR(object):
 
     # this one is failing from time to time even the exemple on the web site.
     @unittest.skip
-    def _test_getUPIForBLAST(self):
+    def test_getUPIForBLAST(self):
         self.e.getUPIForBLAST(self.e._blastfrag_example, "SWISSPROT", taxid="9606")
         self.e.getUPIForBLAST(self.e._blastfrag_example, ["SWISSPROT"], taxid="9606", includeattributes=False)
         self.e.getUPIForBLAST(self.e._blastfrag_example, ["SWISSPROT"], taxid="9606", program="blastp",matrix="BLOSUM62")
