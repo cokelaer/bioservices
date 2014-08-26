@@ -7,24 +7,21 @@ def test_general():
     s = BioMart(host="www.ensembl.org")
     s = BioMart()
     #s.registry()
+
+
+    assert s.datasets("prod-intermart_1") == ['protein', 'entry', 'uniparc']
+
     s.datasets("ensembl")
     s.version("ensembl")
     s.attributes("oanatinus_gene_ensembl")
     s.filters("oanatinus_gene_ensembl")
     s.configuration("oanatinus_gene_ensembl")
 
-    xmlq = """<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Query>
-<Query  virtualSchemaName = "default" formatter = "TSV" header = "0" uniqueRows = "0" count = "" datasetConfigVersion = "0.6" >
-                        
-        <Dataset name = "pathway" interface = "default" >
-                <Filter name = "referencepeptidesequence_uniprot_id_list" value = "P43403"/>
-                <Attribute name = "stableidentifier_identifier" />
-                <Attribute name = "pathway_db_id" />
-        </Dataset>
-</Query>
-"""
-    s.query(s._xml_example)
+
+
+
+    res = s.query(s._xml_example)
+    assert "ENSMUS" in res
 
 
     # build own xml using the proper functions

@@ -1,1 +1,2 @@
 CACHING = True
+DEBUG = True

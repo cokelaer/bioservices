@@ -8,10 +8,10 @@ class test_rhea(Rhea):
 
     def test_search(self):
         r1 = self.search("caffeine")
-        r1 = self.search("caffeine", format="cmlreact")
-        r2 = self.search("caffeine", format="biopax2")
+        r1 = self.search("caffeine", frmt="cmlreact")
+        r2 = self.search("caffeine", frmt="biopax2")
         try:
-            self.search("caffeine", format="biopaxddddddd2")
+            self.search("caffeine", frmt="biopaxddddddd2")
             assert False
         except:
             assert True

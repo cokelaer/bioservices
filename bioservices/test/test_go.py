@@ -1,5 +1,5 @@
 from bioservices.quickgo import *
-
+from . import settings
 
 
 class test_quickGO(QuickGO):
@@ -9,7 +9,7 @@ class test_quickGO(QuickGO):
 
     def test_annotation_wrong_format(self):
         try:
-            res = self.Annotation(tax='9606', format='tsddddddv')
+            res = self.Annotation(tax='9606', frmt='tsddddddv')
             assert False
         except:
             assert True
@@ -17,20 +17,21 @@ class test_quickGO(QuickGO):
     def test_annotation_format_col_compatibility(self):
         # if col provided, format can be only tsv
         try:
-            res = self.Annotation(tax='9606', format='fasta', col="evidence")
+            res = self.Annotation(tax='9606', frmt='fasta', col="evidence")
             assert False
         except:
             assert True
 
     def test_annotation_wrong_limit(self):
-        try:
-            res = self.Annotation(tax='9606', format='tsv', limit=-1)
-            assert False
-        except:
-            assert True
+        if settings.DEBUG == True:
+            try:
+                res = self.Annotation(tax='9606', frmt='tsv', limit=-1)
+                assert False
+            except:
+                assert True
 
         try:
-            res = self.Annotation(tax='9606', format='tsv', limit="dummy")
+            res = self.Annotation(tax='9606', frmt='tsv', limit="dummy")
             assert False
         except TypeError:
             assert True
@@ -39,84 +40,84 @@ class test_quickGO(QuickGO):
 
     def test_annotation_no_protein_and_goid(self):
         try:
-            self.Annotation(format='tsv', col="ref,evidence",ref='PMID:*')
+            self.Annotation(frmt='tsv', col="ref,evidence",ref='PMID:*')
             assert False
         except ValueError:
             assert True
 
     def test_annotation_evidence(self):
-        self.Annotation(protein='P12345', format='tsv', col="ref,evidence", evidence="IDA")
-        self.Annotation(protein='P12345', format='tsv', col="ref,evidence", evidence=["IDA"])
+        self.Annotation(protein='P12345', frmt='tsv', col="ref,evidence", evidence="IDA")
+        self.Annotation(protein='P12345', frmt='tsv', col="ref,evidence", evidence=["IDA"])
         try:
-            self.Annotation(protein='P12345', format='tsv',
+            self.Annotation(protein='P12345', frmt='tsv',
                 col="ref,evidence",evidence=1)
             assert False
         except:assert True
 
     def test_annotation_aspect(self):
-        self.Annotation(protein='P12345', format='tsv', col="ref,evidence",aspect='F')
-        self.Annotation(protein='P12345', format='tsv', col="ref,evidence",aspect='C')
-        self.Annotation(protein='P12345', format='tsv', col="ref,evidence",aspect='P')
+        self.Annotation(protein='P12345', frmt='tsv', col="ref,evidence",aspect='F')
+        self.Annotation(protein='P12345', frmt='tsv', col="ref,evidence",aspect='C')
+        self.Annotation(protein='P12345', frmt='tsv', col="ref,evidence",aspect='P')
         try:
-            self.Annotation(protein='P12345', format='tsv', col="ref,evidence",aspect='dummy')
+            self.Annotation(protein='P12345', frmt='tsv', col="ref,evidence",aspect='dummy')
             assert False
         except:
             assert True
 
 
     def test_annotation_source(self):
-        self.Annotation(protein='P12345', format='tsv',
+        self.Annotation(protein='P12345', frmt='tsv',
             col="ref,evidence",ref='PMID:*', source="UniProtKB")
-        self.Annotation(protein='P12345', format='tsv',
+        self.Annotation(protein='P12345', frmt='tsv',
             col="ref,evidence",ref='PMID:*', source=["UniProtKB"])
         try:
-            self.Annotation(protein='P12345', format='tsv',
+            self.Annotation(protein='P12345', frmt='tsv',
                 col="ref,evidence",ref='PMID:*', source=111)
             assert False    
         except:
             assert True
 
     def test_annotation_protein(self):
-        print self.Annotation(protein='P12345', format='tsv', col="ref,evidence",ref='PMID:*')
+        print self.Annotation(protein='P12345', frmt='tsv', col="ref,evidence",ref='PMID:*')
 
     def test_annotation_goid(self):
-        print self.Annotation(goid='GO:0003824', format='tsv', col="ref,evidence")
+        print self.Annotation(goid='GO:0003824', frmt='tsv', col="ref,evidence")
 
     def test_annotation_ref_PMID(self):
-        res = self.Annotation(tax='9606', format='tsv', col="ref",ref="PMID:*")
+        res = self.Annotation(tax='9606', frmt='tsv', col="ref",ref="PMID:*")
 
     def test_annotation_qualifier(self):
-        res = self.Annotation(tax='9606', format='tsv', 
+        res = self.Annotation(tax='9606', frmt='tsv', 
             col="ref,evidence,proteinID,goID,proteinTaxon,qualifier",ref="PMID:*", 
             qualifier="NOT")
-        res = self.Annotation(tax='9606', format='tsv', 
+        res = self.Annotation(tax='9606', frmt='tsv', 
             col="ref,evidence,proteinID,goID,proteinTaxon,qualifier",ref="PMID:*", 
             qualifier=["NOT"])
         try:
-            res = self.Annotation(tax='9606', format='tsv', 
+            res = self.Annotation(tax='9606', frmt='tsv', 
                 col="ref,evidence,proteinID,goID,proteinTaxon,qualifier",ref="PMID:*", 
                 qualifier=1)
             assert False
         except:assert True
 
     def test_annotation_qualifier2(self):
-        res = set([ x for x in self.Annotation(tax='9606', format='tsv', col="qualifier",ref="PMID:*").split()])
+        res = set([ x for x in self.Annotation(tax='9606', frmt='tsv', col="qualifier",ref="PMID:*").split()])
         assert 'NOT' in res
 
     def test_annotation_termUse(self):
         try:
-            res = self.Annotation(tax='9606', format='tsv',
+            res = self.Annotation(tax='9606', frmt='tsv',
                 col="qualifier",ref="PMID:*", termUse="slimdummy")
             assert False
         except:
             assert True
 
     def test_Term(self):
-        self.Term("GO:0003824", format="obo")
-        self.Term("GO:0003824", format="mini")
+        self.Term("GO:0003824", frmt="obo")
+        self.Term("GO:0003824", frmt="mini")
         self.Term("GO:0003824")
         try:
-            self.Term("GO:0003824", format="dummy")
+            self.Term("GO:0003824", frmt="dummy")
             assert False
         except:
             assert True

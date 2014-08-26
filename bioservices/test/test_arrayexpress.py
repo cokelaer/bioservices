@@ -23,11 +23,11 @@ class test_AE(ArrayExpress):
 
         #res = self.queryExperiments(array="A-AFFY-33")
         #assert len(res.getchildren())>0
-        res = self.queryExperiments(array="A-AFFY-33", species="Homo%20Sapiens",expdesign="dose+response")
+        res = self.queryExperiments(array="A-AFFY-33", species="Homo Sapiens",expdesign="dose+response")
         assert len(res.getchildren())>0
-        res = self.queryExperiments(array="A-AFFY-33", species="Homo%20Sapiens",expdesign="dosestupid")
+        res = self.queryExperiments(array="A-AFFY-33", species="Homo Sapiens",expdesign="dosestupid")
         assert len(res.getchildren())==0
-        res = self.queryExperiments(array="A-AFFY-33", species="Homo%20Sapiens", expdesign="dose+response", 
+        res = self.queryExperiments(array="A-AFFY-33", species="Homo Sapiens", expdesign="dose+response", 
             sortby="releasedate", sortorder="ascending")
 
     def test_retrieveFile(self):
