@@ -19,6 +19,27 @@ Revision 1.3
       * chembldb: get_assay_by_chemblId renamed in get_assays_by_chemblId
       * renamed  get_target_by_refSeqId into get_target_by_refseq
 
+Rhea: format -->frmt
+ArrayExpress: add assert to force usage of xml when calling format -->frmt
+
+../src/bioservices/kegg.py
+../src/bioservices/miriam.py
+../src/bioservices/muscle.py
+../src/bioservices/ncbiblast.py
+../src/bioservices/unichem.py
+../src/bioservices/chebi.py         ../src/bioservices/panther.py
+../src/bioservices/chembldb.py      ../src/bioservices/pathwaycommons.py
+../src/bioservices/uniprot.py
+../src/bioservices/pdb.py
+../src/bioservices/pfam.py
+../src/bioservices/picr.py
+../src/bioservices/wsdbfetch.py
+../src/bioservices/geneprof.py      ../src/bioservices/psicquic.py
+../src/bioservices/hgnc.py 
+../src/bioservices/reactome.py
+
+
+
 Revision 1.3
 ------------------
 

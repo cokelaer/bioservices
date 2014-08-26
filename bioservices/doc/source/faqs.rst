@@ -100,3 +100,33 @@ code for 2 proteins::
 
 
 There are 2 pathways containing the proteins 7535 and 6885.
+
+
+Interest of the BioServices classes REST and WSDL ?
+====================================================
+
+There are a few technical aspects covered by BioServices to ease our life when
+adding new modules.
+
+What is the difference between GET and POST
+-----------------------------------------------
+
+When the user enters information in a form and clicks Submit , there are two
+ways the information can be sent from the browser to the server: in the URL, or
+within the body of the HTTP request.
+
+The alternative to the GET method is the POST method. This method packages the
+name/value pairs inside the body of the HTTP request, which makes for a cleaner
+URL and imposes no size limitations on the forms output. It is also more
+secure.
+
+requests module in python
+----------------------------
+params is for GET-style URL parameters, data is for POST-style body information.
+It is perfectly legal to provide both types of information in a request, and
+your request does so too, but you encoded the URL parameters into the URL
+already.
+
+
+
+
