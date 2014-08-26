@@ -39,12 +39,12 @@
 """
 import sys
 import time
-from bioservices.services import RESTService
+from bioservices.services import REST
 
 __all__ = ["MUSCLE"]
 
 
-class MUSCLE(RESTService):
+class MUSCLE(REST):
     """Interface to the `MUSCLE <http://www.ebi.ac.uk/Tools/webservices/services/msa/muscle_rest>`_ service.
 
     ::
@@ -97,8 +97,8 @@ class MUSCLE(RESTService):
             need to process the XML output.
         """
 
-        request = self.url + "/parameters/"
-        res = self.request(request)
+        res = self.http_get("parameters", frmt="xml")
+        res = self.easyXML(res)
         return res
 
     def _get_parameters(self):
@@ -127,8 +127,9 @@ class MUSCLE(RESTService):
             raise ValueError("Invalid parameterId provided(%s). See parameters attribute" % parameterId)
 
         if parameterId not in self._parametersDetails.keys():
-            request = self.url + "/parameterdetails/" + parameterId
-            res = self.request(request)
+            request = "parameterdetails/" + parameterId
+            res = self.http_get(request, frmt="xml")
+            res = self.easyXML(res)
             self._parametersDetails[parameterId] = res
 
         try:
@@ -140,7 +141,7 @@ class MUSCLE(RESTService):
 
         return res
       
-    def run(self, format=None, sequence=None, tree="none", email=None):
+    def run(self, frmt=None, sequence=None, tree="none", email=None):
         """ Submit a job with the specified parameters.
 
         .. python ncbiblast_urllib2.py -D ENSEMBL --email "test@yahoo.com" --sequence
@@ -169,7 +170,7 @@ class MUSCLE(RESTService):
 
         Example::
 
-            jobid = m.run(format="fasta",
+            jobid = m.run(frmt="fasta",
                  sequence=sequence_example,
                  email="test@yahoo.fr")
 
@@ -185,8 +186,8 @@ class MUSCLE(RESTService):
         """
 
         # There are compulsary arguments:
-        if format==None or sequence==None  or email==None:
-            raise ValueError("format, sequence and email must be provided")
+        if frmt==None or sequence==None  or email==None:
+            raise ValueError("frmt, sequence and email must be provided")
 
 
         # Here, we will check the arguments values (not the type)
@@ -194,18 +195,18 @@ class MUSCLE(RESTService):
         # catch some before, it is better
 
         # FIXME: return parameters from server are not valid
-        self.checkParam(format, ['fasta','clw','clwstrict','html','msf','phyi','phys'])
+        self.checkParam(frmt, ['fasta','clw','clwstrict','html','msf','phyi','phys'])
 
         self.checkParam(tree, ['none','tree1','tree2'])
 
         # parameter structure
         params = {
-            'format': format,
+            'format': frmt,
             'sequence': sequence,
             'email': email}
       
-        request = self.url + "/run/"
-        res = self.requestPost(request, params)
+        request = "run"
+        res = self.http_post(request, frmt="txt", params=params)
         return res
 
     def getStatus(self, jobid):
@@ -225,8 +226,8 @@ class MUSCLE(RESTService):
 
 
       """
-      requestUrl = self.url + '/status/' + jobid
-      res = self.request(requestUrl, format="txt")
+      url = 'status/' + str(jobid)
+      res = self.http_get(url, frmt="txt")
       return res
 
     def getResultTypes(self, jobid):
@@ -243,8 +244,8 @@ class MUSCLE(RESTService):
       if self.getStatus(jobid)!='FINISHED':
           self.logging.warning("waiting for the job to be finished. May take a while")
           self.wait(jobid, verbose=False)
-      requestUrl = self.url + '/resulttypes/' + jobid
-      res = self.request(requestUrl, format="xml")
+      url = 'resulttypes/' + jobid
+      res = self.http_get(url, frmt="xml")
       print res
       output = {}
     
@@ -276,8 +277,8 @@ class MUSCLE(RESTService):
           self.wait(jobid, verbose=False)
       if self.getStatus(jobid) != "FINISHED":
           raise ValueError("job is not finished")
-      requestUrl = self.url + '/result/' + jobid + '/' + resultType
-      res = self.request(requestUrl, format=resultType)
+      url ='/result/' + jobid + '/' + resultType
+      res = self.http_get(url, frmt=resultType)
 
       return res
 
@@ -299,5 +300,8 @@ class MUSCLE(RESTService):
           if result == 'RUNNING' or result == 'PENDING':
               time.sleep(checkInterval)
       return result
+
+
+
 
 

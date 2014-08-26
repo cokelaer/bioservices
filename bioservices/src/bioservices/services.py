@@ -524,6 +524,7 @@ class REST(RESTbase):
     content_types = {
         'json': 'application/json',
         'xml': 'application/xml',
+        'txt': 'application/txt',
     }
     special_characters = ['/', '#', '+']
 

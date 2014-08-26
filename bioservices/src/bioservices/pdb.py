@@ -51,7 +51,7 @@ class PDB(REST):
 
         >>> from bioservices import PDB
         >>> s = PDB()
-        >>> res = s.getFile("1FBV", "pdb")
+        >>> res = s.get_file("1FBV", "pdb")
 
     """
 
@@ -61,7 +61,7 @@ class PDB(REST):
         :param bool verbose: prints informative messages (default is off)
 
         """
-        url="http://www.rcsb.org/pdb/rest"
+        url="http://www.rcsb.org/pdb"
         super(PDB, self).__init__(name="PDB", url=url, verbose=verbose,
             cache=cache)
         self.easyXMLConversion = True
@@ -82,24 +82,24 @@ class PDB(REST):
 
         return res
 
-    def getCurrentIDs(self):
+    def get_current_ids(self):
         """Get a list of all current PDB IDs."""
-        res = self.http_get("getCurrent", frmt="xml")
+        res = self.http_get("rest/getCurrent", frmt="xml")
         res= self.easyXML(res)
         res = [x.attrib['structureId'] for x in res.getchildren()]
         return res
 
-    def getFile(self, Id, fileFormat):
+    def get_file(self, sid, frmt, compression=False, headerOnly=False):
         """Download a file in a specified format
 
-        :param int Id: a valid Identifier. See :meth:`getCurrentIDs`.
-        :param str fileFormat: a valid format in "FASTA", "pdb", "cif", "xml"
+        :param int Id: a valid Identifier. See :meth:`get_current_ids`.
+        :param str fileFormat: a valid format in "pdb", "cif", "xml"
 
         .. doctest::
 
             >>> from bioservices import PDB
             >>> s = PDB()
-            >>> res = s.getFile("1FBV", "pdb")
+            >>> res = s.get_file("1FBV", "pdb")
             >>> import tempfile
             >>> fh = tempfile.NamedTemporaryFile()
             >>> fh.write(res)
@@ -107,17 +107,26 @@ class PDB(REST):
             >>> # close the file ONLY when finished (this is temporary file)
             >>> # fh.close()
 
-
+        reference: http://www.rcsb.org/pdb/static.do?p=download/http/index.html
         """
-        valid_formats = ["FASTA", "pdb", "cif", "xml"]
-        self.devtools.check_param_in_list(fileFormat, valid_formats)
+        valid_formats = [ "pdb", "cif", "xml"]
+        self.devtools.check_param_in_list(frmt, valid_formats)
+        self.devtools.check_param_in_list(headerOnly, [True, False])
+        if headerOnly == True:
+            headerOnly = "YES"
+        else:
+            headerOnly = "NO"
 
-        query = "download/downloadFile.do"
+        query = "files/" + sid + "." + frmt
+        if compression == True:
+            query += ".gz"
 
-        params = {'fileFormat': fileFormat, 'compression': 'NO', 'structureId':Id}
-        if fileFormat == "xml":
-            res = self.http_get(query, frmt="xml", params=params)
-            res = self.easyXML(res)
+        params = {'headerOnly': headerOnly}
+
+        if frmt == "xml":
+            res = self.http_get(query, frmt=frmt, params=params)
+            if compression == False:
+                res = self.easyXML(res)
         else:
             res = self.http_get(query, frmt="txt", params=params)
         return res

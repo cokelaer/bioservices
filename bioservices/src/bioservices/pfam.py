@@ -32,12 +32,11 @@
 
 
 """
-from services import RESTService
-from xmltools import readXML
+from services import REST
 __all__ = ["Pfam"]
 
 
-class Pfam(RESTService):
+class Pfam(REST):
     """Interface to `Pfam <http://pfam.sanger.ac.uk>`_ pages
 
     This is not a REST interface actually but rather a parser to some of the
@@ -61,11 +60,12 @@ class Pfam(RESTService):
     def show(self, Id):
         """Just an example of opening a web page with a uniprot Id
 
-
             p = Pfam()
             p.show("P43403")
 
         """
         url = self._url + "/protein/" + Id
-        print url
         self.onWeb(url)
+
+
+

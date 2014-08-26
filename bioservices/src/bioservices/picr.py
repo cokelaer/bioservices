@@ -41,7 +41,7 @@ access to the REST interface of the PICR web service. There is also a SOAP web s
 
 
 """
-from services import RESTService
+from services import REST
 import xmltools
 
 
@@ -51,7 +51,7 @@ __all__ = ["PICR"]
 #String taxonID = "9606";     //H. Sapiens
 
 
-class PICR(RESTService):
+class PICR(REST):
     """Interface to the `PICR (Protein Identifier Cross reference) <http://www.ebi.ac.uk/Tools/picr/>`_ service
 
     .. doctest::
@@ -69,14 +69,18 @@ class PICR(RESTService):
     _accession_example = "P29375"
     _url = "http://www.ebi.ac.uk/Tools/picr/rest"
 
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=False, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose: prints informative messages (default is False)
 
         """
-        super(PICR, self).__init__(name="PICR", url=PICR._url, verbose=verbose)
+        super(PICR, self).__init__(name="PICR", url=PICR._url, verbose=verbose, 
+                cache=cache)
         self._databases = None
+
+        # the blast call needs time
+        self.settings.params['general.timeout'][0] = 100
 
     def getMappedDatabaseNames(self):
         """Returns names of the databases
@@ -85,8 +89,9 @@ class PICR(RESTService):
 
         .. seealso:: :attr:`databases` to obtain a human readable list
         """
-        url = self.url + "/getMappedDatabaseNames"
-        res = self.request(url)
+        url = "getMappedDatabaseNames"
+        res = self.http_get(url, frmt="txt")
+        res = self.easyXML(res)
         return res
 
     def _get_databases(self):
@@ -128,29 +133,30 @@ class PICR(RESTService):
             >>> results = p.getUPIForSequence(sequence, databases)
 
         """
-        url = self._url + "/getUPIForSequence"
+        url = "getUPIForSequence"
 
         # check validity of the database provided
-
-        url += "?sequence=" + sequence
-        if isinstance(database,str):
+        params = {'sequence':sequence}
+        if isinstance(database, str):
             self._checkDBname(database)
-            url+= "&database=" + database
+            params['database'] = database
         elif isinstance(database,list):
             for d in database:
                 self._checkDBname(d)
-                url+="&database=" + d
+            # requests.get accepts multidict values, so nothing fancy to do here !
+            params['database'] = database[:]
+                
         #if taxid!=None or onlyactive==False or includeattributes==False:
         #    raise NotImplementedError
         if taxid:
-            url += "&taxonid=" +taxid
+            params['taxonid'] = taxid
         if includeattributes == False:
-            url += "&includeattributes=false"
+            params['includeattributes'] = 'false'
         if onlyactive == False:
-            url += "&onlyactive=false"
+            params['onlyactive'] = "false"
 
-
-        res = self.request(url)
+        res = self.http_get(url, frmt="xml", params=params)
+        res = self.easyXML(res)
         return res
 
     def _checkDBname(self, db):
@@ -193,21 +199,28 @@ class PICR(RESTService):
             >>> s.getUPIForAccession("P29375-1", ["IPI", "ENSEMBL"])
         """
 
-        url = self.url + "/getUPIForAccession?accession=" + accession
+        url =  "getUPIForAccession"
+        
+        params = {}
+        params['accession'] = accession
+
         if isinstance(database,str):
             self._checkDBname(database)
-            url+= "&database=" + database
+            params['database'] = database
         elif isinstance(database,list):
             for d in database:
                 self._checkDBname(d)
-                url+="&database=" + d
+            params['database'] = database[:]
         if taxid:
-            url += "&taxonid=" +taxid
+            params['taxonid'] = taxid
         if includeattributes == False:
-            url += "&includeattributes=false"
+            params['includeattributes'] = "false"
         if onlyactive == False:
-            url += "&onlyactive=false"
-        res = self.request(url)
+            params['onlyactive'] = "false"
+
+        res = self.http_get(url, frmt="xml", params=params)
+        res = self.easyXML(res)
+
         return res
 
     def getUPIForBLAST(self, blastfrag, database,
@@ -252,27 +265,25 @@ class PICR(RESTService):
                    program="blastp", matrix="BLOSUM80")
 
         """
-        url = "http://www.ebi.ac.uk/Tools/picr/rest/getUPIForBLAST"
-        url += "?blastfrag=" + blastfrag
+        url = "getUPIForBLAST"
+        params = {'blastfrag': blastfrag}
+
         if isinstance(database,str):
             self._checkDBname(database)
-            url+= "&database=" + database
+            params['database'] = database
         elif isinstance(database,list):
             for d in database:
                 self._checkDBname(d)
-                url+="&database=" + d
+                params["database"] = params
         if taxid:
-            url += "&taxonid=" +taxid
+            params["taxonid"] = taxid
         if includeattributes == False:
-            url += "&includeattributes=false"
+            params["includeattributes"] = "false"
         if onlyactive == False:
-            url += "&onlyactive=false"
+            params["onlyactive"] = "false"
 
-        if kargs:
-            postData = self.urlencode(kargs)
-            res = self.request(url + "&" +postData)
-        else:
-            res = self.request(url)
+        res = self.http_get(url, frmt="xml", params=params)
+        res = self.easyXML(res)
 
         return res
 
