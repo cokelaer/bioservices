@@ -23,7 +23,7 @@
     .. highlights::
 
         The MIRIAM Registry provides a set of online services for the generation of unique and perennial identifiers, in the form of URIs. It provides the core data which is used by the Identifiers.org resolver.
-        The core of the Registry is a catalogue of data collections (corresponding to controlled vocabularies or databases), their URIs and the corresponding physical URLs or resources. Access to this data is made available via exports (XML) and Web Services (SOAP). 
+        The core of the Registry is a catalogue of data collections (corresponding to controlled vocabularies or databases), their URIs and the corresponding physical URLs or resources. Access to this data is made available via exports (XML) and Web Services (SOAP).
 
         -- From MIRIAM Web Site, Feb 2013
 
@@ -40,8 +40,6 @@
 
 """
 from bioservices import WSDLService
-import webbrowser
-import copy
 
 __all__ = ["Miriam"]
 
@@ -63,7 +61,7 @@ class Miriam(WSDLService):
 
         :param bool verbose:
         :param bool debug:
-        :param str url: redefine the wsdl URL 
+        :param str url: redefine the wsdl URL
 
         """
         url = "http://www.ebi.ac.uk/miriamws/main/MiriamWebServices?wsdl"
@@ -104,7 +102,7 @@ class Miriam(WSDLService):
 
         This performs a check of the identifier based on the recorded regular expression.
         :param str identifier: an Identifiers.org URL
-        :return: the MIRIAM URN corresponding to the provided Identifiers.org URL or 'null' if the provided URL is invalid 
+        :return: the MIRIAM URN corresponding to the provided Identifiers.org URL or 'null' if the provided URL is invalid
 
         ::
 
@@ -118,10 +116,10 @@ class Miriam(WSDLService):
     def convertURLs(self, urls):
         """Converts a list of Identifiers.org URLs into their equivalent MIRIAM URNs.
 
-        This performs a check of the identifier based on the recorded regular expression. 
+        This performs a check of the identifier based on the recorded regular expression.
 
         :param str identifier: a list of Identifiers.org URL
-        :return: the MIRIAM URN corresponding to the provided Identifiers.org URL or 'null' if the provided URL is invalid 
+        :return: the MIRIAM URN corresponding to the provided Identifiers.org URL or 'null' if the provided URL is invalid
 
         ::
 
@@ -135,16 +133,16 @@ class Miriam(WSDLService):
     def convertURN(self, urn):
         """Converts a MIRIAM URI into its equivalent Identifiers.org URL.
 
-        This takes care of any necessary conversion, for example in the case 
+        This takes care of any necessary conversion, for example in the case
         the URI provided is obsolete.
 
         :param str urn: a MIRIAM URLs
-        :return: the Identifiers.org URL corresponding to the provided MIRIAM 
+        :return: the Identifiers.org URL corresponding to the provided MIRIAM
 
-        URI or None if the provided URI does not exist 
+        URI or None if the provided URI does not exist
 
         ::
-    
+
             >>> m.serv.convertURN('urn:miriam:ec-code:1.1.1.1')
             'http://identifiers.org/ec-code/1.1.1.1'
 
@@ -155,12 +153,12 @@ class Miriam(WSDLService):
     def convertURNs(self, urns):
         """Converts a list of MIRIAM URIs into their equivalent Identifiers.org URLs.
 
-        This takes care of any necessary conversion, for example in the case a 
-        URI provided is obsolete. If the size of the list of URIs exceeds 200, 
+        This takes care of any necessary conversion, for example in the case a
+        URI provided is obsolete. If the size of the list of URIs exceeds 200,
         None is returned.
 
         :param list urns: list of MIRIAM URIs
-        :return: a list of Identifiers.org URLs corresponding to the provided URIs 
+        :return: a list of Identifiers.org URLs corresponding to the provided URIs
 
         ::
 
@@ -182,7 +180,7 @@ class Miriam(WSDLService):
 
             >>> m.getDataResources("uniprot")
             ['http://www.ebi.uniprot.org/', 'http://www.pir.uniprot.org/', 'http://www.expasy.uniprot.org/', 'http://www.uniprot.org/', 'http://purl.uniprot.org/', 'http://www.ncbi.nlm.nih.gov/protein/']
- 
+
         """
         res = self.serv.getDataResources(nickname)
         return res
@@ -207,7 +205,7 @@ class Miriam(WSDLService):
         """Retrieves the pattern (regular expression) used by the identifiers within a data collection.
 
         :param str nickname: data collection name (or synonym) or URI (URL or URN)
-        :return:  pattern of the data collection 
+        :return:  pattern of the data collection
 
         ::
 
@@ -237,7 +235,7 @@ class Miriam(WSDLService):
         """Retrieves the unique (official) URI of a data collection (example: "urn:miriam:uniprot").
 
         :param str name: name or synonym of a data collection (examples: "UniProt")
-        :return: unique URI of the data collection 
+        :return: unique URI of the data collection
 
         ::
 
@@ -267,7 +265,7 @@ class Miriam(WSDLService):
         """Retrieves the internal identifier (stable and perennial) of all the data collections (for example: "MIR:00000005").
 
 
-        :return: list of the identifier of all the data collections 
+        :return: list of the identifier of all the data collections
 
         ::
 
@@ -316,7 +314,7 @@ class Miriam(WSDLService):
 
 
         :param str nickname: name (can be a synonym) or URI of a data collection (examples: "Gene Ontology", "UniProt"). If Id is None, nickname parameter is a MIRIAM URI of an entity (example: 'urn:miriam:obo.go:GO%3A0045202')
-        :param str id: identifier of an entity within the given data collection (examples: "GO:0045202", "P62158"). 
+        :param str id: identifier of an entity within the given data collection (examples: "GO:0045202", "P62158").
         :return:  physical locationS of web pageS providing knowledge about the given entity. If the URI is not recognised or the data collection does not exist, an empty array is returned. If the identifier is invalid for the data collection, None is returned. All special characters in the data entry part of the URLs are properly encoded.
 
         ::
@@ -351,7 +349,7 @@ class Miriam(WSDLService):
 
 
         :param str uri: deprecated URI (URN or URL), example: "http://www.ebi.ac.uk/chebi/#CHEBI:17891"
-        :return: the official URI corresponding to the deprecated one (for example: "urn:miriam:obo.chebi:CHEBI%3A17891") or 'null' if the URN does not exist 
+        :return: the official URI corresponding to the deprecated one (for example: "urn:miriam:obo.chebi:CHEBI%3A17891") or 'null' if the URN does not exist
 
         ::
 
@@ -372,7 +370,7 @@ class Miriam(WSDLService):
 
             >>> m.getName('urn:miriam:uniprot')
             'UniProt Knowledgebase'
- 
+
         """
         res = self.serv.getName(uri)
         return res
@@ -383,7 +381,7 @@ class Miriam(WSDLService):
 
         :param str uri:  	URI (URL or URN) of a data collection
         :return: the common name of the data collection and all the synonyms
-    
+
         ::
 
             >>> m.serv.getNames('urn:miriam:uniprot')
@@ -391,18 +389,18 @@ class Miriam(WSDLService):
 
         """
         return self.serv.getNames(uri)
-    
+
     def getOfficialDataTypeURI(self, nickname):
         """Retrieves the official URI (it will always be a URN) of a data collection.
 
         :param str nickname: name (can be a synonym) or MIRIAM URI (even deprecated one) of a data collection (for example: "ChEBI", "http://www.ebi.ac.uk/chebi/", ...)
         :return:  the official URI of the data collection
-        
+
         ::
 
             >>> m.getOfficialDataTypeURI("chEBI")
             'urn:miriam:chebi'
-        
+
         """
         res = self.serv.getOfficialDataTypeURI(nickname)
         return res
@@ -527,7 +525,7 @@ class Miriam(WSDLService):
         res = self.serv.isDeprecated(uri)
         res = self._boolean_convertor(res)
         return res
-    
+
 
 
 

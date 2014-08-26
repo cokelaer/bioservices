@@ -36,7 +36,7 @@
 
 
 """
-from bioservices import REST, xmltools
+from bioservices import REST
 from xmltools import bs4
 from urllib2 import HTTPError
 
@@ -79,8 +79,8 @@ class HGNC(REST):
 
 
     :references: http://www.avatar.se/HGNC/doc/tutorial.html
-    
-    .. warning:: this is actually the HGNC/wr website. Maybe not the official. 
+
+    .. warning:: this is actually the HGNC/wr website. Maybe not the official.
 
     """
     def __init__(self, verbose=False, cache=False):
@@ -93,7 +93,6 @@ class HGNC(REST):
         #: Force XML to be checked for unicode consistency see :class:`Service`
         self._fixing_unicode = True
         self._fixing_encoding = "utf-8"
-
 
     def _set_return(self, mode):
         assert mode in [False, True]
@@ -263,7 +262,7 @@ class HGNC(REST):
 
         .. seealso:: :meth:`mapping_all`
         """
-        
+
         xml = self.request(self.url + "s;index.xml?" + self.urlencode({'search': 'xref', 'value':value}))
         genes = xml.findAll("gene")
         res = [g.attrs for g in genes]
@@ -290,7 +289,7 @@ class HGNC(REST):
         names = [entry['xlink:title'] for entry in entries]
         N = len(names)
 
-        # split query in sets of 300 names 
+        # split query in sets of 300 names
 
         dn = 300
         N = len(names)

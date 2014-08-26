@@ -19,6 +19,7 @@
 """Modules with common tools to access web resources"""
 from __future__ import print_function
 
+import os
 import sys
 import socket
 import urllib
@@ -327,7 +328,7 @@ class RESTService(RESTbase):
 
     For debugging:
 
-    * last_response contains 
+    * last_response contains
 
     """
     def __init__(self, name, url=None, verbose=True):
@@ -341,7 +342,6 @@ class RESTService(RESTbase):
         super(RESTService, self).__init__(name, url, verbose=verbose)
 
     def getUserAgent(self):
-        import os
         self.logging.info('getUserAgent: Begin')
         urllib_agent = 'Python-urllib/%s' % urllib2.__version__
         #clientRevision = ''
@@ -495,23 +495,23 @@ class REST(RESTbase):
     python wrapper but significantly changed.
 
     Get one value::
-    
+
         >>> from bioservices import REST
         >>> s = REST("test", "https://www.ebi.ac.uk/chemblws")
         >>> res = s.get_one("targets/CHEMBL2476.json", "json")
         >>> res['organism']
         u'Homo sapiens'
 
-    The caching has two major interests. First one is that it speed up requests if 
+    The caching has two major interests. First one is that it speed up requests if
     you repeat requests. ::
 
 
         >>> s = REST("test", "https://www.ebi.ac.uk/chemblws")
         >>> s.CACHING = True
-        >>> # requests will be stored in a local sqlite database 
+        >>> # requests will be stored in a local sqlite database
         >>> s.get_one("targets/CHEMBL2476")
-        >>> # Disconnect your wiki and any network connections. 
-        >>> # Without caching you cannot fetch any requests but with 
+        >>> # Disconnect your wiki and any network connections.
+        >>> # Without caching you cannot fetch any requests but with
         >>> # the CACHING on, you can retrieve previous requests:
         >>> s.get_one("targets/CHEMBL2476")
 
@@ -525,7 +525,7 @@ class REST(RESTbase):
         'json': 'application/json',
         'xml': 'application/xml',
     }
-    special_characters = ['/', '#']
+    special_characters = ['/', '#', '+']
 
     def __init__(self, name, url=None, verbose=True, cache=False):
         super(REST, self).__init__(name, url, verbose=verbose)
@@ -568,7 +568,7 @@ class REST(RESTbase):
 
     def _create_session(self):
         """Creates a normal session using HTTPAdapter
-        
+
         max retries is defined in the :attr:`MAX_RETRIES`
         """
         self.logging.debug("Creating session (uncached version)")
@@ -589,13 +589,13 @@ class REST(RESTbase):
                          backend='sqlite', fast_save=self.settings.FAST_SAVE)
         return self._session
 
-   
+
     def _get_caching(self):
         return self.settings.params['cache.on']
     def _set_caching(self, caching):
         self.checkParam(caching, [True ,False])
         self.settings.params['cache.on'] = caching
-        # reset the session, which will be automatically created if we 
+        # reset the session, which will be automatically created if we
         # access to the session attribute
         self._session = None
     CACHING = property(_get_caching, _set_caching)
@@ -604,12 +604,7 @@ class REST(RESTbase):
     #    try:
     #        res = session.get(url, **kwargs)
     #        #else:
-    #        #    res = session.post(url, data=data, headers={'Accept': self.content_types[frmt]}, **kwargs)
-    #        if not res.ok:
-    #            return res.status_code
-    #        return res.json().values()[0] if frmt == 'json' else res.content
-    #    except Exception:
-    #        return None
+    #        #    res =
 
     def _process_get_request(self, url, session, frmt, data=None, **kwargs):
         try:
@@ -627,7 +622,7 @@ class REST(RESTbase):
         # if a response, there is a status code that should be ok
         if not res.ok:
             return res.status_code
-        if frmt == "json": 
+        if frmt == "json":
             try:
                 # this is for chembl only
                 return res.json().values()[0]
@@ -686,11 +681,14 @@ class REST(RESTbase):
             return [self.get_one(**{'frmt': frmt, 'query': key, 'params':params }) for key in query]
             #return self.get_sync(query, frmt)
         # OTHERWISE
-        self.logging.debug("Running single call")
+        self.logging.debug("Running http_get (single call mode)")
         return self.get_one(**{'frmt': frmt, 'query': query, 'params':params})
 
     def get_one(self, query, frmt='json', params={}):
-        url = '%s/%s' % (self.url, query)
+        if query == None:
+            url = self.url
+        else:
+            url = '%s/%s' % (self.url, query)
         self.logging.debug(url)
         try:
             res = self.session.get(url, **{'timeout':self.settings.TIMEOUT, 'params':params})
@@ -701,6 +699,8 @@ class REST(RESTbase):
             print(e.message)
             return None
 
+
+
     #def _post_one(self, url, async, frmt, data=None):
     #    session = self._get_session()
     ##    if async:
@@ -710,9 +710,72 @@ class REST(RESTbase):
     #                                 data=data)
 
 
-    #def post_one(self, chembl_id, frmt='json', async=False):
-    #     url = self._build_request(self.url,  chembl_id, frmt)
-    #     return self._post_one(url, async, frmt)
+
+    def http_post(self, query, params=None, data=None,
+                    frmt='xml', headers=None, files=None, **kargs):
+        ## query and frmt are bioservices parameters. Others are post parameters
+        ## NOTE in requests.get you can use params parameter
+        ## BUT in post, you use data
+        # only single post implemented for now unlike get that can be asynchronous
+        # or list of queries
+        if headers == None:
+            headers = {}
+            headers['User-Agent'] = self.getUserAgent()
+            headers['Accept'] = self.content_types[frmt]
+
+        self.logging.debug("Running http_post (single call mode)")
+        kargs.update({'query':query})
+        kargs.update({'headers':headers})
+        kargs.update({'files':files})
+        kargs.update({'params':params})
+        kargs.update({'data':data})
+        kargs.update({'frmt':frmt})
+        return self.post_one(**kargs)
+
+    def post_one(self, query, frmt='json', **kargs):
+        if query == None:
+            url = self.url
+        else:
+            url = '%s/%s' % (self.url, query)
+        self.logging.debug(url)
+        try:
+
+            res = self.session.post(url,  **kargs)
+            self.last_response = res
+            res = self._interpret_returned_request(res, frmt)
+            return res
+        except Exception,e:
+            print(e.message)
+            return None
+
+    def getUserAgent(self):
+        self.logging.info('getUserAgent: Begin')
+        urllib_agent = 'Python-requests/%s' % requests.__version__
+        #clientRevision = ''
+        clientVersion = ''
+        user_agent = 'EBI-Sample-Client/%s (%s; Python %s; %s) %s' % (
+            clientVersion, os.path.basename( __file__ ),
+            platform.python_version(), platform.system(),
+            urllib_agent
+        )
+        self.logging.info('getUserAgent: user_agent: ' + user_agent)
+        self.logging.info('getUserAgent: End')
+        return user_agent
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

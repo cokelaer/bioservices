@@ -4,7 +4,7 @@
 #
 #  Copyright (c) 2011-2013 - EBI-EMBL
 #
-#  File author(s): 
+#  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
 #      https://www.assembla.com/spaces/bioservices/team
 #
@@ -26,18 +26,18 @@
 
     .. highlights::
 
-        ArrayExpress is a database of functional genomics experiments that can be queried and the data downloaded. It includes gene expression data from microarray and high throughput sequencing studies. Data is collected to MIAME and MINSEQE standards. Experiments are submitted directly to ArrayExpress or are imported from the NCBI GEO database. 
+        ArrayExpress is a database of functional genomics experiments that can be queried and the data downloaded. It includes gene expression data from microarray and high throughput sequencing studies. Data is collected to MIAME and MINSEQE standards. Experiments are submitted directly to ArrayExpress or are imported from the NCBI GEO database.
 
         -- ArrayExpress home page, Jan 2013
 
 """
 from __future__ import print_function
 
-from bioservices.services import RESTService, BioServicesError
+from bioservices.services import REST
 
 __all__ = ["ArrayExpress"]
 
-class ArrayExpress(RESTService):
+class ArrayExpress(REST):
     """Interface to the `ArrayExpress <http://www.ebi.ac.uk/arrayexpress>`_ service
 
     ArrayExpress allows to retrieve data sets used in various experiments. If
@@ -48,7 +48,7 @@ class ArrayExpress(RESTService):
         >>> # retrieve a specific file from a experiment
         >>> res = s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")
 
-    The main issue is that you may not know the experiment you are looking for. 
+    The main issue is that you may not know the experiment you are looking for.
     You can query experiments by keyword::
 
         >>> # Search for experiments
@@ -60,9 +60,9 @@ class ArrayExpress(RESTService):
     * More than one keyword can be searched for using the + sign (e.g. keywords="cancer+breast")
     * Use an asterisk as a multiple character wild card (e.g. keywords="colo*")
     * use a question mark ? as a single character wild card (e.g. keywords="te?t")
- 
-    More complex queries can be constructed using the operators AND, OR or NOT. 
-    AND is the default if no operator is specified. Either experiments or 
+
+    More complex queries can be constructed using the operators AND, OR or NOT.
+    AND is the default if no operator is specified. Either experiments or
     files can be searched for. Examples are::
 
         keywords="prostate+AND+breast"
@@ -92,7 +92,7 @@ class ArrayExpress(RESTService):
     Using the same example, you can retrieve the names of the files related to
     the experiment::
 
-        
+
         >>> files = [x.getchildren() for x in exp.getchildren() if x.tag == "files"]
         >>> [x.get("name") for x in files[0]]
         ['E-MEXP-31.raw.1.zip',
@@ -112,11 +112,15 @@ class ArrayExpress(RESTService):
     .. seealso:: :meth:`queryFiles` for more details about the parameters to be
         used in queries.
 
-    .. warning:: supports only new style (v2). You can still use the old style by 
-        setting the request manually using the :meth:`request`.
+    .. warning:: supports only new style (v2). You can still use the old style by
+        setting the request manually using the :meth:`version`.
 
+    .. warning:: some syntax requires the + character, which is a special character
+        for http requests. It is replaced internally by spaces if found
     .. warning:: filtering is not implemented (e.g., assaycount:[x TO y]syntax.)
     """
+
+
 
     def __init__(self, verbose=False):
         """.. rubric:: Constructor
@@ -128,6 +132,7 @@ class ArrayExpress(RESTService):
             url="http://www.ebi.ac.uk/arrayexpress", verbose=verbose)
         self.easyXMLConversion = True
         self._format = "xml"
+        self.version = "v2"
 
     def _set_format(self, f):
         self.checkParam(f, ["json", "xml"])
@@ -140,12 +145,12 @@ class ArrayExpress(RESTService):
     def _search(self, mode, **kargs):
         """common function to search for files or experiments"""
         assert mode in ["experiments", "files"]
-        url = self.url + "/" + self.format + "/v2/" + mode 
+        url = "{0}/{1}/{2}".format(self.format, self.version, mode)
 
 
         defaults = {
             "accession":None, #ex: E-MEXP-31
-            "keywords":None, 
+            "keywords":None,
             "species": None,
             "wholewords": "on",
             "expdesign":  None,
@@ -163,34 +168,43 @@ class ArrayExpress(RESTService):
         }
 
         for k in kargs.keys():
-            self.checkParam(k, defaults.keys())
+            self.devtools.check_param_in_list(k, defaults.keys())
 
-        if len(kargs.keys()):
-            url += "?"
-        params = []
+        #if len(kargs.keys()):
+        #    url += "?"
+        params = {}
 
         for k, v in kargs.iteritems():
             if k in ["expandfo", "wholewords"]:
                 if v in ["on", True, "true", "TRUE", "True"]:
-                    params.append(k + "=on")
+                    #params.append(k + "=on")
+                    params[k] = "on"
             elif k in ["gxa", "directsub"]:
                 if v in ["on", True, "true", "TRUE", "True"]:
-                    params.append(k + "=true")
+                    #params.append(k + "=true")
+                    params[k] = "true"
                 elif v in [False, "false", "False"]:
-                    params.append(k + "=false")
+                    #params.append(k + "=false")
+                    params[k] = "false"
                 else:
                     raise ValueError("directsub must be true or false")
             else:
                 if k in ["sortby", "sortorder"]:
-                    self.checkParam(v, defaults[k])
-                params.append(k + "=" + v)
+                    self.devtools.check_param_in_list(v, defaults[k])
+                #params.append(k + "=" + v)
+                params[k] = v
 
-        url += "&".join(params)
-
+        # NOTE: + is a special character that is replaced by %2B
+        # The + character is the proper encoding for a space when quoting
+        # GET or POST data. Thus, a literal + character needs to be escaped
+        # as well, lest it be decoded to a space on the other end
+        for k,v in params.items():
+            params[k] = v.replace("+",  " ")
 
         self.logging.info(url)
-
-        res = self.request(url)
+        res = self.http_get(url, frmt=self.format, params=params)
+        if self.format == "xml":
+            res = self.easyXML(res)
         return res
 
 
@@ -213,7 +227,7 @@ class ArrayExpress(RESTService):
         :param str pmid: PubMed identifier (e.g., 16553887)
         :param str sa: Sample attribute values. Has EFO expansion. fibroblast
         :param str species: Species of the samples.Has EFO expansion. (e.g., "homo+sapiens")
-        :param bool wholewords: 
+        :param bool wholewords:
 
         The following parameters can filter the experiments:
 
@@ -230,14 +244,14 @@ class ArrayExpress(RESTService):
         .. doctest::
             :options: +SKIP
 
+            >>> from bioservices import ArrayExpress
+            >>> s = ArrayExpress()
             >>> res = s.queryFiles(keywords="cancer+breast", wholewords=True)
-            >>> res = a.queryExperiments(array="A-AFFY-33", species="Homo+Sapiens")
-            >>> res = a.queryExperiments(array="A-AFFY-33", species="Homo+Sapiens", sortorder="releasedate")
-            >>> res = a.queryExperiments(array="A-AFFY-33", species="Homo%20Sapiens", 
-            ...     expdesign="dose+response", sortby="releasedate", sortorder="ascending")
+            >>> res = s.queryExperiments(array="A-AFFY-33", species="Homo Sapiens")
+            >>> res = s.queryExperiments(array="A-AFFY-33", species="Homo Sapiens", sortorder="releasedate")
+            >>> res = s.queryExperiments(array="A-AFFY-33", species="Homo+Sapiens",
+            ...     expdesign="dose response", sortby="releasedate", sortorder="ascending")
             >>> dates = [x.findall("releasedate")[0].text for x in res.getchildren()]
-
-
 
         """
         res = self._search("files", **kargs)
@@ -247,13 +261,13 @@ class ArrayExpress(RESTService):
     def queryExperiments(self, **kargs):
         """Retrieve experiments
 
-        .. seealso:: :meth:`~bioservices.arrayexpress.ArrayExpress.queryFiles` for 
+        .. seealso:: :meth:`~bioservices.arrayexpress.ArrayExpress.queryFiles` for
             all possible keywords
 
         .. doctest::
             :options: +SKIP
 
-            >>> res = a.queryExperiments(keywords="cancer+breast", wholewords=True)
+            >>> res = s.queryExperiments(keywords="cancer+breast", wholewords=True)
 
         """
         res = self._search("experiments", **kargs)
@@ -266,7 +280,7 @@ class ArrayExpress(RESTService):
         ::
 
             >>> s.retrieveExperiment("E-MEXP-31")
-            >>> # equivalent to 
+            >>> # equivalent to
             >>> s.queryExperiments(accession="E-MEXP-31")
 
 
@@ -277,25 +291,29 @@ class ArrayExpress(RESTService):
     def retrieveFile(self, experiment, filename, save=False):
         """Retrieve a specific file from an experiment
 
-        :param str filename: 
+        :param str filename:
 
         ::
 
-            >>> retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")
+            >>> s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")
         """
+        frmt = self.format[:]
+        self.format = "xml"
         files = self.retrieveFilesFromExperiment(experiment)
-        assert filename in files, """Error. Provided filename does not seem to be correct. 
+        self.format = frmt[:]
+
+        assert filename in files, """Error. Provided filename does not seem to be correct.
             Files available for %s experiment are %s """ % (experiment, files)
 
-        url = self.url + "/files/" + experiment + "/" + filename
+        url =  "files/" + experiment + "/" + filename
 
         if save:
-            res = self.request(url, format="txt")
+            res = self.http_get(url, frmt="txt")
             f = open(filename,"w")
             f.write(res)
             f.close()
         else:
-            res = self.request(url)
+            res = self.http_get(url, frmt=None)
             return  res
 
     def retrieveFilesFromExperiment(self, experiment):
@@ -313,7 +331,10 @@ class ArrayExpress(RESTService):
             ['E-MEXP-31.raw.1.zip', 'E-MEXP-31.processed.1.zip', 'E-MEXP-31.idf.txt', 'E-MEXP-31.sdrf.txt']
 
 
+        .. warning:: if format is json, filenames cannot be found so you
+            must use format set to xml
         """
+        assert self.format == "xml", "json format not supported to retrieve the filenames"
         res = self.queryExperiments(keywords=experiment)
         exp = res.getchildren()[0]
         files = [x.getchildren() for x in exp.getchildren() if x.tag == "files"]

@@ -4,7 +4,7 @@
 #
 #  Copyright (c) 2011-2013 - EBI-EMBL
 #
-#  File author(s): 
+#  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
 #      https://www.assembla.com/spaces/bioservices/team
 #
@@ -35,12 +35,12 @@
 """
 from __future__ import print_function
 
-from bioservices.services import RESTService, BioServicesError
+from bioservices.services import REST
 
 __all__ = ["PDB"]
 
 
-class PDB(RESTService):
+class PDB(REST):
     """Interface to part of the `PDB <http://www.rcsb.org/pdb>`_ service
 
     :Status: in progress not for production. You can get all ID and retrieve
@@ -55,19 +55,37 @@ class PDB(RESTService):
 
     """
 
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=False, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose: prints informative messages (default is off)
 
         """
-        super(PDB, self).__init__(name="PDB",
-            url="http://www.rcsb.org/pdb/rest/", verbose=verbose)
+        url="http://www.rcsb.org/pdb/rest"
+        super(PDB, self).__init__(name="PDB", url=url, verbose=verbose,
+            cache=cache)
         self.easyXMLConversion = True
+
+    def search(self, query):
+        """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <orgPdbQuery>
+        <version>B0907</version>
+        <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+        <description>Experimental Method Search : Experimental Method=SOLID-STATE NMR</description>
+        <mvStructure.expMethod.value>SOLID-STATE NMR</mvStructure.expMethod.value>
+        </orgPdbQuery>
+        """
+
+
+        res = self.http_post("search", frmt="", data=query)
+
+        return res
 
     def getCurrentIDs(self):
         """Get a list of all current PDB IDs."""
-        res = self.request("getCurrent")
+        res = self.http_get("getCurrent", frmt="xml")
+        res= self.easyXML(res)
         res = [x.attrib['structureId'] for x in res.getchildren()]
         return res
 
@@ -92,11 +110,15 @@ class PDB(RESTService):
 
         """
         valid_formats = ["FASTA", "pdb", "cif", "xml"]
-        self.checkParam(fileFormat, valid_formats)
-        formatter = "download/downloadFile.do?fileFormat=%s&compression=NO&structureId=%s"
+        self.devtools.check_param_in_list(fileFormat, valid_formats)
+
+        query = "download/downloadFile.do"
+
+        params = {'fileFormat': fileFormat, 'compression': 'NO', 'structureId':Id}
         if fileFormat == "xml":
-            res = self.request(formatter % (fileFormat, Id))
+            res = self.http_get(query, frmt="xml", params=params)
+            res = self.easyXML(res)
         else:
-            res = self.request(formatter % (fileFormat, Id), format="txt")
+            res = self.http_get(query, frmt="txt", params=params)
         return res
 

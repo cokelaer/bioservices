@@ -4,7 +4,7 @@
 #
 #  Copyright (c) 2011-2013 - EBI-EMBL
 #
-#  File author(s): 
+#  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
 #      https://www.assembla.com/spaces/bioservices/team
 #
@@ -42,19 +42,19 @@
 .. http://www.uniprot.org/docs/pkinfam
 
 """
-from services import RESTService
+from services import REST
 from xmltools import readXML
 __all__ = ["BioCarta"]
 
 
-class BioCarta(RESTService):
+class BioCarta(REST):
     """Interface to `BioCarta <http://www.biocarta.com>`_ pages
 
 
     This is not a REST interface actually but rather a parser to some of the
     HTML pages relatd to pathways.
 
-    One can retrieve the pathways names and their list of proteins. 
+    One can retrieve the pathways names and their list of proteins.
 
         >>> from bioservics import *
         >>> b = BioCarta()
@@ -78,22 +78,21 @@ class BioCarta(RESTService):
 
     def get_pathway_names(self, startswith=""):
         """returns pathways from biocarta
-        
+
         all human and mouse. can perform a selectiom
         """
         x = readXML(self._allPathwaysURL)
         pathways = [this.get("href") for this in x.findAll("a") if "pathfiles" in this.get("href")]
-        pathways =  [str(x.split("/")[-1]) for x in pathways] # split the drive
+        pathways =  [str(xx.split("/")[-1]) for xx in pathways] # split the drive
         pathways = sorted(list(set(pathways)))
-        pathways = [x for x in pathways if x.startswith(startswith)]
+        pathways = [xx for xx in pathways if xx.startswith(startswith)]
         return pathways
-
 
     def get_pathway_protein_names(self, pathway):
         """returns list of list. Each elements is made of 3 items: gene name,
         locusId and accession (often empty
-        
-        Requires to parse HTML page such as 
+
+        Requires to parse HTML page such as
         http://www.biocarta.com/pathfiles/m_actinYPathway.asp
 
         to figure out the URL that would pop up if we press the protein list

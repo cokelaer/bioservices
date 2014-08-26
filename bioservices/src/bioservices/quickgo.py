@@ -34,7 +34,7 @@
 """
 from __future__ import print_function
 
-from bioservices.services import REST, RESTService
+from bioservices.services import REST
 
 __all__ = ["QuickGO"]
 
@@ -55,12 +55,12 @@ class QuickGO(REST):
     print only 3 columns of information (protein name, GO identifier and GO
     name)::
 
-        print s.Annotation(protein="Q8IYB3", format="tsv", tax=9606,
+        print s.Annotation(protein="Q8IYB3", frmt="tsv", tax=9606,
             source="UniProt", col="proteinName,goID,goName")
 
     Here is the Term output for a given GO identifier::
 
-        >>> print s.Term("GO:0000016", format="obo")
+        >>> print s.Term("GO:0000016", frmt="obo")
         [Term]
         id: GO:0000016
         name: lactase activity
@@ -80,7 +80,7 @@ class QuickGO(REST):
             'date', 'from', 'splice', 'proteinName', 'proteinSynonym', 'proteinType',
             'proteinTaxonName', 'originalTermID', 'originalGOName']
 
-    def __init__(self, verbose=True, cache=False):
+    def __init__(self, verbose=False, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose: print informative messages.
@@ -113,7 +113,7 @@ class QuickGO(REST):
         if goid.startswith("GO:")==False:
             raise ValueError("GO id must start with 'GO:'")
 
-        params = {'id':goid, 'format':frmt}
+        params = {'id':goid, 'frmt':frmt}
         res = self.http_get("GTerm", frmt="xml", params=params)
 
         return res
@@ -176,7 +176,7 @@ class QuickGO(REST):
 
             >>> print s.Annotation(protein='P12345', frmt='tsv', col="ref,evidence",
             ... ref='PMID:*')
-            >>> print s.Annotation(protein='P12345,Q4VCS5', frmt='tsv', 
+            >>> print s.Annotation(protein='P12345,Q4VCS5', frmt='tsv',
             ...     col="ref,evidence",ref='PMID:,Reactome:')
 
 
@@ -269,8 +269,9 @@ or a string (e.g., 'PUBMED:*') """)
         if frmt=="tsv":
             if col == None:
                 col = 'proteinDB,proteinID,proteinSymbol,qualifier,'
-                col += 'goID,goName,aspect,evidence,ref,with,proteinTaxon,date,from,splice,'
-                col += 'proteinName,proteinSynonym,proteinType,proteinTaxonName,originalTermID,originalGOName'
+                col += 'goID,goName,aspect,evidence,ref,with,proteinTaxon,'
+                col += 'date,from,splice,proteinName,proteinSynonym,proteinType,'
+                col += 'proteinTaxonName,originalTermID,originalGOName'
             else:
                 col = ",".join([x.strip() for x in col.split(",")])
 
@@ -298,7 +299,7 @@ or a string (e.g., 'PUBMED:*') """)
         :param str protein: a GO identifier
         :return: all outputs are stored into a Pandas.DataFrame data structure.
 
-        All parameters from :math:`Annotation` are also valid except **format** that 
+        All parameters from :math:`Annotation` are also valid except **format** that
         is set to **tsv**  and cols that is made of all possible column names.
 
         """
@@ -319,7 +320,7 @@ or a string (e.g., 'PUBMED:*') """)
         try:
             import pandas as pd
             return pd.DataFrame(res)
-        except: 
+        except:
             self.logging.warning("Cannot return a DataFrame. Returns the list. If you want the dataframe, install pandas library")
             return res
 
@@ -329,7 +330,7 @@ or a string (e.g., 'PUBMED:*') """)
         :param str protein: a protein name
         :return: all outputs are stored into a Pandas.DataFrame data structure.
 
-        All parameters from :math:`Annotation` are also valid except **format** that 
+        All parameters from :math:`Annotation` are also valid except **format** that
         is set to **tsv**  and cols that is made of all possible column names.
 
         """
@@ -350,7 +351,7 @@ or a string (e.g., 'PUBMED:*') """)
         try:
             import pandas as pd
             return pd.DataFrame(res)
-        except: 
+        except:
             self.logging.warning("Cannot return a DAtaFrame. Returns the list")
             return res
 

@@ -5,7 +5,7 @@
 #
 #  Copyright (c) 2011-2013 - EBI-EMBL
 #
-#  File author(s): 
+#  File author(s):
 #      https://www.assembla.com/spaces/bioservices/team
 #
 #  Distributed under the GPLv3 License.
@@ -37,19 +37,19 @@ to all the BioModel service.
 
 .. note:: SOAP and REST are available. We use REST for the wrapping.
 """
-from bioservices import RESTService, BioServicesError
+from bioservices import REST, BioServicesError
 
 __all__ = ["BioMart"]
 
 
-class BioMart(RESTService):
+class BioMart(REST):
     r"""Interface to the `BioMart <http://www.biomart.org>`_ service
 
-    BioMart is made of different views. Each view correspond to a specific **MART**. 
+    BioMart is made of different views. Each view correspond to a specific **MART**.
     For instance the UniProt service has a `BioMart view <http://www.ebi.ac.uk/uniprot/biomart/martview/>`_.
 
     The registry can help to find the different services available through
-    BioMart. 
+    BioMart.
 
         >>> from bioservices import *
         >>> s = BioMart()
@@ -76,9 +76,9 @@ class BioMart(RESTService):
         >>> s = BioMart(verbose=False)
         >>> s.lookfor("interpro")
         Candidate:
-             database: intermart_1 
-            MART name: prod-intermart_1 
-          displayName: INTERPRO (EBI UK) 
+             database: intermart_1
+            MART name: prod-intermart_1
+          displayName: INTERPRO (EBI UK)
                 hosts: www.ebi.ac.uk
 
     The display name (INTERPRO) correspond to the MART name
@@ -145,80 +145,80 @@ class BioMart(RESTService):
 
 
     """
-
-
     _xml_example = """<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Query>
-<Query  virtualSchemaName = "default" formatter = "TSV" header = "0" uniqueRows = "0" count = "" datasetConfigVersion = "0.6" >
+                <!DOCTYPE Query>
+                    <Query virtualSchemaName="default" formatter="CSV" header="0" uniqueRows="0" count="" datasetConfigVersion="0.6">
+                    <Dataset name="mmusculus_gene_ensembl" interface="default">
+                    <Filter name="ensembl_gene_id" value="ENSMUSG00000086981"/>
+                    <Attribute name="ensembl_gene_id"/>
+                    <Attribute name="ensembl_transcript_id"/>
+                    <Attribute name="transcript_start"/>
+                    <Attribute name="transcript_end"/>
+                    <Attribute name="exon_chrom_start"/>
+                    <Attribute name="exon_chrom_end"/>
+                    </Dataset>
+                    </Query>"""
 
-	<Dataset name = "pathway" interface = "default" >
-		<Filter name = "referencepeptidesequence_uniprot_id_list" value = "P43403"/>
-		<Attribute name = "stableidentifier_identifier" />
-		<Attribute name = "pathway_db_id" />
-	</Dataset>
-</Query>
-</xml>
-    """
 
-
-    def __init__(self, verbose=False, host=None):
+    def __init__(self, verbose=False, host=None, cache=False):
         """.. rubric:: Constructor
-        
-        
+
+
         By default, the URL used for the biomart service is::
-        
+
             http://www.biomart.org/biomart/martservice
-            
+
         Sometimes, the server is down, in which case you may want to use another
         one (e.g., www.ensembl.org). To do so, use the **host** parameter.
-        
+
         :param str host: a valid host (e.g. "www.ensembl.org")
-        
-        
+
+
         """
         if host == None:
             host = "www.biomart.org"
         url = "http://%s/biomart/martservice" % host
-        
-        super(BioMart, self).__init__("BioMart", url=url, verbose=verbose)
+
+        super(BioMart, self).__init__("BioMart", url=url, verbose=verbose,
+            cache=cache)
         self._names = None
         self._databases = None
         self._display_names = None
         self._valid_attributes = None
         self._hosts = None
 
-        self._init()   # can be commented if we do not want to check the validity of attributes 
+        self._init()   # can be commented if we do not want to check the validity of attributes
 
     def _init(self):
-        self.logging.info("Initialisation %s" % self.name)
         temp = self.debugLevel
         self.debugLevel = "ERROR"
         res = self.lookfor("uniprot", verbose=False)
-        res = self.valid_attributes
+        res2 = self.valid_attributes
         self.debugLevel = temp
         self._biomartQuery = BioMartQuery()
 
     def registry(self):
         """to retrieve registry information
 
-         the XML contains list of children called MartURLLocation made 
+         the XML contains list of children called MartURLLocation made
          of attributes. We parse the xml to return a list of dictionary.
          each dictionary correspond to one MART.
 
         aliases to some keys are provided: names, databases, displayNames
 
-	"""
-        ret = self.request("?type=registry")
-        # the XML contains list of children called MartURLLocation made 
+    	 """
+        ret = self.http_get("?type=registry", frmt="xml")
+        ret = self.easyXML(ret)
+        # the XML contains list of children called MartURLLocation made
         # of attributes. We parse the xml to return a list of dictionary.
         # each dictionary correspond to one MART.
         ret = [x.attrib for x in ret.getchildren()]
         return ret
 
     def datasets(self, mart, raw=False):
-        """to retrieve datasets available for a mart: 
+        """to retrieve datasets available for a mart:
 
-        :param str mart: e.g. ensembl. see :attr:`names` for a list of valid MART names 
+        :param str mart: e.g. ensembl. see :attr:`names` for a list of valid MART names
             the mart is the database. see lookfor method or databases attributes
 
         >>> s = BioMart(verbose=False)
@@ -229,7 +229,8 @@ class BioMart(RESTService):
         """
         if mart not in self.names:
             raise BioServicesError("Provided mart name (%s) is not valid. see 'names' attribute" % mart)
-        ret = self.request("?type=datasets&mart=%s" %mart, format="txt")
+        ret = self.http_get("?type=datasets&mart=%s" %mart, frmt="txt")
+
         if raw==False:
             try:
                 ret2 = [x.split("\t") for x in ret.split("\n") if len(x.strip())]
@@ -248,7 +249,7 @@ class BioMart(RESTService):
         #assert dataset in self.names
         if dataset not in [x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]]:
             raise ValueError("provided dataset (%s) is not found. see valid_attributes" % dataset)
-        ret = self.request("?type=attributes&dataset=%s" %dataset, format='txt')
+        ret = self.http_get("?type=attributes&dataset=%s" %dataset, frmt='txt')
 
         ret = [x for x in ret.split("\n") if len(x)]
         results = {}
@@ -276,7 +277,7 @@ class BioMart(RESTService):
         """
         if dataset not in [x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]]:
             raise ValueError("provided dataset (%s) is not found. see valid_attributes" % dataset)
-        ret = self.request("?type=filters&dataset=%s" %dataset, format='txt')
+        ret = self.http_get("?type=filters&dataset=%s" %dataset, frmt=None)
         ret = [x for x in ret.split("\n") if len(x)]
         results = {}
         for line in ret:
@@ -290,7 +291,8 @@ class BioMart(RESTService):
         :param str dataset: e.g. oanatinus_gene_ensembl
 
         """
-        ret = self.request("?type=configuration&dataset=%s" %dataset)
+        ret = self.http_get("?type=configuration&dataset=%s" %dataset, frmt="xml")
+        ret = self.easyXML(ret)
         return ret
 
     def version(self, mart):
@@ -299,7 +301,8 @@ class BioMart(RESTService):
         :param str mart: e.g. ensembl
 
         """
-        ret = self.request("?type=version&mart=%s" % mart)
+        ret = self.http_get("?type=version&mart=%s" % mart, frmt="xml")
+        ret = self.easyXML(ret)
         return ret
 
     def new_query(self):
@@ -308,22 +311,26 @@ class BioMart(RESTService):
     def query(self, xmlq):
         """Send a query to biomart
 
-	The query must be formatted in a XML format which looks like::
+    	 The query must be formatted in a XML format which looks like (
+        example from https://gist.github.com/keithshep/7776579)::
 
             <?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE Query>
-            <Query  virtualSchemaName = "default" formatter = "TSV" header = "0" uniqueRows = "0" count = "" datasetConfigVersion = "0.6" >
-
-                <Dataset name = "pathway" interface = "default" >
-		    <Filter name = "referencepeptidesequence_uniprot_id_list" value = "P43403"/>
-    	            <Attribute name = "stableidentifier_identifier" />
-               	    <Attribute name = "pathway_db_id" />
-                </Dataset>
-            </Query>
+                <!DOCTYPE Query>
+                    <Query virtualSchemaName="default" formatter="CSV" header="0" uniqueRows="0" count="" datasetConfigVersion="0.6">
+                    <Dataset name="mmusculus_gene_ensembl" interface="default">
+                    <Filter name="ensembl_gene_id" value="ENSMUSG00000086981"/>
+                    <Attribute name="ensembl_gene_id"/>
+                    <Attribute name="ensembl_transcript_id"/>
+                    <Attribute name="transcript_start"/>
+                    <Attribute name="transcript_end"/>
+                    <Attribute name="exon_chrom_start"/>
+                    <Attribute name="exon_chrom_end"/>
+                    </Dataset>
+                    </Query>
 
         """
-
-        ret = self.requestPost(self.url, params={"query":xmlq})
+        xmlq = xmlq.replace("\n", "")
+        ret = self.http_post(None, params={"query":xmlq})
         return ret
 
     def add_attribute_to_xml(self, name, dataset=None):
@@ -438,7 +445,7 @@ class BioMartQuery(object):
     def __init__(self, version="1.0", virtualScheme="default"):
 
         params = {
-            "version": version, 
+            "version": version,
             "virtualSchemaName": virtualScheme,
             "formatter": "TSV",
             "header":0,

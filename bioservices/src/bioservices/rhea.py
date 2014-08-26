@@ -4,7 +4,7 @@
 #
 #  Copyright (c) 2011-2013 - EBI-EMBL
 #
-#  File author(s): 
+#  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
 #      https://www.assembla.com/spaces/bioservices/team
 #
@@ -27,17 +27,17 @@
     .. highlights::
 
         Rhea is a reaction database, where all reaction participants (reactants
-        and products) are linked to the ChEBI database (Chemical Entities of 
+        and products) are linked to the ChEBI database (Chemical Entities of
         Biological Interest) which provides detailed information about structure,
-        formula and charge. Rhea provides built-in validations that ensure both 
-        elemental and charge balance of the reactions... While the main focus of 
-        Rhea is enzyme-catalysed reactions, other biochemical reactions are also 
+        formula and charge. Rhea provides built-in validations that ensure both
+        elemental and charge balance of the reactions... While the main focus of
+        Rhea is enzyme-catalysed reactions, other biochemical reactions are also
         are included.
 
-        The database is extensively cross-referenced. Reactions are currently linked 
-        to the EC list, KEGG and MetaCyc, and the reactions will be used in the 
-        IntEnz database and in all relevant UniProtKB entries. Furthermore, the 
-        reactions will also be used in the UniPathway database to generate 
+        The database is extensively cross-referenced. Reactions are currently linked
+        to the EC list, KEGG and MetaCyc, and the reactions will be used in the
+        IntEnz database and in all relevant UniProtKB entries. Furthermore, the
+        reactions will also be used in the UniPathway database to generate
         pathways and metabolic networks.
 
         -- from Rhea Home page, Dec 2012 (http://www.ebi.ac.uk/rhea/about.xhtml)
@@ -57,7 +57,7 @@ class Rhea(REST):
     You can search by compound name, ChEBI ID, reaction ID, cross reference
     (e.g., EC number) or citation (author name, title, abstract text, publication ID).
     You can use double quotes - to match an exact phrase - and the following
-    wildcards: 
+    wildcards:
 
         * ? (question mark = one character),
         * `*` (asterisk = several characters).
@@ -69,7 +69,7 @@ class Rhea(REST):
         r = Rhea()
         response = r.search("caffe*")
 
-    Searching for a?e?o* will find reactions with participants such as acetoin, 
+    Searching for a?e?o* will find reactions with participants such as acetoin,
     acetone or adenosine.::
 
         from bioservices import Rhea
@@ -91,7 +91,7 @@ class Rhea(REST):
             >>> from bioservices import Rhea
             >>> r = Rhea()
         """
-        super(Rhea2, self).__init__(name="Rhea", url=Rhea._url, 
+        super(Rhea, self).__init__(name="Rhea", url=Rhea._url,
             verbose=verbose, cache=cache)
         self.version = version
         self.format_entry = ["cmlreact", "biopax2", "rxn"]
@@ -112,19 +112,17 @@ class Rhea(REST):
             >>> r.search("caffeine")  # id 10280
             >>> r.search("caffeine", frmt="biopax2")  # id 10280
 
-        The output is in XML format. This page from the Rhea web site explains 
-        what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of 
+        The output is in XML format. This page from the Rhea web site explains
+        what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of
         the XML file.
 
         """
-        _format = format    # format is a keyword but we want to use it so rhea
-                            # users are not confused.
-        if _format == None:
-            _format = "cmlreact" # default is cmlreact
-        if _format not in ["biopax2", "cmlreact"]:
+        if frmt == None:
+            frmt = "cmlreact" # default is cmlreact
+        if frmt not in ["biopax2", "cmlreact"]:
             raise ValueError("format must be either cmlreact (default) or biopax2")
 
-        url = self.version + "/ws/reaction/%s?q=" % _format
+        url = self.version + "/ws/reaction/%s?q=" % frmt
         url += query
 
         response = self.http_get(url, frmt="xml")
@@ -139,14 +137,14 @@ class Rhea(REST):
         :param format: can be rxn, biopax2, or cmlreact
         :Returns: An XML document containing the reactions with undefined
             direction, with links to the corresponding bi-directional ones.
-            The format is easyXML. If frmt is rnx, 
+            The format is easyXML. If frmt is rnx,
 
         ::
 
             >>> print r.entry(10281, frmt="rxn")
 
-        The output is in XML format. This page from the Rhea web site explains 
-        what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of 
+        The output is in XML format. This page from the Rhea web site explains
+        what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of
         the XML file.
         """
         self.devtools.check_param_in_list(frmt, self.format_entry)
@@ -156,7 +154,7 @@ class Rhea(REST):
             response = self.http_get(url, frmt=frmt)
         else:
             response = self.http_get(url, frmt="xml")
-            response = self.easyXML(res)
+            response = self.easyXML(response)
         return response
 
 
