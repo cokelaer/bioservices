@@ -13,7 +13,7 @@ def test_muscle():
     f2 = u.get_fasta("P18813")
 
 
-    jobid = m.run(format="fasta", sequence=f1+f2, email="cokelaer@ebi.ac.uk")
+    jobid = m.run(frmt="fasta", sequence=f1+f2, email="cokelaer@ebi.ac.uk")
     m.getStatus(jobid)
     m.wait(jobid)
 

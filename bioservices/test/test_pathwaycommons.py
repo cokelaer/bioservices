@@ -31,7 +31,7 @@ def test_top_pathways():
 def test_graph(): 
     pc2 = pathwaycommons.PathwayCommons(verbose=False)
     res = pc2.graph(source="http://identifiers.org/uniprot/P20908",
-            kind="neighborhood", format="EXTENDED_BINARY_SIF")
+            kind="neighborhood", frmt="EXTENDED_BINARY_SIF")
 
     #res = pc2.graph(source="P20908", kind="neighborhood")
 
