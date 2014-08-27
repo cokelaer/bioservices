@@ -309,7 +309,7 @@ class PathwayCommons(REST):
         return res
 
     def graph(self, kind, source, target=None, direction=None, limit=1,
-            format=None, datasource=None, organism=None):
+            frmt=None, datasource=None, organism=None):
         """Finds connections and neighborhoods of elements
 
         Connections can be for example the shortest path between two proteins 

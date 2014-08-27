@@ -69,9 +69,12 @@ class Service(Logging):
 
     response_codes = {
         200 : 'OK',
+        201 : 'Created',
         400 : 'Bad Request. There is a problem with your input',
         404 : 'Not found. The resource you requests does not exist',
+        406 : "Not Acceptable. Usually headers issue",
         410 :  'Gone. The resource you requested was removed.',
+        415 : "Unsupported Media Type",
         500 : 'Internal server error. Most likely a temporary problem',
         503 : 'Service not available. The server is being updated, try again  later'
         }
@@ -459,6 +462,7 @@ class RESTService(RESTbase):
             # Set the HTTP User-agent.
             user_agent = self.getUserAgent()
             http_headers = { 'User-Agent' : user_agent }
+            print(requestUrl)
             req = urllib2.Request(requestUrl, None, http_headers)
             # Make the submission (HTTP POST).
             print(req)
@@ -524,7 +528,8 @@ class REST(RESTbase):
     content_types = {
         'json': 'application/json',
         'xml': 'application/xml',
-        'txt': 'application/txt',
+        'txt': 'text/plain',
+        'default' : "application/x-www-form-urlencoded"
     }
     special_characters = ['/', '#', '+']
 

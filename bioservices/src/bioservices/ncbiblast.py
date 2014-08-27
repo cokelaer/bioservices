@@ -53,7 +53,7 @@ class NCBIblast(REST):
 
         >>> from bioservices import *
         >>> s = NCBIblast(verbose=False)
-        >>> jobid = n.run(program="blastp", sequence=n._sequence_example,
+        >>> jobid = s.run(program="blastp", sequence=s._sequence_example,
             stype="protein", database="uniprotkb", email="name@provider")
         >>> s.getResult(jobid, "out")
 
@@ -104,6 +104,7 @@ class NCBIblast(REST):
             need to process the XML output.
         """
         res = self.http_get("parameters", frmt="xml")
+        res = self.easyXML(res)
         return res
 
     def _get_parameters(self):
@@ -125,7 +126,7 @@ returns a list of parameters. See :meth:`getParameters`.""")
 
         For example::
 
-            >>> n.parametersDetails("matrix")
+            >>> s.parametersDetails("matrix")
             [u'BLOSUM45',
              u'BLOSUM50',
              u'BLOSUM62',
@@ -140,7 +141,6 @@ returns a list of parameters. See :meth:`getParameters`.""")
             raise ValueError("Invalid parameterId provided(%s). See parameters attribute" % parameterId)
 
         if parameterId not in self._parametersDetails.keys():
-
             request = "parameterdetails/" + parameterId
             res = self.http_get(request, frmt="xml")
             res = self.easyXML(res)
@@ -261,7 +261,7 @@ returns a list of parameters. See :meth:`getParameters`.""")
             databases = [database]
         else:
             raise TypeError("database must be a string or a list of strings")
-        DBs = "&database=" + "&database=".join(databases)
+        params['database'] = databases
 
         """
 parser.add_option('--seqrange', help='region within input to use as query')
@@ -275,8 +275,8 @@ parser.add_option('--polljob', action="store_true", help='get job result')
 parser.add_option('--status', action="store_true", help='get job status')
 parser.add_option('--resultTypes', action='store_true', help='get result types')
     """
-        print DBs
-        res = self.http_post("http://www.ebi.ac.uk/Tools/services/rest/ncbiblast/run/", params)
+        res = self.http_post("run/", frmt=None, data=params, 
+                headers={})
 
         return res
 
@@ -318,7 +318,7 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
             self.logging.warning("waiting for the job to be finished. May take a while")
             self.wait(jobid, verbose=False)
         url = 'resulttypes/' + jobid
-        res = self.http_get(url, format="txt")
+        res = self.http_get(url, frmt="xml")
         res = self.easyXML(res)
 
         output = {}

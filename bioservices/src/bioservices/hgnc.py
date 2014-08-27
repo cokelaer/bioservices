@@ -124,6 +124,7 @@ class HGNC(REST):
                 res = self.http_get("genes/%s" % gene)
             else:
                 res = self.http_get("gene/%s.xml" % gene)
+                res = self.easyXML(res)
             #res = bs4.BeautifulSoup(res)
         except HTTPError:
             print("!!BioServices HTTPError caught in HGNC. Probably an invalid gene name")
@@ -235,8 +236,8 @@ class HGNC(REST):
         """
         params = {'search': 'symbol', 'value':pattern}
         # note the extra s before ;index.xml
-        xml = self.request(self.url + "s;index.xml?" + self.urlencode(params))
-
+        xml = self.http_get("s;index.xml?" + self.urlencode(params))
+        xml = self.easyXML(xml)
         res = [x.attrs for x in xml.findAll("gene")]
         return res
 
@@ -263,7 +264,8 @@ class HGNC(REST):
         .. seealso:: :meth:`mapping_all`
         """
 
-        xml = self.request(self.url + "s;index.xml?" + self.urlencode({'search': 'xref', 'value':value}))
+        xml = self.http_get("s;index.xml?" + self.urlencode({'search': 'xref', 'value':value}))
+        xml = self.easyXML(xml)
         genes = xml.findAll("gene")
         res = [g.attrs for g in genes]
         return res

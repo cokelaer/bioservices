@@ -52,7 +52,7 @@ class MUSCLE(REST):
         >>> from bioservices import *
         >>> m = MUSCLE(verbose=False)
         >>> sequencesFasta = open('filename','r')
-        >>> jobid = n.run(format="fasta", sequence=sequencesFasta.read(),
+        >>> jobid = n.run(frmt="fasta", sequence=sequencesFasta.read(),
                         email="name@provider")
         >>> s.getResult(jobid, "out")
 
@@ -70,7 +70,7 @@ class MUSCLE(REST):
         >>> f1 = u.get_fasta("P18413")
         >>> f2 = u.get_fasta("P18412")
         >>> m = MUSCLE(verbose=False)
-        >>> jobid = m.run(format="fasta", sequence=f1+f2, email="name@provider")
+        >>> jobid = m.run(frmt="fasta", sequence=f1+f2, email="name@provider")
         >>> m.getResult(jobid, "out")
 
     """
@@ -151,7 +151,7 @@ class MUSCLE(REST):
 
         .. rubric:: Compulsary arguments
 
-        :param str format: input format (e.g., fasta)
+        :param str frmt: input format (e.g., fasta)
         :param str sequence: query sequence. The use of fasta formatted sequence is recommended.
         :param str tree: tree type ('none','tree1','tree2')
         :param str email: a valid email address. Will be checked by the service itself.
@@ -174,9 +174,9 @@ class MUSCLE(REST):
                  sequence=sequence_example,
                  email="test@yahoo.fr")
 
-        format can be a list of formats::
+        frmt can be a list of formats::
 
-            format=['fasta','clw','clwstrict','html','msf','phyi','phys']
+            frmt=['fasta','clw','clwstrict','html','msf','phyi','phys']
 
         The returned object is a jobid, which status can be checked. It must be
         finished before analysing/geeting the results.
@@ -184,11 +184,9 @@ class MUSCLE(REST):
         .. seealso:: :meth:`getResult`
 
         """
-
         # There are compulsary arguments:
         if frmt==None or sequence==None  or email==None:
             raise ValueError("frmt, sequence and email must be provided")
-
 
         # Here, we will check the arguments values (not the type)
         # Arguments will be checked by the service itself but if we can
@@ -196,7 +194,6 @@ class MUSCLE(REST):
 
         # FIXME: return parameters from server are not valid
         self.checkParam(frmt, ['fasta','clw','clwstrict','html','msf','phyi','phys'])
-
         self.checkParam(tree, ['none','tree1','tree2'])
 
         # parameter structure
@@ -204,8 +201,14 @@ class MUSCLE(REST):
             'format': frmt,
             'sequence': sequence,
             'email': email}
-      
-        res = self.http_post("run", frmt="txt", params=params)
+     
+        # headers is muscle is not required. If provided
+        # by the default values from bioservices, it does not
+        # work. 
+        headers = {}
+
+        # IMPORTANTN: use data parameter, not params !!!
+        res = self.http_post("run", frmt="txt", data=params, headers=headers)
         return res
 
     def getStatus(self, jobid):
@@ -245,7 +248,7 @@ class MUSCLE(REST):
           self.wait(jobid, verbose=False)
       url = 'resulttypes/' + jobid
       res = self.http_get(url, frmt="xml")
-      print res
+      res = self.easyXML(res)
       output = {}
     
       def myf(x):
