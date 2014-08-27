@@ -1,11 +1,12 @@
-from bioservices.quickgo import *
-from . import settings
+from bioservices.quickgo import QuickGO
+import settings
 
 
 class test_quickGO(QuickGO):
 
     def __init__(self):
-        super(test_quickGO, self).__init__(verbose=False)
+        super(test_quickGO, self).__init__(verbose=False, 
+                cache=settings.CACHING)
 
     def test_annotation_wrong_format(self):
         try:

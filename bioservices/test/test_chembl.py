@@ -1,11 +1,12 @@
 from bioservices.chembl import *
 import unittest
-
+import settings
 
 class test_Chembl(ChEMBL):
 
     def __init__(self):
-        super(test_Chembl, self).__init__(verbose=False, cache=True)
+        super(test_Chembl, self).__init__(verbose=False, 
+                cache=settings.CACHING)
         self.default_extension = "xml"
         try:
             self.default_extension = "xmlf"
