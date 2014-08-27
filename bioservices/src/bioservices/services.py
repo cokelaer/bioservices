@@ -442,7 +442,7 @@ class RESTService(RESTbase):
         :param str extra: an additional string to add after the params if
             needed. Could be usefule if a parameter/value can not be added to the
             dictionary. For instance is a parameter has several values
-
+            Solved in requests module.
         .. todo:: parameter paranName with a list of values [v1,v2] can be interpreted as
             paramName=v1&paramName=v2
 
@@ -686,10 +686,18 @@ class REST(RESTbase):
         return self.get_one(**{'frmt': frmt, 'query': query, 'params':params})
 
     def get_one(self, query, frmt='json', params={}):
+        """
+
+        if query starts with http:// do not use self.url
+        """
         if query == None:
             url = self.url
         else:
-            url = '%s/%s' % (self.url, query)
+            if query.startswith("http"):
+                # assume we do want to use self.url
+                url = query
+            else:
+                url = '%s/%s' % (self.url, query)
         self.logging.debug(url)
         try:
             res = self.session.get(url, **{'timeout':self.settings.TIMEOUT, 'params':params})

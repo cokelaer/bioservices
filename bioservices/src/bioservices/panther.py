@@ -42,12 +42,12 @@
 .. http://www.uniprot.org/docs/pkinfam
 
 """
-from services import RESTService
+from services import REST
 from xmltools import readXML
 __all__ = ["BioCarta"]
 
 
-class Panther(RESTService):
+class Panther(REST):
     """Interface to `BioCarta <http://www.biocarta.com>`_ pages
 
 
@@ -65,12 +65,13 @@ class Panther(RESTService):
 
     """
     _url = "http://www.pantherdb.org/"
-    def __init__(self, verbose=True):
+    def __init__(self, verbose=True, cache=False):
         """**Constructor**
 
         :param verbose: set to False to prevent informative messages
         """
-        super(Panther, self).__init__(name="BioCarta", url=Panther._url, verbose=verbose)
+        super(Panther, self).__init__(name="BioCarta", url=Panther._url, 
+                verbose=verbose, cache=cache)
 
         self._allPathwaysURL =  "http://www.pantherdb.org/pathway/pathwayList.jsp"
 

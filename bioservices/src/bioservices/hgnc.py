@@ -121,7 +121,7 @@ class HGNC(REST):
         """
         try:
             if ";" in gene:
-                res = self.http_get("genes/%s" % gene, )
+                res = self.http_get("genes/%s" % gene)
             else:
                 res = self.http_get("gene/%s.xml" % gene)
             #res = bs4.BeautifulSoup(res)

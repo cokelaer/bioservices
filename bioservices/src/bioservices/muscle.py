@@ -205,8 +205,7 @@ class MUSCLE(REST):
             'sequence': sequence,
             'email': email}
       
-        request = "run"
-        res = self.http_post(request, frmt="txt", params=params)
+        res = self.http_post("run", frmt="txt", params=params)
         return res
 
     def getStatus(self, jobid):

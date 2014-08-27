@@ -133,7 +133,7 @@ param           Interaction parameters. Only true or
 
 """
 
-from bioservices import RESTService, UniProt
+from bioservices import REST, UniProt
 
 
 #http://code.google.com/p/psicquic/wiki/PsicquicSpec_1_3_Rest
@@ -143,7 +143,7 @@ from bioservices import RESTService, UniProt
 __all__ = ["PSICQUIC"]
 
 
-class PSICQUIC(RESTService):
+class PSICQUIC(REST):
     """Interface to the `PSICQUIC <http://code.google.com/p/psicquic/>`_ service
 
     There are 2 interfaces to the PSICQUIC service (REST and WSDL) but we used
@@ -265,13 +265,12 @@ class PSICQUIC(RESTService):
         return names
     activeDBs = property(_get_active_db, doc="returns the active DBs only")
 
-
     def read_registry(self):
         """Reads and returns the active registry 
 
         """
-        url = self.url + '/registry/registry?action=ACTIVE&format=txt'
-        res = self.request(url, format='txt')
+        url = 'registry/registry?action=ACTIVE&format=txt'
+        res = self.http_get(url, frmt='txt')
         return res.split()
 
     def print_status(self):
@@ -293,8 +292,9 @@ class PSICQUIC(RESTService):
         .. seealso:: If you want the data into lists, see all attributes
             starting with registry such as :meth:`registry_names`
         """
-        url = self.url +  '/registry/registry?action=STATUS&format=xml'
-        res = self.request(url)
+        url = 'registry/registry?action=STATUS&format=xml'
+        res = self.http_get(url, frmt="txt")
+
         names = self.registry_names
         counts = self.registry_counts
         versions = self.registry_versions
@@ -316,8 +316,9 @@ class PSICQUIC(RESTService):
 
     def _get_registry(self):
         if self._registry == None:
-            url = self.url +  '/registry/registry?action=STATUS&format=xml'
-            res = self.request(url, format="xml")
+            url = 'registry/registry?action=STATUS&format=xml'
+            res = self.http_get(url, frmt="xml")
+            res = self.easyXML(res)
             self._registry = res
         return self._registry
     registry = property(_get_registry, doc="returns the registry of psicquic")
@@ -443,9 +444,9 @@ class PSICQUIC(RESTService):
 
 
         if "xml" in output:
-            res = self.request(url, format="xml", baseUrl=False)
+            res = self.http_get(url, frmt="xml")
         else:
-            res = self.request(url, format="txt",baseUrl=False)
+            res = self.http_get(url, frmt="txt")
             res = res.strip().split("\n")
 
         if output.startswith("tab"):

@@ -44,7 +44,7 @@
 """
 import types
 import StringIO
-from services import RESTService
+from services import REST
 try:
     import pandas as pd
 except:
@@ -166,7 +166,7 @@ def _precision(x,digit=2):
 
 
 
-class UniProt(RESTService):
+class UniProt(REST):
     """Interface to the `UniProt <http://www.uniprot.org>`_ service
 
     .. rubric:: Identifiers mapping between databases:
@@ -193,13 +193,14 @@ class UniProt(RESTService):
                 'reviewed', 'score', 'sequence', '3d', 'subcellular locations',
                 'taxonomy', 'tools', 'version', 'virus hosts']
 
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=False, cache=False):
         """**Constructor**
 
         :param verbose: set to False to prevent informative messages
         """
-        super(UniProt, self).__init__(name="UniProt", url=UniProt._url, verbose=verbose)
-        self.timeout = 10
+        super(UniProt, self).__init__(name="UniProt", url=UniProt._url,
+                verbose=verbose, cache=cache)
+        self.settings.params['general.timeout'][0] = 100
 
 
     def mapping(self, fr="ID", to="KEGG_ID",  query="P13368"):
@@ -244,14 +245,12 @@ class UniProt(RESTService):
             instead of just a string
 
         """
-        url = self.url + '/mapping/'
+        url = 'mapping/'
 
         if isinstance(query, list):
             query = " ".join(query)
         params = {'from':fr, 'to':to, 'format': "tab", 'query':query}
-        params = self.urlencode(params)
-        result = self.request(url+"?"+params, format=format)
-
+        result = self.http_get(url, frmt="tab", params=params)
 
         # changes in version 1.1.1 returns a dictionary instead of list
         try:
@@ -277,7 +276,7 @@ class UniProt(RESTService):
         return result_dict
 
     def multi_mapping(self, fr="ID", to="KEGG_ID", query="P13368",
-        format="tab", Nmax=100 ):
+        frmt="tab", Nmax=100 ):
         """Calls mapping several times and concatenates results
 
         The reson for this method is that if a query is too long then the
@@ -317,25 +316,25 @@ class UniProt(RESTService):
             mapping = self.mapping(fr=fr, to=to, query=query)
         return mapping
 
-    def searchUniProtId(self, uniprot_id, format="xml"):
+    def searchUniProtId(self, uniprot_id, frmt="xml"):
         """Search for a uniprot ID in UniprotKB database
 
         :param str uniprot: a valid uniprotKB ID
-        :param str format: expected output format amongst xml, txt, fasta, gff, rdf
+        :param str frmt: expected output format amongst xml, txt, fasta, gff, rdf
 
         ::
 
             >>> u = UniProt()
-            >>> res = u.searchUniProtId("P09958", format="xml")
+            >>> res = u.searchUniProtId("P09958", frmt="xml")
 
 
         """
         _valid_formats = ['txt', 'xml', 'rdf', 'gff', 'fasta']
-        self.checkParam(format, _valid_formats)
-        #if format not in _valid_formats:
-        #    raise ValueError("invalid format provided. Use one of %s" % _valid_formats)
-        url = self.url + "/uniprot/" + uniprot_id + '.' + format
-        res = self.request(url, format=format)
+        self.checkParam(frmt, _valid_formats)
+        url = "uniprot/" + uniprot_id + '.' + frmt
+        res = self.http_get(url, frmt=frmt)
+        if frmt=="xml":
+            res = self.easyXML(res)
         return res
 
     def get_fasta(self, id_):
@@ -366,14 +365,14 @@ class UniProt(RESTService):
         f.load_fasta(id_)
         return f.sequence
 
-    def search(self, query, format="tab", columns=None,
+    def search(self, query, frmt="tab", columns=None,
         include=False,sort="score", compress=False, limit=None, offset=None, maxTrials=10):
         """Provide some interface to the uniprot search interface.
 
         :param str query: query must be a valid uniprot query.
             See http://www.uniprot.org/help/text-search, http://www.uniprot.org/help/query-fields
             See also example below
-        :param str format: a valid format amongst html, tab, xls, asta, gff,
+        :param str frmt: a valid format amongst html, tab, xls, asta, gff,
             txt, xml, rdf, list, rss. If tab or xls, you can also provide the
             columns argument.  (default is tab)
         :param str columns: comma-separated list of values. Works only if fomat
@@ -382,8 +381,8 @@ class UniProt(RESTService):
             database name (e.g., "database(PDB)"). Again, see uniprot website
             for more details. See also :attr:`~bioservices.uniprot.UniProt._valid_columns`
             for the full list of column keyword.
-        :param bool include: include isoform sequences when the format
-            parameter is fasta. Include description when format is rdf.
+        :param bool include: include isoform sequences when the frmt
+            parameter is fasta. Include description when frmt is rdf.
         :param str sort: by score by default. Set to None to bypass this behaviour
         :param bool compress: gzip the results
         :param int limit: Maximum number of results to retrieve.
@@ -395,8 +394,8 @@ class UniProt(RESTService):
         To obtain the list of uniprot ID returned by the search of zap70 can be
         retrieved as follows::
 
-            >>> u.search('zap70+AND+organism:9606', format='list')
-            >>> u.search("zap70+and+taxonomy:9606", format="tab", limit=3,
+            >>> u.search('zap70+AND+organism:9606', frmt='list')
+            >>> u.search("zap70+and+taxonomy:9606", frmt="tab", limit=3,
             ...    columns="entry name,length,id, genes")
             Entry name  Length  Entry   Gene names
             CBLB_HUMAN  982 Q13191  CBLB RNF56 Nbla00127
@@ -410,7 +409,7 @@ class UniProt(RESTService):
         You can also do a search on several keywords. This is especially useful
         if you have a list of known entry names.::
 
-            >>> u.search("ZAP70_HUMAN+or+CBL_HUMAN", format="tab", limit=3,
+            >>> u.search("ZAP70_HUMAN+or+CBL_HUMAN", frmt="tab", limit=3,
             ...    columns="entry name,length,id, genes")
             Entry name  Length  Entry   Gene names
 
@@ -423,13 +422,13 @@ class UniProt(RESTService):
         """
         params = {}
 
-        if format!=None:
+        if frmt!=None:
             _valid_formats = ['tab', 'xls', 'fasta', 'gff', 'txt', 'xml', 'rss', 'list', 'rss', 'html']
-            self.checkParam(format, _valid_formats)
-            params['format'] = format
+            self.checkParam(frmt, _valid_formats)
+            params['format'] = frmt
 
         if columns!=None:
-            self.checkParam(format, ["tab","xls"])
+            self.checkParam(frmt, ["tab","xls"])
 
             # remove unneeded spaces before/after commas if any
             if "," in columns:
@@ -446,7 +445,7 @@ class UniProt(RESTService):
             # convert back to a string as expected by uniprot
             params['columns'] = ",".join([x.strip() for x in columns])
 
-        if include == True and format in ["fasta", "rdf"]:
+        if include == True and frmt in ["fasta", "rdf"]:
             params['include'] = 'yes'
 
         if compress == True:
@@ -464,10 +463,10 @@ class UniProt(RESTService):
             if isinstance(limit, int):
                 params['limit'] = limit
 
-        params = self.urlencode(params)
-
+        params['query'] = query
         #res = s.request("/uniprot/?query=zap70+AND+organism:9606&format=xml", params)
-        res = self.request("uniprot/?query=%s" % query + "&" + params, "txt")
+        print(params)
+        res = self.http_get("uniprot/", frmt="txt", params=params) 
         return res
 
     def quick_search(self, query, include=False,sort="score", limit=None):
@@ -499,7 +498,7 @@ class UniProt(RESTService):
         >>> df.Size
 
         """
-        res = self.request("uniref/?"+self.urlencode({"query":query})+"&format=tab", format="txt")
+        res = self.http_get("uniref/", params={"query":query, 'format':'tab'}, frmt="txt")
         res = pd.read_csv(StringIO.StringIO(res.strip()), sep="\t")
         return res
 
@@ -535,7 +534,7 @@ class UniProt(RESTService):
                 query = "+or+".join(this_entries)
                 if organism:
                     query += "+and+"+organism
-                res = self.search(query, format="tab",
+                res = self.search(query, frmt="tab",
                         columns=",".join(self._valid_columns))
             else:
                 break

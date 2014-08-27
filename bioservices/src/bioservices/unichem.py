@@ -36,10 +36,9 @@
 
 
 """
-from bioservices import RESTService
 
 #from web_resource import REST, WebResource
-from services import REST
+from bioservices import REST
 class UniChem(REST):
     """Interface to the `UniChem <http://www.ebi.ac.uk/unichem/>`_ service
 

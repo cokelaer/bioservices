@@ -318,7 +318,7 @@ class FASTA(object):
         print("get_fasta is deprecated. Use load_fasta instead")
         from bioservices import UniProt
         u = UniProt(verbose=False)
-        res = u.searchUniProtId(id_, format="fasta")
+        res = u.searchUniProtId(id_, frmt="fasta")
         self._fasta = res[:]
         return res
 
@@ -337,7 +337,7 @@ class FASTA(object):
         from bioservices import UniProt
         u = UniProt(verbose=False)
         try:
-            res = u.searchUniProtId(id_, format="fasta")
+            res = u.searchUniProtId(id_, frmt="fasta")
             # some entries in uniprot are valid but obsolet and return empty string
             if res == "":
                 raise Exception

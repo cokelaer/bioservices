@@ -51,7 +51,7 @@ class Search(PSICQUIC):
     .. todo:: to be removed"""
 
     def __init__(self, data):
-        super(Search, self).__init__(verbose=False)
+        super(Search, self).__init__(verbose="ERROR")
         self.data = data
         if "biogrid" in self.activeDBs:
             self.output = self.query("biogrid",self.data)

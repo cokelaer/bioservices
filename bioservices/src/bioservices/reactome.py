@@ -41,18 +41,18 @@
 """
 
 
-from services import WSDLService, RESTService
+from services import WSDLService, REST
 import webbrowser
 import copy
 
 
 
-class ReactomeURL(RESTService):
+class ReactomeURL(REST):
 
     _url = "http://www.reactome.org/cgi-bin"
-    def __init__(self, verbose=True):
+    def __init__(self, verbose=True, cache=False):
         super(ReactomeURL, self).__init__("Reactome(URL)",url=ReactomeURL._url,
-            verbose=verbose)
+            verbose=verbose, cache=False)
 
     def link(self, source, identifier):
         """Linking to Reactome
@@ -65,8 +65,8 @@ class ReactomeURL(RESTService):
             r.link("CHEBI", "15422")     #  ChEBI identifiers, e.g. CHEBI:15422
 
         """
-        url = self.url + "/link?SOURCE" +  source + "&ID=" + identifier
-        res = self.request(url)
+        url = "link?SOURCE" +  source + "&ID=" + identifier
+        res = self.http_get(url, frmt="txt")
         return res
 
 

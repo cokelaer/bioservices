@@ -76,16 +76,13 @@ class PDB(REST):
         <mvStructure.expMethod.value>SOLID-STATE NMR</mvStructure.expMethod.value>
         </orgPdbQuery>
         """
-
-
         res = self.http_post("search", frmt="", data=query)
-
         return res
 
     def get_current_ids(self):
         """Get a list of all current PDB IDs."""
         res = self.http_get("rest/getCurrent", frmt="xml")
-        res= self.easyXML(res)
+        res = self.easyXML(res)
         res = [x.attrib['structureId'] for x in res.getchildren()]
         return res
 

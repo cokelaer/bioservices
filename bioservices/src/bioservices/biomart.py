@@ -330,7 +330,7 @@ class BioMart(REST):
 
         """
         xmlq = xmlq.replace("\n", "")
-        ret = self.http_post(None, params={"query":xmlq})
+        ret = self.http_post(self.url, params={"query":xmlq})
         return ret
 
     def add_attribute_to_xml(self, name, dataset=None):

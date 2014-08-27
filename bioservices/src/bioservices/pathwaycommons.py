@@ -39,13 +39,13 @@ Data is freely available, under the license terms of each contributing database.
 """
 from __future__ import print_function
 
-from bioservices.services import RESTService, BioServicesError
+from bioservices.services import REST, BioServicesError
 
 import json
 
 __all__ = ["PathwayCommons"]
 
-class PathwayCommons(RESTService):
+class PathwayCommons(REST):
     """Interface to the `PathwayCommons <http://www.pathwaycommons.org/about>`_ service
 
 
@@ -134,9 +134,9 @@ class PathwayCommons(RESTService):
 
         """
         if self.default_extension == "xml":
-            url = self.url + "/search.xml?q=%s"  % q
+            url = "search.xml?q=%s"  % q
         elif self.default_extension == "json":
-            url = self.url + "/search.json?q=%s"  % q
+            url = "search.json?q=%s"  % q
 
         params = {}
         if page>0:
@@ -153,15 +153,18 @@ class PathwayCommons(RESTService):
         if organism:
             params['organism'] = organism
 
-        res = self.request(url + "&" + self.urlencode(params))
+        res = self.http_get(url, frmt=self.default_extension, 
+                params=params)
 
-        if self.default_extension == "json":
-            res = json.loads(res)
+        #if self.default_extension == "json":
+        #    res = json.loads(res)
+        if self.default_extension == "xml":
+            res = self.easyXML(res)
 
         return res
 
 
-    def get(self, uri, format="BIOPAX"):
+    def get(self, uri, frmt="BIOPAX"):
         """Retrieves full pathway information for a set of elements
 
         elements can be for example pathway, interaction or physical 
@@ -199,13 +202,13 @@ class PathwayCommons(RESTService):
             >>> res = pc2.get("http://identifiers.org/uniprot/Q06609")
 
         """
-        self.checkParam(format, self._valid_format)
+        self.checkParam(frmt, self._valid_format)
 
         # validates the URIs
         if isinstance(uri, str):
-            url = self.url + "/get?uri=" +uri
+            url = "get?uri=" +uri
         elif instance(uri, list):
-            url = self.url + "/get?uri=" +uri[0]
+            url = "get?uri=" +uri[0]
             if len(uri)>1:
                 for u in uri[1:]:
                     url += "&uri=" + u
@@ -213,10 +216,10 @@ class PathwayCommons(RESTService):
         # ?uri=http://identifiers.org/uniprot/Q06609
         # http://www.pathwaycommons.org/pc2/get?uri=COL5A1
 
-        if format != "BIOPAX":
-            url += "&format=%s" % format
+        if frmt != "BIOPAX":
+            url += "&format=%s" % frmt
 
-        res = self.request(url)
+        res = self.http_get(url, frmt=None)
 
         return res
 
@@ -244,9 +247,9 @@ class PathwayCommons(RESTService):
 
         """
         if self.default_extension == "json":
-            url = self.url + "/top_pathways.json"
+            url = "top_pathways.json"
         else:
-            url = self.url + "/top_pathways"
+            url = "top_pathways"
 
         params = {}
         if datasource:
@@ -257,10 +260,11 @@ class PathwayCommons(RESTService):
         if len(params):
             url += "&" + self.urlencode(params)
 
-        res = self.request(url)
+        res = self.http_get(url, frmt=self.default_extension, 
+                params=params)
 
-        if self.default_extension == "json":
-            res = json.loads(res)
+        if self.default_extension == "xml":
+            res = self.easyXML(res)
         return res
 
 
@@ -292,7 +296,7 @@ class PathwayCommons(RESTService):
 
 
         """
-        url = self.url + "/idmapping?id="
+        url = "idmapping?id="
         if isinstance(ids, str):
             url += ids
         elif isinstance(ids, list):
@@ -300,11 +304,9 @@ class PathwayCommons(RESTService):
             if len(ids) > 1:
                 for id_ in ids[1:]:
                     url += "&id=" + id_
-        res = self.request(url)
-        res = json.loads(res)
+        res = self.http_get(url, frmt="json")
+        #res = json.loads(res)
         return res
-
-
 
     def graph(self, kind, source, target=None, direction=None, limit=1,
             format=None, datasource=None, organism=None):
@@ -368,29 +370,24 @@ class PathwayCommons(RESTService):
 
 
         """
-        url = self.url + "/graph?"
+        url = "graph"
         params = {}
         params['source'] = source
         params['kind'] = kind
         params['limit'] = limit
-        url = url + self.urlencode(params)
 
         params = {}
         if target:
             params['target'] = target
-        if format:
-            params['format'] = format
+        if frmt:
+            params['format'] = frmt
         if datasource:
             params['datasource'] = datasource
         if organism:
             params['organism'] = organism
-        if len(params):
-            url += "&" + self.urlencode(params)
 
-        res = self.request(url)
+        res = self.http_get(url, frmt=None, params=params)
         return res
-
-
 
     def traverse(self, uri, path):
         """Provides XPath-like access to the PC. 
@@ -451,7 +448,7 @@ class PathwayCommons(RESTService):
 
 
         """
-        url = self.url + "/traverse?"
+        url =  "traverse?"
 
         if isinstance(uri, str):
             url += "?uri=" + uri
@@ -462,8 +459,7 @@ class PathwayCommons(RESTService):
 
         url += "&path=" + path
 
-
-        res = self.request(url)
+        res = self.http_get(url, frmt=None)
         return res
 
 

@@ -35,15 +35,17 @@
 
 
 """
+import sys
+import time
 
-from bioservices.services import RESTService
+from bioservices.services import REST
 import xmltools
 
 
 __all__ = ["NCBIblast"]
 
 
-class NCBIblast(RESTService):
+class NCBIblast(REST):
     """Interface to the `NCBIblast <http://blast.ncbi.nlm.nih.gov/>`_ service.
 
 
@@ -101,8 +103,7 @@ class NCBIblast(RESTService):
         .. seealso:: :attr:`parameters` to get a list of the parameters without
             need to process the XML output.
         """
-        request = self.url + "/parameters/"
-        res = self.request(request)
+        res = self.http_get("parameters", frmt="xml")
         return res
 
     def _get_parameters(self):
@@ -140,8 +141,9 @@ returns a list of parameters. See :meth:`getParameters`.""")
 
         if parameterId not in self._parametersDetails.keys():
 
-            request = self.url + "/parameterdetails/" + parameterId
-            res = self.request(request)
+            request = "parameterdetails/" + parameterId
+            res = self.http_get(request, frmt="xml")
+            res = self.easyXML(res)
             self._parametersDetails[parameterId] = res
 
         try:
@@ -152,8 +154,6 @@ returns a list of parameters. See :meth:`getParameters`.""")
             pass
 
         return res
-
-
 
     def run(self, program=None, database=None, sequence=None,stype="protein", email=None, **kargs):
         """ Submit a job with the specified parameters.
@@ -226,7 +226,7 @@ returns a list of parameters. See :meth:`getParameters`.""")
         if program==None or sequence==None or database==None or email==None:
             raise ValueError("program, sequence, email  and database must be provided")
 
-        from easydev import checkParam
+        checkParam = self.devtools.check_param_in_list
 
         # Here, we will check the arguments values (not the type)
         # Arguments will be checked by the service itself but if we can
@@ -253,7 +253,6 @@ returns a list of parameters. See :meth:`getParameters`.""")
 
         # similarly for the database, we must process it by hand because ther
         # can be more than one database
-        print params
         #checkParam(database.lower(), [str(x.replace(" ", "_").lower())
         #    for x in self.parametersDetails("database")])
         if isinstance(database, list):
@@ -277,8 +276,7 @@ parser.add_option('--status', action="store_true", help='get job status')
 parser.add_option('--resultTypes', action='store_true', help='get result types')
     """
         print DBs
-        res = self.requestPost("http://www.ebi.ac.uk/Tools/services/rest/ncbiblast/run/",
-            params, extra=DBs)
+        res = self.http_post("http://www.ebi.ac.uk/Tools/services/rest/ncbiblast/run/", params)
 
         return res
 
@@ -300,8 +298,8 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
 
 
         """
-        requestUrl = self.url + '/status/' + jobid
-        res = self.request(requestUrl, format="txt")
+        url =  'status/' + jobid
+        res = self.http_get(url, frmt="txt")
         return res
 
 
@@ -319,8 +317,9 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
         if self.getStatus(jobid)!='FINISHED':
             self.logging.warning("waiting for the job to be finished. May take a while")
             self.wait(jobid, verbose=False)
-        requestUrl = self.url + '/resulttypes/' + jobid
-        res = self.request(requestUrl, format="xml")
+        url = 'resulttypes/' + jobid
+        res = self.http_get(url, format="txt")
+        res = self.easyXML(res)
 
         output = {}
         def myf(x):
@@ -353,12 +352,12 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
             self.wait(jobid, verbose=False)
         if self.getStatus(jobid) != "FINISHED":
             raise ValueError("job is not finished")
-        requestUrl = self.url + '/result/' + jobid + '/' + resultType
-        res = self.request(requestUrl, format=resultType)
-
+        url = 'result/' + jobid + '/' + resultType
+        res = self.http_get(url, frmt=resultType)
+        if resultType == "xml":
+            res = self.easyXML(res)
 
         return res
-
 
     def wait(self, jobId, checkInterval=5, verbose=True):
         """This function checks the status of a jobid while it is running
@@ -367,8 +366,6 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
         :param int checkInterval: interval between requests in seconds.
 
         """
-        import sys
-        import time
 
         if checkInterval<1:
             raise ValueError("checkInterval must be positive and less than minute")

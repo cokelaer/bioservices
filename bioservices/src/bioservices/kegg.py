@@ -146,8 +146,7 @@ gene name.
 """
 from __future__ import print_function
 
-from bioservices.services import RESTService, BioServicesError
-#from services import RESTService, BioServicesError
+from bioservices.services import REST, BioServicesError
 import webbrowser
 import copy
 
@@ -155,7 +154,7 @@ import copy
 __all__ = ["KEGG", "Kegg", "KeggParser"]
 
 
-class Kegg(RESTService):
+class Kegg(REST):
     """Interface to the `KEGG <http://www.genome.jp/kegg/pathway.html>`_ service
 
     This class provides an interface to the KEGG REST API. The weblink tools 
@@ -212,13 +211,14 @@ class Kegg(RESTService):
     _valid_databases_link = _valid_DB_base + ["pathway", "brite"] 
 
     _docIds = "\n\n.. seealso:: :meth:`list`\n"
-    def __init__(self, verbose=True):
+    def __init__(self, verbose=False, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose: prints informative messages
 
         """
-        super(Kegg, self).__init__(name="Kegg", url="http://rest.kegg.jp", verbose=verbose)
+        super(Kegg, self).__init__(name="Kegg", url="http://rest.kegg.jp", 
+                verbose=verbose, cache=cache)
         self.easyXMLConversion = False
         self._organism = None
 
@@ -341,11 +341,10 @@ class Kegg(RESTService):
             s.info("pathway")
 
         """
-        url = self.url+"/"+"info"
+        #url = self.url+"/"+"info"
         self._checkDB(database, mode="info")
 
-        url = url + "/" + database
-        res = self.request(url)
+        res = self.http_get(database ,frmt="txt")
         return res
 
     def list(self, query, organism=None):
@@ -394,11 +393,11 @@ class Kegg(RESTService):
             s.list("cpd:C01290+gl:G00092")# returns the list of a compound entry and a glycan entry
             s.list("C01290+G00092")       # same as above 
         """
-        url = self.url+"/"+"list"
+        url = "list"
         if query:
             #can be something else than a database so we can not use checkDB
             #self._checkDB(database, mode="list")
-            url = url + "/" + query
+            url +=  "/" + query
 
         if organism:
             if organism not in self.organismIds:
@@ -409,10 +408,10 @@ class Kegg(RESTService):
     If organism is set, then the first argument
     (database) must be either 'pathway' or 'module'. You provided %s""" % query)
                 raise
-            url = url + "/" + organism
+            url += "/" + organism
 
 
-        res = self.request(url, "txt")
+        res = self.http_get(url, "txt")
         return res
 
     def find(self, database, query, option=None):
@@ -452,7 +451,7 @@ class Kegg(RESTService):
         _valid_db_options = ["compound", "drug"]
 
         self._checkDB(database, mode="find") 
-        url = self.url + "/find/"+ database + "/" +  query
+        url = "find/"+ database + "/" +  query
 
         if option:
             if database not in _valid_db_options:
@@ -461,7 +460,7 @@ class Kegg(RESTService):
                 raise ValueError("invalid option. Must be in %s " % _valid_options)
             url +=  "/" + option
 
-        res = self.request(url)
+        res = self.http_get(url, frmt="txt")
         return res
 
     def show_entry(self, entry):
@@ -522,14 +521,14 @@ class Kegg(RESTService):
         _valid_db_options = ["compound", "drug"]
 
         #self._checkDB(database, mode="find") 
-        url = self.url + "/get/"+ dbentries
+        url = "get/"+ dbentries
 
         if option:
             if option not in _valid_options:
                 raise ValueError("invalid option. Must be in %s " % _valid_options)
             url +=  "/" + option
 
-        res = self.request(url)
+        res = self.http_get(url, frmt="txt")
 
         return res
 
@@ -632,9 +631,8 @@ class Kegg(RESTService):
         """
 
 
-        url = self.url + "/conv/"+ target + '/' + source
-
-        res = self.request(url)
+        url = "conv/"+ target + '/' + source
+        res = self.http_get(url, frmt="txt")
 
         try:
             t = [x.split("\t")[0] for x in res.strip().split("\n")]
@@ -667,8 +665,8 @@ class Kegg(RESTService):
 
         self._checkDB(target, mode="link") 
 
-        url = self.url + "/link/"+ target + '/' + source
-        res = self.request(url)
+        url = "link/"+ target + '/' + source
+        res = self.http_get(url, frmt="txt")
         return res
 
     def entry(self, dbentries):
@@ -896,7 +894,7 @@ class Kegg(RESTService):
             return
 
         if self._pathway == None:
-            res = self.request(self.url + "/list/pathway/%s" % self.organism)
+            res = self.http_get("list/pathway/%s" % self.organism, frmt="txt")
             orgs = [x.split()[0] for x in res.split("\n") if len(x)]
             self._pathway = orgs[:]
         return self._pathway
@@ -917,7 +915,7 @@ class Kegg(RESTService):
             return
 
         if self._module == None:
-            res = self.request(self.url + "/list/module/%s" % self.organism)
+            res = self.http_get("list/module/%s" % self.organism)
             orgs = [x.split()[0] for x in res.split("\n") if len(x)]
             self._module = orgs[:]
         return self._module
