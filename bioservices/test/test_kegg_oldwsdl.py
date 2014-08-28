@@ -1,4 +1,4 @@
-from bioservices import Kegg
+from bioservices import KEGG
 #from nose import with_setup
 
 #import easydev
