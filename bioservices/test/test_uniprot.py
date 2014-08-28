@@ -1,9 +1,9 @@
 from bioservices.uniprot import *
-
+import settings
 
 class test_UniProt(UniProt):
     def __init__(self):
-        super(test_UniProt, self).__init__(verbose=False)
+        super(test_UniProt, self).__init__(verbose=False, cache=settings.CACHING)
         self.debugLevel = "ERROR"
 
     def test_mapping(self):

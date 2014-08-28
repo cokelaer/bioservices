@@ -128,3 +128,10 @@ class test_quickGO(QuickGO):
             assert False
         except:
             assert True
+
+
+    def test_annotations_from_goid(self):
+        self.Annotation_from_goid("GO:0003824")
+
+    def test_annotations_from_protein(self):
+        self.Annotation_from_protein("P43403")
