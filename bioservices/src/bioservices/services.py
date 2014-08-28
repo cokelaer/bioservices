@@ -542,6 +542,8 @@ class REST(RESTbase):
         from bioservices.settings import BioServicesConfig
         self.settings = BioServicesConfig()
 
+        self.settings.params['cache.on'][0] = cache
+
         if self.settings.CACHING:
             #import requests_cache
             self.logging.info("Using local cache %s" % self.CACHE_NAME)

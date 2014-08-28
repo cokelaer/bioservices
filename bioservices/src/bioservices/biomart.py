@@ -327,10 +327,12 @@ class BioMart(REST):
                     <Attribute name="exon_chrom_end"/>
                     </Dataset>
                     </Query>
-
+    
+        .. warning:: the input XML must be valid. THere is no validation made
+            in thiss method.
         """
-        xmlq = xmlq.replace("\n", "")
-        ret = self.http_post(self.url, params={"query":xmlq})
+        ret = self.http_post(None, frmt=None, 
+                data={'query':xmlq.strip()}, headers={})
         return ret
 
     def add_attribute_to_xml(self, name, dataset=None):
