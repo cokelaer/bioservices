@@ -148,11 +148,11 @@ on selected KEGG pathways
 
 ::
 
-    >>> from bioservices import KeggParser, GeneProf, UniProt
+    >>> from bioservices import KEGGParser, GeneProf, UniProt
     >>> import StringIO
     >>> import pandas
     >>> g = GeneProf()
-    >>> k = KeggParser()
+    >>> k = KEGGParser()
     >>> u = UniProt()
 
     >>> # load ENCODE RNA-seq into a DataFrame for later

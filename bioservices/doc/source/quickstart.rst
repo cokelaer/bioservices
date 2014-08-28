@@ -30,7 +30,7 @@ the names as close as possible to the API. On top of the service methods, each
 class inherits from the BioService class (REST or WSDL). For instance REST
 service have the useful request method. Another nice function is the onWeb. 
 
-.. seealso:: :class:`~bioservice.services.RESTService`, :class:`~bioservices.services.WSDLService`
+.. seealso:: :class:`~bioservice.services.REST`, :class:`~bioservices.services.WSDLService`
 
 What about the output ?
 ------------------------
@@ -103,16 +103,16 @@ KEGG service
 
 .. testsetup:: kegg
 
-    from bioservices import Kegg
-    k = Kegg(verbose=False)
+    from bioservices import KEGG
+    k = KEGG(verbose=False)
 
 The KEGG interface is similar but contains more methods. The tutorial presents
 the KEGG itnerface in details, but let us have a quick overview. First, let us start a KEGG instance::
 
-    from bioservices import Kegg
-    k = Kegg(verbose=False)
+    from bioservices import KEGG
+    k = KEGG(verbose=False)
 
-You can use the :meth:`~bioservices.kegg.Kegg.info` to obtain statistics on the
+You can use the :meth:`~bioservices.kegg.KEGG.info` to obtain statistics on the
 **pathway** database::
 
     >>> print k.info("pathway")
@@ -122,7 +122,7 @@ You can use the :meth:`~bioservices.kegg.Kegg.info` to obtain statistics on the
                      218,277 entries
 
 You can see the list of valid databases using the databases attribute. Each of the
-database entry can also be listed using the :meth:`~bioservices.kegg.Kegg.list`
+database entry can also be listed using the :meth:`~bioservices.kegg.KEGG.list`
 method. For instance, the organisms can be retrieved with::
 
     k.list("organism")
@@ -140,14 +140,14 @@ The human organism is coded as "hsa". You can also get its T number instead:
     'T01001'
 
 
-Every elements is referred to with a Kegg ID, which may be difficult to handle
+Every elements is referred to with a KEGG ID, which may be difficult to handle
 at first. There are methods to retrieve the IDs though. For instance, get the list of 
 pathways iIs for the current organism as follows::
 
     k.pathwayIds
 
 For a given gene, you can get the full information related to that gene by using
-the method :meth:`~bioservices.kegg.Kegg.get`::
+the method :meth:`~bioservices.kegg.KEGG.get`::
 
     print k.get("hsa:3586")
 
@@ -155,9 +155,9 @@ or a pathway::
 
     print k.get("path:hsa05416")
 
-.. seealso:: Reference guide of :class:`bioservices.kegg.Kegg` for more details
+.. seealso:: Reference guide of :class:`bioservices.kegg.KEGG` for more details
 .. seealso:: :ref:`kegg_tutorial` for more details
-.. seealso:: Reference guide of :class:`bioservices.kegg.KeggParser` to parse a KEGG entry into a dictionary
+.. seealso:: Reference guide of :class:`bioservices.kegg.KEGGParser` to parse a KEGG entry into a dictionary
 
 .. WSDbfetch service
    ==================

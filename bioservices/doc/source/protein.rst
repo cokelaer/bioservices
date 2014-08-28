@@ -137,12 +137,12 @@ The KEGG services provides pathways, so let try to find pathways that contains
 our targetted protein. First we need to know the KEGG Id that corresponds to
 ZAP70. We can use the **find** method form KEGG service::
 
-    >>> from bioservices import Kegg
-    >>> k = Kegg(verbose=False)
+    >>> from bioservices import KEGG
+    >>> k = KEGG(verbose=False)
     >>> k.find("hsa", "zap70")  # "hsa" stands for homo sapiens
     hsa:7535 ZAP70, SRK, STCD, STD, TZK, ZAP-70; zeta-chain (TCR) associated protein kinase 70kDa (EC:2.7.10.2); K07360 tyrosine-protein kinase ZAP-70 [EC:2.7.10.2
 
-There are other ways to perform this conversion using the :meth:`bioservices.uniprot.UniProt.mapping`  or :meth:`bioeservices.Kegg.conv` methods (e.g., \textit{k.conv("hsa", "up:P43403")}).
+There are other ways to perform this conversion using the :meth:`bioservices.uniprot.UniProt.mapping`  or :meth:`bioeservices.KEGG.conv` methods (e.g., \textit{k.conv("hsa", "up:P43403")}).
 
 Now, let us get the pathways that contains this ID::
 

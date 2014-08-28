@@ -45,17 +45,15 @@ The first release of **BioServices** provides a wrapping to more than 18 Web
 Services (more if we consider **BioMart** and **PSICQUIC** portals that link to
 many other Web Services). 
 
-Here are some Web Services available in **BioServices**:
+Here are only some of Web Services that are available in **BioServices**:
 
 .. autosummary::
     :nosignatures:
 
     bioservices.arrayexpress.ArrayExpress
-    bioservices.biodbnet.BioDBNet
     bioservices.biomodels.BioModels
     bioservices.chembl.ChEMBL
-    bioservices.kegg.Kegg
-    bioservices.hgnc.HGNC
+    bioservices.kegg.KEGG
     bioservices.muscle.MUSCLE
     bioservices.pdb.PDB
     bioservices.uniprot.UniProt

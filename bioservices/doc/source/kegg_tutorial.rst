@@ -5,7 +5,7 @@
 
 .. _kegg_tutorial:
 
-Kegg Tutorial
+KEGG Tutorial
 ==============
 
 Introduction
@@ -15,12 +15,12 @@ Start a kegg interface (default organism is human, that is called **hsa**):
 
 .. doctest::
 
-    from bioservices.kegg import Kegg
-    k = Kegg()
+    from bioservices.kegg import KEGG
+    k = KEGG()
 
-Kegg has many databases. The list can be found in the attribute
-:attr:`bioservices.kegg.Kegg.databases`. Each database can be
-queried with the :meth:`bioservices.kegg.Kegg.list` method::
+KEGG has many databases. The list can be found in the attribute
+:attr:`bioservices.kegg.KEGG.databases`. Each database can be
+queried with the :meth:`bioservices.kegg.KEGG.list` method::
 
     k.list("organism")
 
@@ -29,7 +29,7 @@ the Ids, you will need to process the output. However, we provide an alias::
 
     print k.organismIds
 
-In general, methods require an access to the on-line Kegg database
+In general, methods require an access to the on-line KEGG database
 therefore it takes time. For instance, the command above takes a couple of
 seconds. However, some are buffered so next time you call it, it will be much faster.
 
@@ -42,20 +42,20 @@ the list of pathways::
     k.pathwaysIds
 
 Another function provided by the KEGG API is the
-:meth:`bioservices.kegg.Kegg.get` one that query a specific entry. Here we are
+:meth:`bioservices.kegg.KEGG.get` one that query a specific entry. Here we are
 interested into the human gene with the code 7535::
 
     k.get("hsa:7535")    #hsa:7535 is also known as ZAP70
 
 It is quite verbose and is a single string, which may be tricky to handle. We
-provide a tool to ease the parsing (see below and :class:`bioservices.kegg.KeggParser`)
+provide a tool to ease the parsing (see below and :class:`bioservices.kegg.KEGGParser`)
 
 
 
 Searching for an organism
 ---------------------------
 
-The method :meth:`bioservices.kegg.Kegg.find` is quite convenient to search for
+The method :meth:`bioservices.kegg.KEGG.find` is quite convenient to search for
 entries in different database. For instance, if you want to know the code of
 an entry for the gene called ZAP70 in the human organism, type::
 
@@ -65,7 +65,7 @@ an entry for the gene called ZAP70 in the human organism, type::
 It is quite powerful and more examples will be showm. However, it has some limitations.
 For example, what about searching for the organism Ids that correspond to any
 Drosophila ? It does not look like it is possible. BioServices provides a method to search 
-for an organism Id using :meth:`~bioservices.kegg.Kegg.lookfor_organism` given
+for an organism Id using :meth:`~bioservices.kegg.KEGG.lookfor_organism` given
 the name (or part of it)::
 
     >>> k.lookfor_organism("droso")
@@ -125,7 +125,7 @@ The following commands do not help::
 
 
 We provide a method to search for pathways that contain the required gene Id.
-You can search by Kegg Id or gene name::
+You can search by KEGG Id or gene name::
 
     >>> res = s.get_pathway_by_gene("7535", "hsa")
     >>> s.get_pathway_by_gene("zap70", "hsa")
@@ -145,12 +145,12 @@ command to obtain information about the pathway. ::
 
 The output is a single string where you can recognise different fields such as 
 NAME, GENE, DESCRIPTION and so on. This is quite limited. We provide another 
-class called :class:`bioservices.kegg.KeggParser` that inherits from the Kegg class used so
-far (i.e., all functions seen so far works with KeggParser). In addition, it will help us to
+class called :class:`bioservices.kegg.KEGGParser` that inherits from the KEGG class used so
+far (i.e., all functions seen so far works with KEGGParser). In addition, it will help us to
 convert the output of the previous command into a dictionary to easily extract
 information contained in the pathway (e.g., gene name)::
 
-    >>> s = KeggParser()
+    >>> s = KEGGParser()
     >>> data = s.get("hsa04660")
     >>> dict_data = s.parse(data)
     >>> print dict_data['gene']
@@ -190,9 +190,9 @@ Here entry1 and 2 are Ids. The Ids can be found in ::
     res['entries']
 
 
-From there you should consult :meth:`bioservices.kegg.Kegg.parse_kgml_pathway`
+From there you should consult :meth:`bioservices.kegg.KEGG.parse_kgml_pathway`
 and the KEGG document for more information. You may also look at 
-:meth:`bioservices.kegg.Kegg.pathway2sif` method that extact only protein-protein
+:meth:`bioservices.kegg.KEGG.pathway2sif` method that extact only protein-protein
 interactions with activation and inhibition links only.
 
 
@@ -208,8 +208,8 @@ look at a subset by setting Nmax to a small value (e.g., Nmax=10).
 
     from pylab import *
     # extract all relations from all pathways
-    from bioservices.kegg import Kegg
-    s = Kegg()
+    from bioservices.kegg import KEGG
+    s = KEGG()
     s.organism = "hsa"
 
     # retrieve more than 260 pathways so it takes time
@@ -306,7 +306,7 @@ You can then extract more information such as the type of relations::
 
 .. Notes about KO
     ------------------
-    KO stands for Kegg Orthology, several methods are available::
+    KO stands for KEGG Orthology, several methods are available::
     >>> kos = k.get_kos_by_pathway(pid)
     >>> ko = kos[0] # ko:K01116
     >>> k.get_genes_by_ko(ko, "hsa").entry_id

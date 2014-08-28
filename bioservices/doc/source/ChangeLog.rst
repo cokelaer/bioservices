@@ -8,39 +8,37 @@ Revision 1.3
 
 * 1.3.0
 
-  * NEW added new class to access REST using requests instead of urllib2. This speeds up 
-    the code significantly because (i) requests is faster (ii) trials and sleep time
-    are managed as they should unlike the previous hack (iii) requests_cache is
-    also used (iv) also asynchronous requests have been implemented. 
-  * NEW chembldb renamed to :class:`bioservices.chembl.ChEMBL`
-      * it has been updated to inherit from REST class instead of RESTService (so 
-        it uses requests package). All functions are now taking as input either a 
-        string or list of strings
-      * chembldb: get_assay_by_chemblId renamed in get_assays_by_chemblId
+  * NEWS
+
+    * added REST class that uses the requests module. This class replaces
+      of instance of RESTservice that uses urllib2, which will be deprecated
+      later on. This speeds up the code significantly not only 
+      because requests is faster but also because we now do not need trial/time
+      hack that was implemented inside RESTService. We also use the 
+      requests_cache module that could be used to speed go but requires
+      to store cache files locally. Asynchronous requests is available but used
+      only in a few places for now. 
+
+  * CHANGES
+
+    * all paramters called format have been renamed frmt (format is a python
+      keyword)
+    * chembldb module and class renamed to chembl and :class:`bioservices.chembl.ChEMBL`
+    * All classes that depends on RESTService have been updated to use the new
+      REST class.
+    * chembldb: 
+
+      * get_assay_by_chemblId renamed in get_assays_by_chemblId
       * renamed  get_target_by_refSeqId into get_target_by_refseq
+      * kegg module: all Kegg strings replaced by KEGG so the kegg.Kegg class is
+        now kegg.KEGG
 
-Rhea: format -->frmt
-ArrayExpress: add assert to force usage of xml when calling format -->frmt
+  * BUG FIXES:
 
-../src/bioservices/kegg.py
-../src/bioservices/miriam.py
-../src/bioservices/muscle.py
-../src/bioservices/ncbiblast.py
-../src/bioservices/unichem.py
-../src/bioservices/chebi.py         ../src/bioservices/panther.py
-../src/bioservices/chembldb.py      ../src/bioservices/pathwaycommons.py
-../src/bioservices/uniprot.py
-../src/bioservices/pdb.py
-../src/bioservices/pfam.py
-../src/bioservices/picr.py
-../src/bioservices/wsdbfetch.py
-../src/bioservices/geneprof.py      ../src/bioservices/psicquic.py
-../src/bioservices/hgnc.py 
-../src/bioservices/reactome.py
+    * Fixing bug #24/25 posted on assembla related to parse_kgml_pathway
+      second argument can now be used. 
 
-
-
-Revision 1.3
+Revision 1.2
 ------------------
 
 * 1.2.6:

@@ -3,7 +3,7 @@ Manipulating compound identifiers
 .. testsetup:: compound
 
     from bioservices import *
-    k = Kegg(verbose=False)
+    k = KEGG(verbose=False)
 
 .. topic:: Application: retrieving information about a compound
 
@@ -22,7 +22,7 @@ and manipulate the different identifiers.
 First, let us retrieve information on KEGG database::
 
     >>> from bioservices import *
-    >>> k = Kegg(verbose=False)
+    >>> k = KEGG(verbose=False)
 
 KEGG compounds have links to other databases. It is not systematic but the ChEBI
 database is often referenced. So we will want to convert the KEGG identifer to a
@@ -42,7 +42,7 @@ We can get a mapping dictionary from the KEGG compound to ChEBI as follows:
     cpd:C15823  Progeldanamycin
     <BLANKLINE>
 
-Let us look at the first one (Kegg id cpd:C11222). We can get lots
+Let us look at the first one (KEGG id cpd:C11222). We can get lots
 of information from KEGG already by using:
 
 .. doctest::
