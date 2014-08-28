@@ -33,7 +33,7 @@ import easydev
 from  easydev import  Logging
 
 
-__all__ = ["Service", "WSDLService", "RESTService", "BioServicesError", "REST"]
+__all__ = ["Service", "WSDLService", "DevTools", "RESTService", "BioServicesError", "REST"]
 
 
 class BioServicesError(Exception):
@@ -45,7 +45,7 @@ class BioServicesError(Exception):
 
 # could be part of easydev itself but for now, let us keep it here inside bioservices
 class DevTools(object):
-    """
+    """wrapper around useful functions.
 
     See easydev documentation for details.
     """

@@ -463,7 +463,8 @@ class UniProt(REST):
             if isinstance(limit, int):
                 params['limit'] = limit
 
-        params['query'] = query
+        # + are interpreted and have a meaning.
+        params['query'] = query.replace("+", " ")
         #res = s.request("/uniprot/?query=zap70+AND+organism:9606&format=xml", params)
         print(params)
         res = self.http_get("uniprot/", frmt="txt", params=params) 
@@ -506,7 +507,7 @@ class UniProt(REST):
         """Given a list of uniprot entries, this method returns a dataframe with all possible columns
 
 
-        :param entruies: list of valid entry name. if list is too large (about
+        :param entries: list of valid entry name. if list is too large (about
         >200), you need to split the list
         :param chunk:
         :return: dataframe with indices being the uniprot id (e.g. DIG1_YEAST)
