@@ -1,4 +1,4 @@
-from bioservices import Kegg, KeggParser
+from bioservices import KEGG, KEGGParser
 from nose import with_setup
 import unittest
 
@@ -7,12 +7,12 @@ import unittest
 # This is a simple test class that do not test everything on purpose.
 # The other class could be use to test the code more thoroughly but it takes several
 # minutes so during development this one should be used instead.
-# class TestKeggAll should serve as a complement to this class
-class TestKegg(object):
+# class TestKEGGAll should serve as a complement to this class
+class TestKEGG(object):
 
     @classmethod
     def setup_class(klass):
-        klass.ws = Kegg()
+        klass.ws = KEGG()
         klass.ws.organismIds
         klass.ws.organism = "hsa"
 
@@ -63,11 +63,11 @@ class TestKegg(object):
 
 
 
-class TestKeggALL(object):
+class TestKEGGALL(object):
 
     @classmethod
     def setup_class(klass):
-        klass.ws = Kegg()
+        klass.ws = KEGG()
         klass.ws.organismIds
         print(klass)
 
@@ -198,8 +198,8 @@ class TestKeggALL(object):
 
 
 #@unittest.skip
-def test_KeggParser():
-    s = KeggParser()
+def test_KEGGParser():
+    s = KEGGParser()
     d = s.parse(s.get("cpd:C00001"))
     d = s.parse(s.get("ds:H00001"))
     d = s.parse(s.get("dr:D00001"))
