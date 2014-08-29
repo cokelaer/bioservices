@@ -1,6 +1,34 @@
+BioServices
+##############
+
+.. image:: https://badge.fury.io/py/bioservices.svg
+    :target: https://badge.fury.io/py/bioservices.svg
+
+.. image:: https://pypip.in/d/bioservices/badge.png
+    :target: https://crate.io/packages/bioservices/
+
+.. image:: https://secure.travis-ci.org/cokelaer/bioservices.png
+    :target: http://travis-ci.org/cokelaer/bioservices
+
+.. image:: https://coveralls.io/repos/cokelaer/bioservices/badge.png?branch=master 
+   :target: https://coveralls.io/r/cokelaer/bioservices?branch=master 
+
+.. image:: https://landscape.io/github/cokelaer/bioservices/master/landscape.png
+   :target: https://landscape.io/github/cokelaer/bioservices/master
+
+.. image:: https://badge.waffle.io/cokelaer/bioservices.png?label=ready&title=Ready 
+   :target: https://waffle.io/cokelaer/bioservices
+
+
+
+
 **Bioservices** is a Python package that provides access to many Bioinformatices Web Services (e.g.,
 UniProt) and a framework to easily implement Web Services wrappers (based on 
 WSDL/SOAP or REST protocols).
+
+.. image::
+https://github.com/cokelaer/bioservices/blob/master/doc/source/bioservices.png
+    :target: https://github.com/cokelaer/bioservices/blob/master/doc/source/bioservices.png
 
 The primary goal of **BioServices** is to use Python as a glue language to provide
 a programmatic access to several Bioinformatics Web Services. By doing so, elaboration of  new
