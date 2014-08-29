@@ -20,8 +20,6 @@ BioServices
    :target: https://waffle.io/cokelaer/bioservices
 
 
-
-
 **Bioservices** is a Python package that provides access to many Bioinformatices Web Services (e.g.,
 UniProt) and a framework to easily implement Web Services wrappers (based on 
 WSDL/SOAP or REST protocols).
