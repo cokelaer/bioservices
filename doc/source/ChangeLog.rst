@@ -20,7 +20,9 @@ Revision 1.3
       only in a few places for now. 
 
   * CHANGES
-
+    * update code to be python-3 compatible. There are still issues with suds/requests/gevent
+      but the code itself is python3 executable.
+    * WSDLservice now uses suds instead of SOAP package by default
     * all paramters called format have been renamed frmt (format is a python
       keyword)
     * chembldb module and class renamed to chembl and :class:`bioservices.chembl.ChEMBL`

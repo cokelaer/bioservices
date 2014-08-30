@@ -251,7 +251,7 @@ class EUtils(WSDLService):
             request += "&seq_stop=%s" % kargs.get("seq_stop")
 
         if kargs.get("rettype"):
-            print kargs.get("rettype")
+            print(kargs.get("rettype"))
             request += "&rettype=%s" % kargs.get("rettype")
 
         ret = s.request(request)

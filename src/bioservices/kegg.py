@@ -768,7 +768,10 @@ class KEGG(REST):
 
         
         """
-        import urllib2
+        try:
+            from urllib.error import HTTPError
+        except:
+            from urllib2 import HTTPError
         entries = dbentries.split("+")
         # we do not want logging here
         debugLevel = self.debugLevel
@@ -779,7 +782,7 @@ class KEGG(REST):
                 self.get(entry)
                 status = True
             # if ill-formed, an entry will raise the 404 error.
-            except urllib2.HTTPError, e:
+            except HTTPError as err:
                 if e.code == 404:
                     status = False
                     allStatus = False

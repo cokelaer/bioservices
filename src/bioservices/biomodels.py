@@ -598,7 +598,7 @@ records.
                     print("%f %% done" % ((i-start)*100./float(end-start)))
             res = self.getModelsIdByChEBI(ChEBI)
             if res:
-		Ids.append(ChEBI)
+                Ids.append(ChEBI)
         return Ids
 
     def extra_getReactomeIds(self, start=0, end=1000, verbose=False):

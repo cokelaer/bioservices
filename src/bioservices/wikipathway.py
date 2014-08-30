@@ -36,8 +36,8 @@
 
 
 """
-from services import WSDLService, RESTService
-import copy, webbrowser, xmltools, base64
+from bioservices.services import WSDLService, RESTService
+import copy, webbrowser,  base64
 
 
 __all__ = ["Wikipathway"]

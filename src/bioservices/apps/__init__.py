@@ -1,6 +1,5 @@
-import fasta
-from fasta import *
+from . import fasta
+from .fasta import *
 
-import taxonomy
-
-import peptides
+from . import taxonomy
+from . import peptides

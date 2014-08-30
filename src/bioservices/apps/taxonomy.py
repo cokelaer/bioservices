@@ -73,13 +73,17 @@ class Taxon(Logging):
         :param str taxon: taxon identifier 
         """
         import webbrowser
-        import urllib2
         try:
-            urllib2.urlopen('http://www.uniprot.org/taxonomy/%s' % taxon)
+            from urllib.request import urlopen
+            from urllib.error import HTTPError, URLError
+        except:
+            from urllib2 import urlopen, HTTPError, URLError
+        try:
+            urlopen('http://www.uniprot.org/taxonomy/%s' % taxon)
             webbrowser.open("http://www.uniprot.org/taxonomy/%s" % taxon)
-        except urllib2.HTTPError, e:
+        except HTTPError as err:
             print("Invalid taxon")
-        except urllib2.URLError, e:
+        except URLError as err:
             print(e.args)
 
 

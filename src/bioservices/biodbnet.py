@@ -41,8 +41,15 @@
     .. sectionauthor:: Thomas Cokelaer, Feb 2014
 
 """
+import io
 from bioservices.services import WSDLService
-import SOAPpy
+try:
+    import SOAPpy
+except:
+
+    class SOAPpy(object):
+        def struct(self, *args, **kargs):
+            raise Exception("Sorry but BioDBNet service is not yet available in python 3")
 
 __all__ = ["BioDBNet"]
 
@@ -180,8 +187,7 @@ class BioDBNet(WSDLService):
                 import pandas as pd
             except:
                 print("Pandas library is not installed. dataframe are not  available")
-            import StringIO
-            df = pd.readcsv(stringIO.StringIO(res.strip()), sep="\t")
+            df = pd.readcsv(io.StringIO(res.strip()), sep="\t")
             return df
         else:
             return res

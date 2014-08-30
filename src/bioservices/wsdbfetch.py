@@ -35,8 +35,7 @@
 
 
 """
-from services import WSDLService
-import urllib2
+from bioservices.services import WSDLService
 
 
 

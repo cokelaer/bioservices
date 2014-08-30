@@ -1,6 +1,6 @@
 from bioservices.chembl import *
 import unittest
-import settings
+from . import settings
 
 class test_Chembl(ChEMBL):
 

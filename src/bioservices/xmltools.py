@@ -22,7 +22,10 @@ from __future__ import print_function
 import xml.etree.ElementTree as ET
 import bs4
 from bioservices import unicodefix 
-import urllib2
+try:
+    from urllib.request import urlopen
+except:
+    from urllib2 import urlopen
 
 __all__ = ["easyXML", "readXML"]
 
@@ -115,7 +118,7 @@ class readXML(easyXML):
 
     """
     def __init__(self, filename, fixing_unicode=False, encoding="utf-8"):
-        url = urllib2.urlopen(filename, "r")
+        url = urlopen(filename, "r")
         self.data = url.read()
         super(readXML, self).__init__(self.data, fixing_unicode, encoding)
 

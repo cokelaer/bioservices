@@ -1,5 +1,5 @@
 from bioservices.uniprot import *
-import settings
+from . import settings
 
 class test_UniProt(UniProt):
     def __init__(self):
@@ -8,7 +8,6 @@ class test_UniProt(UniProt):
 
     def test_mapping(self):
         res = self.mapping(fr="ACC+ID", to="KEGG_ID", query='P43403')
-        print res
         assert res == {'P43403':['hsa:7535']}
         try: 
             res = self.mapping(fr="AC", to="KEID", query='P434')

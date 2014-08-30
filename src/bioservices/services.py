@@ -18,16 +18,24 @@
 #$Id$
 """Modules with common tools to access web resources"""
 from __future__ import print_function
-
 import os
 import sys
 import socket
-import urllib
-import urllib2
+
+
+# fixing compatiblity python 2 and 3 related to merging or urllib and urllib2 in python 3
+try:
+    #python 3
+    from urllib.request import urlopen
+    from urllib.parse import urlparse, urlencode
+    from urllib.error import HTTPError
+    from urllib.request import Request
+except:
+    from urllib import urlencode
+    from urllib2  import urlopen, Request, HTTPError
+
 import platform
 
-from SOAPpy import  WSDL
-# from SOAPPy import SOAPProxy
 
 import easydev
 from  easydev import  Logging
@@ -113,11 +121,10 @@ class Service(Logging):
         self._url = url
         try:
             if self.url != None:
-                import urllib
-                urllib.urlopen(self.url)
-        except Exception, e:
+                urlopen(self.url)
+        except Exception as err:
             self.logging.critical("The URL (%s) provided cannot be reached" % self.url)
-            print(e)
+            print(err.message)
         #self.url = url
         self.name = name
         self._easyXMLConversion = True
@@ -201,7 +208,7 @@ easyXML object (Default behaviour).""")
         """
         if isinstance(params, dict)==False:
             raise TypeError("Params must be a dictionary.")
-        postData = urllib.urlencode(params)
+        postData = urlencode(params)
         return postData
 
     def checkParam(self, param, valid_values):
@@ -249,7 +256,7 @@ class WSDLService(Service):
 
     """
 
-    def __init__(self, name, url, verbose=True, lib="soappy"):
+    def __init__(self, name, url, verbose=True, lib="suds"):
         """.. rubric:: Constructor
 
         :param str name: a name e.g. Kegg, Reactome, ...
@@ -272,13 +279,14 @@ class WSDLService(Service):
         try:
             #: attribute to access to the methods provided by this WSDL service
             if lib == "soappy":
+                from SOAPpy import WSDL
                 self.serv = WSDL.Proxy(self.url)
             elif lib == "suds":
-                serv = WSDL.Proxy(self.url)
+                #serv = WSDL.Proxy(self.url)
                 from suds.client import Client
                 self.suds = Client(self.url)
                 self.serv = self.suds.service
-                self.serv.methods = serv.methods.copy()
+                #self.serv.methods = serv.methods.copy()
         except Exception:
             self.logging.error("Could not connect to the service %s " % self.url)
             raise Exception
@@ -346,7 +354,10 @@ class RESTService(RESTbase):
 
     def getUserAgent(self):
         self.logging.info('getUserAgent: Begin')
-        urllib_agent = 'Python-urllib/%s' % urllib2.__version__
+        try:
+            urllib_agent = 'Python-urllib/%s' % urllib2.__version__
+        except:
+            urllib_agent = 'Python-urllib/%s' % urllib.__version__
         #clientRevision = ''
         clientVersion = ''
         user_agent = 'EBI-Sample-Client/%s (%s; Python %s; %s) %s' % (
@@ -417,21 +428,21 @@ class RESTService(RESTbase):
             raise ValueError("URL length (%s) exceeds 2000. Please use a differnt URL" % len(url))
 
         try:
-            res = urllib2.urlopen(url).read()
+            res = urlopen(url).read()
             if format=="xml":
                 if self.easyXMLConversion:
                     #logging.warning("--Conversion to easyXML"),
                     try:
                         res = self.easyXML(res)
-                    except Exception,e :
-                        self.logging.warning(e)
+                    except Exception as err:
+                        self.logging.warning(err.message)
                         self.logging.warning("--Conversion to easyXML failed. returns the raw response"),
             self.last_response = res
             return res
         except socket.timeout:
             self.logging.warning("Time out. consider increasing the timeout attribute (currently set to {})".format(self.timeout))
-        except Exception, e:
-            self.logging.debug(e)
+        except Exception as err:
+            self.logging.debug(err.message)
             self.logging.debug("An exception occured while reading the URL")
             self.logging.debug(url)
             self.logging.debug("Error caught within bioservices. Invalid requested URL ? ")
@@ -452,7 +463,7 @@ class RESTService(RESTbase):
         .. note:: this is a HTTP POST request
         .. note:: use only by ::`ncbiblast` service so far.
         """
-        requestData = urllib.urlencode(params)
+        requestData = urlencode(params)
         print(requestData)
         if extra != None:
             requestData += extra
@@ -463,30 +474,23 @@ class RESTService(RESTbase):
             user_agent = self.getUserAgent()
             http_headers = { 'User-Agent' : user_agent }
             print(requestUrl)
-            req = urllib2.Request(requestUrl, None, http_headers)
+            req = Request(requestUrl, None, http_headers)
             # Make the submission (HTTP POST).
             print(req)
-            reqH = urllib2.urlopen(req, requestData)
+            reqH = urlopen(req, requestData)
             jobId = reqH.read()
             reqH.close()
-        except urllib2.HTTPError, ex:
+        except HTTPError as err:
             # Trap exception and output the document to get error message.
             print(sys.stderr, ex.read())
             raise
         return jobId
 
 
-
-
-
-
-
-
-
 import requests         # replacement for urllib2 (2-3 times faster)
 from requests.models import Response
 import requests_cache   # use caching wihh requests
-import grequests        # use asynchronous requests with gevent
+#import grequests        # use asynchronous requests with gevent
 # Note that grequests should be imported after requests_cache. Otherwise,
 # one should use a session instance when calling grequests.get, which we do
 # here below
@@ -646,6 +650,8 @@ class REST(RESTbase):
         return [fn(x, *args, **kwargs) for x in iterable if x is not None]
 
     def _get_async(self, keys, frmt='json', params={}):
+        # does not work under pyhon3 so local import 
+        import grequests 
         session = self._get_session()
         try:
             # build the requests
@@ -658,8 +664,8 @@ class REST(RESTbase):
             self.last_response = ret
             self.logging.debug("grequests.map call done" )
             return ret
-        except Exception, e:
-            self.logging.warning("Error caught in async. " + e.message)
+        except Exception as err:
+            self.logging.warning("Error caught in async. " + err.message)
             return []
 
     def _get_all_urls(self, keys, frmt=None):
@@ -711,8 +717,8 @@ class REST(RESTbase):
             self.last_response = res
             res = self._interpret_returned_request(res, frmt)
             return res
-        except Exception,e:
-            print(e.message)
+        except Exception as err:
+            print(err.message)
             return None
 
 
@@ -760,8 +766,8 @@ class REST(RESTbase):
             self.last_response = res
             res = self._interpret_returned_request(res, frmt)
             return res
-        except Exception,e:
-            print(e.message)
+        except Exception as err:
+            print(err.message)
             return None
 
     def getUserAgent(self):

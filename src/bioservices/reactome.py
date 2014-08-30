@@ -41,7 +41,7 @@
 """
 
 
-from services import WSDLService, REST
+from bioservices.services import WSDLService, REST
 import webbrowser
 import copy
 
@@ -90,7 +90,7 @@ class Reactome(WSDLService):
     def version(self):
         r = WSDLService("version", "http://www.reactome.org:8080/caBIOWebApp/services/Version?wsdl")
         res = r.serv.getVersion()
-        print res
+        print(res)
 
     def queryPathwaysForReferenceIdentifiers(self, list_ids):
         """
