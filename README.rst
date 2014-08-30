@@ -24,9 +24,9 @@ BioServices
 UniProt) and a framework to easily implement Web Services wrappers (based on 
 WSDL/SOAP or REST protocols).
 
-.. image::
-https://github.com/cokelaer/bioservices/doc/source/bioservices.png
-    :target: https://github.com/cokelaer/bioservices/doc/source/bioservices.png
+.. image:: http://pythonhosted.org//bioservices/_images/bioservices.png
+    :target: http://pythonhosted.org//bioservices/_images/bioservices.png
+
 
 The primary goal of **BioServices** is to use Python as a glue language to provide
 a programmatic access to several Bioinformatics Web Services. By doing so, elaboration of  new
