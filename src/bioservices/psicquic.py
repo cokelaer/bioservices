@@ -716,7 +716,7 @@ class PSICQUIC(REST):
             try:
                 dbB, idB = entryB.split(":")
             except:
-                print entryB
+                print(entryB)
             if idA not in mapping.keys():
                 if dbA.startswith("?"):
                     mapping[idA] = entryA
@@ -878,7 +878,7 @@ class AppsPPI(object):
         print("Interactions %s -- %s has %s entries in %s databases (%s):" %
                 (idA, idB, N, uniq, self.counter[key]))
         for r in ret:
-            print r[5], " reference", r[4]
+            print(r[5], " reference", r[4])
 
 
     def show_pie(self):
@@ -892,7 +892,7 @@ class AppsPPI(object):
             from bioservices import BioServicesError
             raise BioServicesError("You must install pylab/matplotlib to use this functionality")
         labels = range(1, self.N + 1 )
-        print labels
+        print(labels)
         counting = [len(self.relevant_interactions[i]) for i in labels]
 
 

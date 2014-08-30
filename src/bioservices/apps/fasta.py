@@ -1,5 +1,8 @@
 from collections import OrderedDict
-import pandas as pd
+try:
+    import pandas as pd
+except:
+    pass
 
 __all__ = ["FASTA", "MultiFASTA"]
 

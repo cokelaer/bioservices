@@ -41,8 +41,7 @@ access to the REST interface of the PICR web service. There is also a SOAP web s
 
 
 """
-from services import REST
-import xmltools
+from bioservices.services import REST
 
 
 __all__ = ["PICR"]

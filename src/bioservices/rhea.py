@@ -45,7 +45,7 @@
 """
 from __future__ import print_function
 
-from services import REST
+from bioservices.services import REST
 
 __all__ = ["Rhea"]
 

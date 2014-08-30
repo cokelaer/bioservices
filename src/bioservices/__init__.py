@@ -36,99 +36,98 @@ except:
 
 
 
-import settings
-from settings import *
+from . import settings
+from .settings import *
 
-import services
-from services import *
+from . import services
+from .services import *
 
-import biomodels
-from biomodels import *
+from . import biomodels
+from .biomodels import *
 
-import chebi
-from chebi import *
+from . import chebi
+from .chebi import *
 
-import geneprof
-from geneprof import *
+from . import geneprof
+from .geneprof import *
 
-import kegg
-from kegg import *
+from . import kegg
+from .kegg import *
 
-import hgnc
-from hgnc import *
+from . import hgnc
+from .hgnc import *
 
-import rhea
-from rhea import *
+from . import rhea
+from .rhea import *
 
-import xmltools
-from xmltools import *
+from . import xmltools
+from .xmltools import *
 
-import wikipathway
-from wikipathway import *
+from . import wikipathway
+from .wikipathway import *
 
-import pdb
-from pdb import *
+from . import pdb
+from .pdb import *
 
-import uniprot
-from uniprot import *
+from . import uniprot
+from .uniprot import *
 
-import unichem
-from unichem import *
+from . import unichem
+from .unichem import *
 
-import wsdbfetch
-from wsdbfetch import *
+from . import wsdbfetch
+from .wsdbfetch import *
 
-import unicodefix
+from . import unicodefix
 
-import xmltools
-from xmltools import *
+from . import xmltools
+from .xmltools import *
 
-import reactome
-from reactome import *
+from . import reactome
+from .reactome import *
 
-import quickgo
-from quickgo import *
-
-import chembldb
-from chembldb import *
-import chembl
-from chembl import *
-
-import picr
-from picr import *
-
-import psicquic
-from psicquic import *
-
-import ncbiblast
-from ncbiblast import *
-
-import biogrid
-from biogrid import *
-
-import miriam
-from miriam import *
-
-import arrayexpress
-from arrayexpress import *
-
-import biomart
-from biomart import *
-
-import eutils
-from eutils import *
-
-import pathwaycommons
-from pathwaycommons import *
+from . import quickgo
+from .quickgo import *
 
 
-import muscle
-from muscle import *
+from . import chembl
+from .chembl import *
 
-import biodbnet
-from biodbnet import *
+from . import picr
+from .picr import *
+
+from . import psicquic
+from .psicquic import *
+
+from . import ncbiblast
+from .ncbiblast import *
+
+from . import biogrid
+from .biogrid import *
+
+from . import miriam
+from .miriam import *
+
+from . import arrayexpress
+from .arrayexpress import *
+
+from . import biomart
+from .biomart import *
+
+from . import eutils
+from .eutils import *
+
+from . import pathwaycommons
+from .pathwaycommons import *
+
+
+from . import muscle
+from .muscle import *
+
+from . import biodbnet
+from .biodbnet import *
 # sub packages inside bioservices.
 
 #import mapping
-import apps
+from . import apps
 #import dev

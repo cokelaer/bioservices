@@ -28,7 +28,7 @@ defaultParams = {
     'cache.tag_suffix': ["_bioservices_database",str, 'suffix to append for cache databases'],
     'cache.on' : [False, bool, 'CACHING on/off'],
     'cache.fast': [True, bool, "FAST_CACHE option"],
-    'chemspider.token': [None, (str, types.NoneType), 'token see http://www.chemspider.com'],
+    'chemspider.token': [None, (str, type(None)), 'token see http://www.chemspider.com'],
 }
 
 

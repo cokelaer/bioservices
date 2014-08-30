@@ -43,13 +43,13 @@
 
 """
 import types
-import StringIO
-from services import REST
+import io
+
+from bioservices.services import REST
 try:
     import pandas as pd
 except:
     print("pandas library is not installed. Not all functionalities will be  available")
-import StringIO
 
 __all__ = ["UniProt"]
 
@@ -500,7 +500,7 @@ class UniProt(REST):
 
         """
         res = self.http_get("uniref/", params={"query":query, 'format':'tab'}, frmt="txt")
-        res = pd.read_csv(StringIO.StringIO(res.strip()), sep="\t")
+        res = pd.read_csv(io.StringIO(res.strip()), sep="\t")
         return res
 
     def get_df(self, entries, nChunk=100, organism=None):
@@ -542,7 +542,7 @@ class UniProt(REST):
             if len(res)==0:
                  self.logging.warning("some entries %s not found" % entries)
             else:
-                df = pd.read_csv(StringIO.StringIO(res), sep="\t")
+                df = pd.read_csv(io.StringIO(res), sep="\t")
                 if isinstance(output, types.NoneType):
                     output = df.copy()
                 else:

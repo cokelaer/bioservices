@@ -37,8 +37,11 @@
 
 """
 from bioservices import REST
-from xmltools import bs4
-from urllib2 import HTTPError
+from .xmltools import bs4
+try:
+    from urllib.error import HTTPError
+except:
+    from urllib2 import HTTPError
 
 __all__ = ["HGNC"]
 

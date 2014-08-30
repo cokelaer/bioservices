@@ -39,7 +39,6 @@ import sys
 import time
 
 from bioservices.services import REST
-import xmltools
 
 
 __all__ = ["NCBIblast"]
@@ -247,7 +246,7 @@ returns a list of parameters. See :meth:`getParameters`.""")
         # here because what is returned by parametersDetails is not exactly what
         # is expected.
         for k,v in kargs.iteritems():
-             print k,v
+             print(k,v)
              checkParam(v,self.parametersDetails(k))
              params[k] = v
 
