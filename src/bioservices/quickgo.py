@@ -55,12 +55,12 @@ class QuickGO(REST):
     print only 3 columns of information (protein name, GO identifier and GO
     name)::
 
-        print s.Annotation(protein="Q8IYB3", frmt="tsv", tax=9606,
-            source="UniProt", col="proteinName,goID,goName")
+        print(s.Annotation(protein="Q8IYB3", frmt="tsv", tax=9606,
+            source="UniProt", col="proteinName,goID,goName"))
 
     Here is the Term output for a given GO identifier::
 
-        >>> print s.Term("GO:0000016", frmt="obo")
+        >>> print(s.Term("GO:0000016", frmt="obo"))
         [Term]
         id: GO:0000016
         name: lactase activity

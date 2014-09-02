@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
+# $Id$
 """This module provides a class :class:`~BioDBNet` to access to BioDBNet WS.
 
 
@@ -43,13 +43,6 @@
 """
 import io
 from bioservices.services import WSDLService
-try:
-    import SOAPpy
-except:
-
-    class SOAPpy(object):
-        def struct(self, *args, **kargs):
-            raise Exception("Sorry but BioDBNet service is not yet available in python 3")
 
 __all__ = ["BioDBNet"]
 
@@ -104,8 +97,6 @@ class BioDBNet(WSDLService):
                 raise Exception
         return outputs
 
-
-
     def db2db(self, input_db, output_db, inputValues, taxon=9606):
         """Retrieves the models which are associated to the provided Taxonomy text.
 
@@ -127,43 +118,38 @@ class BioDBNet(WSDLService):
         inputValues = self._interpret_input_db(inputValues)
         outputs = self._interpret_output_db(input_db, output_db)
 
-        #dbPath = 'Ensembl Gene ID->Gene ID->Homolog - Mouse Gene ID->Ensembl Gene ID'
-        #getDirectOutputsForInput method
-        #directOutputResult = self.getDirectOutputsForInput(input_db)
+        # dbPath = 'Ensembl Gene ID->Gene ID->Homolog - Mouse Gene ID->Ensembl Gene ID'
+        # getDirectOutputsForInput method
+        # directOutputResult = self.getDirectOutputsForInput(input_db)
 
-        #db2db method
-        if taxon:
-            taxonId = str(taxon)
-            params = SOAPpy.structType({'input': input_db, 'inputValues':
-                inputValues, 'outputs': outputs, 'taxonId': taxonId})
-        else:
-
-            params = SOAPpy.structType({'input': input, 'inputValues':
-                inputValues, 'outputs': outputs, 'taxonId': ''})
+        params = self.suds.factory.create("db2dbParams")
+        params.taxonId = str(taxon)
+        params.inputValues = inputValues
+        params.input = input_db
+        params.outputs = output_db
 
         res = self.serv.db2db(params)
         return res
 
     def dbFind(self, input_db, inputValues, taxon="9606"):
         inputValues = self._interpret_input_db(inputValues)
-        taxonId = str(taxon)
-        params = SOAPpy.structType({'input': input_db, 'inputValues':
-            inputValues, 'taxonId': taxonId})
+
+        params = self.suds.factory.create('dbFindParams')
+        params.output = input_db
+        params.taxonId = str(taxon) # do we need the cast ?
+        params.inputValues = inputValues
         return self.serv.dbFind(params)
 
 
     def dbOrtho(self, input_db, output_db, inputValues, input_taxon, output_taxon):
-        raise NotImplementedError
         inputValues = self._interpret_input_db(inputValues)
         outputs = self._interpret_output_db(input_db, output_db)
 
-        taxon1 = str(input_taxon)
-        taxon2 = str(output_taxon) # could be a list ?
-
-        params = SOAPpy.structType({'input': input, 'output': output,
-            'inputValues': inputValues,  'inputTaxon': taxon1, 'outputTaxon':
-            taxon2})
-
+        params = self.suds.factory.create("dbOrtho")
+        params.input = input_db
+        params.output = output_db
+        params.inputTaxon = str(input_taxon)
+        params.outputTaxon = str(output_taxon)
         return self.serv.dbOrtho(params)
 
     def dbReport(self, input_db, inputValues, taxon=9606, output="raw"):
@@ -178,9 +164,12 @@ class BioDBNet(WSDLService):
 
         """
         inputValues = self._interpret_input_db(inputValues)
-        taxonId = str(taxon)
-        params = SOAPpy.structType({'input': input_db, 'inputValues':
-            inputValues, 'taxonId': taxonId})
+
+        params = self.suds.factory.create('dbReportParams')
+        params.input = input_db
+        params.taxonId = str(taxon) # do we need the cast ?
+        params.inputValues = inputValues
+
         res = self.serv.dbReport(params)
         if output == "dataframe":
             try:
@@ -192,12 +181,13 @@ class BioDBNet(WSDLService):
         else:
             return res
 
-    def dbWalk(self , dbPath, inputValues, taxon=9606):
+    def dbWalk(self, dbPath, inputValues, taxon=9606):
         dbPath = 'Ensembl Gene ID->Gene ID->Homolog - Mouse Gene ID->Ensembl Gene ID'
         inputValues = self._interpret_input_db(inputValues)
-        taxonId = str(taxon)
-        params = SOAPpy.structType({'dbPath': dbPath, 'inputValues':
-            inputValues, 'taxonId': taxonId})
+        params = self.suds.factory.create("dbWalkParams")
+        params.dbPath = dbPath
+        params.inputValues = inputValues
+        params.taxonId = str(taxon)
         return self.serv.dbWalk(params)
 
     def getDirectOutputsForInput(self, input_db):

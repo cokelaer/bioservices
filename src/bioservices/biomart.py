@@ -143,6 +143,7 @@ class BioMart(REST):
         res = s.query(xmlq)
 
 
+    .. note:: the biomart sevice is slow (in my experience, 2013-2014) so please be patient...
 
     """
     _xml_example = """<?xml version="1.0" encoding="UTF-8"?>
@@ -303,7 +304,7 @@ class BioMart(REST):
         """
         ret = self.http_get("?type=version&mart=%s" % mart, frmt="xml")
         ret = self.easyXML(ret)
-        return ret
+        return ret.root.strip()
 
     def new_query(self):
         self._biomartQuery.reset()
@@ -389,7 +390,7 @@ class BioMart(REST):
     def _get_databases(self):
         if self._databases == None:
             ret = self.registry()
-            names = [x.get("database", "?") for x in ret]
+            names = sorted([x.get("database", "?") for x in ret])
             self._databases = names[:]
         return self._databases
     databases = property(_get_databases, doc="list of valid datasets")
@@ -407,16 +408,22 @@ class BioMart(REST):
         res = {}
         if self._valid_attributes == None:
             # we could use a loop and call self.datasets(name, raw=False) but it
-            # can be a bit longish, so we use the threaded_request module to
-            # speed up things.
-            import threaded_request
-            requests = threaded_request.RequestMultiURL()
-            for name in self.names:
-                url = self.url + "?type=datasets&mart=%s" % name
-                requests.add_url(url)
-            requests.start()
-            requests.wait()
-            results = requests.get_results()
+            # can be a bit longish, so we use the asynchronous call using
+            # requests
+            saveme = self.settings.params['general.async_threshold']
+            # TODO: not python3 compatible for now. Waiting for gevent package
+            # to be available.
+            self.settings.params['general.async_threshold'][0] = 10000 # 
+
+            queries = ["?type=datasets&mart=%s" % name for name in
+                    self.names]
+            results = self.http_get(queries, frmt="txt")
+
+            self.settings.params['general.async_threshold'] = saveme
+            #requests.start()
+            #requests.wait()
+            #results = requests.get_results()
+
             for i, name in enumerate(self.names):
                 try:
                     res[name] = [x.split("\t")[1] for x in results[i].split("\n") if len(x.strip())>1]

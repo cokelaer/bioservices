@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id: chembldb.py 318 2014-02-28 13:30:26Z cokelaer $
+# $Id: chembldb.py 318 2014-02-28 13:30:26Z cokelaer $
 
 """This module provides a class :class:`ChEMBL`
 
@@ -38,7 +38,7 @@
 
 """
 import os
-from bioservices.services import RESTService, REST
+from bioservices.services import REST
 import webbrowser
 
 __all__ = ["ChEMBL"]
@@ -57,7 +57,7 @@ class ChEMBL(REST):
         >>> resjson['proteinAccession']
         'Q12809'
 
-    By default, most methods return dictionaries (converted from json objects returned 
+    By default, most methods return dictionaries (converted from json objects returned
     by the ChEMBL API), however, you can also set the format to be XML.
 
     """
@@ -67,7 +67,7 @@ class ChEMBL(REST):
     _inChiKey_example = "QFFGVLORLPOAEC-SNVBAGLBSA-N"
     _smiles_example = "COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56"
     _smiles_struct_example = "C\C(=C/C=C/C(=C/C(=O)O)/C)\C=C\C1=C(C)CCCC1(C)C"
-    _smiles_similar_example = _smiles_example 
+    _smiles_similar_example = _smiles_example
     _image_chemblId_example = "CHEMBL192"
     _bioactivities_example = "CHEMBL2"
     _target_chemblId_example = "CHEMBL2477"
@@ -105,7 +105,7 @@ class ChEMBL(REST):
             if the identifier is invalid, the number 404 is returned.
         :param str frmt: json or xml (Default to json)
         :return: Compound Record (dictionary). If
-            the query is a list of identifiers, a list of compound records is 
+            the query is a list of identifiers, a list of compound records is
             returned.
 
         If json format is requested, a dictionary is returned. Here are some of the keys:
@@ -139,7 +139,7 @@ class ChEMBL(REST):
         See :meth:`get_compounds_by_chemblId` for full doc.
 
         ::
-        
+
             >>> s.get_compounds_by_chemblId_form("CHEMBL2")
             [{u'chemblId': u'CHEMBL1347191', u'parent': False},
              {u'chemlId': u'CHEMBL1558', u'parent': False},
@@ -158,7 +158,7 @@ class ChEMBL(REST):
         See :meth:`get_compounds_by_chemblId` for full doc.
 
         ::
-        
+
             >>> s.get_compounds_by_chemblId_drug_mechanism("CHEMBL3")
             [{u'chemblId': u'CHEMBL1347191', u'parent': False},
             {u'chemblId': u'CHEMBL1558', u'parent': False},
@@ -275,7 +275,7 @@ class ChEMBL(REST):
         :param str query: a valid compound ChEMBLId or a list/tuple of valid compound ChEMBLIds.
         :param int dimensions: optional argument. An integer z (:math:`1 \leq z \leq 500`)
             giving the dimensions of the image.
-        :param save: 
+        :param save:
         :param view:
         :param engine: Defaults to rdkit. Implemented for the future but only one value for now.
         :param bool view: show the image. If True the images are opened.
@@ -293,7 +293,7 @@ class ChEMBL(REST):
 
         .. todo:: ignorecoords option
         """
-        # NOTE: not async requests here. 
+        # NOTE: not async requests here.
         self.devtools.check_range(dimensions, 1,500)
         self.devtools.check_param_in_list(engine, ['rdkit'])
         queries = self.devtools.transform_into_list(query)
@@ -311,7 +311,7 @@ class ChEMBL(REST):
             if dimensions is not None:
                 req += '?engine=%s&dimensions=%s'%(engine, dimensions)
             target_data = self.http_get(req, frmt=None)
-            
+
             file_out = os.getcwd()
             file_out += '/%s.png' % query
             __f_save(target_data,file_out)
@@ -361,7 +361,7 @@ class ChEMBL(REST):
         :param str frmt: json or xml (Default to json)
         :return: Target Record in XML or dictionary (if json requested)
 
-        If json format is requested, a dictionary is returned. Here are 
+        If json format is requested, a dictionary is returned. Here are
         some of dictionary's keys:
 
          * target
@@ -467,7 +467,7 @@ class ChEMBL(REST):
         :return: Assay record as a dictionary (if json requested)
             (list of dictionaries if input is a list)
 
-        If json format is requested, a dictionary is returned. 
+        If json format is requested, a dictionary is returned.
         with some of the following keys:
 
          * assayDescription
@@ -598,4 +598,3 @@ class BenchmarkChembl(ChEMBL):
         pylab.axvline(2.5)
         df.boxplot()
         return df
-
