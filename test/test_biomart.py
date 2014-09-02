@@ -1,5 +1,4 @@
 from bioservices import BioMart
-import unittest
 
 
 def test_general():
@@ -11,9 +10,9 @@ def test_general():
 
     assert s.datasets("prod-intermart_1") == ['protein', 'entry', 'uniparc']
 
-    s.datasets("ensembl")
+    assert "mmusculus_gene_ensembl" in s.datasets("ensembl")
     s.version("ensembl")
-    s.attributes("oanatinus_gene_ensembl")
+    assert 'oanatinus_gene_ensembl' in s.valid_attributes["ensembl"]
     s.filters("oanatinus_gene_ensembl")
     s.configuration("oanatinus_gene_ensembl")
 
@@ -30,7 +29,7 @@ def test_general():
 
 def _test_reactome_example():
     # this is not working anymore...
-    s = biomart.BioMart()
+    s = BioMart()
     s.lookfor("reactome")
     s.datasets("REACTOME")
     #['interaction', 'complex', 'reaction', 'pathway']
