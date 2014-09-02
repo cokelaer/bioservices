@@ -1,5 +1,5 @@
 from bioservices.quickgo import QuickGO
-import settings
+from . import settings
 
 
 class test_quickGO(QuickGO):
@@ -79,10 +79,12 @@ class test_quickGO(QuickGO):
             assert True
 
     def test_annotation_protein(self):
-        print self.Annotation(protein='P12345', frmt='tsv', col="ref,evidence",ref='PMID:*')
+        print(self.Annotation(protein='P12345', frmt='tsv',
+            col="ref,evidence",ref='PMID:*'))
 
     def test_annotation_goid(self):
-        print self.Annotation(goid='GO:0003824', frmt='tsv', col="ref,evidence")
+        print(self.Annotation(goid='GO:0003824', frmt='tsv',
+                col="ref,evidence"))
 
     def test_annotation_ref_PMID(self):
         res = self.Annotation(tax='9606', frmt='tsv', col="ref",ref="PMID:*")
