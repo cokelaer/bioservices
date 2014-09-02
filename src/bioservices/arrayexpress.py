@@ -168,13 +168,13 @@ class ArrayExpress(REST):
         }
 
         for k in kargs.keys():
-            self.devtools.check_param_in_list(k, defaults.keys())
+            self.devtools.check_param_in_list(k, list(defaults.keys()))
 
         #if len(kargs.keys()):
         #    url += "?"
         params = {}
 
-        for k, v in kargs.iteritems():
+        for k, v in kargs.items():
             if k in ["expandfo", "wholewords"]:
                 if v in ["on", True, "true", "TRUE", "True"]:
                     #params.append(k + "=on")
@@ -325,7 +325,7 @@ class ArrayExpress(REST):
 
         .. doctest::
 
-            >>> from bioservices import *
+            >>> from bioservices import ArrayExpress
             >>> s = ArrayExpress(verbose=False)
             >>> s.retrieveFilesFromExperiment("E-MEXP-31")
             ['E-MEXP-31.raw.1.zip', 'E-MEXP-31.processed.1.zip', 'E-MEXP-31.idf.txt', 'E-MEXP-31.sdrf.txt']
