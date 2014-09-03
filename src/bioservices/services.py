@@ -123,27 +123,26 @@ class Service(Logging):
             if self.url != None:
                 urlopen(self.url)
         except Exception as err:
-            self.logging.critical("The URL (%s) provided cannot be reached" % self.url)
-            print(err.message)
-        #self.url = url
+            self.logging.warning("The URL (%s) provided cannot be reached." % self.url)
         self.name = name
         self._easyXMLConversion = True
 
         # used by HGNC where some XML contains non-utf-8 characters !!
         self._fixing_unicode = False
         self._fixing_encoding = "utf-8"
-        self._timeout = 1000
+
+        # will be removed once WSDLService is removed.
         self.trials = 5
         self.timesleep = 1
 
         self.devtools = DevTools()
 
-    def _set_timeout(self, timeout):
-        self._timeout = timeout
-        socket.setdefaulttimeout(float(timeout))
-    def _get_timeout(self):
-        return self._timeout
-    timeout = property(_get_timeout, _set_timeout)
+    #def _set_timeout(self, timeout):
+    #    self._timeout = timeout
+    #    socket.setdefaulttimeout(float(timeout))
+    #def _get_timeout(self):
+    #    return self._timeout
+    #timeout = property(_get_timeout, _set_timeout)
 
     def _get_url(self):
         return self._url
@@ -157,7 +156,7 @@ class Service(Logging):
     def _get_easyXMLConversion(self):
         return self._easyXMLConversion
     def _set_easyXMLConversion(self, value):
-        if type(value) != bool:
+        if isinstance(value, bool) is False:
             raise TypeError("value must be a boolean value (True/False)")
         self._easyXMLConversion = value
     easyXMLConversion = property(_get_easyXMLConversion,
@@ -243,10 +242,28 @@ easyXML object (Default behaviour).""")
         import webbrowser
         webbrowser.open(url + str(Id))
 
+    def on_web(self, url):
+        self.onWeb(url)
     def onWeb(self, url):
         """Open a URL into a browser"""
         import webbrowser
         webbrowser.open(url)
+
+    def save_str_to_image(self, data, filename):
+        """Save string object into a file converting into binary"""
+        with open(filename,'wb') as f:
+            import binascii
+            try:
+                #python3
+                 newres = binascii.a2b_base64(bytes(data, "utf-8"))
+
+                 # for reacotme:
+
+
+            except:
+                newres = binascii.a2b_base64(data)
+            f.write(newres)
+
 
 
 class WSDLService(Service):
@@ -256,7 +273,7 @@ class WSDLService(Service):
 
     """
 
-    def __init__(self, name, url, verbose=True, lib="suds"):
+    def __init__(self, name, url, verbose=True):
         """.. rubric:: Constructor
 
         :param str name: a name e.g. Kegg, Reactome, ...
@@ -269,45 +286,46 @@ class WSDLService(Service):
         the list of functionalities.
 
         """
-        assert lib in ["suds", "soappy"],\
-            "library used to connect to the WSDL service must either sud or soappy (default)"
         super(WSDLService, self).__init__(name, url, verbose=verbose)
 
-        #self.serv = SOAPProxy(self.url) # what's that ? can we access to a method directly ?
         self.logging.info("Initialising %s service (WSDL)" % self.name)
 
         try:
             #: attribute to access to the methods provided by this WSDL service
-            if lib == "soappy":
-                from SOAPpy import WSDL
-                self.serv = WSDL.Proxy(self.url)
-            elif lib == "suds":
-                #serv = WSDL.Proxy(self.url)
-                from suds.client import Client
-                self.suds = Client(self.url)
-                self.serv = self.suds.service
-                #self.serv.methods = serv.methods.copy()
+            from suds.client import Client
+            self.suds = Client(self.url)
+            self.serv = self.suds.service
         except Exception:
             self.logging.error("Could not connect to the service %s " % self.url)
             raise Exception
 
+    def wsdl_methods_info(self):
+        methods = self.suds.wsdl.services[0].ports[0].methods.values()
+        for method in methods:
+            try:
+                print('%s(%s) ' % (
+                    method.name,
+                    ', '.join('type:%s: %s - element %s' %
+                            (part.type, part.name, part.element) for part in
+                            method.soap.input.body.parts)))
+            except:
+                print(method)
     def _get_methods(self):
-        return sorted(self.serv.methods.keys())
-    methods = property(_get_methods, doc="returns methods available in the WSDL service")
+        return [x.name for x in
+                self.suds.wsdl.services[0].ports[0].methods.values()]
+    wsdl_methods = property(_get_methods, doc="returns methods available in the WSDL service")
 
-    def _get_dump_out(self):
-        return self.serv.soapproxy.config.dumpSOAPOut
-    def _set_dump_out(self, value):
-        self.serv.soapproxy.config.dumpSOAPOut = value
-    dumpOut = property(_get_dump_out, _set_dump_out,
-        doc="set the dumpSOAPOut mode of the SOAP proxy (0/1)")
-
-    def _get_dump_in(self):
-        return self.serv.soapproxy.config.dumpSOAPIn
-    def _set_dump_in(self, value):
-        self.serv.soapproxy.config.dumpSOAPIn = value
-    dumpIn = property(_get_dump_in, _set_dump_in,
-        doc="set the dumpSOAPIn mode of the SOAP proxy (0/1)")
+    def wsdl_create_factory(self, name, **kargs):
+        params = self.suds.factory.create(name)
+        for k,v in kargs.items():
+            from suds import sudsobject
+            keys = sudsobject.asdict(params).keys()
+            if k in keys: 
+               params[k] = v
+            else:
+                msg = "{0} incorrect. Correct ones are {1}"
+                self.logging.error(msg.format(k, keys))
+        return params
 
 
 class RESTbase(Service):
@@ -317,6 +335,7 @@ class RESTbase(Service):
         self.last_response = None
 
     def http_get(self):
+        # should return unicode
         raise NotImplementedError
 
     def http_post(self):
@@ -390,10 +409,6 @@ class RESTService(RESTbase):
         .. note:: you can set the timeout of the connection, which is 1000
             seconds by default by changing the :attr:`timeout`.
         """
-        #level = self.debugLevel
-        #self.debugLevel="ERROR"
-
-        #try:
         for i in range(0, self.trials):
             res = self._get_request(path, format=format, baseUrl=baseUrl)
             if res != None:
@@ -403,10 +418,6 @@ class RESTService(RESTbase):
             if i!=self.trials-1:
                 print("Trying again trial {}/{}".format(i+1, self.trials))
             time.sleep(self.timesleep)
-        #except Exception:
-        #    self.debugLevel = level
-        # get back the parameters
-        #self.debugLevel = level
         return res
 
     def http_get(self, path, format="xml", baseUrl=True):
@@ -629,7 +640,7 @@ class REST(RESTbase):
 
     def _interpret_returned_request(self, res, frmt):
         # must be a Response
-        if type(res) is not Response:
+        if isinstance(res, Response) is False:
             return res
         # if a response, there is a status code that should be ok
         if not res.ok:
@@ -650,8 +661,8 @@ class REST(RESTbase):
         return [fn(x, *args, **kwargs) for x in iterable if x is not None]
 
     def _get_async(self, keys, frmt='json', params={}):
-        # does not work under pyhon3 so local import 
-        import grequests 
+        # does not work under pyhon3 so local import
+        import grequests
         session = self._get_session()
         try:
             # build the requests
@@ -716,11 +727,16 @@ class REST(RESTbase):
             res = self.session.get(url, **{'timeout':self.settings.TIMEOUT, 'params':params})
             self.last_response = res
             res = self._interpret_returned_request(res, frmt)
+            try:
+                # for python 3 compatibility
+                res = res.decode()
+            except:
+                pass
             return res
         except Exception as err:
-            print(err.message)
-            return None
-
+            print(err)
+            print("Your current timeout is {0}. Consider increasing it with"\
+                    "settings.TIMEOUT attribute".format(self.settings.TIMEOUT))
 
 
     #def _post_one(self, url, async, frmt, data=None):
@@ -765,9 +781,12 @@ class REST(RESTbase):
             res = self.session.post(url,  **kargs)
             self.last_response = res
             res = self._interpret_returned_request(res, frmt)
-            return res
+            try:
+                return res.decode()
+            except:
+                return res
         except Exception as err:
-            print(err.message)
+            print(err)
             return None
 
     def getUserAgent(self):

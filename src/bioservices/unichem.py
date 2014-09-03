@@ -18,7 +18,7 @@
 ##############################################################################
 #$Id$
 
-"""This module provides a class :class:`UniChem` 
+"""This module provides a class :class:`UniChem`
 
 .. topic:: What is UniChem
 
@@ -36,9 +36,9 @@
 
 
 """
-
-#from web_resource import REST, WebResource
 from bioservices import REST
+
+
 class UniChem(REST):
     """Interface to the `UniChem <http://www.ebi.ac.uk/unichem/>`_ service
 
@@ -48,7 +48,7 @@ class UniChem(REST):
             >>> u = UniChem()
 
 
-"""
+    """
 
     _url = "http://www.ebi.ac.uk/unichem/rest"
 
@@ -59,7 +59,7 @@ class UniChem(REST):
         """
         super(UniChem, self).__init__(name="UniChem", url=UniChem._url, verbose=verbose, cache=cache)
         self.source_ids = {
-            "chembl":1, 
+            "chembl":1,
             "drugbank":2,
             "pdb":3,
             "iuphar":4,
@@ -86,7 +86,7 @@ class UniChem(REST):
         maxid_service = max(self.get_all_src_ids())
         maxid_bioservices = max(self.source_ids.values())
         if maxid_bioservices != maxid_service:
-            self.logging.warning("UniChem has added new source. "+ 
+            self.logging.warning("UniChem has added new source. "+
                     "Please update the source_ids attribute in bioservices")
 
     def _process(self, query, frmt, request):
@@ -127,7 +127,7 @@ class UniChem(REST):
     def get_compound_ids_from_src_id(self, src_compound_id, src_id, target=None):
         """Obtain a list of all src_compound_ids from all sources which are
         CURRENTLY assigned to the same structure as a currently assigned query
-        src_compound_id. 
+        src_compound_id.
 
         The output will include query src_compound_id if it is a valid
         src_compound_id with a current assignment. Note also, that by adding an
@@ -159,14 +159,14 @@ class UniChem(REST):
     def get_src_compound_ids_all_from_src_compound_id(self, src_compound_id,
         src_id, target=None):
         self.logging.warning("Deprecated us get_compound_ids")
-        return self.get_all_compound_ids_from_all_src_id(src_compound_id, 
+        return self.get_all_compound_ids_from_all_src_id(src_compound_id,
                 src_id, target=target)
 
     def get_all_compound_ids_from_all_src_id(self, src_compound_id,
         src_id, target=None):
         """Obtain a list of all src_compound_ids from all sources (including
         BOTH current AND obsolete assignments) to the same structure as a currently
-        assigned query src_compound_id. 
+        assigned query src_compound_id.
 
         The output will include query src_compound_id if
         it is a valid src_compound_id with a current assignment. Note also, that by
@@ -213,8 +213,8 @@ class UniChem(REST):
             >>> get_mapping("kegg_ligand", "chembl")
 
         """
-        self.devtools.check_param_in_list(source, self.source_ids.keys())
-        self.devtools.check_param_in_list(target, self.source_ids.keys())
+        self.devtools.check_param_in_list(source, list(self.source_ids.keys()))
+        self.devtools.check_param_in_list(target, list(self.source_ids.keys()))
 
         query = "mapping/%s/%s/" % (self.source_ids[source], self.source_ids[target])
         res = self.http_get(query, frmt=None)
@@ -250,7 +250,7 @@ class UniChem(REST):
             and 'Assignment'.
 
         ::
-    
+
             >>> uni.get_src_compound_ids_all_from_inchikey("AAOVKJBEBIDNHE-UHFFFAOYSA-N")
 
         """
@@ -274,7 +274,7 @@ class UniChem(REST):
     def get_source_information(self, src_id):
         """Description:  Obtain all information on a source by querying with a source id
 
-        :param int src_id: valid identifiers (values or keys of :attr:`source_ids` e.g. 
+        :param int src_id: valid identifiers (values or keys of :attr:`source_ids` e.g.
             chebi, chembl,0,1). could also be a list of those identifiers.
         :return: dictionary (or list of dictionaries) with following keys:
 
@@ -291,13 +291,13 @@ class UniChem(REST):
             * base_id_url (the base url for constructing hyperlinks to this source [append an
             * identifier f    rom this source to the end of this url to create a valid url to a
             * specific page for this cpd], unless aux_for_url=1),
-            * aux_for_url (A flag to indicate whether the aux_src field should be used to create 
+            * aux_for_url (A flag to indicate whether the aux_src field should be used to create
               hyperlinks instead of the src_compound_id [1=yes, 0=no]
 
         ::
-        
+
             >>> res = get_source_information("chebi")
-        
+
         """
         if isinstance(src_id, list):
             src_id = [self._get_source_id(this) for this in src_id]
@@ -313,7 +313,7 @@ class UniChem(REST):
         """Obtain structure(s) CURRENTLY assigned to a query src_compound_id.
 
         :param str src_compound_id: a valid compound identifier
-        :param int src_id: corresponding database identifier (name or id). 
+        :param int src_id: corresponding database identifier (name or id).
 
         :return:  dictionary with 'standardinchi' and 'standardinchikey' keys
 
@@ -335,8 +335,8 @@ class UniChem(REST):
         """Obtain structure(s) with current AND obsolete assignments
 
         :param str src_compound_id: a valid compound identifier
-        :param int src_id: corresponding database identifier (name or id). 
-        :return:  dictionary with 'standardinchi', 'standardinchikey' and 
+        :param int src_id: corresponding database identifier (name or id).
+        :return:  dictionary with 'standardinchi', 'standardinchikey' and
             'assignment' keys
 
         ::
@@ -371,7 +371,7 @@ class UniChem(REST):
         ::
 
             >>> uni.get_src_compound_id_url("CHEMBL12", "chembl", "drugbank")
-            >>> # equivalent to 
+            >>> # equivalent to
             >>> uni.get_src_compound_id_url("CHEMBL12", 1, 2)
 
 
@@ -380,7 +380,7 @@ class UniChem(REST):
         to_src_id = self._get_source_id(to_src_id)
         request = "src_compound_id_url/%s" + "/%s/%s" % (src_id, to_src_id)
         res = self._process(src_compound_id, "json", request)
-        if isinstance(src_compound_id, list): 
+        if isinstance(src_compound_id, list):
             res = [x[0]['url'] for x in res]
         else:
             res = res[0]['url']
@@ -389,8 +389,8 @@ class UniChem(REST):
     def get_src_compound_ids_all_from_obsolete(self, obsolete_src_compound_id,
         src_id, to_src_id=None):
         """Obtain a list of all src_compound_ids from all sources with BOTH
-        current AND obsolete to the same structure with an obsolete assignment to the 
-        query src_compound_id. 
+        current AND obsolete to the same structure with an obsolete assignment to the
+        query src_compound_id.
 
         The output will include query src_compound_id if it is a
         valid src_compound_id with an obsolete assignment. Note also, that by adding an
@@ -421,13 +421,13 @@ class UniChem(REST):
 
 
     def get_verbose_src_compound_ids_from_inchikey(self, inchikey):
-        """Obtain all src_compound_ids (from all sources) 
-        
+        """Obtain all src_compound_ids (from all sources)
+
         which are CURRENTLY assigned to a query InChIKey. However, these are returned as part of the
         following data structure: A list of sources containing these src_compound_ids,
         including source description, base_id_url, etc. One element in this list is a
         list of the src_compound_ids currently assigned to the query InChIKey.
-    
+
         :param str inchikey: input source identified by its InChiKey
         :return: list containing
 
@@ -470,16 +470,16 @@ class UniChem(REST):
         for compound-specific pages by using strings or identifiers (called 'auxiliary
         data' here) that are different to the src_compound_ids for the source. This is
         not very common, but is dealt with in UniChem by use of an additional mapping
-        step for these sources. This function returns such mapping. 
+        step for these sources. This function returns such mapping.
 
-        .. warning:: this method may return very large data sets. you will need to change 
-            TIMEOUT to a larger value. 
+        .. warning:: this method may return very large data sets. you will need to change
+            TIMEOUT to a larger value.
 
         :param int src_id: corresponding database identifier (name or id).
         :return: list of two element arrays, containing 'src_compound_id' and 'auxiliary data'.
 
         ::
-        
+
             >>> uni.get_auxiliary_mappings(15)
 
         """

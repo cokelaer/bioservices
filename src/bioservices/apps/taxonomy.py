@@ -1,17 +1,12 @@
 from bioservices import *
 from easydev import Logging
 
-try:
-    import pandas as pd
-except:
-    pass
-
 
 __all__ = ["Taxon"]
 
 class Taxon(Logging):
     """Utility to search for information related to a taxon
-    
+
     Uses HGNC service to fetch information about a taxon.
     ::
 
@@ -26,7 +21,7 @@ class Taxon(Logging):
 
 
     A full list of taxons is available here::
-    
+
         http://www.uniprot.org/taxonomy/?query=*&format=*
 
 
@@ -34,43 +29,43 @@ class Taxon(Logging):
     """
     def __init__(self):
         super(Taxon, self).__init__("INFO")
-        self.df = pd.DataFrame(index=[], columns=["Taxon", "Scientific Name"])
+        # self.df = pd.DataFrame(index=[], columns=["Taxon", "Scientific Name"])
         self._eutils_service = EUtils()
 
     def search_by_taxon(self, taxon):
         """
         should be a string without comma (only one entry accepted")
         """
-        assert isinstance(taxon,str)
+        assert isinstance(taxon, str)
         assert "," not in taxon
         ret = self._eutils_service.taxonomy(taxon)
         if ret == "\n":
-            #nothing found
+            # nothing found
             pass
         else:
-            res = {'taxon':taxon, 'Scientific Name':ret.Taxon.ScientificName}
-            #self.df.append(res)
+            res = {'taxon': taxon, 'Scientific Name': ret.Taxon[0].ScientificName}
+            # self.df.append(res)
             return res
 
     def info(self, taxon, lineage=False):
         """Prints information about a Taxon
 
-        :param str taxon: taxon identifier 
+        :param str taxon: taxon identifier
         :param bool lineage: prints lineage is set to True
         """
         ret = self._eutils_service.taxonomy(taxon)
-        print("Display Name: %s" % ret.Taxon.OtherNames.Name.DispName)
-        print("GenBank Common name: %s" % ret.Taxon.OtherNames.GenbankCommonName)
-        print("Taxon Id: %s " % ret.Taxon.TaxId)
+        print("Display Name: %s" % ret.Taxon[0].OtherNames.Name.DispName)
+        print("GenBank Common name: %s" % ret.Taxon[0].OtherNames.GenbankCommonName)
+        print("Taxon Id: %s " % ret.Taxon[0].TaxId)
         if lineage:
             print("Lineage:")
-            for i,x in enumerate(ret.Taxon.Lineage.split(";")):
+            for i, x in enumerate(ret.Taxon[0].Lineage.split(";")):
                 print(i*" "+x)
 
     def uniprot_onweb(self, taxon):
         """Open Uniprot taxonomy page for a given taxon
 
-        :param str taxon: taxon identifier 
+        :param str taxon: taxon identifier
         """
         import webbrowser
         try:
@@ -84,6 +79,5 @@ class Taxon(Logging):
         except HTTPError as err:
             print("Invalid taxon")
         except URLError as err:
-            print(e.args)
-
+            print(err.args)
 

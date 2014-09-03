@@ -110,6 +110,7 @@ class FixingUnicode(object):
                 return text
 
             # Sort the results by badness
+            # TODO use sorted instead of sort for python3 compatibility
             attempts.sort(key=lambda x: x[1])
             #print attempts
             goodtext = attempts[0][0]
@@ -294,10 +295,17 @@ class FixingUnicode(object):
 
     # Pre-cache the Unicode data saying which of these first 256 characters are
     # letters. We'll need it often.
-    SINGLE_BYTE_LETTERS = [
+    try:
+        # Python3
+        SINGLE_BYTE_LETTERS = [
         unicodedata.category(chr(i)).startswith('L')
         for i in range(256)
-    ]
+        ]
+    except:
+        SINGLE_BYTE_LETTERS = [
+        unicodedata.category(unichr(i)).startswith('L')
+        for i in range(256)
+        ]
 
     # A table telling us how to interpret the first word of a letter's Unicode
     # name. The number indicates how frequently we expect this script to be used

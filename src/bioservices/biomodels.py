@@ -5,7 +5,7 @@
 #
 #  Copyright (c) 2011-2013 - EBI-EMBL
 #
-#  File author(s): 
+#  File author(s):
 #      https://www.assembla.com/spaces/bioservices/team
 #
 #  Distributed under the GPLv3 License.
@@ -24,7 +24,7 @@
 
     :URL: http://www.ebi.ac.uk/biomodels-main/
     :Service: http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices?wsdl
-    :Citations: http://www.ncbi.nlm.nih.gov/pubmed/20587024    
+    :Citations: http://www.ncbi.nlm.nih.gov/pubmed/20587024
 
     .. highlights::
 
@@ -70,6 +70,9 @@ from bioservices.services import WSDLService
 __all__ = ["BioModels"]
 
 
+
+
+
 def checkId(fn):
     """a decorator that checks the validity of a model Id"""
     @wraps(fn)
@@ -79,14 +82,13 @@ def checkId(fn):
             res = fn(self, Id, **kwargs)
             return res
         else:
-            raise ValueError("""
-    Id provided is not a valid ID. See modelsId attribute.""")
-    
+            raise ValueError("""Id provided is not a valid ID. See modelsId attribute.""")
+
     return wrapped
 
 
 class BioModels(WSDLService):
-    """Interface to the `BioModels <http://www.ebi.ac.uk/biomodels>`_ service 
+    """Interface to the `BioModels <http://www.ebi.ac.uk/biomodels>`_ service
 
     ::
 
@@ -113,12 +115,22 @@ class BioModels(WSDLService):
         """
         super(BioModels, self).__init__(name="BioModels", url=BioModels._url, verbose=verbose)
 
-	#: used to store all model Ids once for all
+    #: used to store all model Ids once for all
         self._modelsId = None
 
     def __len__(self):
         l = len(self.serv.getAllModelsId())
         return l
+
+    def _item2list(self, sid):
+        valid_ids = self.modelsId
+
+        if isinstance(sid, str):
+            sid = [sid]
+        elif isinstance(sid, list) == False:
+            raise TypeError("list of identifiers must be a list of string or one string")
+
+        return sid
 
     def getAllModelsId(self):
         """Retrieves the identifiers of all published models
@@ -172,11 +184,11 @@ class BioModels(WSDLService):
 
         :param str Id: a valid ,odel Id
 
-	.. warning:: this method is now deprecated!
+    .. warning:: this method is now deprecated!
 
         ::
 
-            model = s.getModelById("BIOMD0000000256") 
+            model = s.getModelById("BIOMD0000000256")
 
         Instead, please use: :meth:`getModelSBMLById`
 
@@ -193,7 +205,7 @@ class BioModels(WSDLService):
 
         :return: list of names of the publication's authors
 
-	::
+    ::
 
             >>> s.getAuthorsByModelId("BIOMD0000000299")
             ['Leloup JC', 'Gonze D', 'Goldbeter A']
@@ -281,19 +293,19 @@ class BioModels(WSDLService):
         return self.serv.getModelSBMLById(Id)
 
     def getModelsIdByChEBI(self, Id):
-        """Retrieves the identifiers of all models which are **associated** to 
+        """Retrieves the identifiers of all models which are **associated** to
         some ChEBI terms. This relies on the method 'getLiteEntity' of the
         ChEBI Web Services (cf. http://www.ebi.ac.uk/chebi/webServices.do).
 
         :param str Id: a valid model Id. See :attr:`modelsId` attribute.
-        :return:  list of model identifiers 
+        :return:  list of model identifiers
 
         ::
-      
+
             >>> s.getModelsIdByChEBI("CHEBI:4978")
             ['BIOMD0000000217', 'BIOMD0000000404']
 
-        .. seealso:: :meth:`getSimpleModelsByChEBIIds`, 
+        .. seealso:: :meth:`getSimpleModelsByChEBIIds`,
             :meth:`getSimpleModelsRelatedWithChEBI`, :meth:`getModelsIdByChEBIId`
         """
         return self.serv.getModelsIdByChEBI(Id)
@@ -303,55 +315,56 @@ class BioModels(WSDLService):
         a given ChEBI term.
 
         :param str Id: identifier of a ChEBI term (e.g. CHEBI:4978)
-        :return:  list of model identifiers 
+        :return:  list of model identifiers
 
         .. doctest:: biomodels
- 
+
             >>> from bioservices import *
             >>> s = BioModels()
             >>> s.getModelsIdByChEBIId('CHEBI:4978')
             ['BIOMD0000000404']
 
-        .. seealso:: :meth:`getSimpleModelsByChEBIIds`, 
+        .. seealso:: :meth:`getSimpleModelsByChEBIIds`,
             :meth:`getSimpleModelsRelatedWithChEBI`,
-            :meth:`getModelsIdByChEBI` 
+            :meth:`getModelsIdByChEBI`
         """
         return self.serv.getModelsIdByChEBIId(Id)
 
-    def getSimpleModelsByChEBIIds(self, Ids):
+    def getSimpleModelsByChEBIIds(self, Id):
         """Retrieves the models which are annotated with the given ChEBI terms.
 
         :param str Id: identifier of a ChEBI term (e.g. CHEBI:4978)
- 
-        :return: list with all models annotated with the provided ChEBI identifiers, 
-            as a TreeMap (which uses ChEBI identifiers as keys) 
 
-        .. seealso:: :meth:`getSimpleModelsByChEBIIds`, 
+        :return: list with all models annotated with the provided ChEBI identifiers,
+            as a TreeMap (which uses ChEBI identifiers as keys)
+
+        .. seealso:: :meth:`getSimpleModelsByChEBIIds`,
             :meth:`getModelsIdByChEBIId`,
-            :meth:`getModelsIdByChEBI` 
+            :meth:`getModelsIdByChEBI`
 
-        .. warning:: this method returns empty models even with example 
+        .. warning:: this method returns empty models even with example
             provided on BioModels website
         """
-        return self.serv.getSimpleModelsByChEBIIds(Ids)
+        ids = self._item2list(Id)
+        return self.serv.getSimpleModelsByChEBIIds(ids)
 
     def getSimpleModelsRelatedWithChEBI(self):
         """Retrieves all the models which are annotated with ChEBI terms.
 
-        The output of this function is a lengthy XML document containing 
-        utf-8 characters and the models (in simple models format). You can 
-        convert it and extract information such as the models ID by using 
-        the our xml parser and the following code:: 
+        The output of this function is a lengthy XML document containing
+        utf-8 characters and the models (in simple models format). You can
+        convert it and extract information such as the models ID by using
+        the our xml parser and the following code::
 
             res = s.getSimpleModelsRelatedWithChEBI()
-            res = self.easyXML(res.encode('utf-8'))    
+            res = self.easyXML(res.encode('utf-8'))
             set([x.findall('modelId')[0].text for x in res.getchildren()])
 
-        .. note:: the output is a string. You can convert it to a class that 
+        .. note:: the output is a string. You can convert it to a class that
             ease its introspection using :meth:`~bioservices.services.Service.easyXML`.
-        .. seealso:: :meth:`getSimpleModelsByChEBIIds`, 
+        .. seealso:: :meth:`getSimpleModelsByChEBIIds`,
             :meth:`getModelsIdByChEBIId`,
-            :meth:`getModelsIdByChEBI` 
+            :meth:`getModelsIdByChEBI`
 
         """
         return self.serv.getSimpleModelsRelatedWithChEBI()
@@ -369,16 +382,16 @@ class BioModels(WSDLService):
             >>> s.getPublicationByModelId("BIOMD0000000256")
             '16932741'
 
-        .. seealso:: You can open the corresponding pubmed HTML page with 
+        .. seealso:: You can open the corresponding pubmed HTML page with
             :meth:`pubmed`
         """
         return self.serv.getPublicationByModelId(Id)
 
     @checkId
-    def getSimpleModelsByIds(self, Id):
+    def getSimpleModelsByIds(self, Ids):
         """Retrieves the main information about given models.
 
-        :param str Id: a valid model Id. See :attr:`modelsId` attribute.
+        :param str Ids: a valid model Id. See :attr:`modelsId` attribute.
 
         :return: a XML representaton (string) of the model meta information including
             identifier, name, publication identifier date of last modification...
@@ -386,11 +399,12 @@ class BioModels(WSDLService):
         ::
 
             >>> model = s.getSimpleModelsByIds("BIOMD0000000256")
-           
-        .. note:: the output is a string. You can convert it to a class that 
+
+        .. note:: the output is a string. You can convert it to a class that
             ease its introspection using :meth:`~bioservices.services.Service.easyXML`.
         """
-        res = self.serv.getSimpleModelsByIds(Id)
+        ids = self._item2list(Ids)
+        res = self.serv.getSimpleModelsByIds(ids)
         return res
 
 
@@ -418,16 +432,17 @@ records.
         :param: list of reactome identifiers (e.g., REACT_1590)
         :param bool raw: return raw data if True
 
-        :return:  models annotated with the provided Reactome identifiers, as a TreeMap (which uses Reactome identifiers as keys) 
+        :return:  models annotated with the provided Reactome identifiers, as a TreeMap (which uses Reactome identifiers as keys)
 
 
         .. seealso:: How to retrieve REACTOME IDs in :meth:`extra_getReactomeIds`
-        .. note:: the output is converted to ease introspection 
+        .. note:: the output is converted to ease introspection
              using :meth:`~bioservices.services.Service.easyXML`.
         """
+        reacID = self._item2list(reacID)
         res = self.serv.getSimpleModelsByReactomeIds(reacID)
         if raw!=True:
-            res = self.easyXML(res) 
+            res = self.easyXML(res)
         return res
 
 
@@ -435,9 +450,9 @@ records.
         """Retrieves all the models which are associated to the provided UniProt text.
 
         :param str text: a free UniProt based text
-        :return:  list of model identifiers 
+        :return:  list of model identifiers
 
-        :: 
+        ::
 
             >>> s.getModelsIdByUniprot("P10113")
             ['BIOMD0000000033']
@@ -450,14 +465,14 @@ records.
         """Retrieves all the models which are annotated with the given UniProt records.
 
         :param str Id: a valid model Id. See :attr:`modelsId` attribute.
-        :return:  list of model identifiers 
+        :return:  list of model identifiers
 
-        :: 
+        ::
 
             >>> s.getModelsIdByUniprot("P10113")
             ['BIOMD0000000033']
 
-    
+
         """
         res = self.serv.getModelsIdByUniprotId(Id)
         return res
@@ -466,9 +481,9 @@ records.
         """Retrieves all the models which are annotated with the given UniProt records.
 
         :param str Ids_list: a valid model Id. See :attr:`modelsId` attribute.
-        :return:  list of model identifiers 
+        :return:  list of model identifiers
 
-        :: 
+        ::
 
             >>> s.getModelsIdByUniprotIds(["P10113", "P10415"])
             ['BIOMD0000000033', 'BIOMD0000000220']
@@ -480,7 +495,7 @@ records.
     def getModelsIdByName(self, name):
         """Retrieves the models' identifiers which name includes the given keyword.
 
-        :param str name: 
+        :param str name:
         :return:  array of strings - list of model identifiers
 
         ::
@@ -488,7 +503,7 @@ records.
             >>> res = s.getModelsIdByName("2009")
 
         """
-        
+
         return self.serv.getModelsIdByName(name)
 
     def getModelsIdByPublication(self, pubId):
@@ -496,7 +511,7 @@ records.
 
 
         :param str pubId: publication identifier PMID or DOI or text which occurs in the publications.
-        
+
         ::
 
             s.getModelsIdByPublication('18308339')
@@ -508,9 +523,9 @@ records.
 
     def getModelsIdByGO(self, goId):
         """Retrieves the identifiers of all models related to a Gene Ontology Id.
-   
+
         :param str goId: a free GO text
-        :return:  list of model identifiers 
+        :return:  list of model identifiers
 
         ::
 
@@ -526,7 +541,7 @@ records.
         """Retrieves the models which are associated to the provided Taxonomy text.
 
         :param str text: free (Taxonomy based) text
-        :return:  list of model identifiers 
+        :return:  list of model identifiers
 
         """
         return self.serv.getModelsIdByTaxonomy(text)
@@ -547,12 +562,14 @@ records.
         :param modelId: identifier of the model from which the sub-model will be extracted
         :param elementsIDs: identifiers of the selected elements. Currently only
             supports identifiers from compartments, species, and reactions.
+            could be a string or list of strings
 
         ::
 
             s.getSubModelSBML("BIOMD0000000242", "cyclinEdegradation_1")
         """
-        return self.serv.getSubModelSBML(modelId, elementsIDs)
+        sid = self._item2list(elementsIDs)
+        return self.serv.getSubModelSBML(modelId, sid)
 
 
     def getModelsIdByGOId(self, GOId):
@@ -562,7 +579,7 @@ records.
 
         .. seealso:::meth:`getModelsIdByGO`
 
-        :: 
+        ::
 
             >>> s.getModelsIdByGOId("GO:0006919")
             ['BIOMD0000000256', 'BIOMD0000000102', 'BIOMD0000000103']
@@ -609,7 +626,7 @@ records.
         :param bool verbose: show the status of the analysis
         :return: list of reactome IDs that have been found in the DB.
 
-        Search all models for reactome Ids in range 'REACT_start' to 'REACT_end'. 
+        Search all models for reactome Ids in range 'REACT_start' to 'REACT_end'.
         Can take a while so do not be greedy and select a short range.
 
         For instance, scanning the database for start=0 and end=3000, a list of
@@ -634,7 +651,7 @@ records.
 
 
     def extra_getUniprotIds(self, start=10000, end=11000):
-        """Retrieve the Uniprot IDs  
+        """Retrieve the Uniprot IDs
 
         :param int start: starting ID value used to scan the database
         :param int end: ending ID value used to to scan the database

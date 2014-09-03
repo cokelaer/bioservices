@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id: chembldb.py 318 2014-02-28 13:30:26Z cokelaer $
+# $Id: chembldb.py 318 2014-02-28 13:30:26Z cokelaer $
 
 """This module provides a class :class:`ChEMBL`
 
@@ -38,7 +38,7 @@
 
 """
 import os
-from bioservices.services import RESTService, REST
+from bioservices.services import REST
 import webbrowser
 
 __all__ = ["ChEMBL"]
@@ -57,7 +57,7 @@ class ChEMBL(REST):
         >>> resjson['proteinAccession']
         'Q12809'
 
-    By default, most methods return dictionaries (converted from json objects returned 
+    By default, most methods return dictionaries (converted from json objects returned
     by the ChEMBL API), however, you can also set the format to be XML.
 
     """
@@ -67,7 +67,7 @@ class ChEMBL(REST):
     _inChiKey_example = "QFFGVLORLPOAEC-SNVBAGLBSA-N"
     _smiles_example = "COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56"
     _smiles_struct_example = "C\C(=C/C=C/C(=C/C(=O)O)/C)\C=C\C1=C(C)CCCC1(C)C"
-    _smiles_similar_example = _smiles_example 
+    _smiles_similar_example = _smiles_example
     _image_chemblId_example = "CHEMBL192"
     _bioactivities_example = "CHEMBL2"
     _target_chemblId_example = "CHEMBL2477"
@@ -90,13 +90,22 @@ class ChEMBL(REST):
             res = self.http_get([request % x for x in query], frmt=frmt)
         return res
 
+    def _postprocess(self, data, key):
+        try:
+            return data[key]
+        except:
+            try:
+                return [x[key] for x in data]
+            except:
+                return data
+
     def status(self):
         """Return the API status
 
         :return: Response is the string 'UP' if the service is running
         """
         res = self.http_get("status", frmt="json")
-        return res['status']
+        return res['service']['status']
 
     def get_compounds_by_chemblId(self, query, frmt="json"):
         """Get compound by ChEMBLId
@@ -105,7 +114,7 @@ class ChEMBL(REST):
             if the identifier is invalid, the number 404 is returned.
         :param str frmt: json or xml (Default to json)
         :return: Compound Record (dictionary). If
-            the query is a list of identifiers, a list of compound records is 
+            the query is a list of identifiers, a list of compound records is
             returned.
 
         If json format is requested, a dictionary is returned. Here are some of the keys:
@@ -139,7 +148,7 @@ class ChEMBL(REST):
         See :meth:`get_compounds_by_chemblId` for full doc.
 
         ::
-        
+
             >>> s.get_compounds_by_chemblId_form("CHEMBL2")
             [{u'chemblId': u'CHEMBL1347191', u'parent': False},
              {u'chemlId': u'CHEMBL1558', u'parent': False},
@@ -147,7 +156,7 @@ class ChEMBL(REST):
 
         """
         res = self._process(query, frmt, "compounds/%s/form")
-        return res
+        return self._postprocess(res, 'forms')
 
     def get_compounds_by_chemblId_drug_mechanism(self, query, frmt="json"):
         """
@@ -158,7 +167,7 @@ class ChEMBL(REST):
         See :meth:`get_compounds_by_chemblId` for full doc.
 
         ::
-        
+
             >>> s.get_compounds_by_chemblId_drug_mechanism("CHEMBL3")
             [{u'chemblId': u'CHEMBL1347191', u'parent': False},
             {u'chemblId': u'CHEMBL1558', u'parent': False},
@@ -193,7 +202,7 @@ class ChEMBL(REST):
             >>> resjson = s.get_individual_compounds_by_inChiKey(s._inChiKey_example)
         """
         res = self._process(query, frmt, "compounds/stdinchikey/%s")
-        return res
+        return self._postprocess(res, 'compound')
 
     def get_compounds_by_SMILES(self, query, frmt="json"):
         """Get list of compounds by Canonical SMILES
@@ -266,7 +275,7 @@ class ChEMBL(REST):
         """
         self.devtools.check_range(similarity, 70, 100)
         res = self._process(query, frmt, "compounds/similarity/%s/"+str(similarity))
-        return res
+        return self._postprocess(res, 'compounds')
 
     def get_image_of_compounds_by_chemblId(self, query, dimensions=500,
             save=True, view=True, engine="rdkit"):
@@ -275,7 +284,7 @@ class ChEMBL(REST):
         :param str query: a valid compound ChEMBLId or a list/tuple of valid compound ChEMBLIds.
         :param int dimensions: optional argument. An integer z (:math:`1 \leq z \leq 500`)
             giving the dimensions of the image.
-        :param save: 
+        :param save:
         :param view:
         :param engine: Defaults to rdkit. Implemented for the future but only one value for now.
         :param bool view: show the image. If True the images are opened.
@@ -293,16 +302,10 @@ class ChEMBL(REST):
 
         .. todo:: ignorecoords option
         """
-        # NOTE: not async requests here. 
+        # NOTE: not async requests here.
         self.devtools.check_range(dimensions, 1,500)
         self.devtools.check_param_in_list(engine, ['rdkit'])
         queries = self.devtools.transform_into_list(query)
-
-        def __f_save(target_data, file_out):
-            FILE = open(file_out, 'w')
-            FILE.write(target_data)
-            FILE.close()
-            self.logging.info("saved to %s"%file_out)
 
         res = {'filenames':[], 'images':[], 'chemblids':[]}
         for query in queries:
@@ -311,10 +314,13 @@ class ChEMBL(REST):
             if dimensions is not None:
                 req += '?engine=%s&dimensions=%s'%(engine, dimensions)
             target_data = self.http_get(req, frmt=None)
-            
+
             file_out = os.getcwd()
             file_out += '/%s.png' % query
-            __f_save(target_data,file_out)
+            with open(file_out, "wb") as thisfile:
+                thisfile.write(bytes(target_data))
+                thisfile.close()
+                self.logging.info("saved to %s" % file_out)
 
             fout = file_out
             res['chemblids'].append(query)
@@ -361,7 +367,7 @@ class ChEMBL(REST):
         :param str frmt: json or xml (Default to json)
         :return: Target Record in XML or dictionary (if json requested)
 
-        If json format is requested, a dictionary is returned. Here are 
+        If json format is requested, a dictionary is returned. Here are
         some of dictionary's keys:
 
          * target
@@ -395,7 +401,7 @@ class ChEMBL(REST):
             >>> resjson = s.get_target_by_uniprotId(s._target_uniprotId_example)
         """
         res = self._process(query, frmt, "targets/uniprot/%s")
-        return res
+        return self._postprocess(res, 'target')
 
 
     def get_target_by_refseq(self, query, frmt='json'):
@@ -429,7 +435,7 @@ class ChEMBL(REST):
             >>> resjson = s.get_target_bioactivities(s._target_bioactivities_example)
         """
         res = self._process(query, frmt, "targets/%s/bioactivities")
-        return res
+        return self._postprocess(res, 'bioactivities')
 
     def get_all_targets(self, frmt="json"):
         """Get all targets in a dictionary
@@ -457,7 +463,7 @@ class ChEMBL(REST):
         """
         self.devtools.check_param_in_list(frmt, ["json", "xml"])
         res = self.http_get("targets." + frmt, frmt=frmt)
-        return res
+        return self._postprocess(res, 'targets')
 
     def get_assays_by_chemblId(self, query, frmt="json"):
         """Get assay by ChEMBLId
@@ -467,7 +473,7 @@ class ChEMBL(REST):
         :return: Assay record as a dictionary (if json requested)
             (list of dictionaries if input is a list)
 
-        If json format is requested, a dictionary is returned. 
+        If json format is requested, a dictionary is returned.
         with some of the following keys:
 
          * assayDescription
@@ -488,7 +494,6 @@ class ChEMBL(REST):
 
         """
         res = self._process(query, frmt, "assays/%s")
-        #res = res[0]
         return res
 
     def get_assays_bioactivities(self, query, frmt="json"):
@@ -506,7 +511,6 @@ class ChEMBL(REST):
             >>> resjson = s.get_assays_bioactivities(s._assays_example)
         """
         res = self._process(query, frmt, "assays/%s/bioactivities")
-        res = res[0]
         return res
 
     def inspect(self, query, item_type):
@@ -531,7 +535,7 @@ class ChEMBL(REST):
     def version(self):
         """Return version of the API on the server"""
         res = self.http_get("status", frmt="json")
-        return res['version']
+        return res['service']['version']
 
 
 class BenchmarkChembl(ChEMBL):
@@ -598,4 +602,3 @@ class BenchmarkChembl(ChEMBL):
         pylab.axvline(2.5)
         df.boxplot()
         return df
-

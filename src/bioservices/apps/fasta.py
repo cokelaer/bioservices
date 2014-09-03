@@ -1,8 +1,6 @@
 from collections import OrderedDict
-try:
-    import pandas as pd
-except:
-    pass
+
+from easydev.decorators import ifpylab, ifpandas
 
 __all__ = ["FASTA", "MultiFASTA"]
 
@@ -91,7 +89,7 @@ class MultiFASTA(object):
     def save_fasta(self, filename):
         """Save all FASTA into a file"""
         fh = open(filename, "w")
-        for f in self._fasta.itervalues():
+        for f in self._fasta.values():
             fh.write(f.fasta)
         fh.close()
 
@@ -110,12 +108,15 @@ class MultiFASTA(object):
             else:
                 print("Accession %s is already in the ids list or could not be interpreted. skipped" % str(f.accession))
 
+    @ifpandas
     def _get_df(self):
+        import pandas as pd
         df =  pd.concat([self.fasta[id_].df for id_ in self.fasta.keys()])
         df.reset_index(inplace=True)
         return df
     df = property(_get_df)
 
+    @ifpylab
     def hist_size(self, **kargs):
         import pylab
         self.df.Size.hist(**kargs)
@@ -248,8 +249,9 @@ class FASTA(object):
             return header.split(" ")[0].split("|")[2]
     name = property(_get_name_sp)
 
-    # for
+    @ifpandas
     def _get_df(self):
+        import pandas as pd
         df = pd.DataFrame({
             "Identifiers": [self.identifier],
             "Accession": [self.accession],

@@ -83,3 +83,35 @@ Of course, you can add new methods to ease the access to any functionalities::
 
 Similarly to the previous case using REST, you can wrap this example into a
 proper class. 
+
+
+Others
+========
+
+When wrapper a WSDL services, it may be difficult to know what parameters
+to provide. This can be knwon as follows. First, you need the name of the
+method::
+
+    s.methods
+
+Then, the name of the structure that contains the parameter::
+
+    ?
+
+Finally, introspect the structure itself::
+
+    s.suds.factory.resolver.find("db2dbParams")
+
+
+For eutils, this was more difficult::
+
+    m1 = list(e.suds.wsdl.services[0].ports[0].methods.values())[2]
+    m1.soap.input.body.parts[0]
+    the service is in m1.soap.input.body.parts[0] check for the element in the
+    root attribute
+
+
+suds and client auth
+=======================
+http://stackoverflow.com/questions/6277027/suds-over-https-with-cert
+

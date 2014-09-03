@@ -56,7 +56,7 @@ class ChEBI(WSDLService):
 
         """
         super(ChEBI, self).__init__(name="ChEBI", url=ChEBI._url, 
-            verbose=verbose, lib="suds")
+            verbose=verbose)
 
     def getCompleteEntity(self, chebiId):
         """Retrieves the complete entity including synonyms, database links and
@@ -147,7 +147,7 @@ chemical structures, using the ChEBI identifier.
         else:
             return res
 
-    def getUpdatedPolymer(self, chebiId, index1=None, index2=None, index3=None):
+    def getUpdatedPolymer(self, chebiId):
         """Returns the UpdatedPolymer object
 
         :param str chebiId:
@@ -160,9 +160,8 @@ chemical structures, using the ChEBI identifier.
         primary ChEBI ID of the polymer, even if the secondary Identifier was passed
         to the web-service.
 
-        .. note:: parameters index1,2,3 have not been tested.
         """
-        res = self.serv.getUpdatedPolymer(chebiId, index1, index2, index3)
+        res = self.serv.getUpdatedPolymer(chebiId)
         return res
 
     def getCompleteEntityByList(self, chebiIdList=[]):

@@ -89,6 +89,7 @@ class HGNC(REST):
     def __init__(self, verbose=False, cache=False):
         url = "http://www.avatar.se/HGNC/wr/"
         super(HGNC, self).__init__("HGNC", url=url, verbose=verbose, cache=cache)
+        self.logging.warning("Service unavailable when testing (Aug 2014). May not work")
 
 
         self._always_return_list = False

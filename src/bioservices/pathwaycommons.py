@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
+# $Id$
 """This module provides a class :class:`~PathwayCommons`
 
 .. topic:: What is PathwayCommons ?
@@ -41,7 +41,6 @@ from __future__ import print_function
 
 from bioservices.services import REST, BioServicesError
 
-import json
 
 __all__ = ["PathwayCommons"]
 
@@ -65,8 +64,9 @@ class PathwayCommons(REST):
         :param bool verbose: prints informative messages
 
         """
+        # Note that the url must end with / character to be reachable...
         super(PathwayCommons, self).__init__(name="PathwayCommons",
-                url="http://www.pathwaycommons.org/pc2", verbose=verbose)
+                url="http://www.pathwaycommons.org/pc2/", verbose=verbose)
         self.easyXMLConversion = False
 
 
@@ -103,22 +103,22 @@ class PathwayCommons(REST):
 
         This query can be used standalone or to retrieve starting points
         for graph searches.
-        
+
 
         :param str q: requires a keyword , name, external identifier, or a
             Lucene query string.
         :param int page: (N>=0, default is 0), search result page number.
         :param str datasource: filter by data source (use names or URIs of
-            pathway data sources or of any existing Provenance object). If 
-            multiple data source values are specified, a union of hits from 
-            specified sources is returned. datasource=[reactome,pid] returns  
+            pathway data sources or of any existing Provenance object). If
+            multiple data source values are specified, a union of hits from
+            specified sources is returned. datasource=[reactome,pid] returns
             hits associated with Reactome or PID.
         :param str organism: The organism can be specified either by
-            official name, e.g. "homo sapiens" or by NCBI taxonomy id, 
-            e.g. "9606". Similar to data sources, if multiple organisms 
-            are declared a union of all hits from specified organisms 
-            is returned. For example organism=[9606, 10016] returns results 
-            for both human and mice. 
+            official name, e.g. "homo sapiens" or by NCBI taxonomy id,
+            e.g. "9606". Similar to data sources, if multiple organisms
+            are declared a union of all hits from specified organisms
+            is returned. For example organism=[9606, 10016] returns results
+            for both human and mice.
         :param str type: BioPAX class filter
 
 
@@ -153,7 +153,7 @@ class PathwayCommons(REST):
         if organism:
             params['organism'] = organism
 
-        res = self.http_get(url, frmt=self.default_extension, 
+        res = self.http_get(url, frmt=self.default_extension,
                 params=params)
 
         #if self.default_extension == "json":
@@ -167,11 +167,11 @@ class PathwayCommons(REST):
     def get(self, uri, frmt="BIOPAX"):
         """Retrieves full pathway information for a set of elements
 
-        elements can be for example pathway, interaction or physical 
+        elements can be for example pathway, interaction or physical
         entity given the RDF IDs. Get commands only
-        retrieve the BioPAX elements that are directly mapped to the ID. 
-        Use the :meth:`traverse` query to traverse BioPAX graph and 
-        obtain child/owner elements. 
+        retrieve the BioPAX elements that are directly mapped to the ID.
+        Use the :meth:`traverse` query to traverse BioPAX graph and
+        obtain child/owner elements.
 
         :param str uri: valid/existing BioPAX element's URI (RDF ID; for
             utility classes that were "normalized", such as entity refereneces
@@ -191,7 +191,7 @@ class PathwayCommons(REST):
             not applicable for the BioPAX result. For example,
             BINARY_SIF output usually works if there are some
             interactions, complexes, or pathways in the retrieved set
-            and not only physical entities. 
+            and not only physical entities.
 
 
         .. doctest::
@@ -226,7 +226,7 @@ class PathwayCommons(REST):
 
     def top_pathways(self, datasource=None, organism=None):
         """This command returns all *top* pathways
-        
+
         Pathways can be top or pathways that are neither
         'controlled' nor 'pathwayComponent' of another process.
 
@@ -236,9 +236,9 @@ class PathwayCommons(REST):
         :return: dictionary with information about top pathways. Check the
             "searchHit" key for information about "dataSource" for instance
 
-    
+
         .. doctest::
-        
+
             >>> from bioservices import PathwayCommons
             >>> pc2 = PathwayCommons(verbose=False)
             >>> res = pc2.top_pathways()
@@ -260,7 +260,7 @@ class PathwayCommons(REST):
         if len(params):
             url += "&" + self.urlencode(params)
 
-        res = self.http_get(url, frmt=self.default_extension, 
+        res = self.http_get(url, frmt=self.default_extension,
                 params=params)
 
         if self.default_extension == "xml":
@@ -272,14 +272,14 @@ class PathwayCommons(REST):
     def idmapping(self, ids):
         """Identifier mapping tool
 
-        Unambiguously maps, e.g., HGNC gene symbols, NCBI Gene, RefSeq, ENS, 
-        and secondary UniProt identifiers to the primary UniProt accessions, 
-        or - ChEBI and PubChem IDs to primary ChEBI. You can mix different 
-        standard ID types in one query. 
-        
-        .. note:: this is a specific id-mapping (not general-purpose) for 
-            reference proteins and small molecules; the mapping tables 
-            were derived exclusively from Swiss-Prot (DR fields) and 
+        Unambiguously maps, e.g., HGNC gene symbols, NCBI Gene, RefSeq, ENS,
+        and secondary UniProt identifiers to the primary UniProt accessions,
+        or - ChEBI and PubChem IDs to primary ChEBI. You can mix different
+        standard ID types in one query.
+
+        .. note:: this is a specific id-mapping (not general-purpose) for
+            reference proteins and small molecules; the mapping tables
+            were derived exclusively from Swiss-Prot (DR fields) and
             ChEBI data
 
         :param str ids: list of Identifiers or a single identifier string.
@@ -312,26 +312,26 @@ class PathwayCommons(REST):
             frmt=None, datasource=None, organism=None):
         """Finds connections and neighborhoods of elements
 
-        Connections can be for example the shortest path between two proteins 
-        or the neighborhood for a particular protein state or all states. 
-        
-        Graph searches take detailed BioPAX semantics such as generics or 
-        nested complexes into account and traverse the graph accordingly. 
+        Connections can be for example the shortest path between two proteins
+        or the neighborhood for a particular protein state or all states.
+
+        Graph searches take detailed BioPAX semantics such as generics or
+        nested complexes into account and traverse the graph accordingly.
         The starting points can be either physical entites or entity references.
-        
+
         In the case of the latter the graph search starts from ALL
-        the physical entities that belong to that particular entity references, 
-        i.e.  all of its states. Note that we integrate BioPAX data from 
-        multiple databases  based on our proteins and small molecules data 
-        warehouse and consistently normalize UnificationXref, EntityReference, 
-        Provenance, BioSource, and ControlledVocabulary objects when we are 
-        absolutely sure that two objects of the same type are equivalent. We, 
-        however, do not merge physical entities and reactions from different 
-        sources as matching and aligning pathways at that level is still an 
+        the physical entities that belong to that particular entity references,
+        i.e.  all of its states. Note that we integrate BioPAX data from
+        multiple databases  based on our proteins and small molecules data
+        warehouse and consistently normalize UnificationXref, EntityReference,
+        Provenance, BioSource, and ControlledVocabulary objects when we are
+        absolutely sure that two objects of the same type are equivalent. We,
+        however, do not merge physical entities and reactions from different
+        sources as matching and aligning pathways at that level is still an
         open research problem. As a result, graph searches can return
-        several similar but disconnected sub-networks that correspond to 
-        the pathway data from different providers (though some physical 
-        entities often refer to the same small molecule or protein reference 
+        several similar but disconnected sub-networks that correspond to
+        the pathway data from different providers (though some physical
+        entities often refer to the same small molecule or protein reference
         or controlled vocabulary).
 
 
@@ -390,11 +390,11 @@ class PathwayCommons(REST):
         return res
 
     def traverse(self, uri, path):
-        """Provides XPath-like access to the PC. 
-        
-        
+        """Provides XPath-like access to the PC.
+
+
         The format of the path query is in the form::
-        
+
             [InitialClass]/[property1]:[classRestriction(optional)]/[property2]... A "*"
 
         sign after the property instructs path accessor to transitively traverse
@@ -435,7 +435,7 @@ class PathwayCommons(REST):
 
         ::
 
-            
+
             from bioservices import PathwayCommons
             pc2 = PathwayCommons(verbose=False)
             res = pc2.traverse(uri=['http://identifiers.org/uniprot/P38398','http://identifiers.org/uniprot/Q06609'], path="ProteinReference/organism")

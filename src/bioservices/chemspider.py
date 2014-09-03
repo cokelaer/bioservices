@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
+# $Id$
 """Interface to the ArrayExpress web Service.
 
 .. topic:: What is ChemSpider ?
@@ -37,7 +37,10 @@
         -- ChemSpider home page, March 2013
 """
 from bioservices import REST, get_bioservices_env
-
+try:
+    from urllib.parse import quote
+except:
+    from urllib2 import quote
 
 class ChemSpider(REST):
     """ChemSpider Web Service Interface
@@ -66,8 +69,8 @@ class ChemSpider(REST):
         if token == None:
             try:
                 token = self.settings.params["chemspider.token"][0]
-            except Exception,e:
-                raise Exception(e)
+            except Exception as err:
+                raise Exception(err)
         self._token = None
         self.token = token
 
@@ -80,8 +83,7 @@ class ChemSpider(REST):
 
     def find(self, query):
         """return the first 100 compounds that match the query"""
-        import urllib2
-        this = "Search.asmx/SimpleSearch?query=%s&token=%s" % (urllib2.quote(query), self._token)
+        this = "Search.asmx/SimpleSearch?query=%s&token=%s" % (quote(query), self._token)
         res = self.http_get(this, frmt="xml")
         res = self.easyXML(res)
         Ids = [int(x.text) for x in res.findAll("int")]
@@ -125,6 +127,7 @@ class ChemSpider(REST):
         url = "Search.asmx/GetCompoundThumbnail?id=%s&token=%s" % (Id, self._token)
         res = self.http_get(url, frmt="xml")
         res = self.easyXML(res)
+        #TODO python3 compatible !
         import base64
         image = base64.b64decode(res.root.text)
         return image
@@ -148,7 +151,6 @@ class ChemSpider(REST):
             ret = self.http_get("MassSpecAPI.asmx/GetDatabases?", frmt="xml")
             ret = self.easyXML(ret)
             self._databases = [x.text for x in ret.getchildren()]
-            print self._databases
         return self._databases
     databases = property(_get_databases, doc="Returns databases searched for in chemSpider")
 
