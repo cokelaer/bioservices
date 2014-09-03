@@ -9,7 +9,7 @@ before_install:
 install: 
   - pip install .
   - pip install nose coverage
-    grequests requests requests_cache easydev beautifulsoup4 SOAPpy suds appdirs
+    grequests requests requests_cache easydev beautifulsoup4 suds-jurko appdirs
   - pip install coveralls
 # # command to run tests, e.g. python setup.py test
 script:  
