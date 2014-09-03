@@ -18,6 +18,8 @@ Revision 1.3
       requests_cache module that could be used to speed go but requires
       to store cache files locally. Asynchronous requests is available but used
       only in a few places for now. 
+    * EUtils has been fully implemented excepting EPost. API may still change to
+      make its usage easier but functionalities are there.
 
   * CHANGES
     * update code to be python-3 compatible. There are still issues with suds/requests/gevent
@@ -34,11 +36,23 @@ Revision 1.3
       * renamed  get_target_by_refSeqId into get_target_by_refseq
       * kegg module: all Kegg strings replaced by KEGG so the kegg.Kegg class is
         now kegg.KEGG
+    * ChEBI
+      * getUpdatedPolymer: remove useless parameters (was failing with python3)
+    * Wikipathway class renamed as WikiPathways to agree with official name
+    * biomart now uses python3 and we had to remove the threaded_request module,
+      which does not seem to ba available. So, we used the new implementation
+      using requests but gevent is not available for python3 either so, we use
+      requests but without the asynchronous call. This is working for now.
+      Transparent for the user.
+    * geneprof: parameter called type and format are renamed output and frmt to
+      not clash with python keywords. Use REST class instead of RESTService but
+      should be transparent for the users.
 
   * BUG FIXES:
 
     * Fixing bug #24/25 posted on assembla related to parse_kgml_pathway
       second argument can now be used. 
+    * wikipathway: findInteractions had a typo in i
 
 Revision 1.2
 ------------------

@@ -130,3 +130,5 @@ already.
 
 
 
+
+e.suds.wsdl.services[0].ports[0].methods.values()
