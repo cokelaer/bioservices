@@ -1,4 +1,4 @@
-from bioservices.services import *
+from bioservices.services import Service, WSDLService, RESTService, REST
 
 
 class test_Service(Service):
@@ -25,12 +25,7 @@ class test_WSDLService(WSDLService):
             verbose=False)
 
     def test_methods(self):
-        self.methods
-    def test_dump(self):
-        self.dumpOut
-        self.dumpIn
-        self.dumpOut = 1
-        self.dumpIn = 1
+        self.wsdl_methods
 
 
 

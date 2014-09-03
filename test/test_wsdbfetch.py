@@ -41,7 +41,7 @@ class test_WSDbfetch(WSDbfetch):
         self.getDbFormats("uniprotkb")
 
     def test_getFormat(self):
-        assert self.getFormatStyles("uniprotkb", "fasta") >= 3
+        assert len(self.getFormatStyles("uniprotkb", "fasta")) >= 3
         #['default', 'raw', 'html']
 
     def test_wrong_db(self):

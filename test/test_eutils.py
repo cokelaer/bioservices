@@ -11,8 +11,8 @@ class test_EUtils(object):
 
     def test_taxonomy(self):
         ret = self.e.taxonomy("9606")
-        assert ret.TaxaSet.Taxon[0].TaxId == '9606'
-        ret.TaxaSet.Taxon[0].ScientificName
+        assert ret.Taxon[0].TaxId == '9606'
+        ret.Taxon[0].ScientificName
 
     def test_snp(self):
         self.e.snp("123")
