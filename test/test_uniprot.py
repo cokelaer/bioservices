@@ -1,4 +1,4 @@
-from bioservices.uniprot import *
+from bioservices.uniprot import UniProt
 from . import settings
 
 class test_UniProt(UniProt):
@@ -8,8 +8,8 @@ class test_UniProt(UniProt):
 
     def test_mapping(self):
         res = self.mapping(fr="ACC+ID", to="KEGG_ID", query='P43403')
-        assert res == {'P43403':['hsa:7535']}
-        try: 
+        assert res['P43403'] == ['hsa:7535']
+        try:
             res = self.mapping(fr="AC", to="KEID", query='P434')
             assert False
         except:
@@ -37,12 +37,12 @@ class test_UniProt(UniProt):
 
         self.quick_search("ZAP70")
 
-
+    @settings.ifpandas
     def test_uniref(self):
         df = self.uniref("member:Q03063")
         df.Size
 
+    @settings.ifpandas
     def test_get_df(self):
         df = self.get_df(["P43403"])
-
 

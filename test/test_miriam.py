@@ -8,7 +8,6 @@ class test_miriam(Miriam):
     def __init__(self):
         super(test_miriam, self).__init__(verbose=False)
 
-
     def test_checkRegExp(self):
         assert self.checkRegExp("1P43403", "uniprot") == False
         assert self.checkRegExp("P43403", "uniprot") == True
@@ -45,7 +44,6 @@ class test_miriam(Miriam):
     def test_getDataTypeURIs(self):
         self.getDataTypeURIs("uniprot")
         ['urn:miriam:uniprot', 'urn:lsid:uniprot.org:uniprot', 'urn:lsid:uniprot.org', 'http://www.uniprot.org/']
-
 
     def test_getDataTypesId(self):
         self.getDataTypesId()
@@ -86,7 +84,6 @@ class test_miriam(Miriam):
         res = self.getResourceInfo("MIR:00100005")
         assert res == 'MIRIAM Resources (data collection)'
 
-
     def test_getResourceInstitution(self):
         res = self.getResourceInstitution("MIR:00100005")
         assert res == "European Bioinformatics Institute"
@@ -110,5 +107,4 @@ class test_miriam(Miriam):
 
     def test_isDeprecated(self):
         self.isDeprecated("urn:miriam:uniprot")
-    
 

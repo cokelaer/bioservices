@@ -1,20 +1,17 @@
-from bioservices.wikipathway import  Wikipathway
+from bioservices.wikipathway import  WikiPathways
 import unittest
 
 
-class TestRepGen(unittest.TestCase, Wikipathway):
+class TestRepGen(unittest.TestCase, WikiPathways):
     @classmethod
     def setUpClass(self):
-        self.s = Wikipathway()
-
-
+        self.s = WikiPathways()
 
 
 class test_wiki(TestRepGen):
     @classmethod
     def setUpClass(self):
         super(test_wiki, self).setUpClass()
-
 
     def test_organism(self):
         assert len(self.s.organisms)
@@ -31,13 +28,12 @@ class test_wiki(TestRepGen):
     def test_showPathwayInBrowser(self):
         self.s.showPathwayInBrowser("WP2320")
 
-
     #@unittest.skip("test")
-    def test_listPathways(self): 
+    def test_listPathways(self):
         l = self.s.listPathways()
-        #len(l) > 40
+        assert len(l) > 40
         l = self.s.listPathways("Homo sapiens")
-        #len(l) > 40
+        assert len(l) > 40
 
     def test_getPathway(self):
         self.s.getPathway("WP2320")
@@ -46,8 +42,6 @@ class test_wiki(TestRepGen):
 
     def test_getPathwayAs(self):
         res = self.s.getPathwayAs("WP4", filetype="txt")
-        
-
 
     def test_findPathwaysByText(self):
         res = self.s.findPathwaysByText(query="p53")
@@ -61,14 +55,6 @@ class test_wiki(TestRepGen):
 
     def test_getOntologyTermsByOntology(self):
         self.s.getOntologyTermsByOntology("Disease")
-
-    def test_getPathwaysByOntologyTerm(self):
-        self.s.getPathwaysByOntologyTerm('DOID:344')
-
-
-    def test_getPathwaysByParentOntologyTerm(self):
-        self.s.getPathwaysByParentOntologyTerm("DOID:344")
-
 
     def test_getCurationTags(self):
         self.s.getCurationTags("WP4")
@@ -138,10 +124,10 @@ class test_wiki(TestRepGen):
             assert True
 
     def test_getPathwayHistory(self):
-        res = self.s.getPathwayHistory("WP455", "20100101000000")
+        _ = self.s.getPathwayHistory("WP455", "20100101000000")
 
     def test_coloredPathway(self):
-        res = self.s.getColoredPathway("WP4",revision=0)
+        _ = self.s.getColoredPathway("WP4",revision=0)
 
 
 

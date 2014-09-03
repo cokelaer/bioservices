@@ -1,4 +1,4 @@
-from bioservices.chembl import *
+from bioservices.chembl import ChEMBL
 import unittest
 from . import settings
 
@@ -27,7 +27,6 @@ class test_Chembl(ChEMBL):
 
     def test_get_compounds_by_chemblId_drug_mechanism(self):
         res = self.get_compounds_by_chemblId_drug_mechanism("CHEMBL3")
-        #res[0]['parent']
 
     def test_get_individual_compounds_by_inChiKey(self):
         res = self.get_individual_compounds_by_inChiKey(self._inChiKey_example)
@@ -90,6 +89,8 @@ class test_Chembl(ChEMBL):
         res = self.get_image_of_compounds_by_chemblId(
             self._image_chemblId_example
             , view=False)
+        import os
+        os.remove(self._image_chemblId_example + ".png")
 
     def test_version(self):
         self.version()

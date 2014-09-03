@@ -37,7 +37,7 @@ class test_AE(ArrayExpress):
         os.remove("E-MEXP-31.idf.txt")
 
         try:
-            res = self.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txtdddd")
+            res == self.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txtdddd")
             assert False
         except:
             pass

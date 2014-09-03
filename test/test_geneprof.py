@@ -20,8 +20,8 @@ def test_1():
     g.get_list_reference_datasets()
 
     g.get_list_experiment_samples("mouse")
-    g.get_list_experiment_samples("human", format="txt")
-    g.get_list_experiment_samples("human", format="rdata")
+    g.get_list_experiment_samples("human", frmt="txt")
+    g.get_list_experiment_samples("human", frmt="rdata")
 
     g.search_genes("sox2")
     g.search_genes("sox2", taxons="9606")
@@ -55,9 +55,9 @@ def test_3():
     g.get_list_idtypes("mouse")
     g.get_list_idtypes("human")
     g.get_gene_expression("mouse", "715", with_sample_info=True)
-    g.get_gene_expression("mouse", "715", type="RAW")
-    g.get_gene_expression("mouse", "715", format="txt", with_sample_info=True)
-    g.get_gene_expression("mouse", "715", format="rdata", with_sample_info=True)
+    g.get_gene_expression("mouse", "715", output="RAW")
+    g.get_gene_expression("mouse", "715", frmt="txt", with_sample_info=True)
+    g.get_gene_expression("mouse", "715", frmt="rdata", with_sample_info=True)
    
 
 def test_gettargets():
@@ -66,54 +66,54 @@ def test_gettargets():
     g.get_targets_tf("mouse", "9885")
     g.get_targets_tf("human", "36958", include_unbound=True)
     g.get_targets_tf("mouse", "14899", ats="C_NAME,C_ENSG")
-    g.get_targets_tf("human", "36958", format="rdata")
+    g.get_targets_tf("human", "36958", frmt="rdata")
     g.get_targets_by_experiment_sample("mouse", "541")
     g.get_targets_by_experiment_sample("human", "784", include_unbound=True)
     g.get_targets_by_experiment_sample("mouse", "541", ats="C_NAME,C_ENSG")
-    g.get_targets_by_experiment_sample("human", "784", format="rdata")
+    g.get_targets_by_experiment_sample("human", "784", frmt="rdata")
         
 def test_get_tfas():
     g = GeneProf(verbose=False)
     g.get_tfas_by_gene("mouse", "9885")
-    g.get_tfas_by_gene("human", "36958", format="xml",
+    g.get_tfas_by_gene("human", "36958", frmt="xml",
                     include_unbound=True)
-    g.get_tfas_by_gene("mouse", "14899", format="txt", 
+    g.get_tfas_by_gene("mouse", "14899", frmt="txt", 
                     ats="C_NAME,C_ENSG")
-    g.get_tfas_by_gene("human", "36958", format="rdata")
+    g.get_tfas_by_gene("human", "36958", frmt="rdata")
 
     g.get_tfas_by_sample("mouse", 541)
-    g.get_tfas_by_sample("human", "784", format="xml",
+    g.get_tfas_by_sample("human", "784", frmt="xml",
                     include_unbound=True)
-    g.get_tfas_by_sample("mouse", "541", format="txt", 
+    g.get_tfas_by_sample("mouse", "541", frmt="txt", 
                 ats="C_NAME,C_ENSG")
     g.get_tfas_by_sample("human", "784")
 
 def test_get_tf():
     g = GeneProf(verbose=False)
     g.get_tf_by_target_gene("mouse", "715", with_sample_info=True)
-    g.get_tf_by_target_gene("mouse", "715", format="xml",
+    g.get_tf_by_target_gene("mouse", "715", frmt="xml",
                     with_sample_info=True)
-    g.get_tf_by_target_gene("mouse", "715", format="txt")
-    g.get_tf_by_target_gene("mouse", "715", format="rdata", 
+    g.get_tf_by_target_gene("mouse", "715", frmt="txt")
+    g.get_tf_by_target_gene("mouse", "715", frmt="rdata", 
                     with_sample_info=True)
 
     
     g.get_tfas_scores_by_target("mouse", "715", with_sample_info=True)
     g.get_tfas_scores_by_target("mouse", 715, with_sample_info=True)
-    g.get_tfas_scores_by_target("mouse", 715, format="txt")
-    g.get_tfas_scores_by_target("mouse", "715", format="rdata",
+    g.get_tfas_scores_by_target("mouse", 715, frmt="txt")
+    g.get_tfas_scores_by_target("mouse", "715", frmt="rdata",
                 with_sample_info=True)
 
 def test_data():
     g = GeneProf(verbose=False)
-    g.get_data("11_119_18_1", format="txt", gz=True)
-    g.get_data("11_119_18_1", format="txt", gz=True, 
+    g.get_data("11_119_18_1", frmt="txt", gz=True)
+    g.get_data("11_119_18_1", frmt="txt", gz=True, 
          ats="C_ENSG,C_11_119_16_1_RPKM0,C_11_119_16_1_RPKM1,C_11_119_16_1_RPKM2,C_11_119_16_1_RPKM3")
 
 
-    g.get_chromosome_names("pub_mm_ens58_ncbim37", format="txt")
-    g.get_chromosome_names("pub_hs_ens59_grch37", format="json")
-    g.get_chromosome_names("11_3_7_2", format="xml")
+    g.get_chromosome_names("pub_mm_ens58_ncbim37", frmt="txt")
+    g.get_chromosome_names("pub_hs_ens59_grch37", frmt="json")
+    g.get_chromosome_names("11_3_7_2", frmt="xml")
 
     g.get_bed_files("11_3_7_2")
     g.get_bed_files("11_3_7_2", chromosome="3-chr3")

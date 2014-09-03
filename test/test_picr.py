@@ -8,21 +8,18 @@ class TestPICR(object):
     def setup_class(klass):
         klass.e = picr.PICR(verbose=False)
 
-    #def __init__(self):
-    #    super(TestPICR, self).__init__(verbose=False)
-
-
     def test_getUPIForSequence(self):
-        res = self.e.getUPIForSequence(self.e._sequence_example, ["IPI", "ENSEMBL", "SWISSPROT"])
-        res = self.e.getUPIForSequence(self.e._sequence_example, "SWISSPROT", taxid="9606")
-        res = self.e.getUPIForSequence(self.e._sequence_example, "SWISSPROT", onlyactive=False, includeattributes=False)
-        print res
+        res = self.e.getUPIForSequence(self.e._sequence_example,
+                ["IPI", "ENSEMBL", "SWISSPROT"])
+        res = self.e.getUPIForSequence(self.e._sequence_example, "SWISSPROT",
+                taxid="9606")
+        res = self.e.getUPIForSequence(self.e._sequence_example, "SWISSPROT",
+                onlyactive=False, includeattributes=False)
 
     def test_databases(self):
-        assert len(self.e.databases)>0
+        assert len(self.e.databases) > 0
 
     def test_MappedDB(self):
-        #res = xmltools.easyXML(res)
         self.e.getMappedDatabaseNames()
 
     def test_checkDB(self):
