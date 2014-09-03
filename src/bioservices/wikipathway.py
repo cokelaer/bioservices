@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id: $
+# $Id: $
 """Interface to the WikiPathway service
 
 .. topic:: What is WikiPathway ?
@@ -40,16 +40,16 @@ from bioservices.services import WSDLService, RESTService
 import copy, webbrowser,  base64
 
 
-__all__ = ["Wikipathway"]
+__all__ = ["Wikipathway", "WikiPathways"]
 
 
 # this is useless but let us keep for now
 class _Items2(object):
-    def __init__(self, data, name = 'item', verbose = True):
+    def __init__(self, data, name='item', verbose=True):
         self.data = data
 
         self._items = copy.deepcopy(data)
-        self.definitions = self._items  ## Consider replace self_items with this variable
+        self.definitions = self._items  # Consider replace self_items with this variable
 #    def _get_entry_ids(self):
 #    def _get_definitions(self):
 #        ids = [x[
@@ -57,25 +57,28 @@ class _Items2(object):
     def _get_entry_ids(self):
         ids = [x['id'] for x in self.items]
         return ids
-    entry_ids = property(_get_entry_ids, doc = "return list of ids")
+    entry_ids = property(_get_entry_ids, doc="return list of ids")
 
     def _get_names(self):
         name = [x['name'] for x in self.items]
         return name
-    name = property(_get_names, doc = "return list of names")
+    name = property(_get_names, doc="return list of names")
 
     def _get_items(self):
         return self._items
-    items = property(_get_items,doc=_get_items.__doc__)
+    items = property(_get_items, doc=_get_items.__doc__)
     #def _get_entry_ids(self):
 
+class Wikipathway(object):
+    def __init__(self):
+        raise(ValueError("Please use WikiPathways class instead. Renamed in version 1.3.0"))
 
-class Wikipathway(WSDLService):
+class WikiPathways(WSDLService):
     """Interface to `Pathway <http://www.wikipathways.org/index.php>`_ service
 
     .. doctest::
 
-       >>> from bioservices import *
+       >>> from bioservices import WikiPathways
        >>> s = Wikipathway()
        >>> s.organism  # default organism
        'Homo sapiens'
@@ -95,18 +98,19 @@ class Wikipathway(WSDLService):
 
       * getXrefList: Neither WSDL or REST seemed to work
       * u'getCurationTagHistory': No API found in Wikipathway web page
-      * u'getRelations': No API found in WikiPathway web page
+      * u'getRelations': No API found in Wikipathway web page
     """
     _url = 'http://www.wikipathways.org/wpi/webservice/webservice.php?wsdl'
-    def __init__(self, verbose = True):
+    def __init__(self, verbose=True):
         """.. rubric:: Constructor
 
         :param bool verbose:
 
         """
 
-        super(Wikipathway, self).__init__(name="Wikipathway", url=Wikipathway._url, verbose = verbose)
-        self._organism = 'Homo sapiens' ## This function is redundant (see class service)
+        super(WikiPathways, self).__init__(name="WikiPathways", 
+                url=WikiPathways._url, verbose=verbose)
+        self._organism = 'Homo sapiens' # This function is redundant (see class service)
         self.logging.info("Fetching organisms...")
 
         #: Get a list of all available organisms.
@@ -118,7 +122,7 @@ class Wikipathway(WSDLService):
         if organism in self.organisms:
             self._organism = organism
         else:
-            raise ValueError("'%s' is not supported in Wikipathways. See :attr:`organisms`" % organism)
+            raise ValueError("'%s' is not supported in WikiPathways. See :attr:`organisms`" % organism)
 
     def _get_organism(self):
         return self._organism
@@ -142,10 +146,10 @@ class Wikipathway(WSDLService):
         """Find pathways by searching on the external references of DataNodes.
 
 
-        This function supports only 1 ids and 1 code at a time. To specify 
+        This function supports only 1 ids and 1 code at a time. To specify
         multiple ids and codes parameters to query for multiple xrefs at once,
-        the REST syntax should be used. In that case, the number of ids and 
-        codes parameters should match, they will be paired to form xrefs, 
+        the REST syntax should be used. In that case, the number of ids and
+        codes parameters should match, they will be paired to form xrefs,
         e.g.::
 
             >>> from bioservices import RESTService
@@ -171,9 +175,9 @@ class Wikipathway(WSDLService):
         res = self.serv.findPathwaysByXref(ids=ids)
         return res
 
-    #REST: s.url[:-5] + ?query=P53
-    def findInteractions(self, query, organism=None,interactionOnly=True, 
-        raw = False):
+    # REST: s.url[:-5] + ?query=P53
+    def findInteractions(self, query, organism=None,
+            interactionOnly=True, raw=False):
         """Find interactions defined in WikiPathways pathways.
 
 
@@ -202,7 +206,7 @@ class Wikipathway(WSDLService):
             for x in self.serv.findInteractions(query=query):
                 if len(x) == 0:
                     continue
-                if 'species' not in x._keyord:
+                if hasattr(x, 'species') == False:
                     continue
                 if x['species'] == organism:
                     intA.append(x['fields'][1]['values'])
@@ -324,12 +328,14 @@ class Wikipathway(WSDLService):
         .. warning:: Argument pathwayId and filetype are inversed as compared to the
             WSDL prototype (if you want to call it directly)
 
+        .. change:: 1.3.0 return raw output of the service without any parsing
 
+        .. note:: use :meth:`savePathwayAs` to save into a file.
         """
-        self.checkParam(filetype, ['gpml','png','svg','pdf','txt','pwf', 'owl'])
-        res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, 
+        self.checkParam(filetype, ['gpml', 'png', 'svg', 'pdf', 'txt', 'pwf', 'owl'])
+        res = self.serv.getPathwayAs(fileType=filetype, pwId=pathwayId, 
              revision = revisionNumb)
-        return base64.b64decode(res)
+        return res
 
     def savePathwayAs(self, pathwayId, filename, revisionNumb = 0, display = True):
         """Save a pathway.
@@ -344,9 +350,18 @@ class Wikipathway(WSDLService):
         if filename.find('.') == -1:
             filename = "%s.%s" %(filename,'pdf')
         filetype = filename.split('.')[-1]
-        res = self.serv.getPathwayAs(fileType = filetype, pwId = pathwayId, revision = revisionNumb)
-        f = open(filename,'w')
-        f.write(base64.b64decode(res))
+
+        res = self.getPathwayAs(pathwayId, filetype=filetype,
+            revisionNumb=revisionNumb)
+        with open(filename,'wb') as f:
+            import binascii
+            try:
+                #python3
+                newres = binascii.a2b_base64(bytes(res, "utf-8"))
+            except:
+                newres = binascii.a2b_base64(res)
+            f.write(newres)
+
         if display:
             webbrowser.open(filename)
         f.close()
@@ -537,6 +552,8 @@ class Wikipathway(WSDLService):
 
         ::
 
+            >>> from bioservices import WikiPathways
+            >>> s = WikiPathway()
             >>> s.getOntologyTermsByOntology("Disease")
 
         """
@@ -552,7 +569,7 @@ class Wikipathway(WSDLService):
 
         ::
 
-            >>> from bioservices import *
+            >>> from bioservices import WikiPathways
             >>> s = Wikipathway()
             >>> s.getPathwaysByOntologyTerm('DOID:344')
 

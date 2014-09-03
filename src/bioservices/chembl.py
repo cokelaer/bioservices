@@ -90,13 +90,22 @@ class ChEMBL(REST):
             res = self.http_get([request % x for x in query], frmt=frmt)
         return res
 
+    def _postprocess(self, data, key):
+        try:
+            return data[key]
+        except:
+            try:
+                return [x[key] for x in data]
+            except:
+                return data
+
     def status(self):
         """Return the API status
 
         :return: Response is the string 'UP' if the service is running
         """
         res = self.http_get("status", frmt="json")
-        return res['status']
+        return res['service']['status']
 
     def get_compounds_by_chemblId(self, query, frmt="json"):
         """Get compound by ChEMBLId
@@ -147,7 +156,7 @@ class ChEMBL(REST):
 
         """
         res = self._process(query, frmt, "compounds/%s/form")
-        return res
+        return self._postprocess(res, 'forms')
 
     def get_compounds_by_chemblId_drug_mechanism(self, query, frmt="json"):
         """
@@ -193,7 +202,7 @@ class ChEMBL(REST):
             >>> resjson = s.get_individual_compounds_by_inChiKey(s._inChiKey_example)
         """
         res = self._process(query, frmt, "compounds/stdinchikey/%s")
-        return res
+        return self._postprocess(res, 'compound')
 
     def get_compounds_by_SMILES(self, query, frmt="json"):
         """Get list of compounds by Canonical SMILES
@@ -266,7 +275,7 @@ class ChEMBL(REST):
         """
         self.devtools.check_range(similarity, 70, 100)
         res = self._process(query, frmt, "compounds/similarity/%s/"+str(similarity))
-        return res
+        return self._postprocess(res, 'compounds')
 
     def get_image_of_compounds_by_chemblId(self, query, dimensions=500,
             save=True, view=True, engine="rdkit"):
@@ -298,12 +307,6 @@ class ChEMBL(REST):
         self.devtools.check_param_in_list(engine, ['rdkit'])
         queries = self.devtools.transform_into_list(query)
 
-        def __f_save(target_data, file_out):
-            FILE = open(file_out, 'w')
-            FILE.write(target_data)
-            FILE.close()
-            self.logging.info("saved to %s"%file_out)
-
         res = {'filenames':[], 'images':[], 'chemblids':[]}
         for query in queries:
             req = "compounds/%s/image" % query
@@ -314,7 +317,10 @@ class ChEMBL(REST):
 
             file_out = os.getcwd()
             file_out += '/%s.png' % query
-            __f_save(target_data,file_out)
+            with open(file_out, "wb") as thisfile:
+                thisfile.write(bytes(target_data))
+                thisfile.close()
+                self.logging.info("saved to %s" % file_out)
 
             fout = file_out
             res['chemblids'].append(query)
@@ -395,7 +401,7 @@ class ChEMBL(REST):
             >>> resjson = s.get_target_by_uniprotId(s._target_uniprotId_example)
         """
         res = self._process(query, frmt, "targets/uniprot/%s")
-        return res
+        return self._postprocess(res, 'target')
 
 
     def get_target_by_refseq(self, query, frmt='json'):
@@ -429,7 +435,7 @@ class ChEMBL(REST):
             >>> resjson = s.get_target_bioactivities(s._target_bioactivities_example)
         """
         res = self._process(query, frmt, "targets/%s/bioactivities")
-        return res
+        return self._postprocess(res, 'bioactivities')
 
     def get_all_targets(self, frmt="json"):
         """Get all targets in a dictionary
@@ -457,7 +463,7 @@ class ChEMBL(REST):
         """
         self.devtools.check_param_in_list(frmt, ["json", "xml"])
         res = self.http_get("targets." + frmt, frmt=frmt)
-        return res
+        return self._postprocess(res, 'targets')
 
     def get_assays_by_chemblId(self, query, frmt="json"):
         """Get assay by ChEMBLId
@@ -488,7 +494,6 @@ class ChEMBL(REST):
 
         """
         res = self._process(query, frmt, "assays/%s")
-        #res = res[0]
         return res
 
     def get_assays_bioactivities(self, query, frmt="json"):
@@ -506,7 +511,6 @@ class ChEMBL(REST):
             >>> resjson = s.get_assays_bioactivities(s._assays_example)
         """
         res = self._process(query, frmt, "assays/%s/bioactivities")
-        res = res[0]
         return res
 
     def inspect(self, query, item_type):
@@ -531,7 +535,7 @@ class ChEMBL(REST):
     def version(self):
         """Return version of the API on the server"""
         res = self.http_get("status", frmt="json")
-        return res['version']
+        return res['service']['version']
 
 
 class BenchmarkChembl(ChEMBL):

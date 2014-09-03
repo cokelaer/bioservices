@@ -245,7 +245,7 @@ returns a list of parameters. See :meth:`getParameters`.""")
         # this is fine for now but note for instance that stype could not be put
         # here because what is returned by parametersDetails is not exactly what
         # is expected.
-        for k,v in kargs.iteritems():
+        for k,v in kargs.items():
              print(k,v)
              checkParam(v,self.parametersDetails(k))
              params[k] = v

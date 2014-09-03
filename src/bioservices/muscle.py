@@ -37,6 +37,7 @@
         -- from EMBL-EBI web page
 
 """
+from __future__ import print_function
 import sys
 import time
 from bioservices.services import REST
@@ -298,11 +299,12 @@ class MUSCLE(REST):
       while result == 'RUNNING' or result == 'PENDING':
           result = self.getStatus(jobId)
           if verbose:
-              print >> sys.stderr, jobId, " is ", result
+              # required from __future__ import print_function
+              print("WARNING: ", jobId, " is ", result, file=sys.stderr)
+
           if result == 'RUNNING' or result == 'PENDING':
               time.sleep(checkInterval)
       return result
-
 
 
 

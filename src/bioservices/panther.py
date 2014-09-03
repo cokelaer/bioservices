@@ -81,8 +81,8 @@ class Panther(REST):
         all human and mouse. can perform a selectiom
         """
         raise NotImplementedError
-        x = readXML(self._allPathwaysURL)
-        pathways = [this.get("href") for this in x.findAll("a") if "pathfiles" in this.get("href")]
+        allx = readXML(self._allPathwaysURL)
+        pathways = [this.get("href") for this in allx.findAll("a") if "pathfiles" in this.get("href")]
         pathways =  [str(x.split("/")[-1]) for x in pathways] # split the drive
         pathways = sorted(list(set(pathways)))
         pathways = [x for x in pathways if x.startswith(startswith)]

@@ -47,7 +47,7 @@ Data is freely available, under the license terms of each contributing database.
 """
 from __future__ import print_function
 
-from bioservices.services import RESTService, BioServicesError
+from bioservices.services import REST, BioServicesError
 
 import json
 
@@ -55,7 +55,7 @@ __all__ = ["GeneProf"]
 
 
 
-class GeneProf(RESTService):
+class GeneProf(REST):
     """Interface to the `GeneProf <http://www.geneprof.org/>`_ service
 
 
@@ -116,6 +116,9 @@ class GeneProf(RESTService):
         """
         super(GeneProf, self).__init__(name="GeneProf",
                 url="http://www.geneprof.org/GeneProf/api", verbose=verbose)
+
+        self.settings.TIMEOUT = 100
+
         # why is it set to False ?
         self.easyXMLConversion = False
         self._default_extension = "json"
@@ -140,7 +143,7 @@ class GeneProf(RESTService):
     def _get_ids_exp(self):
         if self._ids_exp == None:
             self.logging.info("Fetchin ids...")
-            res = self.get_list_experiments(format="json")
+            res = self.get_list_experiments(frmt="json")
             self._ids_exp = [x['id'] for x in res]
             self._rigid_ids_exp = [x['rigid_id'] for x in res]
         return self._ids_exp
@@ -149,7 +152,7 @@ class GeneProf(RESTService):
     def _get_rigid_ids_exp(self):
         if self._rigid_ids_exp == None:
             self.logging.info("Fetchin ids...")
-            res = self.get_list_experiments(format="json")
+            res = self.get_list_experiments(frmt="json")
             self._rigid_ids_exp = [x['rigid_id'] for x in res]
             self._ids_exp = [x['id'] for x in res]
         return self._rigid_ids_exp
@@ -159,16 +162,16 @@ class GeneProf(RESTService):
     def _get_ids_ds(self):
         if self._ids_ds == None:
             self.logging.info("Fetchin ids...")
-            res = self.get_list_reference_datasets(format="json")
+            res = self.get_list_reference_datasets(frmt="json")
             self._ids_ds = [x['id'] for x in res]
         return self._ids_ds
     ids_ds = property(_get_ids_ds)
 
 
-    def get_list_experiments(self, format="json", **kargs):
+    def get_list_experiments(self, frmt="json", **kargs):
         """Retrieves a list of GeneProf experiments.
 
-        :param str format: format of the output
+        :param str frmt: format of the output
         :param bool with-ats: Include descriptions for all datasets'
             annotation types (data columns).
         :param bool with-samples: Include information about the sample
@@ -185,8 +188,8 @@ class GeneProf(RESTService):
         :param bool key:  An optional WebAPI key, required to access
             non-public data.
 
-        :return: if json output is requested, the output is a list of
-            dictionaries. Each dictionary corresponds to one experiment
+        :return: if json format is requested, the output is a list of
+            dictionaries. Each dictionary corresponds to one experiment.
 
         .. doctest::
 
@@ -195,30 +198,30 @@ class GeneProf(RESTService):
             experiments = g.get_list_experiments(with_outputs=True)
 
         """
-        
-        format_ = self._check_format(format)
-        url = self.url + "/exp/list." + format_
-
+        frmt = self._check_format(frmt)
+        params = {}
         for key in kargs.keys():
             if key not in ["with_ats", "with_samples", "with_inputs",
                     "with_outputs", "with_workflow", "with_all_data",
                     "only_user_experiments", "key"]:
                 raise BioServicesError("invalid parameter (%s) provided" % key)
-        params = self.urlencode(kargs)
-        if len(params):
-            params = params.replace("with_", "with-")
-            url += "?"+ params
-        res = self.request(url, format=format_)
-        if format == "json":
-            res = json.loads(res)
-            res = res['experiments']
+            params[key] = kargs.get(key)
+
+        params = self._clean_parameters(params)
+
+        res =self.http_get("exp/list." + frmt, frmt=frmt, params=params)
+        if frmt == "json":
+            try:
+                res = res['experiments']
+            except:
+                pass
         return res
 
-    def _check_format(self, format_):
-        if format_ == None:
-            format_ = self.default_extension
-        self.checkParam(format_, self._valid_format)
-        return format_
+    def _check_format(self, frmt):
+        if frmt == None:
+            frmt_ = self.default_extension
+        self.checkParam(frmt, self._valid_format)
+        return frmt
 
     def _check_id(self, Id):
         try:
@@ -237,7 +240,17 @@ class GeneProf(RESTService):
             if key not in valid_keys:
                 raise BioServicesError("invalid parameter (%s) provided" % key)
 
-    def get_metadata_experiment(self, Id, format="json", **kargs):
+    def _clean_parameters(self, params):
+        # some parametesr in geneprof have dash character, which
+        # cannot be usd in python so we use underscore. Consequently,
+        # we must revert to a dash when encoding the URL
+        for k,v in params.items():
+            if "with_" in k:
+                params[k.replace("with_", "with-")]=v
+                del params[k]
+        return params
+
+    def get_metadata_experiment(self, Id, frmt="json", **kargs):
         """Retrieves metadata (names, descriptions, IDs, etc) about experiments.
 
         An experiment typically consists of a set of input data (e.g. raw
@@ -256,23 +269,16 @@ class GeneProf(RESTService):
             >>> g.get_metadata_experiment(Id="385", with_workflow=True)
 
         """
-        format_ = self._check_format(format)
+        frmt = self._check_format(frmt)
         self._check_id(Id)
         self._check_kargs(kargs, ["with_ats", "with_samples", "with_inputs",
                     "with_outputs", "with_workflow", "with_all_data", "key"])
-
-        url = self.url + "/exp/%s." % Id + format_
-        params = self.urlencode(kargs)
-        if len(params):
-            params = params.replace("with_", "with-")
-            params = params.replace("only_user_ex", "only-user-ex")
-            url += "?"+ params
-        res = self.request(url, format=format_)
-        if format == "json":
-            res = json.loads(res)
+        params = self._clean_parameters(kargs)
+        #    params = params.replace("only_user_ex", "only-user-ex")
+        res = self.http_get('exp/%s.' %Id+frmt, frmt=frmt, params=params)
         return res
 
-    def get_metadata_dataset(self, Id, format="json", **kargs):
+    def get_metadata_dataset(self, Id, frmt="json", **kargs):
         """Get metadata about geneprof dataset
 
         This method retrieves metadata about a specific GeneProf dataset
@@ -282,30 +288,20 @@ class GeneProf(RESTService):
         :param str Id: The identifier of the dataset of interest. Either the
             entire accession ID (e.g. gpDS_11_385_44_1) or just the
             dataset-specific part (e.g. 11_385_44_1).
-        :param str format: one of json, xml, txt, rdata
+        :param str frmt: one of json, xml, txt, rdata
 
         Retrieve metadata about the dataset gpDS_11_12_122_1 as JSON::
 
             g.get_metadata_dataset("11_12_122_1", with_ats=True)
 
         """
-        format_ = self._check_format(format)
-        #self._check_id_ds(Id)
+        frmt = self._check_format(frmt)
         self._check_kargs(kargs, ["with_ats", "key"])
-
-        url = self.url + "/ds/%s." % Id + format_
-        params = self.urlencode(kargs)
-        if len(params):
-            params = params.replace("with_", "with-")
-            url += "?"+ params
-        res = self.request(url, format=format_)
-        if format == "json":
-            res = json.loads(res)
+        params = self._clean_parameters(kargs)
+        res = self.http_get("ds/%s." % Id + frmt, frmt=frmt)
         return res
 
-
-
-    def get_list_reference_datasets(self, format="json"):
+    def get_list_reference_datasets(self, frmt="json"):
         """Retrieves a list of public reference datasets.
 
         GeneProf provides a number of recommended reference datasets
@@ -316,7 +312,7 @@ class GeneProf(RESTService):
         retrieves a list of all the public, recommended reference datasets
         currently available in the database.
 
-        :param str format: format in one of: json, xml, txt, rdata.
+        :param str frmt: format in one of: json, xml, txt, rdata.
 
         .. note:: the txt and rdata format versions of the output reports a
             flattened version of the dataset metadata and misses out some
@@ -327,16 +323,14 @@ class GeneProf(RESTService):
             >>> g.get_list_reference_datasets()
 
         """
-        format_ = self._check_format(format)
-        url = self.url + "/ds/pubref." + format_
-        res = self.request(url, format=format_)
-        if format_ == "json":
-            res = json.loads(res)
+        frmt = self._check_format(frmt)
+        url = "ds/pubref." + frmt
+        res = self.http_get(url, frmt=frmt)
+        if frmt == "json":
             res = res['references']
         return res
 
-
-    def get_list_experiment_samples(self, ref, format="json"):
+    def get_list_experiment_samples(self, ref, frmt="json"):
         """Returns list of Public Experiment Samples for a reference dataset.
 
         All public data in the GeneProf databases has been annotated
@@ -355,22 +349,18 @@ class GeneProf(RESTService):
         Retrieve a list of all samples for mouse as XML::
 
             >>> g.get_list_experiment_samples("mouse")
-            >>> g.get_list_experiment_samples("human", format="txt")
-            >>> g.get_list_experiment_samples("human", format="rdata")
+            >>> g.get_list_experiment_samples("human", frmt="txt")
+            >>> g.get_list_experiment_samples("human", frmt="rdata")
 
         """
-        format_ = self._check_format(format)
-        url = self.url + "/gene.info/list.samples/%s." % ref + format_
-        res = self.request(url, format=format_)
-
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        frmt = self._check_format(frmt)
+        url = "gene.info/list.samples/%s." % ref + frmt
+        res = self.http_get(url, frmt=frmt)
+        if frmt == "json":
             res = res['samples']
         return res
 
-
-    def search_genes(self, query, taxons=None, format="json"):
+    def search_genes(self, query, taxons=None, frmt="json"):
         """Search genes using genes' description, name and accession IDs.
 
          use sets of gene annotations
@@ -386,7 +376,7 @@ class GeneProf(RESTService):
              fields are: id, label, description, type and reference. You can
              also use boolean logic in your queries using the keywords AND and
              OR, brackets and quotes (") for exact matches of whole phrases.
-        :param str format: file format requests, one of: json, xml, txt, rdata.
+        :param str frmt: file format requests, one of: json, xml, txt, rdata.
         :param str taxons: Only return matches from experiments
                      dealing with organisms matching these NCBI taxonomy IDs
                      (comma-separated list).
@@ -408,7 +398,7 @@ class GeneProf(RESTService):
 
         XML output example::
 
-        >>> g.search_genes("sox2", taxons="9606", format="xml")
+        >>> g.search_genes("sox2", taxons="9606", frmt="xml")
         >>> geneIds = [x.find('numeric_id').text for x in res.findAll("genes")]
 
         >>> g.search_genes("sox2", taxons="9606")
@@ -417,19 +407,12 @@ class GeneProf(RESTService):
 
         .. seealso:: search_gene_ids
         """
-        format_ = self._check_format(format)
+        frmt = self._check_format(frmt)
         query = query.replace(" ", "+")
-        url = self.url + "/search/gene/%s." % query + format_
-        params = {}
-        if taxons:
-            params['taxons'] = taxons
-        params = self.urlencode(params)
-        if len(params):
-            url += "?" +  params
-        res = self.request(url, format=format_)
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        url = "search/gene/%s." % query + frmt
+        params = {'taxons': taxons}
+        res = self.http_get(url, frmt=frmt, params=params)
+        if frmt == "json":
             res = res['matches_per_dataset']
         return res
 
@@ -446,7 +429,7 @@ class GeneProf(RESTService):
             geneIds[taxon] = ids
         return geneIds
 
-    def search_experiments(self, query, taxons=None, format="json"):
+    def search_experiments(self, query, taxons=None, frmt="json"):
         """Search Experiments using  name, description and citations.
 
         Experiments are what GeneProf calls each individual data  analysis
@@ -470,7 +453,7 @@ class GeneProf(RESTService):
             quotes (") for exact matches of whole phrases. Advanced search
             options and examples are documents on GeneProf's search
             page.
-        :param str format: The file format requests, one of: json, xml, txt, rdata.
+        :param str frmt: The file format requests, one of: json, xml, txt, rdata.
         :param str taxons: Only return matches from experiments dealing with
             organisms matching these NCBI taxonomy IDs (comma-separated list).
 
@@ -489,22 +472,16 @@ class GeneProf(RESTService):
             >>> g.search_experiments("citation:'stem cell'")
 
         """
-        format_ = self._check_format(format)
+        frmt = self._check_format(frmt)
         query = query.replace(" ", "+")
-        url = self.url + "/search/experiment/%s." % query + format_
+        url = "search/experiment/%s." % query + frmt
         params = {}
         if taxons:
             params['taxons'] = taxons
-        params = self.urlencode(params)
-        if len(params):
-            url += "?" +  params
-        res = self.request(url, format=format_)
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        res = self.http_get(url, frmt=frmt, params=params)
         return res
 
-    def search_datasets(self, query, taxons=None, format=None):
+    def search_datasets(self, query, taxons=None, frmt="json"):
         """search for datasets
 
         Using this web service, you can search for experiments of interest
@@ -519,7 +496,7 @@ class GeneProf(RESTService):
             and OR, brackets and quotes (") for exact matches of whole phrases.
             Advanced search options and examples are documents on GeneProf's
             search page.
-        :param str format: file format in: json, xml, txt, rdata.
+        :param str frmt: file format in: json, xml, txt, rdata.
         :param str taxons: Only return matches from experiments dealing
              with organisms matching these NCBI taxonomy IDs (comma-separated
              list).
@@ -537,23 +514,16 @@ class GeneProf(RESTService):
             >>> g.search_datasets("datatype:GENOMIC_REGIONS AND sox2")
 
         """
-        format_ = self._check_format(format)
+        frmt = self._check_format(frmt)
         query = query.replace(" ", "+")
-        url = self.url + "/search/dataset/%s." % query + format_
+        url = "search/dataset/%s." % query + frmt
         params = {}
         if taxons:
             params['taxons'] = taxons
-        params = self.urlencode(params)
-        if len(params):
-            url += "?" +  params
-        res = self.request(url, format=format_)
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        res = self.http_get(url, frmt=frmt, params=params)
         return res
 
-
-    def search_samples(self, query, taxons=None, format=None):
+    def search_samples(self, query, taxons=None, frmt=None):
         """search for public experiment samples using search terms against their annotations.
 
 
@@ -574,7 +544,7 @@ class GeneProf(RESTService):
             quotes (") for exact matches of whole phrases. Advanced
             search options and examples are documents on GeneProf's search
             page.
-        :param bool format: file format requests, one of: json, xml, txt, rdata.
+        :param bool frmt: file format requests, one of: json, xml, txt, rdata.
         :param str taxons: Only return matches from experiments dealing with
             organisms matching these NCBI taxonomy IDs (comma-separated list).
 
@@ -593,23 +563,16 @@ class GeneProf(RESTService):
             >>> g.search_samples("human")
 
         """
-        format_ = self._check_format(format)
+        frmt = self._check_format(frmt)
         query = query.replace(" ", "+")
-        url = self.url + "/search/sample/%s." % query + format_
+        url = "search/sample/%s." % query + frmt
         params = {}
         if taxons:
             params['taxons'] = taxons
-        params = self.urlencode(params)
-        if len(params):
-            url += "?" +  params
-        res = self.request(url, format=format_)
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        res = self.http_get(url, frmt=frmt, params=params)
         return res
 
-
-    def get_gene_id(self, ref, idtype, Id, format="json"):
+    def get_gene_id(self, ref, idtype, Id, frmt="json"):
         """Get the GeneProf ID of a Gene
 
         GeneProf uses well-defined sets of gene annotations
@@ -628,7 +591,7 @@ class GeneProf(RESTService):
             :meth:`get_list_idtypes` to find out which types are supported for a
             dataset.
         :param str Id: The GeneProf ID of a gene (an integer number).
-        :param str format: output format in json, txt, xml, rdata.
+        :param str frmt: output format in json, txt, xml, rdata.
 
         Get the GeneProf ID of the mouse gene with Ensembl ID ENSMUSG00000059552
 
@@ -645,19 +608,14 @@ class GeneProf(RESTService):
 
             >>> g.get_gene_id("human", "any", "NM_005657")
         """
-        format_ = self._check_format(format)
-
-        url = self.url + "/gene.info/gp.id/%s/%s/%s." % (ref, idtype, Id)
-        url += format_
-
-        res = self.request(url, format=format_)
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        frmt = self._check_format(frmt)
+        url = "gene.info/gp.id/%s/%s/%s." % (ref, idtype, Id)
+        url += frmt
+        res = self.http_get(url, frmt=frmt)
         return res
 
 
-    def get_external_gene_id(self, ref, idtype, Id, format="json"):
+    def get_external_gene_id(self, ref, idtype, Id, frmt="json"):
         """Translates a GeneProf gene ID into an external identifier or name.
 
         GeneProf uses sets of gene annotations based on those from Ensembl.
@@ -675,7 +633,7 @@ class GeneProf(RESTService):
         :param str idtype:   The identifier an annotation column storing
             IDs. Check the :meth:`get_list_idtypes` to find out which types
             are supported for a  dataset.
-        :param str format:  format requests, one of: json, txt, xml, rdata.
+        :param str frmt:  format requests, one of: json, txt, xml, rdata.
 
         Get the Ensembl Gene ID(s) of the mouse gene #715, as plain text:
 
@@ -689,23 +647,23 @@ class GeneProf(RESTService):
 
              >>> g.get_external_gene_id("mouse","2981", "C_NAME")
         """
-        format_ = self._check_format(format)
-        url = self.url + "/gene.info/external.id/%s/%s/%s." % (ref, idtype, Id)
-        url += format_
-        res = self.request(url, format=format_)
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        frmt = self._check_format(frmt)
+        url = "gene.info/external.id/%s/%s/%s." % (ref, idtype, Id)
+        url += frmt
+        res = self.http_get(url, frmt=frmt)
         return res
 
-    def get_list_idtypes(self, ref, format="json"):
+    def get_list_idtypes(self, ref, frmt="json"):
         """list all the ID types available for a dataset.
 
-        GeneProf reference datasets provide a number of alternative ID annotations (e.g. Ensembl Gene IDs, RefSeq IDs, UniGene IDs, etc.) for each of the genes in the reference annotation. This service simply lists all the ID types available for a dataset.
+        GeneProf reference datasets provide a number of alternative ID annotations (e.g.
+        Ensembl Gene IDs, RefSeq IDs, UniGene IDs, etc.) for each of the genes
+        in the reference annotation. This service simply lists all the ID types
+        available for a dataset.
 
         :param str ref: identifier of a public GeneProf reference dataset (e.g.
             human)
-        :param str format: format, one of: json, txt, xml, rdata.
+        :param str frmt: format, one of: json, txt, xml, rdata.
 
 
         ::
@@ -714,34 +672,31 @@ class GeneProf(RESTService):
             >>> g.get_list_idtypes("human")
 
         """
-        format_ = self._check_format(format)
-        url = self.url + "/gene.info/list.id.types/%s." % ref
-        url += format_
-        res = self.request(url, format=format_)
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        frmt = self._check_format(frmt)
+        url = "gene.info/list.id.types/%s." % ref
+        url += frmt
+        res = self.http_get(url, frmt=frmt)
         return res
 
-
-    def get_expression(self, ref, Id, format="json", with_sample_info=False, type="RPKM"):
+    def get_expression(self, ref, Id, frmt="json", with_sample_info=False,
+            output="RPKM"):
         """Alias to :meth:`get_gene_expression`
-        
-        
-        
-        
+
+
+
+
         """
-        return self.get_gene_expression(ref, Id, format=format, 
-                with_sample_info=with_sample_info, type=type)
+        return self.get_gene_expression(ref, Id, frmt=frmt,
+                with_sample_info=with_sample_info, output=output)
 
 
-    def get_gene_expression(self, ref, Id, format="json",
-            with_sample_info=False,  type="RPKM"):
+    def get_gene_expression(self, ref, Id, frmt="json",
+            with_sample_info=False,  output="RPKM"):
         """Get Gene Expression Values for a Gene
 
         Retrieves gene expression values for a gene based on public RNA-seq data
-        in the GeneProf databases. 
-        
+        in the GeneProf databases.
+
         GeneProf's databases contain many
         pre-calculated gene expression values stemming from a reanalyses of a
         large collection of RNA-seq (and similar) experiments. Use this web
@@ -767,7 +722,7 @@ class GeneProf(RESTService):
         :param str ref: identifier of a public GeneProf reference dataset. You
             may use aliases here. Check the list public references service for
             all available reference datasets.
-        :param str format: format requests, one of: json, txt, xml, rdata.
+        :param str frmt: format requests, one of: json, txt, xml, rdata.
         :param str type: type of values to obtain, one of: RAW | RPM | RPKM
         :param str with_sample_info: Include additional annotations about the
             tissue, cell type, etc. of the expression values.
@@ -782,12 +737,12 @@ class GeneProf(RESTService):
 
         Retrieve gene expression values for the mouse gene #715 as a tab-delimited text file, including additional annotation data:
 
-            >>> g.get_gene_expression("mouse", "715", format="txt", with_sample_info=True)
+            >>> g.get_gene_expression("mouse", "715", frmt="txt", with_sample_info=True)
 
         Retrieve gene expression values for the mouse gene #715 as an
         RData file, including additional annotation data:
 
-            >>> g.get_gene_expression("mouse", "715", format="rdata", with_sample_info=True)
+            >>> g.get_gene_expression("mouse", "715", frmt="rdata", with_sample_info=True)
 
 
         .. plot::
@@ -801,34 +756,30 @@ class GeneProf(RESTService):
             >>> res = g.get_gene_expression("mouse", "715")
             >>> rpkmValues = [x["RPKM"] for x in res]
             >>> logValues = [math.log(x+1,2.) for x in rpkmValues]
-            >>> hist(logValues) 
+            >>> hist(logValues)
             >>> xlabel('RPKM'); ylabel('Count')
             >>> title( 'Histogram: 715')
             >>> show()
 
         """
-        format_ = self._check_format(format)
-        type_ = type
+        frmt = self._check_format(frmt)
         self.checkParam(type_, ["RAW", "RPM", "RPKM"])
 
-        url = self.url + "/gene.info/expression/%s/%s." % (ref, Id)
-        url += format_
+        url = "gene.info/expression/%s/%s." % (ref, Id)
+        url += frmt
 
         #TODO: params
         params = {}
         params['with-sample-info'] = with_sample_info
-        params['type'] = type_
-        params = self.urlencode(params)
-        url += "?"+ params
-        res = self.request(url, format=format_)
+        params['type'] = output
 
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        res = self.http_get(url, frmt=frmt, params=params)
+
+        if frmt == "json":
             res = res['values']
         return res
 
-    def get_targets_tf(self,ref,Id,format="json", ats="C_NAME",
+    def get_targets_tf(self,ref,Id,frmt="json", ats="C_NAME",
             include_unbound=False):
         """Retrieve putative target genes for a transcription factor
 
@@ -840,12 +791,12 @@ class GeneProf(RESTService):
 
         GeneProf's databases contain lots of information about putative
         gene regulatory interactions from a reanalyses of a large
-        collection of ChIP-seq experiments. 
-        
+        collection of ChIP-seq experiments.
+
         Give the name of the reference
         dataset the TF gene belongs to and its internal GeneProf gene ID -- use
         the :meth:`get_list_reference_datasets`, :meth:`get_gene_id` or
-        :meth:`search_genes` or :meth:`get_gene_id` methods to look up these 
+        :meth:`search_genes` or :meth:`get_gene_id` methods to look up these
         identifiers. The assignment of putative
         target genes to TFs has been done by calling enriched binding peaks on
         the aligned ChIP-seq reads using MACS and subsequently assigning the
@@ -854,7 +805,10 @@ class GeneProf(RESTService):
         1kb down-stream of the TSS; in an upcoming release of the web service,
         you will be able to redefine these threshold dynamically, so watch this
         space!). The GeneProf workflow modules corresponding to these two steps
-        are documented in `Find Peaks with MACS <http://www.geneprof.org/GeneProf/help_modules.jsp#module:org.stembio.geneprof.workflow.module.chipseq.MACS14withFDRFilter>`_ and `Map Regions to Genes  <http://www.geneprof.org/GeneProf/help_modules.jsp#module:org.stembio.geneprof.workflow.module.chipseq.MapRegionsToGenes>`_.
+        are documented in `Find Peaks with MACS
+        <http://www.geneprof.org/GeneProf/help_modules.jsp#module:org.stembio.geneprof.workflow.module.chipseq.MACS14withFDRFilter>`_
+        and `Map Regions to Genes
+        <http://www.geneprof.org/GeneProf/help_modules.jsp#module:org.stembio.geneprof.workflow.module.chipseq.MapRegionsToGenes>`_.
         Full details for the analysis pipeline that was used to calculate each
         value are available from the individual experiments the values come
         from (the JSON and XML output contain a link to the experiment of
@@ -867,7 +821,7 @@ class GeneProf(RESTService):
         :param str ref: identifier of a public GeneProf reference dataset.
             Check the list public references service for all available reference
             datasets.
-        :param str format: format requests, one of: json, txt, xml, rdata.
+        :param str frmt: format requests, one of: json, txt, xml, rdata.
         :param str ats: (default C_NAME)  A selection of column IDs (from the
             reference) to be included in the output.
         :param bool include_unbound: include not only putative target genes in
@@ -891,27 +845,21 @@ class GeneProf(RESTService):
 
         Get all the putative targets of the human TF MEIS1 as an RData file::
 
-            >>> g.get_targets_tf("human", "36958", format="rdata")
+            >>> g.get_targets_tf("human", "36958", frmt="rdata")
 
 
         """
-        format_ = self._check_format(format)
-        url = self.url + "/gene.info/regulation/binary/by.gene/%s/%s." % (ref, Id)
-        url += format_
+        frmt = self._check_format(frmt)
+        url =  "gene.info/regulation/binary/by.gene/%s/%s." % (ref, Id)
+        url += frmt
         params = {}
         params['ats'] = ats
         params['include-unbound'] = include_unbound
-        params = self.urlencode(params)
-        url += "?"+ params
 
-        res = self.request(url, format=format_)
-
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        res = self.http_get(url, frmt=frmt, params=params)
         return res
 
-    def get_targets_by_experiment_sample(self, ref, Id, format="json", 
+    def get_targets_by_experiment_sample(self, ref, Id, frmt="json",
         ats="C_NAME", include_unbound=False):
         """Get Targets by Experiment Sample
 
@@ -945,7 +893,7 @@ class GeneProf(RESTService):
         :param str ref: The identifier of a public GeneProf reference dataset.
             You may use aliases here. Check the list public references service
             for all available reference datasets.
-        :param str format: format requests, one of: json, txt, xml, rdata.
+        :param str frmt: format requests, one of: json, txt, xml, rdata.
         :param str ats: (default C_NAME)  A selection of column IDs (from the
             reference) to be included in the output.
         :param bool include_unbound: default False. Include not only putative
@@ -969,27 +917,20 @@ class GeneProf(RESTService):
 
         Get all the putative targets of the human TF MEIS1 as an RData file::
 
-            >>> g.get_targets_by_experiment_sample("human", "784", format="rdata")
+            >>> g.get_targets_by_experiment_sample("human", "784", frmt="rdata")
 
 
         """
-        format_ = self._check_format(format)
-        url = self.url + "/gene.info/regulation/binary/by.sample/%s/%s." % (ref, Id)
-        url += format_
+        frmt = self._check_format(frmt)
+        url = "gene.info/regulation/binary/by.sample/%s/%s." % (ref, Id)
+        url += frmt
         params = {}
         params['ats'] = ats
         params['include-unbound'] = include_unbound
-        params = self.urlencode(params)
-        url += "?"+ params
-
-        res = self.request(url, format=format_)
-
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        res = self.http_get(url, frmt=frmt, params=params)
         return res
 
-    def get_tfas_by_gene(self, ref, Id, format="json", ats="C_NAME",
+    def get_tfas_by_gene(self, ref, Id, frmt="json", ats="C_NAME",
             include_unbound=False):
         """Get TFAS of a Transcription Factor
 
@@ -1029,7 +970,7 @@ class GeneProf(RESTService):
         :param str Ref: The identifier of a public GeneProf reference dataset.
             You may use aliases here. Check the list public references service
             for all available reference datasets.
-        :param str format: format requests, one of: json, txt, xml, rdata.
+        :param str frmt: format requests, one of: json, txt, xml, rdata.
         :param str ats: (default C_NAME) a selection of column IDs (from
             the reference) to be included in the output.
 
@@ -1040,44 +981,35 @@ class GeneProf(RESTService):
         Get all TFAS scores for the human TF MEIS1 in XML format, also include
         unbound genes for comparison:
 
-            >>> g.get_tfas_by_gene("human", "36958", format="xml",
+            >>> g.get_tfas_by_gene("human", "36958", frmt="xml",
                     include_unbound=True)
 
         Get all TFAS scores the mouse TF Nanog as tab-delimited text and include
         a column for gene name and Ensembl ID (there are TWO ChIP-seq datasets
         available for this TF!):
 
-            >>> g.get_tfas_by_gene("mouse", "14899", format="txt",
+            >>> g.get_tfas_by_gene("mouse", "14899", frmt="txt",
                     ats="C_NAME,C_ENSG")
 
         Get all TFAS scores for the human TF MEIS1 as an RData file:
 
-            >>> g.get_tfas_by_gene("human", "36958", format="rdata")
-
-
+            >>> g.get_tfas_by_gene("human", "36958", frmt="rdata")
 
         """
-        format_ = self._check_format(format)
-        url = self.url + "/gene.info/regulation/tfas/by.gene/%s/%s." % (ref, Id)
-        url += format_
+        frmt = self._check_format(frmt)
+        url = "gene.info/regulation/tfas/by.gene/%s/%s." % (ref, Id)
+        url += frmt
         params = {}
         params['ats'] = ats
         params['include-unbound'] = include_unbound
-        params = self.urlencode(params)
-        url += "?"+ params
-
-        res = self.request(url, format=format_)
-
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        res = self.http_get(url, frmt=frmt, params=params)
         return res
 
-    def get_tfas_by_sample(self, ref, Id, format="json", ats="C_NAME",
+    def get_tfas_by_sample(self, ref, Id, frmt="json", ats="C_NAME",
             include_unbound=False):
         """Get TFAS by Experiment Sample
 
-        Retrieve a list of TFAS scores for a transcription factor (TF) or 
+        Retrieve a list of TFAS scores for a transcription factor (TF) or
         other DNA-binding protein, by giving the identifier of a public GeneProf
         sample -- use the list public samples or the :meth:`search_samples`
         to look up these identifiers. TFAS (transcription factor association
@@ -1099,7 +1031,7 @@ class GeneProf(RESTService):
         :param str ref: identifier of a public GeneProf reference dataset.
             You may use aliases here. Check the list public references service
             for all available reference datasets.
-        :param str format: format requests, one of: json, txt, xml, rdata.
+        :param str frmt: format requests, one of: json, txt, xml, rdata.
         :param str ats: (default C_NAME) a selection of column IDs (from the
             reference) to be included in the output.
 
@@ -1110,13 +1042,13 @@ class GeneProf(RESTService):
         Get TFAS scores for the human TF MEIS1 in XML format, also include
         unbound genes for comparison:
 
-            >>> g.get_tfas_by_sample("human", "784", format="xml",
+            >>> g.get_tfas_by_sample("human", "784", frmt="xml",
                     >>> include_unbound=True)
 
         Get TFAS scores for the mouse TF Smad1 as tab-delimited text and include
         a column for gene name and Ensembl ID:
 
-            >>> g.get_tfas_by_sample("mouse", "541", format="txt",
+            >>> g.get_tfas_by_sample("mouse", "541", frmt="txt",
                 ats="C_NAME,C_ENSG")
 
         Get TFAS scores for the human TF MEIS1 as an RData file:
@@ -1124,24 +1056,16 @@ class GeneProf(RESTService):
             >>> g.get_tfas_by_sample("human", "784")
 
         """
-        format_ = self._check_format(format)
-        url = self.url + "/gene.info/regulation/tfas/by.sample/%s/%s." % (ref, Id)
-        url += format_
+        frmt = self._check_format(frmt)
+        url = "gene.info/regulation/tfas/by.sample/%s/%s." % (ref, Id)
+        url += frmt
         params = {}
         params['ats'] = ats
         params['include-unbound'] = include_unbound
-        params = self.urlencode(params)
-        url += "?"+ params
-
-        res = self.request(url, format=format_)
-
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        res = self.http_get(url, frmt=frmt, params=params)
         return res
 
-
-    def get_tf_by_target_gene(self, ref, Id, format="json", ats="C_NAME",
+    def get_tf_by_target_gene(self, ref, Id, frmt="json", ats="C_NAME",
             with_sample_info=False):
         """Get Transcription Factors by Target Gene
 
@@ -1156,7 +1080,7 @@ class GeneProf(RESTService):
         be regulating a gene of interest, by giving the name of the reference
         dataset the gene belongs to and its internal GeneProf gene ID -- use the
         :meth:`get_list_reference_datasets`, :meth:`get_gene_id` or
-        :meth:`search_genes` to look up these identifiers. The assignment 
+        :meth:`search_genes` to look up these identifiers. The assignment
         of putative target genes to
         TFs has been done by calling enriched binding peaks on the aligned
         ChIP-seq reads using MACS and subsequently assigning the peaks to target
@@ -1175,8 +1099,8 @@ class GeneProf(RESTService):
         :param str ref: The identifier of a public GeneProf reference dataset.
             see :meth:`get_list_reference_datasets` and :attr:`valid_species`
             for list of public references.
-        :param bool format: format requests, one of: json, txt, xml, rdata.
-        :param bool with_sample_info: default false. Include additional 
+        :param bool frmt: format requests, one of: json, txt, xml, rdata.
+        :param bool with_sample_info: default false. Include additional
             annotations about the  tissue, cell type, etc. of the expression
             values.
 
@@ -1188,49 +1112,42 @@ class GeneProf(RESTService):
         Get information about factors putatively targeting gene #715 in
         XML format, including additional annotation data::
 
-            >>> g.get_tf_by_target_gene("mouse", "715", format="xml",
+            >>> g.get_tf_by_target_gene("mouse", "715", frmt="xml",
                     with_sample_info=True)
 
         Get information about factors putatively targeting gene #715
         as a tab-delimited text file::
 
-            >>> g.get_tf_by_target_gene("mouse", "715", format="txt")
+            >>> g.get_tf_by_target_gene("mouse", "715", frmt="txt")
 
         Get information about factors putatively targeting gene
         715 as an RData file, including additional annotation
         data::
 
-            >>> g.get_tf_by_target_gene("mouse", "715", format="rdata",
+            >>> g.get_tf_by_target_gene("mouse", "715", frmt="rdata",
                     with_sample_info=True)
 
         """
-        format_ = self._check_format(format)
-        url = self.url + "/gene.info/regulation/binary/by.target/%s/%s." % (ref, Id)
-        url += format_
+        frmt = self._check_format(frmt)
+        url = "gene.info/regulation/binary/by.target/%s/%s." % (ref, Id)
+        url += frmt
         params = {}
         params['with-sample-info'] = with_sample_info
-        params = self.urlencode(params)
-        url += "?"+ params
-
-        res = self.request(url, format=format_)
-
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        res = self.http_get(url, frmt=frmt, params=params)
         return res
 
-    def get_tfas_scores_by_target(self, ref, Id, format="json",
+    def get_tfas_scores_by_target(self, ref, Id, frmt="json",
             with_sample_info=False):
         """Get TFAS Scores by Target Gene
 
-        Rerieve a list of Transcription Factor Association Strength scores 
+        Rerieve a list of Transcription Factor Association Strength scores
         quantitating  the association between transcription factors
         (TFs) and other DNA-binding proteins and a gene of interest, by giving
         the name of the reference dataset the gene belongs to and its internal
-        GeneProf gene ID -- use the :meth:`get_list_reference_datasets`, 
+        GeneProf gene ID -- use the :meth:`get_list_reference_datasets`,
         :meth:`get_gene_id`, :meth:`search_genes` to look up these identifiers.
 
-        TFAS scores are continuous values that give an indication of how 
+        TFAS scores are continuous values that give an indication of how
         strongly a transcription factor (or other
         DNA-binding protein) is associated with a target gene. The TFAS is
         calculated as a function of the intensity and the distance of all
@@ -1239,9 +1156,9 @@ class GeneProf(RESTService):
         intensity score the fold-change enrichment of the ChIP-seq signal over
         the control background as calculated by MACS in conjunction with calling
         peaks for the input ChIP-seq data. The GeneProf workflow modules
-        corresponding to these two steps are documented here: 
+        corresponding to these two steps are documented here:
         `Find Peaks with MACS <http://www.geneprof.org/GeneProf/help_modules.jsp#module:org.stembio.geneprof.workflow.module.chipseq.MACS14withFDRFilter>`_ and `Calculate TFAS <http://www.geneprof.org/GeneProf/help_modules.jsp#module:org.stembio.geneprof.workflow.module.chipseq.TranscriptionFactorAssociationStrength>`_
-            
+
         Full details for the analysis pipeline that was  used to calculate each
         value are available from the individual experiments the values come from
         (the JSON and XML output contain a link to the experiment of origin).
@@ -1250,7 +1167,7 @@ class GeneProf(RESTService):
         :param str ref:   The identifier of a public GeneProf reference
             dataset. You may use aliases here. Check the list public references
             service for all available reference datasets.
-        :param str format: format requests, one of: json, txt, xml, rdata.
+        :param str frmt: format requests, one of: json, txt, xml, rdata.
         :param bool with-sample-info: (default false) Include additional
             annotations about the tissue, cell type, etc. of the expression values.
 
@@ -1267,27 +1184,20 @@ class GeneProf(RESTService):
 
         Get TFAS scores to gene #715 as a tab-delimited text file::
 
-            >>> g.get_tfas_scores_by_target("mouse", 715, format="txt")
+            >>> g.get_tfas_scores_by_target("mouse", 715, frmt="txt")
 
         Get TFAS scores to gene #715 as an RData file, including additional
         annotation data::
 
-            >>> g.get_tfas_scores_by_target("mouse", "715", format="rdata",
+            >>> g.get_tfas_scores_by_target("mouse", "715", frmt="rdata",
                 with_sample_info=True)
         """
-        format_ = self._check_format(format)
-        url = self.url + "/gene.info/regulation/tfas/by.target/%s/%s." % (ref, Id)
-        url += format_
+        frmt = self._check_format(frmt)
+        url = "gene.info/regulation/tfas/by.target/%s/%s." % (ref, Id)
+        url += frmt
         params = {}
         params['with-sample-info'] = with_sample_info
-        params = self.urlencode(params)
-        url += "?"+ params
-
-        res = self.request(url, format=format_)
-
-        if format_ == "json":
-            # TODO: special characters to be removed.
-            res = json.loads(res.replace("\\", ""))
+        res = self.http_get(url, frmt=frmt, params=params)
         return res
 
     def get_metadata_usr(self):
@@ -1297,7 +1207,7 @@ class GeneProf(RESTService):
         """
         raise NotImplementedError
 
-    def get_data(self, Id, format=None, sep="\t", gz=False, ats=None, key=None):
+    def get_data(self, Id, frmt=None, sep="\t", gz=False, ats=None, key=None):
         """Retrieves data as Plain Text Files (TXT)
 
         Retrieve data from a GeneProf dataset as plain
@@ -1322,22 +1232,21 @@ class GeneProf(RESTService):
         Retrieve data from all visible columns of the dataset gpDS_11_119_18_1
         (example RNA-seq data):
 
-            >>> g.get_data("11_119_18_1", format="txt", gz=True)
+            >>> g.get_data("11_119_18_1", frmt="txt", gz=True)
 
         Retrieve only the Ensembl Gene IDs and RPKM values from the same
         dataset:
 
-            >>> g.get_data("11_119_18_1", format="txt", gz=True,
+            >>> g.get_data("11_119_18_1", frmt="txt", gz=True,
                     ats="C_ENSG,C_11_119_16_1_RPKM0,C_11_119_16_1_RPKM1,C_11_119_16_1_RPKM2,C_11_119_16_1_RPKM3")
 
         """
-        format_ = format
-        if format_ not in ["txt", "xls", "xml", "rdata"]:
-            raise ValueError("format must be txt,xls,xml,rdata")
-        url = self.url + "/data/%s." % (Id)
-        url += format_
+        frmt = frmt
+        if frmt not in ["txt", "xls", "xml", "rdata"]:
+            raise ValueError("frmt must be txt,xls,xml,rdata")
+        url = "data/%s." % (Id) + frmt
         if gz:
-            if format_ == "rdata":
+            if frmt == "rdata":
                 raise ValueError("rdata and gz cannot be combined.")
             url += ".gz"
         params = {}
@@ -1347,13 +1256,10 @@ class GeneProf(RESTService):
             params['key'] = key
         if sep!="\t":
             params['sep'] = sep
-        if len(params):
-            params = self.urlencode(params)
-            url += "?" + params
-        res = self.request(url, format=format_)
+        res = self.http_get(url, frmt=frmt, params=params)
         return res
 
-    def get_chromosome_names(self, Id, format="json", key=None):
+    def get_chromosome_names(self, Id, frmt="json", key=None):
         """Get Chromosome Names
 
         Retrieve the IDs and names of all chromosomes in a genomic dataset. This
@@ -1366,8 +1272,8 @@ class GeneProf(RESTService):
         but 'chrM' in the UCSC databases. The data as :meth:`get_bed_files`
         or as `WIG <get_wig_files>`_ might therefore require you to rename
         the experiments in the
-        output, before using them with other applications. 
-        
+        output, before using them with other applications.
+
         :param str Id: The identifier of the dataset of interest. Either the
             entire accession ID (e.g. gpDS_11_385_44_1) or just the
             dataset-specific part (e.g. 11_385_44_1).
@@ -1376,7 +1282,7 @@ class GeneProf(RESTService):
         Get all chromosomes for the mouse reference dataset in plain text
         format::
 
-            >>> g.get_chromosome_names("pub_mm_ens58_ncbim37", format="txt")
+            >>> g.get_chromosome_names("pub_mm_ens58_ncbim37", frmt="txt")
 
         Get all chromosomes for the human reference dataset in JSON format::
 
@@ -1385,42 +1291,36 @@ class GeneProf(RESTService):
         Get the chromosome names from the ChIP-seq peaks dataset gpDS_11_3_7_2
         in  XML format::
 
-            >>> g.get_chromosome_names("11_3_7_2", format="xml")
+            >>> g.get_chromosome_names("11_3_7_2", frmt="xml")
 
         """
-        format_ = self._check_format(format)
-
-        url = self.url + "/data/chromosome.names/%s." % (Id)
-        url += format_
-
+        frmt = self._check_format(frmt)
+        url = "data/chromosome.names/%s." % (Id) + frmt
         params = {}
         if key:
             params['key'] = key
-            params = self.urlencode(params)
-            url += "?" + params
-        res = self.request(url, format=format_)
+        res = self.http_get(url, frmt=frmt, params=params)
         return res
-
 
     def get_bed_files(self, Id, chromosome=None, key=None, filter_column=None,
             with_track_description=True, only_distinct=False):
         """Retrieve Genomic Data as compressed BED Files (gzipped)
 
-        Retrieves genomic data as `BED <http://genome.ucsc.edu/FAQ/FAQformat.html#format1>`_  
+        Retrieves genomic data as `BED <http://genome.ucsc.edu/FAQ/FAQformat.html#format1>`_
         files in compressed gzipped format. It works only for datasets with type
         GENOMIC_REGIONS  i.e. those containing genomic data! The dataset of
         interest is identified by its GeneProf accession ID (something of the
         form  gpDS_XXX_XXX_XXX_X). You can get a list of datasets belonging to a
         certain experiment of interest using the metadata for an experiment
-        service :meth:`get_metadata_experiment`, or you can use the search 
-        datasets service to query datasets globally. The maximum size of 
+        service :meth:`get_metadata_experiment`, or you can use the search
+        datasets service to query datasets globally. The maximum size of
         datasets retrieved without an
-        API key is restricted to 10,000,000 entries. 
-        
+        API key is restricted to 10,000,000 entries.
+
         .. note:: chromosomes in the output BED can be
             dynamically renamed in order to make the names compatible with other
-            applications (that's because, unfortunately, not all genome 
-            databases use the same names, see also the 
+            applications (that's because, unfortunately, not all genome
+            databases use the same names, see also the
             :meth:`get_chromosome_names` method).
 
         :param str Id: The identifier of the dataset of interest. Either
@@ -1466,9 +1366,9 @@ class GeneProf(RESTService):
                     filter_column="C_11_12_125_2_14_TFBS")
 
         """
-        url = self.url + "/data/"
+        url =  "data/"
         if chromosome:
-            self.url + chromosome + "/"
+            url += chromosome + "/"
         url += "%s.bed.gz" % (Id)
 
         params = {}
@@ -1480,9 +1380,7 @@ class GeneProf(RESTService):
             params['only-distinct'] = only_distinct
         if key:
             params['key'] = key
-            params = self.urlencode(params)
-            url += "?" + params
-        res = self.request(url, format="txt")
+        res = self.http_get(url, frmt="txt", params=params)
         return res
 
     def get_wig_files(self, Id, chromosome=None, key=None, frag_length=-1,
@@ -1499,7 +1397,7 @@ class GeneProf(RESTService):
         :meth:`search_datasets` method to query datasets globally. The maximum
         size of datasets retrieved without an API key is restricted to
         10,000,000 entries. With an API key, the maximum size is unlimited.
-        
+
         .. note:: chromosomes in the output BED can be
             dynamically renamed in order to make the names compatible with other
             applications (because not all genome databases
@@ -1541,9 +1439,9 @@ class GeneProf(RESTService):
             >>> g.get_wig_files("11_12_112_2", with_track_description=False,
                 only_distinct=True, frag_length=200)
         """
-        url = self.url + "/data/"
+        url = "data/"
         if chromosome:
-            self.url + chromosome + "/"
+            url += chromosome + "/"
         url += "%s.wig.gz" % (Id)
 
         params = {}
@@ -1557,11 +1455,8 @@ class GeneProf(RESTService):
             params['only-distinct'] = only_distinct
         if key:
             params['key'] = key
-            params = self.urlencode(params)
-            url += "?" + params
-        res = self.request(url, format="txt")
+        res = self.http_get(url, frmt="txt", params=params)
         return res
-
 
     def get_fasta(self, Id, key=None):
         """Sequence Data as FASTA Files (FASTA, gzipped)
@@ -1588,13 +1483,11 @@ class GeneProf(RESTService):
             >>> g.get_fasta("11_385_6_1")
 
         """
-        url = self.url + "/data/%s.fasta.gz" % (Id)
+        url = "data/%s.fasta.gz" % (Id)
         params = {}
         if key:
             params['key'] = key
-            params = self.urlencode(params)
-            url += "?" + params
-        res = self.request(url)
+        res = self.http_get(url, frmt=None, params=params)
         return res
 
     def get_fastq(self, Id, key=None):
@@ -1608,11 +1501,8 @@ class GeneProf(RESTService):
 
         """
         url = self.url + "/data/%s.fastq.gz" % (Id)
-        params = {}
-        if key:
-            params['key'] = key
-            params = self.urlencode(params)
-            url += "?" + params
-        res = self.request(url)
+        params = {'key':key}
+        res = self.http_get(url, None, params=params)
+
         return res
 

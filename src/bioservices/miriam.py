@@ -508,7 +508,10 @@ class Miriam(WSDLService):
             >>> m.serv.getURIs(["UniProt", "GO"], ["P62158", "GO:0045202"])
             ['urn:miriam:uniprot:P62158', 'urn:miriam:obo.go:GO%3A0045202']
 
+        .. todo:: : chracter is not encoded correclty
         """
+        names = self.devtools.transform_into_list(names)
+        Ids = self.devtools.transform_into_list(Ids)
         res = self.serv.getURIs(names, Ids)
         return res
 

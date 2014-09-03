@@ -21,7 +21,7 @@ __all__ = ["get_bioservices_env", "defaultParams", "BioServicesConfig"]
 # second item if a type or TUPLE of types possible
 # third item is documentation
 defaultParams = {
-    'general.timeout': [3, (int,float), ""],
+    'general.timeout': [10, (int,float), ""],
     'general.max_retries': [3, int, ''],
     'general.async_concurrent' : [50, int, ''], 
     'general.async_threshold': [10 , int, 'when to switch to asynchronous requests'],
@@ -274,21 +274,30 @@ class BioServicesConfig(ConfigReadOnly):
     def _get_caching(self):
         return self.params['cache.on'][0]
     CACHING = property(_get_caching)
+
     def _get_fast_save(self):
         return self.params['cache.fast'][0]
     FAST_CACHE = property(_get_fast_save)
+
     def _get_async_concurrent(self):
         return self.params['general.async_concurrent'][0]
     CONCURRENT = property(_get_async_concurrent)
+
     def _get_async_threshold(self):
         return self.params['general.async_threshold'][0]
     ASYNC_THRESHOLD = property(_get_async_threshold)
+
     def _get_timeout(self):
         return self.params['general.timeout'][0]
-    TIMEOUT = property(_get_timeout)
+    def _set_timeout(self, timeout):
+        self.params['general.timeout'][0] = timeout
+    TIMEOUT = property(_get_timeout, _set_timeout)
+
     def _get_max_retries(self):
         return self.params['general.max_retries'][0]
-    MAX_RETRIES = property(_get_max_retries)
+    def _set_max_retries(self, max_retries):
+        self.params['general.max_retries'][0] = max_retries
+    MAX_RETRIES = property(_get_max_retries, _set_max_retries)
 
 
 

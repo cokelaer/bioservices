@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
+# $Id$
 """Interface to some part of the UniProt web service
 
 .. topic:: What is UniProt ?
@@ -55,7 +55,7 @@ __all__ = ["UniProt"]
 
 
 # TODO:: falt files to get list of identifiers
-# http://www.ebi.ac.uk/uniprot/database/download.html 
+# http://www.ebi.ac.uk/uniprot/database/download.html
 # grep sp uniprot_sprot.fasta  | grep HUMAN | awk '{print substr($1, 12, length($1))}'
 
 mapping = {"UniProtKB AC/ID":"ACC+ID",
@@ -156,14 +156,12 @@ mapping = {"UniProtKB AC/ID":"ACC+ID",
     "ChiTaRS": "CHITARS_ID",
     "DrugBank": "DRUGBANK_ID",
     "GenomeRNAi": "GENOMERNAI_ID",
-    "NextBio": "NEXTBIO_ID"
-}
+    "NextBio": "NEXTBIO_ID"}
 
-def _precision(x,digit=2):
-    x = int(x*pow(10,digit))
-    x/=pow(10.,digit)
+def _precision(x, digit=2):
+    x = int(x*pow(10, digit))
+    x /= pow(10., digit)
     return x
-
 
 
 class UniProt(REST):
@@ -249,7 +247,7 @@ class UniProt(REST):
 
         if isinstance(query, list):
             query = " ".join(query)
-        params = {'from':fr, 'to':to, 'format': "tab", 'query':query}
+        params = {'from':fr, 'to':to, 'format':"tab", 'query':query}
         result = self.http_get(url, frmt="tab", params=params)
 
         # changes in version 1.1.1 returns a dictionary instead of list
@@ -286,12 +284,12 @@ class UniProt(REST):
         you were to call :math:`mapping` yourself several times.
 
         """
-        if isinstance(query, list)==False:
+        if isinstance(query, list) is False:
             query = [query]
 
         unique_entry_names = list(set(query))
 
-        if len(unique_entry_names)>Nmax:
+        if len(unique_entry_names) > Nmax:
             unique_entry_names = list(unique_entry_names)
             self.logging.info("There are more than %s unique species. Using multi stage uniprot mapping" % Nmax)
             mapping = {}
@@ -307,7 +305,7 @@ class UniProt(REST):
                     i2 = len(unique_entry_names)
                 query=",".join(unique_entry_names[i1:i2])
                 this_mapping = self.mapping(fr=fr, to=to, query=query)
-                for k,v in this_mapping.iteritems():
+                for k,v in this_mapping.items():
                     mapping[k] = v
                 self.logging.info(str(_precision((i+1.)/N*100.,2)) + "%% completed")
         else:
@@ -422,7 +420,7 @@ class UniProt(REST):
         """
         params = {}
 
-        if frmt!=None:
+        if frmt != None:
             _valid_formats = ['tab', 'xls', 'fasta', 'gff', 'txt', 'xml', 'rss', 'list', 'rss', 'html']
             self.checkParam(frmt, _valid_formats)
             params['format'] = frmt
@@ -467,7 +465,7 @@ class UniProt(REST):
         params['query'] = query.replace("+", " ")
         #res = s.request("/uniprot/?query=zap70+AND+organism:9606&format=xml", params)
         print(params)
-        res = self.http_get("uniprot/", frmt="txt", params=params) 
+        res = self.http_get("uniprot/", frmt="txt", params=params)
         return res
 
     def quick_search(self, query, include=False,sort="score", limit=None):
@@ -499,8 +497,13 @@ class UniProt(REST):
         >>> df.Size
 
         """
+        try:
+            import pandas as pd
+        except:
+            print("uniref method requires Pandas")
+            return
         res = self.http_get("uniref/", params={"query":query, 'format':'tab'}, frmt="txt")
-        res = pd.read_csv(io.StringIO(res.strip()), sep="\t")
+        res = pd.read_csv(io.StringIO(unicode(res.strip())), sep="\t")
         return res
 
     def get_df(self, entries, nChunk=100, organism=None):
@@ -542,7 +545,7 @@ class UniProt(REST):
             if len(res)==0:
                  self.logging.warning("some entries %s not found" % entries)
             else:
-                df = pd.read_csv(io.StringIO(res), sep="\t")
+                df = pd.read_csv(io.StringIO(unicode(res)), sep="\t")
                 if isinstance(output, types.NoneType):
                     output = df.copy()
                 else:
@@ -568,5 +571,4 @@ class UniProt(REST):
         output.Sequence = output['Sequence'].apply(lambda x: x.replace(" ",""))
 
         return output
-
 

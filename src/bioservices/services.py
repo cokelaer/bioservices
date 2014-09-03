@@ -123,27 +123,26 @@ class Service(Logging):
             if self.url != None:
                 urlopen(self.url)
         except Exception as err:
-            self.logging.critical("The URL (%s) provided cannot be reached" % self.url)
-            print(err)
-        #self.url = url
+            self.logging.warning("The URL (%s) provided cannot be reached." % self.url)
         self.name = name
         self._easyXMLConversion = True
 
         # used by HGNC where some XML contains non-utf-8 characters !!
         self._fixing_unicode = False
         self._fixing_encoding = "utf-8"
-        self._timeout = 1000
+
+        # will be removed once WSDLService is removed.
         self.trials = 5
         self.timesleep = 1
 
         self.devtools = DevTools()
 
-    def _set_timeout(self, timeout):
-        self._timeout = timeout
-        socket.setdefaulttimeout(float(timeout))
-    def _get_timeout(self):
-        return self._timeout
-    timeout = property(_get_timeout, _set_timeout)
+    #def _set_timeout(self, timeout):
+    #    self._timeout = timeout
+    #    socket.setdefaulttimeout(float(timeout))
+    #def _get_timeout(self):
+    #    return self._timeout
+    #timeout = property(_get_timeout, _set_timeout)
 
     def _get_url(self):
         return self._url
@@ -243,10 +242,28 @@ easyXML object (Default behaviour).""")
         import webbrowser
         webbrowser.open(url + str(Id))
 
+    def on_web(self, url):
+        self.onWeb(url)
     def onWeb(self, url):
         """Open a URL into a browser"""
         import webbrowser
         webbrowser.open(url)
+
+    def save_str_to_image(self, data, filename):
+        """Save string object into a file converting into binary"""
+        with open(filename,'wb') as f:
+            import binascii
+            try:
+                #python3
+                 newres = binascii.a2b_base64(bytes(data, "utf-8"))
+
+                 # for reacotme:
+
+
+            except:
+                newres = binascii.a2b_base64(data)
+            f.write(newres)
+
 
 
 class WSDLService(Service):
@@ -392,10 +409,6 @@ class RESTService(RESTbase):
         .. note:: you can set the timeout of the connection, which is 1000
             seconds by default by changing the :attr:`timeout`.
         """
-        #level = self.debugLevel
-        #self.debugLevel="ERROR"
-
-        #try:
         for i in range(0, self.trials):
             res = self._get_request(path, format=format, baseUrl=baseUrl)
             if res != None:
@@ -405,10 +418,6 @@ class RESTService(RESTbase):
             if i!=self.trials-1:
                 print("Trying again trial {}/{}".format(i+1, self.trials))
             time.sleep(self.timesleep)
-        #except Exception:
-        #    self.debugLevel = level
-        # get back the parameters
-        #self.debugLevel = level
         return res
 
     def http_get(self, path, format="xml", baseUrl=True):
@@ -725,7 +734,9 @@ class REST(RESTbase):
                 pass
             return res
         except Exception as err:
-            print(err.message)
+            print(err)
+            print("Your current timeout is {0}. Consider increasing it with"\
+                    "settings.TIMEOUT attribute".format(self.settings.TIMEOUT))
 
 
     #def _post_one(self, url, async, frmt, data=None):
@@ -775,7 +786,7 @@ class REST(RESTbase):
             except:
                 return res
         except Exception as err:
-            print(err.message)
+            print(err)
             return None
 
     def getUserAgent(self):

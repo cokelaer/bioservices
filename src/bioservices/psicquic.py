@@ -161,7 +161,7 @@ class PSICQUIC(REST):
         >>> len(res) # there are 11 interactions found
         11
         >>> for x in res[1]: 
-        ...     print x
+        ...     print(x)
         uniprotkb:O95169
         uniprotkb:P43403
         intact:EBI-716238
@@ -598,8 +598,8 @@ class PSICQUIC(REST):
         countB = len([x for x in idsB if x.startswith("?")])
         if countA+countB > 0:
             self.logging.warning("%s ids out of %s were not identified" % (countA+countB, len(idsA)*2))
-            print (set([x.split(":")[0] for x in idsA if x.startswith("?")]))
-            print (set([x.split(":")[0] for x in idsB if x.startswith("?")]))
+            print(set([x.split(":")[0] for x in idsA if x.startswith("?")]))
+            print(set([x.split(":")[0] for x in idsB if x.startswith("?")]))
         self.logging.info("knownName done")
         return idsA, idsB
 
@@ -836,7 +836,7 @@ class AppsPPI(object):
             p.summary()
 
         """
-        for k,v in self.interactions.iteritems():
+        for k,v in self.interactions.items():
             print("Found %s interactions within %s database" % (len(v), k))
 
         counter = {}
