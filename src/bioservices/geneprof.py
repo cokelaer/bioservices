@@ -131,7 +131,7 @@ class GeneProf(REST):
 
     # just a get/set to the default extension
     def _set_default_ext(self, ext):
-        self.checkParam(ext, ["json","xml", "txt", "rdata"])
+        self.devtools.check_param_in_list(ext, ["json","xml", "txt", "rdata"])
         self._default_extension = ext
     def _get_default_ext(self):
         return self._default_extension
@@ -220,7 +220,7 @@ class GeneProf(REST):
     def _check_format(self, frmt):
         if frmt == None:
             frmt_ = self.default_extension
-        self.checkParam(frmt, self._valid_format)
+        self.devtools.check_param_in_list(frmt, self._valid_format)
         return frmt
 
     def _check_id(self, Id):
@@ -763,7 +763,7 @@ class GeneProf(REST):
 
         """
         frmt = self._check_format(frmt)
-        self.checkParam(type_, ["RAW", "RPM", "RPKM"])
+        self.devtools.check_param_in_list(output, ["RAW", "RPM", "RPKM"])
 
         url = "gene.info/expression/%s/%s." % (ref, Id)
         url += frmt
@@ -775,8 +775,8 @@ class GeneProf(REST):
 
         res = self.http_get(url, frmt=frmt, params=params)
 
-        if frmt == "json":
-            res = res['values']
+        #if frmt == "json":
+        #    res = res['values']
         return res
 
     def get_targets_tf(self,ref,Id,frmt="json", ats="C_NAME",
