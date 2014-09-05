@@ -328,7 +328,7 @@ class UniProt(REST):
 
         """
         _valid_formats = ['txt', 'xml', 'rdf', 'gff', 'fasta']
-        self.checkParam(frmt, _valid_formats)
+        self.devtools.check_param_in_list(frmt, _valid_formats)
         url = "uniprot/" + uniprot_id + '.' + frmt
         res = self.http_get(url, frmt=frmt)
         if frmt=="xml":
@@ -422,11 +422,11 @@ class UniProt(REST):
 
         if frmt != None:
             _valid_formats = ['tab', 'xls', 'fasta', 'gff', 'txt', 'xml', 'rss', 'list', 'rss', 'html']
-            self.checkParam(frmt, _valid_formats)
+            self.devtools.check_param_in_list(frmt, _valid_formats)
             params['format'] = frmt
 
         if columns!=None:
-            self.checkParam(frmt, ["tab","xls"])
+            self.devtools.check_param_in_list(frmt, ["tab","xls"])
 
             # remove unneeded spaces before/after commas if any
             if "," in columns:
@@ -438,7 +438,7 @@ class UniProt(REST):
                 if col.startswith("database(") == True:
                     pass
                 else:
-                    self.checkParam(col, self._valid_columns)
+                    self.devtools.check_param_in_list(col, self._valid_columns)
 
             # convert back to a string as expected by uniprot
             params['columns'] = ",".join([x.strip() for x in columns])
@@ -450,7 +450,7 @@ class UniProt(REST):
             params['compress'] = 'yes'
 
         if sort:
-            self.checkParam(sort, ["score"])
+            self.devtools.check_param_in_list(sort, ["score"])
             params['sort'] = sort
 
         if offset != None:
