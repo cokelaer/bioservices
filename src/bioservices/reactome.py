@@ -19,13 +19,11 @@
 #$Id$
 """Interface to the Reactome webs services
 
-:STATUS: in progress/draft don't use !
-
 .. topic:: What is Reactome?
 
     :URL: http://www.reactome.org/ReactomeGWT/entrypoint.html
     :Citation: http://www.reactome.org/citation.html
-    :WSDL: http://www.reactome.org:8080/caBIOWebApp/services/caBIOService?wsdl
+    :REST: http://reactomews.oicr.on.ca:8080/ReactomeRESTfulAPI/RESTfulWS
 
     .. highlights::
 
@@ -46,26 +44,61 @@ import webbrowser
 import copy
 
 
-# for reactome, content-type could be 
+# for reactome, content-type could be
 #  "Content-Type", "multipart/form-data; boundary=" +    boundary);
 
 class Reactome(REST):
+    """Reactome interface
+
+    some data can be download on the main `website <http://www.reactome.org/pages/download-data/>`_
+    """
 
     _url = "http://reactomews.oicr.on.ca:8080/ReactomeRESTfulAPI/RESTfulWS"
+
     def __init__(self, verbose=True, cache=False):
         super(Reactome, self).__init__("Reactome(URL)",url=Reactome._url,
             verbose=verbose, cache=False)
         self.logging.warning("Class in development. Some methods are already  working but those required POST do not. Coming soon ")
 
-    def biopax_exporter(self, identifier, level=2):
-        """Get BioPAX
+        # for buffering
+        self._list_pathways = None
 
-        Pass an Event database identifier, and get the BioPAX exported in either XML
-        or JSON. The passed Id has to be an Event Id. If there is no matching ID in
+    def _download_list_pathways(self):
+        if self._list_pathways is None:
+            res =  self.session.get("http://www.reactome.org/download/current/ReactomePathways.txt")
+            if res.status_code == 200:
+                res = res.content
+                res = res.strip()
+                self._list_pathways = [x.split("\t") for x in res.split("\n")]
+            else:
+                self.logging.error("could not fetch the pathways")
+        return self._list_pathways
+
+    def get_list_pathways(self):
+        """Return list of pathways from reactome website
+
+        :return: list of lists. Each sub-lis contains 3 items: reactome pathway
+            identifier, description and species
+
+        """
+        res = self._download_list_pathways()
+        return res
+
+    def get_species(self):
+        """Return list of species from all pathways"""
+        res = self._download_list_pathways()
+        res = set([x[2] for x in self.get_list_pathways()])
+        return res
+
+
+    def biopax_exporter(self, identifier, level=2):
+        """Get BioPAX file
+
+        The passed identifier has to be a valid event identifier. If there is no matching ID in
         the database, it will return an empty string.
 
         :param int level: BioPAX level: one of two values: 2 or 3
-        :param int identfir: event database identifier
+        :param int identfier: event database identifier
         :return: BioPAX RDF document
 
 
@@ -78,7 +111,6 @@ class Reactome(REST):
         res = self.http_get("biopaxExporter/Level{0}/{1}".format(level, identifier),
                 frmt=None)
         return res
-
 
     def front_page_items(self, species):
         """Get list of front page items listed in the Reactome Pathway Browser
@@ -96,7 +128,7 @@ class Reactome(REST):
             >>> print(res[0]['name'])
             ['Apoptosis']
 
-        .. seealso::   `Pathway Browser <http://www.reactome.org/PathwayBrowser/`_
+        .. seealso:: `Pathway Browser <http://www.reactome.org/PathwayBrowser/>`_
         """
         species = species.replace("+", " ")
         res = self.http_get("frontPageItems/{0}".format(species),
@@ -111,46 +143,55 @@ class Reactome(REST):
         :param int frmt: PNG or PDF
         :return:  This  method should be used after method queryHitPathways.
 
+        ::
+
+            res = s.http_post("highlightPathwayDiagram/68875/PNG", frmt="txt",
+                data="CDC2")
+            with open("test.png", 'wb') as f:
+                f.write(res.decode("base64"))
+                f.close()
+
+        .. todo:: Saving the image above returns a blank image ...
+
+
         """
         self.devtools.check_param_in_list(frmt, ['PDF', 'PNG'])
 
         url = "highlightPathwayDiagram/{0}/{1}"
-        params = {'genes': genes}
+        genes = self.devtools.list2string(genes)
 
-        res = self.http_post(url.format(identifier, frmt), frmt="txt", data=params)
+        res = self.http_post(url.format(identifier, frmt), frmt="txt",
+                data=genes)
         return res
 
 
     def list_by_query(self, classname, **kargs):
-        """Query Reactome database for a list of objects using Key/Value pairs based on an object's attributes.
-
-
-         For example, to query pathways with names as "Apoptosis", post "name=Apoptosis" to the server.
+        """Get list of objecs from Reactome database
 
         :param str class name:
-        :param further attribute values encoded in key-value pair
-        :return: json object
+        :param kargs: further attribute values encoded in key-value pair
+        :return: list of dictionaries. Each dictionary contains information
+            about a given pathway
 
-        To query a list of pathways with names as "Apoptosis", try XML or JSON result
+        To query a list of pathways with names as "Apoptosis"::
 
-        ::
             >>> s = Reactome()
-            >>> res = list_by_query("Pathway", name="apostosis")
+            >>> res = list_by_query("Pathway", name="apoptosis")
+            >>> identifiers = [x['dbId'] for x in res]
 
         """
-        url = "ListByQuery/{0}".format(classname)
-        res = self.http_post(url, frmt='json', data=kargs)
+        url = "listByQuery/{0}".format(classname)
+        # NOTE: without the content-type this request fails with error 415
+        # fixed by
+        res = self.http_post(url, frmt='json', data=kargs,
+                headers={'Content-Type': "application/json;odata=verbose"})
         return res
 
-    def pathway_diagram(self, identifier, frmt="PNG", save=False, view=False):
+    def pathway_diagram(self, identifier, frmt="PNG"):
         """Retrieve pathway diagram
 
         :param int identifier: Pathway database identifier
         :param str frmt: PNG, PDF, or XML.
-        ;param bool save: if True, save the output into a file called
-            identifier.ext where ext is the lower-case versiob of the frmt
-            parameter
-        :param view: show image in a browser
         :return:  Base64 encoded pathway diagram for PNG or PDF. XML text for the XML file type.
 
         ::
@@ -158,19 +199,13 @@ class Reactome(REST):
             >>> s = Reactome()
             >>> s.pathway_diagram('109581', 'PNG',view=True)
             >>> s.pathway_diagram('109581', 'PNG', save=True)
+
+        .. todo:: if PNG or PDF, the output is base64 but there is no
+            facility to easily save the results in a file for now
         """
         self.devtools.check_param_in_list(frmt, ['PDF', 'PNG', 'XML'])
         url = 'pathwayDiagram/{0}/{1}'.format(identifier, frmt)
         res = self.http_get(url, frmt=frmt)
-
-
-        if save:
-            filename = str(identifier)+"."+frmt.lower()
-            self.save_str_to_image(res, filename)
-        if view and save:
-            filename = str(identifier)+"."+frmt.lower()
-            self.on_web(filename)
-
         return res
 
     def pathway_hierarchy(self, species):
@@ -180,42 +215,63 @@ class Reactome(REST):
             'homo+sapiens' for  human, or 'mus musculus' for mouse)
         :return: XML text containing  pathways and reactions
 
+        ::
 
+            s.pathway_hierarchy("homo sapiens")
         """
         species = species.replace("+", " ")
         res = self.http_get("pathwayHierarchy/{0}".format(species),
-                frmt="json")
+                            frmt="xml")
         return res
 
-    def pathway_participant(self, identifier):
+    def pathway_participants(self, identifier):
         """Get list of pathway participants for a pathway using
 
-        a Pathway database identifier. It returns a list of
-            all PhysicalEntity objects that participate in the Pathway.
-
         :param int identifier: Pathway database identifier
-        :return: list of fully encoded PhysicalEntity objects in the pathway (in
-            JSON)
+        :return: list of fully encoded PhysicalEntity objects in the pathway
+            (in JSON)
 
         ::
 
             >>> s = Reactome()
-            >> s.pathway_participants(109581)
+            >>> s.pathway_participants(109581)
         """
-        res = self.http_get("pathwayParticipant/{0}".format(identifier),
-                frmt=None)
+        res = self.http_get("pathwayParticipants/{0}".format(identifier),
+                            frmt='json')
         return res
 
     def pathway_complexes(self, identifier):
+        """Get complexes belonging to a pathway
+
+        :param int identifier: Pathway database identifier
+        :return: list of all PhysicalEntity objects that participate in the
+            Pathway.(in JSON)
+
+        ::
+
+            >>> s = Reactome()
+            >>> s.pathway_complexes(109581)
+
+        """
         res = self.http_get("pathwayComplexes/{0}".format(identifier),
-                frmt=None)
+                frmt="json")
         return res
 
     def query_by_id(self, classname, identifier):
-        """
+        """Get Reactome Database for a specific object.
+        
 
+        :param str classname: e.g. Pathway
+        :param int identifier: database identifier or stable identifier if available
 
-        classname can be Pathway
+        It returns a full object, including full class information about
+        all the attributes of the returned object. For example, if the object has
+        one PublicationSource attribute, it will return a full PublicationSource
+        object within the returned object.
+
+        ::
+
+            >>> s.query_by_id("Pathway", "109581")
 
         """
         url = "queryById/{0}/{1}".format(classname, identifier)
@@ -225,45 +281,51 @@ class Reactome(REST):
     def query_by_ids(self, classname, identifiers):
         """
 
-
+        :param str classname: e.g. Pathway
         :param list identifiers: list of strings or int
 
-        other options could be but not implemented
-        FOCUS_SPECIES_ID=48887
-        FOCUS_PATHWAY_ID=109581
+
+        ::
+
+            >>> s.quey_by_ids("Pathway", "CDC2")
+
+        .. warning:: not sure the wrapping is correct
         """
 
-        identifiers = ",".join([str(x) for x in identifiers])
-        params = {'ID':identifiers}
-
+        identifiers = self.devtools.list2string(identifiers)
         url = "queryByIds/{0}".format(classname)
-        res = self.http_post(url, frmt="txt", data=params)
+        res = self.http_post(url, frmt="json", data=identifiers)
+        #headers={'Content-Type': "application/json"})
         return res
 
     def query_hit_pathways(self, query):
-        """ Query for a list of pathways that contain one or more genes passed in the
-         query list. In the Reactome data model, pathways are organized in a
-         hierarchical structure. The returned pathways in this method are pathways
-     having detailed manually drawn pathway diagrams. Currently only human
-     pathways will be returned from this method. 
+        """Get pathways that contain one or more genes passed in the query list.
 
+        In the Reactome data model, pathways are organized in a
+        hierarchical structure. The returned pathways in this method are pathways
+        having detailed manually drawn pathway diagrams. Currently only human
+        pathways will be returned from this method.
 
+        ::
+
+            s.query_hit_pathways('CDC2')
+            s.query_hit_pathways(['CDC2'])
 
         """
-        identifiers = ",".join([str(x) for x in identifiers])
-        params = {'ID':identifiers}
-        url = "queryHitPathways"
-        res = self.http_post(url, frmt='json', data=params)
+        identifiers = self.devtools.list2string(query)
+        res = self.http_post("queryHitPathways", frmt='json', data=identifiers)
         return res
 
     def query_pathway_for_entities(self, identifiers):
-        """     Query for pathway objects by specifying an array of
-        PhysicalEntity database identifiers. The returned Pathways should
+        """Get pathway objects by specifying an array of PhysicalEntity database identifiers.
+
+
+        The returned Pathways should
         contain the passed EventEntity objects. All passed EventEntity database
-        identifiers should be in the database. 
+        identifiers should be in the database.
 
         """
-        identifiers = ",".join([str(x) for x in identifiers])
+        identifiers = self.devtools.list2string(identifiers, space=False)
         url = "pathwayForEntities"
         res = self.http_post(url, frmt='json', data={'ID':identifiers})
         return res
@@ -279,6 +341,13 @@ class Reactome(REST):
 
         :param int identifier: Pathway database identifier
         :return: SBML object in XML format as a string
+
+
+        ::
+
+            >>> from bioservices import Reactome
+            >>> s = Reactome()
+            >>> xml = s.SBML_exporter(109581)
 
         """
         url = "sbmlExporter/{0}".format(identifier)
