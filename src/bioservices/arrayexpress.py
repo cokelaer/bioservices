@@ -135,7 +135,7 @@ class ArrayExpress(REST):
         self.version = "v2"
 
     def _set_format(self, f):
-        self.checkParam(f, ["json", "xml"])
+        self.devtools.check_param_in_list(f, ["json", "xml"])
         self._format = f
     def _get_format(self):
         return self._format

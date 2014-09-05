@@ -417,7 +417,7 @@ class PSICQUIC(REST):
 
         params = {}
         if output!=None:
-            self.checkParam(output, self.formats)
+            self.devtools.check_param_in_list(output, self.formats)
             params['format'] = output
         else: output="none"
 

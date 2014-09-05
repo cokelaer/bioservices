@@ -12,11 +12,11 @@
 #  See accompanying file LICENSE.txt or copy at
 #      http://www.gnu.org/licenses/gpl-3.0.html
 #
-#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  website: https://github.com/cokelaer/bioservices
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
+# $Id$
 """Interface to the quickGO interface
 
 .. topic:: What is quickGO
@@ -210,12 +210,12 @@ class QuickGO(REST):
 
         # aspect parameter
         if aspect != None:
-            self.checkParam(aspect, _valid_aspect)
+            self.devtools.check_param_in_list(aspect, _valid_aspect)
             params['aspect'] = aspect
 
         # aspect parameter
         if termUse != None:
-            self.checkParam(termUse, ["slim"])
+            self.devtools.check_param_in_list(termUse, ["slim"])
             params['termUse'] = termUse
 
         if relType:
@@ -276,7 +276,7 @@ or a string (e.g., 'PUBMED:*') """)
                 col = ",".join([x.strip() for x in col.split(",")])
 
             for c in col.split(','):
-                self.checkParam(c, self._valid_col)
+                self.devtools.check_param_in_list(c, self._valid_col)
             params["col"] = col
 
         if frmt not in ["tsv", "dict"]:

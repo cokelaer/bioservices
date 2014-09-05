@@ -230,7 +230,7 @@ class WikiPathways(WSDLService):
         if organism == None:
             return self.serv.listPathways(organism = self.organism)
         else:
-            self.checkParam(organism, self.organisms)
+            self.devtools.check_param_in_list(organism, self.organisms)
             return self.serv.listPathways(organism = organism)
 
     def getPathway(self, pathwayId, revision=0):
@@ -328,16 +328,16 @@ class WikiPathways(WSDLService):
         .. warning:: Argument pathwayId and filetype are inversed as compared to the
             WSDL prototype (if you want to call it directly)
 
-        .. change:: 1.3.0 return raw output of the service without any parsing
+        .. versionchanged:: 1.3.0 return raw output of the service without any parsing
 
         .. note:: use :meth:`savePathwayAs` to save into a file.
         """
-        self.checkParam(filetype, ['gpml', 'png', 'svg', 'pdf', 'txt', 'pwf', 'owl'])
+        self.devtools.check_param_in_list(filetype, ['gpml', 'png', 'svg', 'pdf', 'txt', 'pwf', 'owl'])
         res = self.serv.getPathwayAs(fileType=filetype, pwId=pathwayId, 
              revision = revisionNumb)
         return res
 
-    def savePathwayAs(self, pathwayId, filename, revisionNumb = 0, display = True):
+    def savePathwayAs(self, pathwayId, filename, revisionNumb=0, display=True):
         """Save a pathway.
 
         :param str pathwayId: the pathway identifier.

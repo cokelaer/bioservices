@@ -74,7 +74,7 @@ class PathwayCommons(REST):
 
     # just a get/set to the default extension
     def _set_default_ext(self, ext):
-        self.checkParam(ext, ["json","xml"])
+        self.devtools.check_param_in_list(ext, ["json","xml"])
         self._default_extension = ext
     def _get_default_ext(self):
         return self._default_extension
@@ -202,7 +202,7 @@ class PathwayCommons(REST):
             >>> res = pc2.get("http://identifiers.org/uniprot/Q06609")
 
         """
-        self.checkParam(frmt, self._valid_format)
+        self.devtools.check_param_in_list(frmt, self._valid_format)
 
         # validates the URIs
         if isinstance(uri, str):
