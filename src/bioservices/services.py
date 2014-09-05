@@ -21,6 +21,7 @@ from __future__ import print_function
 import os
 import sys
 import socket
+import platform
 
 
 # fixing compatiblity python 2 and 3 related to merging or urllib and urllib2 in python 3
@@ -34,37 +35,48 @@ except:
     from urllib import urlencode
     from urllib2  import urlopen, Request, HTTPError
 
-import platform
 
 
 import easydev
-from  easydev import  Logging
+from easydev import Logging
 
 
-__all__ = ["Service", "WSDLService", "DevTools", "RESTService", "BioServicesError", "REST"]
+__all__ = ["Service", "WSDLService", "DevTools", "RESTService",
+           "BioServicesError", "REST"]
 
 
 class BioServicesError(Exception):
     def __init__(self, value):
         self.value = value
+
     def __str__(self):
         return repr(self.value)
 
 
-# could be part of easydev itself but for now, let us keep it here inside bioservices
+# could be part of easydev itself but for now, let us keep it here
+# inside bioservices
 class DevTools(object):
     """wrapper around useful functions.
 
     See easydev documentation for details.
     """
     def check_range(self, a, b, value):
-        easydev.check_range(a,b,value, strict=False)
+        easydev.check_range(a, b, value, strict=False)
+
     def transform_into_list(self, query):
         return easydev.transform_into_list(query)
+
     def check_param_in_list(self, param, valid_values):
         easydev.check_param_in_list(param, valid_values)
-    def swapdict(self,d):
+
+    def swapdict(self, d):
         return easydev.swapdict(d)
+
+    def tolist(self, query):
+        return easydev.tolist(query)
+
+    def list2string(self, query, sep=",", space=False):
+        return easydev.list2string(query, sep=sep, space=space)
 
 
 class Service(Logging):
@@ -76,18 +88,16 @@ class Service(Logging):
     """
 
     response_codes = {
-        200 : 'OK',
-        201 : 'Created',
-        400 : 'Bad Request. There is a problem with your input',
-        404 : 'Not found. The resource you requests does not exist',
-        406 : "Not Acceptable. Usually headers issue",
-        410 :  'Gone. The resource you requested was removed.',
-        415 : "Unsupported Media Type",
-        500 : 'Internal server error. Most likely a temporary problem',
-        503 : 'Service not available. The server is being updated, try again  later'
+        200: 'OK',
+        201: 'Created',
+        400: 'Bad Request. There is a problem with your input',
+        404: 'Not found. The resource you requests does not exist',
+        406: "Not Acceptable. Usually headers issue",
+        410:  'Gone. The resource you requested was removed.',
+        415: "Unsupported Media Type",
+        500: 'Internal server error. Most likely a temporary problem',
+        503: 'Service not available. The server is being updated, try again later'
         }
-
-
 
     _error_codes = [400, 404]
 
@@ -100,9 +110,9 @@ class Service(Logging):
         :param bool verbose: prints informative messages if True (default is
             True)
 
-        All instances have an attribute called :attr:`~Service.logging` that is an instance
-        of the :mod:`logging` module. It can be used to print information, warning,
-        error messages::
+        All instances have an attribute called :attr:`~Service.logging` that 
+        is an instanceof the :mod:`logging` module. It can be used to print 
+        information, warning, error messages::
 
             self.logging.info("informative message")
             self.logging.warning("warning message")
@@ -136,13 +146,6 @@ class Service(Logging):
         self.timesleep = 1
 
         self.devtools = DevTools()
-
-    #def _set_timeout(self, timeout):
-    #    self._timeout = timeout
-    #    socket.setdefaulttimeout(float(timeout))
-    #def _get_timeout(self):
-    #    return self._timeout
-    #timeout = property(_get_timeout, _set_timeout)
 
     def _get_url(self):
         return self._url
@@ -210,21 +213,6 @@ easyXML object (Default behaviour).""")
         postData = urlencode(params)
         return postData
 
-    def checkParam(self, param, valid_values):
-        """Simple utility to check that a parameter has a valid value
-
-        :param param:
-        :param valid_values:
-
-        Calls :func:`easydev.tools.checkParam`
-
-        ::
-
-            checkParam(aboolean, [True, False])
-            checkParam(mode, ["mean", "std", "skew"])
-        """
-        self.devtools.check_param_in_list(param, valid_values)
-
     def __str__(self):
         txt = "This is an instance of %s service" % self.name
         return txt
@@ -244,6 +232,7 @@ easyXML object (Default behaviour).""")
 
     def on_web(self, url):
         self.onWeb(url)
+
     def onWeb(self, url):
         """Open a URL into a browser"""
         import webbrowser
@@ -803,7 +792,12 @@ class REST(RESTbase):
         self.logging.info('getUserAgent: End')
         return user_agent
 
-
+    def get_headers(self, frmt='txt'):
+        headers = {}
+        headers['User-Agent'] = self.getUserAgent()
+        headers['Accept'] = self.content_types[frmt]
+        #headers['Content-Type'] = "application/json;odata=verbose" required in reactome
+        return headers
 
 
 
