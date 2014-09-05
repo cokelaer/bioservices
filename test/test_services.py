@@ -15,7 +15,7 @@ class test_Service(Service):
         assert res in ["a=1&b=2", "b=2&a=1"]
 
     def test_pubmed(self):
-        self.pubmed("http://www.ncbi.nlm.nih.gov/pubmed/19693079")
+        self.pubmed("24064416")
 
 
 class test_WSDLService(WSDLService):

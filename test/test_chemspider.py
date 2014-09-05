@@ -1,7 +1,12 @@
 from bioservices import chemspider
+from settings import DEBUG
+
+
 
 
 def test_chemspider():
+    if DEBUG is not True:
+        return
     s = chemspider.ChemSpider()
     assert s.find("Pyridine") == [1020]
     s.GetExtendedCompoundInfo(1020)

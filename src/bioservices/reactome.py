@@ -43,7 +43,7 @@ from bioservices.services import WSDLService, REST
 import webbrowser
 import copy
 
-
+__all__ = ['Reactome']
 # for reactome, content-type could be
 #  "Content-Type", "multipart/form-data; boundary=" +    boundary);
 
@@ -409,4 +409,40 @@ class ReactomePathway(object):
         txt += "\nevidence Type: " + str(self.raw_data.evidenceType) + "\n"
 
         return txt
+
+
+
+class ReactomeAnalysis(REST):
+
+
+    _url = "http://www.reactome.org:80/AnalysisService"
+    
+    #"identifiers/projection?pageSize=8000&page=1&sortBy=ENTITIES_PVALUE&order=ASC&resource=TOTAL",
+
+    def __init__(self, verbose=True, cache=False):
+        super(ReactomeAnalysis, self).__init__("Reactome(URL)",url=ReactomeAnalysis._url,
+            verbose=verbose, cache=False)
+        self.logging.warning("Class in development. Some methods are already  working but those required POST do not. Coming soon ")
+
+
+
+    def identifiers(self, genes):
+        """
+
+        s.identfiers("TP53")
+        .. warning:: works for oe gene only for now
+        """
+        url = "identifiers/projection?pageSize=8000&page=1&sortBy=ENTITIES_PVALUE&order=ASC&resource=TOTAL"
+
+        genes = self.devtools.list2string(genes)
+        genes = genes.replace(" ","")
+        print(genes)
+        res = self.http_post(url, frmt="json", data=genes,
+                headers={"Content-Type": "text/plain;charset=UTF-8", 
+                    "Accept": "application/json"})
+        return res
+
+
+
+
 

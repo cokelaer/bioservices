@@ -1,3 +1,6 @@
 CACHING = False
 DEBUG = False
-from easydev.decorators import ifpandas
+from easydev.decorators import ifpandas, ifpylab
+
+
+
