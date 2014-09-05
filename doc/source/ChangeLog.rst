@@ -47,6 +47,8 @@ Revision 1.3
     * geneprof: parameter called type and format are renamed output and frmt to
       not clash with python keywords. Use REST class instead of RESTService but
       should be transparent for the users.
+    * services do not have the checkParam method. use
+      devtools.check_param_in_list instead.
 
   * BUG FIXES:
 

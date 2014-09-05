@@ -10,11 +10,13 @@ BIOSERVICES: a Python package to access biological web services programmatically
     .. image:: bioservices.png
         :width: 50%
 
-    :Citations: If you use BioServices, please cite *Cokelaer et al, Bioinformatics (2013)*. See `bioinformatics link <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ for details.
+    :Citations: If you use BioServices, please cite *Cokelaer et al, Bioinformatics (2013)*. 
+    See `bioinformatics link <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ 
+    for details.
 
 
 .. note:: Contributions to implement new wrappers are more than welcome. 
-    See `BioServices wiki <https://www.assembla.com/spaces/bioservices/wiki>`_
+    See `BioServices wiki <https://github.com/cokelaer/bioservices/>`_
     to join the development, and the :ref:`developer` on how to implement new
     wrappers. Although contributors have their names in the header files, you
     can also look at the :ref:`contributors` directly.

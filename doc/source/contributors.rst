@@ -12,4 +12,6 @@ implemented modules now available in BioServices:
  * Sven-Maurice Althoff, Christian Knauth implemented the :class:`bioservices.muscle` module.
 
 And thank you also to the contributions from users who have sent communication
-via emails or via the `ticket system <https://www.assembla.com/spaces/bioservices/tickets>`_.
+via emails or via the `ticket system <https://github.com/cokelaer/bioservices/issues>`_.
+
+Note that origially code (and earlier tickets) were hosted  `elsewhere <https://www.assembla.com/spaces/bioservices/tickets>`_.
