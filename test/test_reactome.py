@@ -9,19 +9,20 @@ class test_Reactome(object):
     def setup_class(klass):
         klass.e = Reactome(verbose=True)
 
+    def test_species(self):
+        assert len( self.e.get_species()) > 10
+
     def test_biopax_exporter(self):
         res = self.e.biopax_exporter(109581)
 
     def test_front_page_items(self):
         res = self.e.front_page_items("homo sapiens")
 
-    def _test_highlight_pathway_diagram(self):
-        pass
+    def test_highlight_pathway_diagram(self):
+        res = self.e.highlight_pathway_diagram(68875, frmt="PNG", genes="CDC2")
 
     def test_list_by_query(self):
-        classname = 'Pathway'
-        res = self.e.list_by_query(classname, name="apostosis")
-
+        assert len(self.e.list_by_query("Pathway", name="Apoptosis"))>1
 
     def test_pathway_diagram(self):
         res = self.e.pathway_diagram(109581, 'XML')
@@ -35,22 +36,30 @@ class test_Reactome(object):
 
     def test_pathway_hierarchy(self):
         res = self.e.pathway_hierarchy('homo sapiens')
+        assert len(res)>10
 
-    def test_pathway_participant(self):
-        res = self.e.pathway_participant(109581)
+    def test_pathway_participants(self):
+        res = self.e.pathway_participants(109581)
+        assert len(res)>0
 
     def test_pathway_complexes(self):
         res = self.e.pathway_complexes(109581)
+        assert len(res)>1
+        assert "dbId" in list(res[0].keys())
 
     def test_query_by_id(self):
         res = self.e.query_by_id("Pathway", 109581)
+        assert len(res)>1
 
     def test_query_by_ids(self):
-        res = self.e.query_by_ids("Pathway", [109581])
+        res = self.e.query_by_ids("Pathway", 'CDC2')
+        assert len(res)>=1
 
+    def test_query_hit_pathways(self):
+        assert len(self.e.query_hit_pathways("CDC2"))>1
 
-    def _test_pathway_for_entities(self):
-        res = self.e.query_pathways_for_entities("CDC2")
+    def test_pathway_for_entities(self):
+        res = self.e.query_pathway_for_entities("CDC2")
 
     def test_species_list(self):
         res = self.e.species_list()
