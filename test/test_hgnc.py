@@ -1,18 +1,20 @@
 from bioservices import HGNC
-
+from nose.plugins.attrib import attr
 
 class test_hgnc():
 
     def __init__(self):
         self.s = HGNC(verbose=False)
 
-    def _test_get_xml(self):
+    @attr('skip')
+    def test_get_xml(self):
         xml = self.s.get_xml("ZAP70")
         xml = self.s.get_xml("ZAP70;INSR")
         assert len(xml.findAll("gene")) == 2
         self.s.get_xml("wrong")
 
-    def _test_aliases(self):
+    @attr('skip')
+    def test_aliases(self):
         assert self.s.get_aliases("ZAP70") == [u'ZAP-70', u'STD']
         self.s.get_name("ZAP70")
         self.s.get_chromosome("ZAP70")
@@ -22,14 +24,17 @@ class test_hgnc():
 
 
 
-    def _test_xref(self):
+    @attr('skip')
+    def test_xref(self):
         assert self.s.get_xrefs("ZAP70")['UniProt']['xkey'] == 'P43403'
         assert self.s.get_xrefs("ZAP70", "xml")['UniProt']['link'] == ['http://www.uniprot.org/uniprot/P43403.xml']
 
-    def _test_lookfor(self):    
+    @attr('skip')
+    def test_lookfor(self):    
         self.s.lookfor("ZAP70")
 
-    def _test_mapping(self):
+    @attr('skip')
+    def test_mapping(self):
         value = "UniProt:P43403"
         res = self.s.mapping(value)
         res[0]['xlink:title'] == "ZAP70"

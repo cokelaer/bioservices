@@ -1,12 +1,11 @@
 from bioservices.quickgo import QuickGO
-from . import settings
-
+from nose.plugins.attrib import attr
 
 class test_quickGO(QuickGO):
 
     def __init__(self):
         super(test_quickGO, self).__init__(verbose=False, 
-                cache=settings.CACHING)
+                cache=False)
 
     def test_annotation_wrong_format(self):
         try:
@@ -23,13 +22,13 @@ class test_quickGO(QuickGO):
         except:
             assert True
 
+    @attr('slow')
     def test_annotation_wrong_limit(self):
-        if settings.DEBUG == True:
-            try:
-                res = self.Annotation(tax='9606', frmt='tsv', limit=-1)
-                assert False
-            except:
-                assert True
+        try:
+            res = self.Annotation(tax='9606', frmt='tsv', limit=-1)
+            assert False
+        except:
+            assert True
 
         try:
             res = self.Annotation(tax='9606', frmt='tsv', limit="dummy")

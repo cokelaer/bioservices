@@ -1,5 +1,5 @@
 from bioservices import Reactome
-
+from nose.plugins.attrib import attr
 
 
 
@@ -34,6 +34,7 @@ class test_Reactome(object):
         except:
             assert True
 
+    @attr('slow')
     def test_pathway_hierarchy(self):
         res = self.e.pathway_hierarchy('homo sapiens')
         assert len(res)>10
@@ -64,6 +65,7 @@ class test_Reactome(object):
     def test_species_list(self):
         res = self.e.species_list()
 
+    @attr('slow')
     def test_sbml_exporter(self):
         res = self.e.SBML_exporter(109581)
 

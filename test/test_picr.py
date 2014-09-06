@@ -1,5 +1,5 @@
 from bioservices import picr
-import unittest
+from nose.plugins.attrib import attr
 
 
 class TestPICR(object):
@@ -36,7 +36,7 @@ class TestPICR(object):
         res = self.e.getUPIForAccession(self.e._accession_example, "SWISSPROT", onlyactive=False, includeattributes=False)
 
     # this one is failing from time to time even the exemple on the web site.
-    @unittest.skip
+    @attr('skip')
     def test_getUPIForBLAST(self):
         self.e.getUPIForBLAST(self.e._blastfrag_example, "SWISSPROT", taxid="9606")
         self.e.getUPIForBLAST(self.e._blastfrag_example, ["SWISSPROT"], taxid="9606", includeattributes=False)

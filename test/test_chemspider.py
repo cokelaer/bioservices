@@ -1,12 +1,11 @@
 from bioservices import chemspider
-from settings import DEBUG
+
+from nose.plugins.attrib import attr
 
 
-
-
+# works only if you have a token
+@attr('skip')
 def test_chemspider():
-    if DEBUG is not True:
-        return
     s = chemspider.ChemSpider()
     assert s.find("Pyridine") == [1020]
     s.GetExtendedCompoundInfo(1020)

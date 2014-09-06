@@ -1,4 +1,4 @@
-from bioservices.apps.fasta import *
+from bioservices.apps.fasta import FASTA, MultiFASTA
 import tempfile
 
 

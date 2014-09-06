@@ -1,5 +1,5 @@
-from bioservices import *
-
+from bioservices import PSICQUIC
+from nose.plugins.attrib import attr
 
 
 
@@ -36,7 +36,7 @@ class test_psicquic(PSICQUIC):
         # accessing the string DB
         self.query("string", "species:10090", firstResult=0, maxResults=100, output="tab25")
 
-
+@attr('slow')
 def test_appsPPI():
     p = psicquic.AppsPPI(verbose=False)
     p.queryAll("ZAP70", ["intact"])

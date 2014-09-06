@@ -1,12 +1,11 @@
 from bioservices.chembl import ChEMBL
-import unittest
-from . import settings
+from nose.plugins.attrib import attr
 
 class test_Chembl(ChEMBL):
 
     def __init__(self):
         super(test_Chembl, self).__init__(verbose=False, 
-                cache=settings.CACHING)
+                cache=False)
         self.default_extension = "xml"
         try:
             self.default_extension = "xmlf"
@@ -81,7 +80,7 @@ class test_Chembl(ChEMBL):
         self.get_assays_bioactivities("CHEMBL1217643")
         self.get_assays_by_chemblId("CHEMBL1217643")
 
-    @unittest.skip
+    @attr('skip')
     def test_inspect(self): 
         self.inspect(self._assays_example,'assay')
 

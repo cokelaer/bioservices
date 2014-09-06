@@ -2,17 +2,17 @@
 #
 #  This file is part of bioservices software
 #
-#  Copyright (c) 2011-2013 - EBI-EMBL
+#  Copyright (c) 2013-2014 - EBI-EMBL
 #
 #  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      https://www.assembla.com/spaces/bioservices/team
+#      
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
 #      http://www.gnu.org/licenses/gpl-3.0.html
 #
-#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  website: https://github.com/cokelaer/bioservices
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
@@ -326,8 +326,8 @@ class GeneProf(REST):
         frmt = self._check_format(frmt)
         url = "ds/pubref." + frmt
         res = self.http_get(url, frmt=frmt)
-        if frmt == "json":
-            res = res['references']
+        #if frmt == "json":
+        #    res = res['references']
         return res
 
     def get_list_experiment_samples(self, ref, frmt="json"):
@@ -356,8 +356,8 @@ class GeneProf(REST):
         frmt = self._check_format(frmt)
         url = "gene.info/list.samples/%s." % ref + frmt
         res = self.http_get(url, frmt=frmt)
-        if frmt == "json":
-            res = res['samples']
+        #if frmt == "json":
+        #    res = res['samples']
         return res
 
     def search_genes(self, query, taxons=None, frmt="json"):
@@ -412,8 +412,8 @@ class GeneProf(REST):
         url = "search/gene/%s." % query + frmt
         params = {'taxons': taxons}
         res = self.http_get(url, frmt=frmt, params=params)
-        if frmt == "json":
-            res = res['matches_per_dataset']
+        #if frmt == "json":
+        #    res = res['matches_per_dataset']
         return res
 
     def search_gene_ids(self, query, taxons):
@@ -523,7 +523,7 @@ class GeneProf(REST):
         res = self.http_get(url, frmt=frmt, params=params)
         return res
 
-    def search_samples(self, query, taxons=None, frmt=None):
+    def search_samples(self, query, taxons=None, frmt="json"):
         """search for public experiment samples using search terms against their annotations.
 
 

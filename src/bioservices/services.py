@@ -2,16 +2,15 @@
 #
 #  This file is part of bioservices software
 #
-#  Copyright (c) 2011-2013 - EBI-EMBL
+#  Copyright (c) 2013-2014 - EBI-EMBL
 #
 #  File author(s):
-#      https://www.assembla.com/spaces/bioservices/team
+#      https://github.com/cokelaer/bioservices
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
 #      http://www.gnu.org/licenses/gpl-3.0.html
 #
-#  website: https://www.assembla.com/spaces/bioservices/wiki
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
@@ -36,6 +35,11 @@ except:
     from urllib2  import urlopen, Request, HTTPError
 
 
+# This is a hack in case suds is already installed.
+# Indded, we want suds_jurko instead
+sys.path = [x for x in sys.path if 'suds-' not in x]
+
+from bioservices.settings import BioServicesConfig
 
 import easydev
 from easydev import Logging
@@ -73,18 +77,16 @@ class DevTools(object):
         return easydev.swapdict(d)
 
     def tolist(self, query):
-        return easydev.tolist(query)
+        return easydev.codecs.tolist(query)
 
     def list2string(self, query, sep=",", space=False):
-        return easydev.list2string(query, sep=sep, space=space)
+        return easydev.codecs.list2string(query, sep=sep, space=space)
 
 
 class Service(Logging):
     """Base class for WSDL and REST classes
 
-
-    .. seealso:: :class:`RESTService`, :class:`WSDLService`
-
+    .. seealso:: :class:`REST`, :class:`WSDLService`
     """
 
     response_codes = {
@@ -261,7 +263,7 @@ class WSDLService(Service):
     .. seealso:: :class:`RESTService`, :class:`Service`
 
     """
-
+    _service = "WSDL"
     def __init__(self, name, url, verbose=True):
         """.. rubric:: Constructor
 
@@ -318,6 +320,7 @@ class WSDLService(Service):
 
 
 class RESTbase(Service):
+    _service = "REST"
     def __init__(self, name, url=None, verbose=True):
         super(RESTbase, self).__init__(name, url, verbose=verbose)
         self.logging.info("Initialising %s service (REST)" % self.name)
@@ -539,7 +542,7 @@ class REST(RESTbase):
 
     def __init__(self, name, url=None, verbose=True, cache=False):
         super(REST, self).__init__(name, url, verbose=verbose)
-        self.CACHE_NAME = self.name+"_bioservices_database"
+        self.CACHE_NAME = self.name + "_bioservices_database"
 
         self._session = None
 

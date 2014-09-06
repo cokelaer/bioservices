@@ -1,5 +1,5 @@
 from bioservices.wsdbfetch import WSDbfetch
-
+from nose.plugins.attrib import attr
 
 
 class test_WSDbfetch(WSDbfetch):
@@ -21,6 +21,7 @@ class test_WSDbfetch(WSDbfetch):
         res = self.getSupportedStyles()
         assert len(res) >10
 
+    @attr('fixme')
     def test_fetchBatch(self):
         self.fetchBatch("uniprot" ,"wap_mouse", "xml") 
 

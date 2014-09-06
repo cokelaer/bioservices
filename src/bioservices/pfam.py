@@ -2,17 +2,17 @@
 #
 #  This file is part of bioservices software
 #
-#  Copyright (c) 2011-2013 - EBI-EMBL
+#  Copyright (c) 2013-2014 - EBI-EMBL
 #
 #  File author(s): 
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      https://www.assembla.com/spaces/bioservices/team
+#      
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
 #      http://www.gnu.org/licenses/gpl-3.0.html
 #
-#  website: https://www.assembla.com/spaces/bioservices/wiki
+#  website: https://github.com/cokelaer/bioservices
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################

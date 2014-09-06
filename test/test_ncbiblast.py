@@ -1,5 +1,5 @@
-from bioservices import *
-
+from bioservices import NCBIblast
+from nose.plugins.attrib import attr
 
 class test_nciblast(NCBIblast):
     def __init__(self):
@@ -10,6 +10,7 @@ class test_nciblast(NCBIblast):
         assert(len(self.parameters)>0)
         assert(len(self.parameters)>0)
 
+    
     def test_paramdetails(self):
         names = self.parametersDetails("matrix") 
         try:
@@ -18,6 +19,7 @@ class test_nciblast(NCBIblast):
         except:
             assert True
 
+    @attr('slow')
     def test_run(self):
 
         try:

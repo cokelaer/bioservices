@@ -1,6 +1,7 @@
 from bioservices import KEGG, KEGGParser
-from nose import with_setup
-import unittest
+from nose.plugins.attrib import attr
+
+
 
 
 
@@ -24,9 +25,11 @@ class TestKEGG(object):
     def test_database_IDs(self):
         self.ws.pathwayIds
 
+    @attr('slow')
     def test_conv(self):
         self.ws.conv("ncbi-gi","hsa:10458+ece:Z5100")
 
+    @attr('slow')
     def test_info(self):
         self.ws.info("kegg")
         self.ws.info("brite")
@@ -37,9 +40,11 @@ class TestKEGG(object):
     def test_find(self):
         self.ws.find("compound", "300-310", "mol_weight")
 
+    @attr('slow')
     def test_get(self):
         self.ws.get("cpd:C01290+gl:G00092")
 
+    @attr('slow')
     def test_checkDB(self):
         for this in ["info", "list", "find", "link"]:
             try:
@@ -52,10 +57,12 @@ class TestKEGG(object):
     def test_link(self):
         self.ws.link("pathway", "hsa:10458+ece:Z5100")
 
+    @attr('slow')
     def test_org_conv(self):
         assert 'hsa' == self.ws.Tnumber2code("T01001")
         assert 'T01001' == self.ws.code2Tnumber("hsa")
 
+    @attr('slow')
     def test_parse_kgml_pathway(self):
         res = self.ws.parse_kgml_pathway("hsa04660")
 
@@ -71,6 +78,7 @@ class TestKEGGALL(object):
         klass.ws.organismIds
         print(klass)
 
+    @attr('slow')
     def test_ids(self):
         assert self.ws.enzymeIds[0].startswith("ec")
         assert self.ws.compoundIds[0].startswith("cpd")
@@ -81,6 +89,7 @@ class TestKEGGALL(object):
         assert self.ws.briteIds[0].startswith("br")
 
 
+    @attr('slow')
     def test_lookfor(self):
         self.ws.lookfor_organism("human")
         self.ws.lookfor_pathway("cell")
@@ -105,6 +114,7 @@ class TestKEGGALL(object):
         except:
             assert True
 
+    @attr('slow')
     def test_list(self):
         self.ws.list("pathway")             # returns the list of reference pathways
         self.ws.list("organism")            # returns the list of KEGG organisms with taxonomic classification
@@ -127,6 +137,7 @@ class TestKEGGALL(object):
         except:
             assert True
 
+    @attr('slow')
     def test_find(self):
         self.ws.find("genes", "shiga+toxin")             # for keywords "shiga" and "toxin"
         self.ws.find("genes", "shiga toxin")            # for keywords "shigatoxin"
@@ -135,6 +146,7 @@ class TestKEGGALL(object):
         self.ws.find("compound", "174.05","exact_mass")  # for 174.045 =<exact mass < 174.055
         self.ws.find("compound", "300-310","mol_weight") # for 300 =<molecular weight =< 310
 
+    @attr('slow')
     def test_get(self):
         self.ws.get("C01290+G00092")
         self.ws.get("hsa:10458+ece:Z5100")
@@ -146,6 +158,7 @@ class TestKEGGALL(object):
         except:
             assert True
 
+    @attr('slow')
     def test_conv(self):
         self.ws.conv("ncbi-gi","hsa:10458+ece:Z5100")
 
@@ -177,10 +190,12 @@ class TestKEGGALL(object):
         #self.conv("asc", "uniprot")
         self.ws.conv("hsa","up:Q9BV86+")
 
+    @attr('slow')
     def test_show_module(self):
         self.ws.show_module("md:hsa_M00402")
 
 
+    @attr('slow')
     def test_show_pathway(self):
         self.ws.show_entry("path:hsa05416")
         self.ws.show_pathway("path:hsa05416", scale=50)
@@ -197,7 +212,7 @@ class TestKEGGALL(object):
         sif = self.ws.pathway2sif("path:hsa05416")
 
 
-#@unittest.skip
+@attr('slow')
 def test_KEGGParser():
     s = KEGGParser()
     d = s.parse(s.get("cpd:C00001"))

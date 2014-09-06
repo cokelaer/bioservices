@@ -1,9 +1,9 @@
 from bioservices.uniprot import UniProt
-from . import settings
+from easydev.decorators import ifpandas
 
 class test_UniProt(UniProt):
     def __init__(self):
-        super(test_UniProt, self).__init__(verbose=False, cache=settings.CACHING)
+        super(test_UniProt, self).__init__(verbose=False, cache=False)
         self.debugLevel = "ERROR"
 
     def test_mapping(self):
@@ -37,12 +37,12 @@ class test_UniProt(UniProt):
 
         self.quick_search("ZAP70")
 
-    @settings.ifpandas
+    @ifpandas
     def test_uniref(self):
         df = self.uniref("member:Q03063")
         df.Size
 
-    @settings.ifpandas
+    @ifpandas
     def test_get_df(self):
         df = self.get_df(["P43403"])
 

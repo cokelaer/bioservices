@@ -1,31 +1,41 @@
 from bioservices import BioMart
+from nose.plugins.attrib import attr
 
 
-def test_general():
-    # test another host
-    s = BioMart(host="www.ensembl.org")
-    s = BioMart()
-    #s.registry()
+class test_biomart(object):
+    @classmethod
+    def setup_class(klass):
+        klass.s = BioMart(verbose=False)
 
+    def test_general(self):
+        # test another host
+        s = BioMart(host="www.ensembl.org")
 
-    assert s.datasets("prod-intermart_1") == ['protein', 'entry', 'uniparc']
+    def test_version(self):
+        self.s.version("ensembl")
 
-    assert "mmusculus_gene_ensembl" in s.datasets("ensembl")
-    s.version("ensembl")
-    assert 'oanatinus_gene_ensembl' in s.valid_attributes["ensembl"]
-    s.filters("oanatinus_gene_ensembl")
-    s.configuration("oanatinus_gene_ensembl")
+    def test_datasets(self):
+        assert self.s.datasets("prod-intermart_1") == ['protein', 'entry', 'uniparc']
 
+        assert "mmusculus_gene_ensembl" in self.s.datasets("ensembl")
 
+    def test_attributes(self):
+        assert 'oanatinus_gene_ensembl' in self.s.valid_attributes["ensembl"]
 
+    def test_filteres(self):
+        self.s.filters("oanatinus_gene_ensembl")
 
-    res = s.query(s._xml_example)
-    assert "ENSMUS" in res
+    def test_config(self):
+        self.s.configuration("oanatinus_gene_ensembl")
 
+    def test_query(self):
+        res = self.s.query(self.s._xml_example)
+        assert "ENSMUS" in res
 
-    # build own xml using the proper functions
-    s.add_dataset_to_xml("protein")
-    s.get_xml()
+    def test_xml(self):
+        # build own xml using the proper functions
+        self.s.add_dataset_to_xml("protein")
+        self.s.get_xml()
 
 def _test_reactome_example():
     # this is not working anymore...

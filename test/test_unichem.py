@@ -1,11 +1,10 @@
 from bioservices import UniChem
-from settings import CACHING
-
+from nose.plugins.attrib import attr
 
 
 class test_Chembl(UniChem):
     def __init__(self):
-        super(test_Chembl, self).__init__(verbose=False, cache=CACHING)
+        super(test_Chembl, self).__init__(verbose=False, cache=False)
 
     def test_get_compound_ids_from_src_id(self):
         res1 = self.get_compound_ids_from_src_id("CHEMBL2", "chembl", "chebi")
@@ -73,6 +72,7 @@ class test_Chembl(UniChem):
         assert self.get_verbose_src_compound_ids_from_inchikey("GZUITABIAKMVPG-UHFFFAOYSA-N") != 400
         assert self.get_verbose_src_compound_ids_from_inchikey("QFFGVLORLPOAEC-SNVBAGLBSA-N") != 400 
 
+    @attr('slow')
     def test_get_auxiliary_mapping(self):
         self.settings.TIMEOUT = 100
         res = self.get_auxiliary_mappings(1)

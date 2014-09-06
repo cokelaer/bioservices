@@ -1,6 +1,5 @@
 from bioservices.geneprof import GeneProf
-DEBUG = True
-
+from nose.plugins.attrib import attr
 
 
 def test_geneprof():
@@ -13,9 +12,9 @@ def test_geneprof():
     g.get_metadata_experiment(Id="385", with_workflow=True)
     g.get_metadata_dataset("11_12_122_1", with_ats=True)
 
+
+@attr('slow')
 def test_1():
-    if DEBUG == True:
-        return
     g = GeneProf(verbose=False)
     g.get_list_reference_datasets()
 
@@ -28,9 +27,8 @@ def test_1():
     g.search_genes("sox2", taxons="9606, 10090")
     res = g.search_genes("brca2 AND cancer AND reference", taxons="mouse")
 
+@attr('slow')
 def test_2():
-    if DEBUG == True:
-        return
     g = GeneProf(verbose=False)
     g.search_experiments("sox2")
     g.search_experiments("citation:cancer")
@@ -42,9 +40,8 @@ def test_2():
     g.search_samples("Gene:sox2")
     g.search_samples("human")
 
+@attr('slow')
 def test_3():
-    if DEBUG == True:
-        return
     g = GeneProf(verbose=False)
     g.get_gene_id("mouse", "C_ENSG", "ENSMUSG00000059552")
     g.get_gene_id("human", "C_RSEQ", "NM_005657")
@@ -60,8 +57,8 @@ def test_3():
     g.get_gene_expression("mouse", "715", frmt="rdata", with_sample_info=True)
    
 
+@attr('slow')
 def test_gettargets():
-
     g = GeneProf(verbose=False)
     g.get_targets_tf("mouse", "9885")
     g.get_targets_tf("human", "36958", include_unbound=True)
@@ -71,7 +68,9 @@ def test_gettargets():
     g.get_targets_by_experiment_sample("human", "784", include_unbound=True)
     g.get_targets_by_experiment_sample("mouse", "541", ats="C_NAME,C_ENSG")
     g.get_targets_by_experiment_sample("human", "784", frmt="rdata")
-        
+
+
+@attr('slow')
 def test_get_tfas():
     g = GeneProf(verbose=False)
     g.get_tfas_by_gene("mouse", "9885")
@@ -88,6 +87,8 @@ def test_get_tfas():
                 ats="C_NAME,C_ENSG")
     g.get_tfas_by_sample("human", "784")
 
+
+@attr('slow')
 def test_get_tf():
     g = GeneProf(verbose=False)
     g.get_tf_by_target_gene("mouse", "715", with_sample_info=True)
@@ -97,19 +98,18 @@ def test_get_tf():
     g.get_tf_by_target_gene("mouse", "715", frmt="rdata", 
                     with_sample_info=True)
 
-    
     g.get_tfas_scores_by_target("mouse", "715", with_sample_info=True)
     g.get_tfas_scores_by_target("mouse", 715, with_sample_info=True)
     g.get_tfas_scores_by_target("mouse", 715, frmt="txt")
     g.get_tfas_scores_by_target("mouse", "715", frmt="rdata",
                 with_sample_info=True)
 
+@attr('slow')
 def test_data():
     g = GeneProf(verbose=False)
     g.get_data("11_119_18_1", frmt="txt", gz=True)
     g.get_data("11_119_18_1", frmt="txt", gz=True, 
          ats="C_ENSG,C_11_119_16_1_RPKM0,C_11_119_16_1_RPKM1,C_11_119_16_1_RPKM2,C_11_119_16_1_RPKM3")
-
 
     g.get_chromosome_names("pub_mm_ens58_ncbim37", frmt="txt")
     g.get_chromosome_names("pub_hs_ens59_grch37", frmt="json")

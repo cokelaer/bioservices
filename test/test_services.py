@@ -1,5 +1,5 @@
 from bioservices.services import Service, WSDLService, RESTService, REST
-
+from nose.plugins.attrib import attr
 
 class test_Service(Service):
     def __init__(self):
@@ -14,6 +14,7 @@ class test_Service(Service):
         res = self.urlencode({'a':1, 'b':2})
         assert res in ["a=1&b=2", "b=2&a=1"]
 
+    @attr('skip')
     def test_pubmed(self):
         self.pubmed("24064416")
 

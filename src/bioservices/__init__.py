@@ -4,14 +4,8 @@ import bioservices
 u = bioservices.uniprot.UniProt()
 u.search("ZAP70")
 
-contents
-----------
 
-* uniprot
-* KEGG
-* and much more
-
-see online documentation for details at http://
+see online documentation for details on pypi or github.
 
 """
 #from __future__ import absolute_import
