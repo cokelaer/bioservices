@@ -1,8 +1,8 @@
 from bioservices import Miriam
+from nose.plugins.attrib import attr
 
 
-
-
+@attr('skip')
 class test_miriam(Miriam):
 
     def __init__(self):

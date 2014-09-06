@@ -7,7 +7,7 @@ class test_EUtils(object):
 
     @classmethod
     def setup_class(klass):
-        klass.e = eutils.EUtils(verbose=True)
+        klass.e = eutils.EUtils(verbose=False)
 
     def test_taxonomy(self):
         ret = self.e.taxonomy("9606")
