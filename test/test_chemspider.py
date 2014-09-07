@@ -4,7 +4,7 @@ from nose.plugins.attrib import attr
 
 
 # works only if you have a token
-@attr('skip')
+@attr('skip_travis')
 def test_chemspider():
     s = chemspider.ChemSpider()
     assert s.find("Pyridine") == [1020]

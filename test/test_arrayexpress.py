@@ -1,44 +1,38 @@
 from bioservices import ArrayExpress
-import unittest
+from nose.plugins.attrib import attr
 
 
+@attr('skip_travis')
+class test_AE(object):
 
-"""class test_AE(object):
     @classmethod
     def setup_class(klass):
-        klass.e = ArrayExpress(verbose=False)
-"""
+        klass.s = ArrayExpress(verbose=False)
 
-
-class test_AE(ArrayExpress):
-    def __init__(self):
-        super(test_AE, self).__init__()
-
-    @unittest.skip
     def test_retrieveFiles(self):
         #res = self.retrieveFiles(keywords="cancer+breast", species="Home+Sapiens")
-        res = self.queryFiles(array="A-AFFY-33")
+        res = self.s.queryFiles(array="A-AFFY-33")
 
     def test_retrieveExperiments(self):
         #res = self.retrieveExperiments(keywords="cancer+breast", species="Home+Sapiens")
 
         #res = self.queryExperiments(array="A-AFFY-33")
         #assert len(res.getchildren())>0
-        res = self.queryExperiments(array="A-AFFY-33", species="Homo Sapiens",expdesign="dose+response")
+        res = self.s.queryExperiments(array="A-AFFY-33", species="Homo Sapiens",expdesign="dose+response")
         assert len(res.getchildren())>0
-        res = self.queryExperiments(array="A-AFFY-33", species="Homo Sapiens",expdesign="dosestupid")
+        res = self.s.queryExperiments(array="A-AFFY-33", species="Homo Sapiens",expdesign="dosestupid")
         assert len(res.getchildren())==0
-        res = self.queryExperiments(array="A-AFFY-33", species="Homo Sapiens", expdesign="dose+response", 
+        res = self.s.queryExperiments(array="A-AFFY-33", species="Homo Sapiens", expdesign="dose+response", 
             sortby="releasedate", sortorder="ascending")
 
     def test_retrieveFile(self):
-        res = self.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")
-        self.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt", save=True) 
+        res = self.s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")
+        self.s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt", save=True) 
         import os
         os.remove("E-MEXP-31.idf.txt")
 
         try:
-            res == self.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txtdddd")
+            res == self.s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txtdddd")
             assert False
         except:
             pass
@@ -53,11 +47,11 @@ class test_AE(ArrayExpress):
             assert True
 
     def test_retrieveExperiment(self):
-        self.retrieveExperiment("E-MEXP-31")
+        self.s.retrieveExperiment("E-MEXP-31")
 
-    @unittest.skip
+    @attr('slow')
     def test_extra(self):
         # works. just takes 15 seconds so let us skip it.
-        res = self.e.queryFiles(keywords="cancer+breast", wholewords=True)
-        res = self.e.queryFiles(keywords="cancer+breast", wholewords=True, gxa="true")
-        res = self.e.queryFiles(keywords="cancer+breast", wholewords=True, directsub="false")
+        res = self.s.queryFiles(keywords="cancer+breast", wholewords=True)
+        res = self.s.queryFiles(keywords="cancer+breast", wholewords=True, gxa="true")
+        res = self.s.queryFiles(keywords="cancer+breast", wholewords=True, directsub="false")

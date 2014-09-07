@@ -3,9 +3,9 @@ from nose.plugins.attrib import attr
 
 
 @attr('skip_travis')
-class test_Chembl(UniChem):
+class test_UniChem(UniChem):
     def __init__(self):
-        super(test_Chembl, self).__init__(verbose=False, cache=False)
+        super(test_UniChem, self).__init__(verbose=False, cache=False)
 
     def test_get_compound_ids_from_src_id(self):
         res1 = self.get_compound_ids_from_src_id("CHEMBL2", "chembl", "chebi")

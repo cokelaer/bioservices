@@ -2,6 +2,7 @@ from bioservices.wsdbfetch import WSDbfetch
 from nose.plugins.attrib import attr
 
 
+@attr('skip_travis')
 class test_WSDbfetch(object):
     @classmethod
     def setup_class(klass):
@@ -32,33 +33,26 @@ class test_WSDbfetch(object):
     def test_fetchBatch(self):
         self.s.fetchBatch("uniprot" ,"wap_mouse", "xml") 
 
-    @attr('skip')
     def test_fetchData(self):
         self.s.fetchData('uniprot:zap70_human')
 
-    @attr('skip')
     def test_getDatabaseInfo(self):
         res = self.s.getDatabaseInfo("uniprotkb")
         assert res.displayName == 'UniProtKB'
 
-    @attr('skip')
     def test_getDatabaseInfoList(self):
         assert len(self.s.getDatabaseInfoList())>10
 
-    @attr('skip')
     def test_getDatavaseInfoList(self):
         self.s.getDatabaseInfoList()
 
-    @attr('skip')
     def test_getDbFormats(self):
         self.s.getDbFormats("uniprotkb")
 
-    @attr('skip')
     def test_getFormat(self):
         assert len(self.s.getFormatStyles("uniprotkb", "fasta")) >= 3
         #['default', 'raw', 'html']
 
-    @attr('skip')
     def test_wrong_db(self):
         try:
             self.s.getDbFormats("uniprot")

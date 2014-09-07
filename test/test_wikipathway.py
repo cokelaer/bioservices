@@ -2,6 +2,7 @@ from bioservices.wikipathway import  WikiPathways
 from nose.plugins.attrib import attr
 
 
+@attr('skip_travis')
 class test_wiki(object):
     @classmethod
     def setup_class(klass):

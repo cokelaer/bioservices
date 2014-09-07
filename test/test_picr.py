@@ -2,7 +2,7 @@ from bioservices import picr
 from nose.plugins.attrib import attr
 
 # timeout on travis...
-@attr('fixme')
+@attr('skip_travis')
 class TestPICR(object):
 
     @classmethod
@@ -40,7 +40,7 @@ class TestPICR(object):
         res = self.e.getUPIForAccession(self.e._accession_example, "SWISSPROT", onlyactive=False, includeattributes=False)
 
     # this one is failing from time to time even the exemple on the web site.
-    @attr('skip')
+    @attr('fixme')
     def test_getUPIForBLAST(self):
         self.e.getUPIForBLAST(self.e._blastfrag_example, "SWISSPROT", taxid="9606")
         self.e.getUPIForBLAST(self.e._blastfrag_example, ["SWISSPROT"], taxid="9606", includeattributes=False)

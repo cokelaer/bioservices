@@ -1,7 +1,7 @@
 from bioservices import BioDBNet
 from nose.plugins.attrib import attr
 
-
+@attr('skip_travis')
 class test_biodbnet(object):
     @classmethod
     def setup_class(klass):
