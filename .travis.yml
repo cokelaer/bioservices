@@ -8,10 +8,10 @@ install:
   - pip install .
   - pip install nose coverage
     grequests requests requests_cache easydev>=0.7.2 beautifulsoup4 suds-jurko appdirs
-  - pip install coveralls
+
 # # command to run tests, e.g. python setup.py test
 #script:  
 #  - python setup.py nosetests  --with-coverage --cover-package bioservices --logging-level ERROR --attr '!slow,!skip,!fixme'
 
-#after_success:
+after_success:
 #  coveralls
