@@ -9,6 +9,7 @@ import unittest
         klass.e = ArrayExpress(verbose=False)
 """
 
+
 class test_AE(ArrayExpress):
     def __init__(self):
         super(test_AE, self).__init__()

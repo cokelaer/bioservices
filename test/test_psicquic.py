@@ -2,7 +2,7 @@ from bioservices import PSICQUIC
 from nose.plugins.attrib import attr
 
 
-
+@attr('slow')
 class test_psicquic(object):
     @classmethod
     def setup_class(klass):

@@ -2,6 +2,7 @@ from bioservices import UniChem
 from nose.plugins.attrib import attr
 
 
+@attr('skip_travis')
 class test_Chembl(UniChem):
     def __init__(self):
         super(test_Chembl, self).__init__(verbose=False, cache=False)

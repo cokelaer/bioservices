@@ -1,7 +1,8 @@
 from bioservices.rhea import Rhea
+from nose.plugins.attrib import attr
 
 
-
+@attr('skip_travis')
 class test_rhea(Rhea):
     def __init__(self):
         super(test_rhea, self).__init__(verbose=False)

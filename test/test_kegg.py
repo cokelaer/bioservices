@@ -9,6 +9,8 @@ from nose.plugins.attrib import attr
 # The other class could be use to test the code more thoroughly but it takes several
 # minutes so during development this one should be used instead.
 # class TestKEGGAll should serve as a complement to this class
+
+@attr('skip_travis')
 class TestKEGG(object):
 
     @classmethod
@@ -17,17 +19,14 @@ class TestKEGG(object):
         klass.ws.organismIds
         klass.ws.organism = "hsa"
 
-    @attr('skip')
     def test_isOrganism(self):
         assert self.ws.isOrganism('T01440') == True
         assert self.ws.isOrganism('hsa') == True
         assert self.ws.isOrganism('dummy') == False
 
-    @attr('skip')
     def test_database_IDs(self):
         self.ws.pathwayIds
 
-    @attr('slow')
     def test_conv(self):
         self.ws.conv("ncbi-gi","hsa:10458+ece:Z5100")
 
@@ -72,6 +71,7 @@ class TestKEGG(object):
 
 
 
+@attr('skip_travis')
 class TestKEGGALL(object):
 
     @classmethod

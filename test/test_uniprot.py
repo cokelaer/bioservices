@@ -2,6 +2,8 @@ from bioservices.uniprot import UniProt
 from easydev.decorators import ifpandas
 from nose.plugins.attrib import attr
 
+
+@attr('skip_travis')
 class test_UniProt(UniProt):
     def __init__(self):
         super(test_UniProt, self).__init__(verbose=False, cache=False)
