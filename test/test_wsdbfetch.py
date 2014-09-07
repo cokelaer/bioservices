@@ -16,11 +16,13 @@ class test_WSDbfetch(object):
         res = self.s.getSupportedDBs()
         assert len(res) >10
 
+    @attr('slow')
     def test_getSupportedFormats(self):
         res = self.s.getSupportedFormats()
         res = self.s.getSupportedFormats()
         assert len(res) >10
 
+    @attr('slow')
     def test_getSupportedStyles(self):
         res = self.s.getSupportedStyles()
         res = self.s.getSupportedStyles()

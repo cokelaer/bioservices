@@ -1,7 +1,8 @@
 from bioservices import picr
 from nose.plugins.attrib import attr
 
-
+# timeout on travis...
+@attr('fixme')
 class TestPICR(object):
 
     @classmethod

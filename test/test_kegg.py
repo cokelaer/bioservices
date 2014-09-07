@@ -17,11 +17,13 @@ class TestKEGG(object):
         klass.ws.organismIds
         klass.ws.organism = "hsa"
 
+    @attr('skip')
     def test_isOrganism(self):
         assert self.ws.isOrganism('T01440') == True
         assert self.ws.isOrganism('hsa') == True
         assert self.ws.isOrganism('dummy') == False
 
+    @attr('skip')
     def test_database_IDs(self):
         self.ws.pathwayIds
 

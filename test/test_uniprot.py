@@ -1,5 +1,6 @@
 from bioservices.uniprot import UniProt
 from easydev.decorators import ifpandas
+from nose.plugins.attrib import attr
 
 class test_UniProt(UniProt):
     def __init__(self):
@@ -15,6 +16,7 @@ class test_UniProt(UniProt):
         except:
             assert True
 
+    @attr('slow')
     def test_searchUniProtId(self):
         self.searchUniProtId("P09958", frmt="rdf")
         self.searchUniProtId("P09958", frmt="xml")
@@ -28,6 +30,7 @@ class test_UniProt(UniProt):
         except:
             assert True
 
+    @attr('slow')
     def test_search(self):
         self.search('zap70+AND+organism:9606', frmt='list')
         self.search("zap70+and+taxonomy:9606", frmt="tab", limit=3, columns="entry name,length,id, genes")
