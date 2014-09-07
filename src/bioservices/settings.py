@@ -21,7 +21,7 @@ __all__ = ["get_bioservices_env", "defaultParams", "BioServicesConfig"]
 # second item if a type or TUPLE of types possible
 # third item is documentation
 defaultParams = {
-    'general.timeout': [10, (int,float), ""],
+    'general.timeout': [30, (int,float), ""],
     'general.max_retries': [3, int, ''],
     'general.async_concurrent' : [50, int, ''], 
     'general.async_threshold': [10 , int, 'when to switch to asynchronous requests'],

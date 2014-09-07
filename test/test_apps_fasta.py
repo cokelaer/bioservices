@@ -1,47 +1,60 @@
 from bioservices.apps.fasta import FASTA, MultiFASTA
 import tempfile
+from nose.plugins.attrib import attr
 
 
-def test_fasta():
-    f = FASTA()
-    f.load_fasta(None)
-    f.load_fasta("P43403")
-    f.load_fasta("P43403") # already there 
-    f.header
-    f.gene_name
-    f.sequence
-    f.fasta
-    f.identifier
-    fh = tempfile.NamedTemporaryFile(delete=False)
-    f.save_fasta(fh.name)
-    f.read_fasta(fh.name)
-    fh.delete = True
-    fh.close()
+class test_FASTA(object):
+    @classmethod
+    def setup_class(klass):
+        klass.s = FASTA(verbose=False)
 
+    def test_fasta(self):
+        self.s.load_fasta(None)
+        self.s.load_fasta("P43403")
+        self.s.load_fasta("P43403") # already there 
+        self.s.header
+        self.s.gene_name
+        self.s.sequence
+        self.s.fasta
+        self.s.identifier
+        fh = tempfile.NamedTemporaryFile(delete=False)
+        self.s.save_fasta(fh.name)
+        self.s.read_fasta(fh.name)
+        fh.delete = True
+        fh.close()
 
-def test_multi_fasta():
-    f = MultiFASTA()
-    try:
-        f.fasta
-        assert False
-    except:
-        assert True
-    try:
-        f.header
-        assert False
-    except:
-        assert True
+class test_FASTA(object):
+    @classmethod
+    def setup_class(klass):
+        klass.s = MultiFASTA()
 
-    f.load_fasta("P43403")
-    f.load_fasta("P43408")
-    assert len(f) == 2
+        try:
+            klass.s.fasta
+            assert False
+        except:
+            assert True
+        try:
+            f.header
+            assert False
+        except:
+            assert True
+
+        klass.s.load_fasta("P43403")
+        klass.s.load_fasta("P43408")
+
+    def test_attributes(self):
+        assert len(self.s) == 2
     
-    f.ids
-    f.fasta
-    fh = tempfile.NamedTemporaryFile(delete=False)
-    f.save_fasta(fh.name)
-    f.read_fasta(fh.name)
+        self.s.ids
+        self.s.fasta
+        fh = tempfile.NamedTemporaryFile(delete=False)
+        self.s.save_fasta(fh.name)
+        self.s.read_fasta(fh.name)
 
-    f.fasta["P43403"]
-    f.hist_size()
-    f.df
+        self.s.fasta["P43403"]
+
+    @attr('skip')
+    def test_extra(self):
+
+        self.s.hist_size()
+        self.s.df

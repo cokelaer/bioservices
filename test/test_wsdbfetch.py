@@ -2,52 +2,57 @@ from bioservices.wsdbfetch import WSDbfetch
 from nose.plugins.attrib import attr
 
 
-class test_WSDbfetch(WSDbfetch):
-    def __init__(self):
-        super(test_WSDbfetch, self).__init__(verbose=False)
+class test_WSDbfetch(object):
+    @classmethod
+    def setup_class(klass):
+        klass.s = WSDbfetch(verbose=False)
+
+    #def __init__(self):
+    #    super(test_WSDbfetch, self).__init__(verbose=False)
+        
 
     def test_getSupportedDBs(self):
-        res = self.getSupportedDBs()
-        res = self.getSupportedDBs()
+        res = self.s.getSupportedDBs()
+        res = self.s.getSupportedDBs()
         assert len(res) >10
 
     def test_getSupportedFormats(self):
-        res = self.getSupportedFormats()
-        res = self.getSupportedFormats()
+        res = self.s.getSupportedFormats()
+        res = self.s.getSupportedFormats()
         assert len(res) >10
 
     def test_getSupportedStyles(self):
-        res = self.getSupportedStyles()
-        res = self.getSupportedStyles()
+        res = self.s.getSupportedStyles()
+        res = self.s.getSupportedStyles()
         assert len(res) >10
 
     @attr('fixme')
     def test_fetchBatch(self):
-        self.fetchBatch("uniprot" ,"wap_mouse", "xml") 
+        self.s.fetchBatch("uniprot" ,"wap_mouse", "xml") 
 
     def test_fetchData(self):
-        self.fetchData('uniprot:zap70_human')
+        self.s.fetchData('uniprot:zap70_human')
 
     def test_getDatabaseInfo(self):
-        res = self.getDatabaseInfo("uniprotkb")
+        res = self.s.getDatabaseInfo("uniprotkb")
         assert res.displayName == 'UniProtKB'
 
     def test_getDatabaseInfoList(self):
-        assert len(self.getDatabaseInfoList())>10
+        assert len(self.s.getDatabaseInfoList())>10
 
     def test_getDatavaseInfoList(self):
-        self.getDatabaseInfoList()
+        self.s.getDatabaseInfoList()
 
     def test_getDbFormats(self):
-        self.getDbFormats("uniprotkb")
+        self.s.getDbFormats("uniprotkb")
 
     def test_getFormat(self):
-        assert len(self.getFormatStyles("uniprotkb", "fasta")) >= 3
+        assert len(self.s.getFormatStyles("uniprotkb", "fasta")) >= 3
         #['default', 'raw', 'html']
 
     def test_wrong_db(self):
         try:
-            self.getDbFormats("uniprot")
+            self.s.getDbFormats("uniprot")
             assert False
         except:
             assert True

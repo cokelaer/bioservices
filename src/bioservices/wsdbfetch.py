@@ -55,7 +55,7 @@ class WSDbfetch(WSDLService):
 
     """
     _url = 'http://www.ebi.ac.uk/ws/services/WSDbfetchDoclit?wsdl'
-    def __init__(self,  verbose=True):
+    def __init__(self,  verbose=False):
         """.. rubric:: Constructor
 
         :param bool verbose: print informative messages

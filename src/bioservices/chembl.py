@@ -105,7 +105,11 @@ class ChEMBL(REST):
         :return: Response is the string 'UP' if the service is running
         """
         res = self.http_get("status", frmt="json")
-        return res['status']
+        try:
+            #FIXME: wierd behaviour that is different on different systems...
+            return res['status']
+        except:
+            return res
 
     def get_compounds_by_chemblId(self, query, frmt="json"):
         """Get compound by ChEMBLId
@@ -535,7 +539,11 @@ class ChEMBL(REST):
     def version(self):
         """Return version of the API on the server"""
         res = self.http_get("status", frmt="json")
-        return res['version']
+        try:
+            #FIXME: wierd behaviour that is different on different systems...
+            return res['version']
+        except:
+            return res
 
 
 class BenchmarkChembl(ChEMBL):

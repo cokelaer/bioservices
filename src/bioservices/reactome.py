@@ -57,8 +57,8 @@ class Reactome(REST):
 
     def __init__(self, verbose=True, cache=False):
         super(Reactome, self).__init__("Reactome(URL)",url=Reactome._url,
-            verbose=verbose, cache=False)
-        self.logging.warning("Class in development. Some methods are already  working but those required POST do not. Coming soon ")
+            verbose="ERROR", cache=False)
+        self.debugLevel = verbose
 
         # for buffering
         self._list_pathways = None
@@ -67,7 +67,7 @@ class Reactome(REST):
         if self._list_pathways is None:
             res =  self.session.get("http://www.reactome.org/download/current/ReactomePathways.txt")
             if res.status_code == 200:
-                res = res.content
+                res = res.text # content does not work in python 3.3
                 res = res.strip()
                 self._list_pathways = [x.split("\t") for x in res.split("\n")]
             else:
@@ -355,7 +355,7 @@ class Reactome(REST):
         return res
 
 
-
+"""
 class ReactomePathway(object):
 
     def __init__(self, entry):
@@ -409,7 +409,7 @@ class ReactomePathway(object):
         txt += "\nevidence Type: " + str(self.raw_data.evidenceType) + "\n"
 
         return txt
-
+"""
 
 
 class ReactomeAnalysis(REST):
