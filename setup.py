@@ -25,8 +25,8 @@ metainfo = {
     'keywords' : [
         "BioServices", "WebServices", "Biology", "BioDBNet", "ChEBI", "UniChem", "Kegg", "KEGG", "BioModels",
         "EUtils", "UniProt", "PICR", "ArrayExpress", "MUSCLE", "QuickGO", "PDB", "PSICQUIC", "Blast",
-        "BioMART", "BioGRID", "MIRIAM", "BioMart", "GeneProf", "EUtils", "ChEMBL", "ChemSpider", 
-        "HGNC", "PathwayCommons"],
+        "BioMART", "BioGRID", "MIRIAM", "BioMart", "GeneProf", "ChEMBL", "ChemSpider", 
+        "HGNC", "PathwayCommons", "Rhea"],
     'classifiers' : [
           'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Developers',

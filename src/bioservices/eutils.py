@@ -284,17 +284,21 @@ class EUtils(WSDLService):
 
         ::
 
+            >>> all_database_names = s.EInfo()
+            >>> # specific info about one database:
             >>> ret = s.EInfo("taxonomy")
             >>> ret.Count
             >>> ret.Name
-
+            >>> ret = s.EInfo('pubmed')
+            >>> res.FieldList[2].FullName
+            'Filter'
 
         """
         if db == None:
             return self.databases
         else:
             self._check_db(db)
-        #does not work. issue with schema
+        # does not work. issue with schema
         # ret = self._einfo_wsdl(db, **kargs)
         # Let us use rest instead.
         ret = self._einfo_rest(db)
@@ -313,7 +317,6 @@ class EUtils(WSDLService):
         params.db = db
         params.tool = self.tool[:]
         params.email = self.email[:]
-        print(params)
         return self.serv.run_eInfo(db, params)
 
     def _check_ids(self, sid):
@@ -432,6 +435,9 @@ class EUtils(WSDLService):
     #    ret = self.easyXML(ret)
     #    return ret
 
+    def get_esearch_params(self):
+        return self.wsdl_create_factory("nsese:eSearchRequest")
+
     def ESearch(self, db, term, **kargs):
         """
 
@@ -443,11 +449,24 @@ class EUtils(WSDLService):
             >>> # There is on identifier in the IdList (therefore the first element)
             >>> identifiers = e.pubmed(ret.IdList.Id)
 
+        
+        More complex requests can be used. We will not cover all the possiblities (see the
+        NCBI website). Here is an example to tuned the search term to look into
+        PubMed for the journal PNAS Volume 16, and retrieve.::
+
+            >>> e.ESearch("pubmed", "PNAS[ta] AND 16[vi]")
+
+
         You can then look more closely at a specific identifier using EFetch::
 
             >>> e = EFetch("pubmed")
             >>> e.efetch(identifiers)
 
+
+
+
+
+        .. note:: valid parameters can be found by calling :meth:`get_esearch_params`  
         """
         params = self.wsdl_create_factory("nsese:eSearchRequest", **kargs)
         params['db'] = db
@@ -561,7 +580,10 @@ class AttrDict(dict):
 
 
 class EUtilsParser(AttrDict):
-    """Convert xml returned by EUtils into a structure easier to manipulate"""
+    """Convert xml returned by EUtils into a structure easier to manipulate
+    
+    Tested and used for EInfo, 
+    """
     def __init__(self, xml):
         super(EUtilsParser, self).__init__()
 

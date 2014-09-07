@@ -19,9 +19,11 @@ class TestPICR(object):
     def test_databases(self):
         assert len(self.e.databases) > 0
 
+    @attr('slow')
     def test_MappedDB(self):
         self.e.getMappedDatabaseNames()
 
+    @attr('slow')
     def test_checkDB(self):
         self.e._checkDBname("IPI")
         try:
@@ -30,6 +32,7 @@ class TestPICR(object):
         except:
             assert True
 
+    @attr('slow')
     def test_getUPIForAccession(self):
         self.e.getUPIForAccession(self.e._accession_example, ["SWISSPROT"])
         self.e.getUPIForAccession(self.e._accession_example, "SWISSPROT", taxid="9606")
