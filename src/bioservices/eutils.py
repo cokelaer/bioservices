@@ -6,7 +6,7 @@
 #
 #  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -49,6 +49,7 @@ EINFO
 ESEARCH
 ESummary
 EGQuery
+EPost
 
 """
 # source:
@@ -127,24 +128,60 @@ class EUtils(WSDLService):
     comma or spaces.
 
     A few functions takes an argument called **term**. You can use the **AND**
-    keyword but spaces must be replaced by + signs::
+    keyword with spaces or + signs as separators::
 
-        Incorrect: term=biomol mrna[properties] AND mouse[organism]
+        Correct:   term=biomol mrna[properties] AND mouse[organism]
         Correct:   term=biomol+mrna[properties]+AND+mouse[organism]
 
     Other special characters, such as quotation marks (") or the # symbol used
-    in referring to a query key on the History server, should be represented by
-    their URL encodings (%22 for "; %23 for #).::
+    in referring to a query key on the History server, could be represented by
+    their URL encodings (%22 for "; %23 for #) or verbatim .::
 
-        Incorrect: term=#2+AND+"gene in genomic"[properties]
-        Correct:   term=%232+AND+%22gene+in+genomic%22[properties]
+        Correct: term=#2+AND+"gene in genomic"[properties]
+        Correct: term=%232+AND+%22gene+in+genomic%22[properties]
+
+    .. note:: most of the parameter names are identical to the expected names
+        except for **id**, which has been replaced by **sid**.
 
     """
     def __init__(self, verbose=False, email="unknown"):
-        url = "http://www.ncbi.nlm.nih.gov/entrez/eutils/soap/v2.0/eutils.wsdl?"
-        super(EUtils, self).__init__(name="EUtils", verbose=verbose, url=url)
-        self.logging.warning("In development. Some functionalities do work but API may change")
+        #url = "http://www.ncbi.nlm.nih.gov/entrez/eutils/soap/v2.0/eutils.wsdl?"
 
+        # according to http://www.ncbi.nlm.nih.gov/books/NBK25497/#chapter2.chapter2_table1
+        # this url should be use
+        url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/soap/v2.0/eutils.wsdl?"
+        super(EUtils, self).__init__(name="EUtils", verbose=verbose, url=url)
+
+
+        warning = """
+
+        NCBI recommends that users post no more than three URL requests per second.
+        Failure to comply with this policy may result in an IP address being blocked
+        from accessing NCBI. If NCBI blocks an IP address, service will not be
+        restored unless the developers of the software accessing the E-utilities
+        register values of the tool and email parameters with NCBI. The value of
+        email will be used only to contact developers if NCBI observes requests
+        that violate our policies, and we will attempt such contact prior to blocking
+        access.  For more details see http://www.ncbi.nlm.nih.gov/books/NBK25497/#chapter2.chapter2_table1
+
+        BioServices does not check if you send more than 3 requests per seconds.
+        This is considered to be the user responsability. Within BioServices, we
+        fill the parameter **tool** and **email**, however, to fill the later
+        you should provide your email either globablly when instanciating EUtils,
+        or locally when calling a method.
+
+        This message will not appear if you set the email as a parameter::
+
+            e = EUtils(email="name@adress")
+
+        or in you bioservices configuration file (.config/bioservices/bioservices.cfg)
+        under linux with a user section::
+
+            [user]
+            email = yourname@somewhere
+
+
+        """
         # on top of the WSDL protocol we also need a REST for the EFetch method
         # Indeed, although we have a WSDL class for EFetch, it is (i) limited
         # because doc could not be found (ii) required sn instanciation for
@@ -153,7 +190,13 @@ class EUtils(WSDLService):
 
         self._databases = None
         self.tool = "bioservices"
-        self.email = email      # TODO do we want to make this compulsary
+        self.email = email
+        if self.email == "unknown":
+            # trying the bioservices config file
+            if self.settings.params['user.email'][0]!="unknown":
+                self.email = self.settings.params['user.email'][0]
+            else:
+                self.logging.warning(warning)
 
     def _get_databases(self):
         """alias to run_eInfo"""
@@ -162,6 +205,48 @@ class EUtils(WSDLService):
             self._databases = sorted(self.serv.run_eInfo().DbList.DbName)
         return self._databases
     databases = property(_get_databases, doc="Returns list of valid databases")
+
+    def _check_db(self, db):
+        if db not in self.databases:
+            raise ValueError("You must provide a valid databases from : ", self.databases)
+
+    def _check_retmode(self, retmode):
+        if retmode not in ["xml", "text"]:
+            raise ValueError("You must provide a retmode in 'xml', 'text'")
+
+    def get_einfo_params(self, **kargs):
+        return self.wsdl_create_factory("nsei:eInfoRequest", **kargs)
+
+    def get_esummary_params(self, **kargs):
+        return self.wsdl_create_factory("nsesu:eSummaryRequest", **kargs)
+
+    def get_esearch_params(self, **kargs):
+        return self.wsdl_create_factory("nsese:eSearchRequest", **kargs)
+
+    def get_egquery_params(self, **kargs):
+        return self.wsdl_create_factory("nseg:eGqueryRequest", **kargs)
+
+    def get_espell_params(self, **kargs):
+        return self.wsdl_create_factory("nsesp:eSpellRequest", **kargs)
+
+    def get_elink_params(self, **kargs):
+        return self.wsdl_create_factory("nsel:eLinkRequest", **kargs)
+
+    def get_epost_params(self, **kargs):
+        return self.wsdl_create_factory("nseps:ePostRequest", **kargs)
+
+    def _check_ids(self, sid):
+        if isinstance(sid, int):
+            sid = [sid]
+        if isinstance(sid, list):
+            sid = ",".join([str(x) for x in sid])
+
+        # If there are commas, let us split, strip spaces and join back the ids
+        sid = ",".join([x.strip() for x in sid.split(',') if x.strip()!=""])
+
+        if len(sid.split(","))>200:
+            raise ValueError("Number of comma separated IDs must be less than 200")
+        return sid
 
     def taxonomy(self, sid, raw=False):
         """Alias to EFetch for ther taxonomy database using WSDL
@@ -200,7 +285,7 @@ class EUtils(WSDLService):
         ret = serv.efetch(sid)
         return ret
 
-    def EFetch(self, db, sid, retmode="text", **kargs):
+    def EFetch(self, db, sid=None, retmode="text", **kargs):
         """Access to the EFetch E-Utilities
 
         :param str db: Database from which to retrieve UIDs. The value must be a valid Entrez database
@@ -247,7 +332,7 @@ class EUtils(WSDLService):
 
             >>> e.EFetch("pubmed", "20210808", retmode="xml")
             >>> e.EFetch('nucleotide', id=15, retmode='xml')
-            >>> e.EFetch('nucleotide', id=15, retmode='xml', rettype='fasta')   
+            >>> e.EFetch('nucleotide', id=15, retmode='xml', rettype='fasta')
             >>> e.EFetch('nucleotide', 'NT_019265', rettype='gb')
 
         eutils.EUtilsParser(e.EFetch("taxonomy", "9685", retmode="xml")
@@ -259,7 +344,8 @@ class EUtils(WSDLService):
         """
         #self._check_db(db)
         self._check_retmode(retmode)
-        sid = self._check_ids(sid)
+        if sid != None:
+            sid = self._check_ids(sid)
 
         params = {'db':db, 'id':sid, 'retmode':retmode, 'tool':self.tool,
                 'email': self.email}
@@ -275,17 +361,18 @@ class EUtils(WSDLService):
             else:
                 raise ValueError("invalid complexity. must be a number in 0,1,2,3,4")
 
-        if kargs.get("seq_start"):
-            params['seq_start'] = seq_start
-        if kargs.get("seq_stop"):
-            params['seq_stop'] = seq_stop
-        if kargs.get("rettype"):
-            params['rettype'] = kargs.get('rettype')
+        for param in ['retmax', 'seq_start', "seq_stop", "rettype", "query_key", "WebEnv"]:
+            if kargs.get(param):
+                params[param] = kargs.get(param)
+
+        #print(params)
         if retmode == "xml":
             ret = self._efetch.http_get("efetch.fcgi", 'xml', params=params)
             ret = self.easyXML(ret)
         else:
             ret = self._efetch.http_get("efetch.fcgi", 'txt', params=params)
+
+
         return ret
 
     def EInfo(self, db=None, **kargs):
@@ -295,9 +382,9 @@ class EUtils(WSDLService):
 
         :param str db: target database about which to gather statistics. Value must be a
             valid Entrez database name. See :attr:`databases` or don't provide
-            db to get the list
-        :return: statistics with XML format if method is "rest") or SOAP format
-            if method is wsdl (default).
+            any value to obtain the entire list
+        :return: either a list of databases, or a dictionary with relevant information
+            about the requested database
 
         ::
 
@@ -315,74 +402,40 @@ class EUtils(WSDLService):
             return self.databases
         else:
             self._check_db(db)
-        # does not work. issue with schema
-        # ret = self._einfo_wsdl(db, **kargs)
-        # Let us use rest instead.
-        ret = self._einfo_rest(db)
+
+        # WSDL does not work, let us use rest instead.
+        ret = self._einfo_rest(db, **kargs)
         ret = EUtilsParser(ret)
         return ret
 
-    # TOKEEP
-    def _einfo_rest(self, db=None):
+    def _einfo_rest(self, db=None, **kargs):
         s = REST("test","http://eutils.ncbi.nlm.nih.gov/entrez/eutils/")
-        ret = s.http_get("einfo.fcgi?db=%s" % db, "xml")
+        ret = s.http_get("einfo.fcgi?db=%s" % db, frmt="xml",
+                         params={'tool':kargs.get('tool',self.tool),
+                                 'email':kargs.get('email',self.email)
+                                 })
         ret = self.easyXML(ret)
         return ret
 
+    """Does not work...issue with DbBuil
+    # ret = self._einfo_wsdl(db, **kargs)
     def _einfo_wsdl(self, db=None, **kargs):
         params = self.suds.factory.create("nsei:eInfoRequest", **kargs)
         params.db = db
         params.tool = self.tool[:]
         params.email = self.email[:]
         return self.serv.run_eInfo(db, params)
+    """
 
-    def _check_ids(self, sid):
-        if isinstance(sid, int):
-            sid = [sid]
-        if isinstance(sid, list):
-            sid = ",".join([str(x) for x in sid])
 
-        # If there are commas, let us split, strip spaces and join back the ids
-        sid = ",".join([x.strip() for x in sid.split(',') if x.strip()!=""])
 
-        if len(sid.split(","))>200:
-            raise ValueError("Number of comma separated IDs must be less than 200")
-        return sid
 
-    def _check_db(self, db):
-        if db not in self.databases:
-            raise ValueError("You must provide a valid databases from : ", self.databases)
+    def ESummary(self, db, sid=None,  **kargs):
+        """Returns document summaries for a list of input UIDs
 
-    def _check_retmode(self, retmode):
-        if retmode not in ["xml", "text"]:
-            raise ValueError("You must provide a retmode in 'xml', 'text'")
 
-    def get_esummary_params(self, **kargs):
-        return self.wsdl_create_factory("nsesu:eSummaryRequest", **kargs)
-
-    def get_esearch_params(self, **kargs):
-        return self.wsdl_create_factory("nsese:eSearchRequest", **kargs)
-
-    def get_egquery_params(self, **kargs):
-        return self.wsdl_create_factory("nseg:eGqueryRequest", **kargs)
-
-    def get_espell_params(self, **kargs):
-        return self.wsdl_create_factory("nsesp:eSpellRequest", **kargs)
-
-    def get_elink_params(self, **kargs):
-        return self.wsdl_create_factory("nsel:eLinkRequest", **kargs)
-
-    def get_epost_params(self, **kargs):
-        return self.wsdl_create_factory("nseps:ePostRequest", **kargs)
-
-    def ESummary(self, db, sid, method="wsdl", **kargs):
-        """document summary downloads
-
-        Returns document summaries (DocSums) for a list of input UIDs
-        OR returns DocSums for a set of UIDs stored on the Entrez History server
-
-        :param str sid: UID list. Either a single UID or a comma-delimited list of UIDs may be provided.
-            All of the UIDs must be from the database specified by db. Limited
+        :param str sid: list of identifiers (or string comma separated).
+            all of the UIDs must be from the database specified by db. Limited
             to 200 sid
 
         ::
@@ -405,20 +458,19 @@ class EUtils(WSDLService):
             }
 
 
-
         """
-        sid = self._check_ids(sid)
+        if sid!=None:
+            sid = self._check_ids(sid)
+
         if db == None:
             return self.databases
         else:
             self._check_db(db)
 
-        if method=="wsdl":
-            ret = self._esummary_wsdl(db, sid, **kargs)
-        elif method == "rest":
-            ret = self._esummary_rest(db, sid)
-        else:
-            raise ValueError("method must be either wsdl or rest")
+        params = self.get_esummary_params(**kargs)
+        params.db = db
+        params.id = sid
+        ret = self.serv.run_eSummary(**dict(params))
         return ret
 
     def _esummary_rest(self, db, sid):
@@ -428,13 +480,10 @@ class EUtils(WSDLService):
         ret = self.easyXML(ret)
         return ret
 
-    def _esummary_wsdl(self, db, sid, **kargs):
-        params = self.get_esummary_params(**kargs)
-        ret = self.serv.run_eSummary(db, sid, params)
-        return ret
+
 
     def EGQuery(self, term, **kargs):
-        """Provides the number of records retrieved in all Entrez databases by a single text query.
+        """Provides the number of records retrieved in all Entrez databases by a text query.
 
         :param str term: Entrez text query. All special characters must be URL
             encoded. Spaces may be replaced by '+' signs. For very long queries (more than
@@ -457,7 +506,16 @@ class EUtils(WSDLService):
         return ret
 
     def ESearch(self, db, term, **kargs):
-        """
+        """Responds to a query in a given  database
+
+
+        The response can be used later in ESummary, EFetch or ELink, along with
+        the term translations of the query.
+
+        :param db:
+        :param term:
+
+        .. note:: see :meth:`get_esearch_params` for the list of valid parameters.
 
         ::
 
@@ -467,9 +525,9 @@ class EUtils(WSDLService):
             >>> # There is on identifier in the IdList (therefore the first element)
             >>> identifiers = e.pubmed(ret.IdList.Id)
 
-        
+
         More complex requests can be used. We will not cover all the possiblities (see the
-        NCBI website). Here is an example to tuned the search term to look into
+        NCBI website). Here is an example to tune the search term to look into
         PubMed for the journal PNAS Volume 16, and retrieve.::
 
             >>> e.ESearch("pubmed", "PNAS[ta] AND 16[vi]")
@@ -481,9 +539,9 @@ class EUtils(WSDLService):
             >>> e.efetch(identifiers)
 
 
-        .. note:: valid parameters can be found by calling :meth:`get_esearch_params`  
+        .. note:: valid parameters can be found by calling :meth:`get_esearch_params`
         """
-        params = self.wsdl_create_factory("nsese:eSearchRequest", **kargs)
+        params = self.get_esearch_params(**kargs)
         params['db'] = db
         params['term'] = term
         # the API requires the db and term paramters to be provided
@@ -503,11 +561,12 @@ class EUtils(WSDLService):
 
 
     def ESpell(self, db, term, **kargs):
-        """Provides spelling suggestions for terms within a single text query in a given database.
+        """Retrieve spelling suggestions for a text query in a given database.
 
-        :param str db: database to search. Value must be a valid Entrez database name (default = pubmed).
-        :param str term: Entrez text query. All special characters must be URL encoded. Spaces may be replaced by '+' signs. For very long queries (more than several hundred characters long), consider using an HTTP POST call. See the PubMed or Entrez help for information about search field descriptions and tags. Search fields and tags are database specific.
-
+        :param str db: database to search. Value must be a valid Entrez
+            database name (default = pubmed).
+        :param str term: Entrez text query. All special characters must be
+            URL encoded.
 
         ::
 
@@ -528,7 +587,7 @@ class EUtils(WSDLService):
         ret = self.serv.run_eSpell(db, term, params)
         return ret
 
-    def ELink(self, dbfrom, sid, **kargs):
+    def ELink(self, dbfrom, sid=None, **kargs):
         """The Entrez links utility
 
         Responds to a list of UIDs in a given database with either a list of
@@ -571,11 +630,12 @@ class EUtils(WSDLService):
 
         .. todo:: remove LinkSet : there is only 1 set ?
         """
-        sid = self._check_ids(sid)
+        if sid!=None:
+            sid = self._check_ids(sid)
         self._check_db(dbfrom)
         if 'cmd' in kargs.keys():
-            assert kargs['cmd'] in ["neighbor", "neighbor_score", 
-                    "neighbor_history", "acheck", "llinks", "lcheck", 
+            assert kargs['cmd'] in ["neighbor", "neighbor_score",
+                    "neighbor_history", "acheck", "llinks", "lcheck",
                     "ncheck", "llinkslib" ,"prlinks"]
 
         #s = REST("test","http://eutils.ncbi.nlm.nih.gov/entrez/eutils/")
@@ -592,7 +652,10 @@ class EUtils(WSDLService):
         return ret
 
     def EPost(self, db, sid, **kargs):
-        """
+        """Accepts a list of UIDs from a given database,
+
+        stores the set on the History Server, and responds with a query
+        key and web environment for the uploaded dataset.
 
         :param str db: a valid database
         :param id: list of strings of strings
@@ -614,8 +677,8 @@ class AttrDict(dict):
 
 class EUtilsParser(AttrDict):
     """Convert xml returned by EUtils into a structure easier to manipulate
-    
-    Tested and used for EInfo, 
+
+    Tested and used for EInfo,
 
     Does not work for Esummary
     """

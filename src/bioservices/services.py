@@ -112,8 +112,8 @@ class Service(Logging):
         :param bool verbose: prints informative messages if True (default is
             True)
 
-        All instances have an attribute called :attr:`~Service.logging` that 
-        is an instanceof the :mod:`logging` module. It can be used to print 
+        All instances have an attribute called :attr:`~Service.logging` that
+        is an instanceof the :mod:`logging` module. It can be used to print
         information, warning, error messages::
 
             self.logging.info("informative message")
@@ -280,6 +280,7 @@ class WSDLService(Service):
         super(WSDLService, self).__init__(name, url, verbose=verbose)
 
         self.logging.info("Initialising %s service (WSDL)" % self.name)
+        self.settings = BioServicesConfig()
 
         try:
             #: attribute to access to the methods provided by this WSDL service
@@ -308,10 +309,19 @@ class WSDLService(Service):
 
     def wsdl_create_factory(self, name, **kargs):
         params = self.suds.factory.create(name)
+
+        # e.g., for eutils
+        if "email" in dict(params).keys():
+            params.email = self.settings.params['user.email'][0]
+
+        if "tool" in dict(params).keys():
+            import bioservices
+            params.tool = "BioServices, " + bioservices.__version__
+
         for k,v in kargs.items():
             from suds import sudsobject
             keys = sudsobject.asdict(params).keys()
-            if k in keys: 
+            if k in keys:
                params[k] = v
             else:
                 msg = "{0} incorrect. Correct ones are {1}"
@@ -546,7 +556,6 @@ class REST(RESTbase):
 
         self._session = None
 
-        from bioservices.settings import BioServicesConfig
         self.settings = BioServicesConfig()
 
         self.settings.params['cache.on'][0] = cache

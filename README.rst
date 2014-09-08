@@ -2,7 +2,7 @@ BioServices
 ##############
 
 .. image:: https://badge.fury.io/py/bioservices.svg
-    :target: https://badge.fury.io/py/bioservices.svg
+    :target: https://pypi.python.org/pypi/bioservices
 
 .. image:: https://pypip.in/d/bioservices/badge.png
     :target: https://crate.io/packages/bioservices/
@@ -36,18 +36,20 @@ One of the main philosophy of **BioServices** is to make use of the existing
 biological databases (not to re-invent new databases) and to alleviates the
 needs for expertise in Web Services for the developers/users.
 
-BioServices provides access to 25 Web Services including 
+BioServices provides access to 25 Web Services including. For a quick start,
+look at some notebooks related to 
 
-* `BioModels <http://www.ebi.ac.uk/biomodels-main/>`_
-* `KEGG <http://www.genome.jp/kegg/pathway.html>`_
-* `UniProt <http://www.uniprot.org/>`_
-* `quickGO <http://www.ebi.ac.uk/QuickGO/WebServices.html>`_
-* `PSICQUIC <http://code.google.com/p/psicquic/>`_
-* `WikiPathway <http://www.wikipathways.org/index.php/WikiPathways>`_
-* and more (e.g., UniChem, ChEMBL, EUtils, GeneProf, PathwayCommons, BioDBNet,
-* UniChem). 
+* UniProt on `uniprot nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/UniProt.ipynb>`_
+* BioModels on `biomodels nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/BioModels.ipynb>`_
+* ChhEMBL on `chembl nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/ChEMBL.ipynb>`_
+* KEGG on `KEGG nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/KEGG.ipynb>`_
+* MUSCLE on `MUSCLE  nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/MUSCLE.ipynb>`_
+* NCBIBlast on `ncbiblast nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/NCBIBlast.ipynb>`_
+* WikiPathway on `wikipathway nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/WikiPathway.ipynb>`_
 
-an up-to-date list of Web Services is provided within 
+and more on `github <https://github.com/cokelaer/bioservices/tree/master/doc/source/notebook>`_.
+
+An up-to-date list of Web Services is provided within 
 the online `documentation <http://pythonhosted.org/bioservices/>`_.
 
 Here is a little example using the UniProt Web Service to search for the zap70 specy in human

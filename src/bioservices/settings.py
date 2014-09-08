@@ -6,10 +6,7 @@ Created on Fri Aug  8 15:31:34 2014
 """
 import os
 from easydev import DynamicConfigParser, underline
-import sys
-import tempfile
 import copy
-import types
 import shutil
 
 import appdirs
@@ -21,9 +18,10 @@ __all__ = ["get_bioservices_env", "defaultParams", "BioServicesConfig"]
 # second item if a type or TUPLE of types possible
 # third item is documentation
 defaultParams = {
+    'user.email': ["unknown", (str), "email addresss that may be used in some utilities (e.g. EUtils)"],
     'general.timeout': [30, (int,float), ""],
     'general.max_retries': [3, int, ''],
-    'general.async_concurrent' : [50, int, ''], 
+    'general.async_concurrent' : [50, int, ''],
     'general.async_threshold': [10 , int, 'when to switch to asynchronous requests'],
     'cache.tag_suffix': ["_bioservices_database",str, 'suffix to append for cache databases'],
     'cache.on' : [False, bool, 'CACHING on/off'],
@@ -42,13 +40,13 @@ def get_bioservices_env(section, option):
         fh = open(bs.config_file, "w")
         bs.cf.write(fh)
         fh.close()
-        raise ValueError("""No token found for chemspider. 
+        raise ValueError("""No token found for chemspider.
         Creating one on http//www.chemspider.com and provide it when creating instance of ChemSpider""")
     else:
         bs.cf.read(bs.config_file)
         value = bs.cf.get(section, option)
         if value=="":
-            raise ValueError("""No token found for chemspider. 
+            raise ValueError("""No token found for chemspider.
             Creating one on http//www.chemspider.com and provide it when creating instance of ChemSpider""")
         return value
 
@@ -57,7 +55,7 @@ def get_bioservices_env(section, option):
 
 class ConfigReadOnly(object):
     """A generic Config file handler
-    
+
     Uses appdirs from ypi to handle the XDG protocol
 
     Read the configuration in the XDG directory. If not found, the
@@ -71,7 +69,7 @@ class ConfigReadOnly(object):
     """
     def __init__(self, name=None, default_params={}):
         """name is going to be the generic name of the config folder
-        
+
         e.g., /home/user/.config/<name>/<name>.cfg
 
         """
@@ -109,12 +107,12 @@ class ConfigReadOnly(object):
 
         where True is the expected value.
 
-        
+
         """
         try:
             self.config_parser.read(self.user_config_file_path)
         except IOError:
-            
+
             msg = "Welcome to %s" % self.name.capitalize()
             print(underline(msg))
             print("It looks like you do not have a configuration file.")
@@ -131,7 +129,7 @@ class ConfigReadOnly(object):
                 if newkey in self.params.keys():
                     # the type should be self.params[newkey][1]
                     cast = self.params[newkey][1]
-                    # somehow 
+                    # somehow
                     if isinstance(value, cast) == True:
                         self.params[newkey][0] = value
                     else:
@@ -141,8 +139,8 @@ class ConfigReadOnly(object):
                     print("Warning:: found invalid option or section in %s (ignored):" % self.user_config_file_path)
                     print("   %s %s" % (section, option))
 
-    def _get_home(self):    
-        # This function should be robust   
+    def _get_home(self):
+        # This function should be robust
         # First, let us try with expanduser
         try:
             homedir = os.path.expanduser("~")
@@ -163,7 +161,7 @@ class ConfigReadOnly(object):
 
     def _mkdirs(self, newdir, mode=0o777):
         """from matplotlib mkdirs
-        
+
         make directory *newdir* recursively, and set *mode*.  Equivalent to ::
 
         > mkdir -p NEWDIR
@@ -195,7 +193,7 @@ class ConfigReadOnly(object):
     def _get_config_dir(self):
         sdir = self.appdirs.user_config_dir
         return self._get_and_create(sdir)
-    user_config_dir = property(_get_config_dir, 
+    user_config_dir = property(_get_config_dir,
             doc="return directory of this configuration file")
 
     def _get_cache_dir(self):
@@ -211,12 +209,12 @@ class ConfigReadOnly(object):
 
     def _get_config_file(self):
         return self.name + ".cfg"
-    config_file = property(_get_config_file, 
+    config_file = property(_get_config_file,
             doc="config filename (without path)")
 
     def init(self):
         """Reads the user_config_file and update params.
-        Creates the directories for config and cache if they do not exsits 
+        Creates the directories for config and cache if they do not exsits
 
         """
         # Let us create the directories by simply getting these 2 attributes:
@@ -224,7 +222,7 @@ class ConfigReadOnly(object):
             _ = self.user_config_dir
         except:
             print("Could not retrieve or create the config file and/or directory in %s" % self.name)
-        try:    
+        try:
             _ = self.user_cache_dir
         except:
             print("Could not retrieve or create the cache file and/or directory in %s" % self.name)
@@ -253,12 +251,12 @@ class ConfigReadOnly(object):
             fh.write("[" + section +"]\n")
             options = [x.split(".")[1] for x in self._default_params.keys() if x.startswith(section+".")]
             for option in options:
-                key = section + '.' + option    
+                key = section + '.' + option
                 value = self._default_params[key]
                 fh.write("# {}\n{} = {}\n".format(value[2], option, value[0]))
             fh.write("\n")
         fh.close()
-                
+
     def reload_default_params(self):
         self.params = copy.deepcopy(self._default_params)
 
@@ -266,7 +264,7 @@ class ConfigReadOnly(object):
 
 class BioServicesConfig(ConfigReadOnly):
     def __init__(self):
-        super(BioServicesConfig, self).__init__(name="bioservices", 
+        super(BioServicesConfig, self).__init__(name="bioservices",
                 default_params=defaultParams)
 
 
