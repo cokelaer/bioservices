@@ -22,7 +22,11 @@ class test_EUtils(object):
 
     def test_summary(self):
         ret = self.e.ESummary("taxonomy", "9606,9913")
+        assert ret.DocSum[0].Id == '9606'
+        assert ret.DocSum[1].Id == '9913'
 
+        # test another database 
+        assert self.e.ESummary("structure", "10000").DocSum[0].Id
 
     def _test_espell(self):
         ret = self.e.ESpell(db="omim", term="aasthma+OR+alergy")
@@ -30,8 +34,14 @@ class test_EUtils(object):
         assert ret.Query == 'aasthma OR alergy'
         assert ret.CorrectedQuery == 'asthma or allergy'
 
-    def _test_elink(self):
+    def test_elink(self):
         ret = self.e.ELink("pubmed", "pubmed", Ids="20210808", cmd="neighbor_score")
+
+
+        ret = self.e.ELink("pubmed", "24064416")
+        assert len(ret.LinkSet[0].LinkSetDb[0].Link) > 10
+
+        self.e.ELink("nucleotide", "48819,7140345", db="protein")
 
     def test_einfo(self):
         dbinfo = self.e.EInfo("gtr")
@@ -40,18 +50,41 @@ class test_EUtils(object):
         assert dbinfo.Description == 'GTR database'
         assert dbinfo.FieldList[0].Name == 'ALL'
 
-
-
-
         ret = self.e.EInfo("taxonomy")
         ret.Count
 
     def test_gquery(self):
-        ret = self.e.EGquery("asthma")
+        ret = self.e.EGQuery("asthma")
         [(x.DbName, x.Count) for x in ret.eGQueryResult.ResultItem if x.Count!='0']
 
-    def _test_efetch(self):
-        ret = self.e.EFetch("omim", "269840")
-        ret1 = self.e.EFetch("sequences", "34577063", retmode="text", rettype="fasta", stand=1)
-        ret2 = self.e.EFetch("sequences", "34577063", retmode="text", rettype="fasta", stand=2)
-        self.e.EFetch("sequences", "34577063", retmode="text", rettype="fasta",strand=2,seq_start=10, seq_stop=20)
+    def test_efetch(self):
+        #ret = self.e.EFetch("omim", "269840")
+        #ret1 = self.e.EFetch("sequences", "34577063", retmode="text", rettype="fasta", stand=1)
+        #ret2 = self.e.EFetch("sequences", "34577063", retmode="text", rettype="fasta", stand=2)
+        #self.e.EFetch("sequences", "34577063", retmode="text", rettype="fasta",strand=2,seq_start=10, seq_stop=20)
+
+
+        ret = self.e.EFetch('pubmed', '12091962,9997',  retmode='xml', rettype='abstract')
+
+        # sequences
+        res1 = self.e.EFetch("sequences", "352, 234", retmode="text", rettype="fasta")
+        res2 = self.e.EFetch("sequences", ["352", "234"], retmode="text", rettype="fasta")
+        res3 = self.e.EFetch("sequences", [352, 234], retmode="text", rettype="fasta")
+        assert res1 == res2
+        assert res2 == res3
+        assert res1 == res3
+
+        assert len(self.e.EFetch("sequences", "352, 234", retmode="text", rettype="fasta"))>20
+
+
+    def test_epost(self):
+        ret = self.e.EPost("pubmed", "20210808")
+        assert ret.QueryKey
+        print(ret)
+        assert "ERROR" not in dict(ret).keys()
+
+        ret = self.e.EPost("pubmed", "-1")
+        assert ret.QueryKey
+        assert "ERROR" in dict(ret).keys()
+
+

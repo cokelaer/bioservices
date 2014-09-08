@@ -4,3 +4,9 @@ source = bioservices
 [report]
 exclude_lines = 
     if __name__ == __main__
+omit = 
+    */site-packages/nose/*
+    */site-packages/pandas/*
+    */site-packages/*
+    */easydev/*
+    ./test/test*py

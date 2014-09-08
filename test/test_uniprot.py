@@ -1,9 +1,7 @@
 from bioservices.uniprot import UniProt
-from easydev.decorators import ifpandas
 from nose.plugins.attrib import attr
 
 
-@attr('skip_travis')
 class test_UniProt(UniProt):
     def __init__(self):
         super(test_UniProt, self).__init__(verbose=False, cache=False)
@@ -42,12 +40,12 @@ class test_UniProt(UniProt):
 
         self.quick_search("ZAP70")
 
-    @ifpandas
+    @attr('skip')
     def test_uniref(self):
         df = self.uniref("member:Q03063")
         df.Size
 
-    @ifpandas
+    @attr('skip')
     def test_get_df(self):
         df = self.get_df(["P43403"])
 

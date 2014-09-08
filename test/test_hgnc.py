@@ -1,6 +1,8 @@
 from bioservices import HGNC
 from nose.plugins.attrib import attr
 
+
+@attr('fixme')
 class test_hgnc():
 
     def __init__(self):

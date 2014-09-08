@@ -8,10 +8,6 @@ class test_WSDbfetch(object):
     def setup_class(klass):
         klass.s = WSDbfetch(verbose=False)
 
-    #def __init__(self):
-    #    super(test_WSDbfetch, self).__init__(verbose=False)
-        
-
     def test_getSupportedDBs(self):
         res = self.s.getSupportedDBs()
         res = self.s.getSupportedDBs()

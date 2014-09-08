@@ -42,6 +42,15 @@ from bioservices import REST
 __all__ = ["EUtils"]
 
 
+#DONE
+
+"""
+EINFO
+ESEARCH
+ESummary
+EGQuery
+
+"""
 # source:
 # http://www.dalkescientific.com/writings/diary/archive/2005/09/30/using_eutils.html
 
@@ -150,7 +159,7 @@ class EUtils(WSDLService):
         """alias to run_eInfo"""
         if self._databases == None:
             # DbData changed into DbList in rev 1.3.0
-            self._databases = self.serv.run_eInfo().DbList.DbName
+            self._databases = sorted(self.serv.run_eInfo().DbList.DbName)
         return self._databases
     databases = property(_get_databases, doc="Returns list of valid databases")
 
@@ -207,7 +216,7 @@ class EUtils(WSDLService):
         ::
 
             >>> ret = s.EFetch("omim", "269840")  --> ZAP70
-            >>> ret = s.EFetch("taxonomy", "9606")
+            >>> ret = s.EFetch("taxonomy", "9606", retmode="xml")
             >>> [x.text for x in ret.getchildren()[0].getchildren() if x.tag=="ScientificName"]
             ['Homo sapiens']
 
@@ -233,7 +242,15 @@ class EUtils(WSDLService):
             >>> e.EFetch("sequences", [352, 234], retmode="text", rettype="fasta")
 
 
+        **retmode** should be xml or text depending on the database. For instance, xml fo
+        pubmed::
 
+            >>> e.EFetch("pubmed", "20210808", retmode="xml")
+            >>> e.EFetch('nucleotide', id=15, retmode='xml')
+            >>> e.EFetch('nucleotide', id=15, retmode='xml', rettype='fasta')   
+            >>> e.EFetch('nucleotide', 'NT_019265', rettype='gb')
+
+        eutils.EUtilsParser(e.EFetch("taxonomy", "9685", retmode="xml")
         .. todo:: more documentation and optional arguments
 
         Other special characters, such as quotation marks (") or the # symbol
@@ -340,6 +357,24 @@ class EUtils(WSDLService):
         if retmode not in ["xml", "text"]:
             raise ValueError("You must provide a retmode in 'xml', 'text'")
 
+    def get_esummary_params(self, **kargs):
+        return self.wsdl_create_factory("nsesu:eSummaryRequest", **kargs)
+
+    def get_esearch_params(self, **kargs):
+        return self.wsdl_create_factory("nsese:eSearchRequest", **kargs)
+
+    def get_egquery_params(self, **kargs):
+        return self.wsdl_create_factory("nseg:eGqueryRequest", **kargs)
+
+    def get_espell_params(self, **kargs):
+        return self.wsdl_create_factory("nsesp:eSpellRequest", **kargs)
+
+    def get_elink_params(self, **kargs):
+        return self.wsdl_create_factory("nsel:eLinkRequest", **kargs)
+
+    def get_epost_params(self, **kargs):
+        return self.wsdl_create_factory("nseps:ePostRequest", **kargs)
+
     def ESummary(self, db, sid, method="wsdl", **kargs):
         """document summary downloads
 
@@ -357,8 +392,6 @@ class EUtils(WSDLService):
             >>> ret = s.ESummary("snp","7535")
             >>> ret = s.ESummary("snp","7535,7530")
             >>> ret = s.ESummary("taxonomy", "9606,9913")
-
-
 
         ::
 
@@ -396,12 +429,11 @@ class EUtils(WSDLService):
         return ret
 
     def _esummary_wsdl(self, db, sid, **kargs):
-        params = self.wsdl_create_factory("nsesu:eSummaryRequest", **kargs)
-        print(params)
+        params = self.get_esummary_params(**kargs)
         ret = self.serv.run_eSummary(db, sid, params)
         return ret
 
-    def EGquery(self, term, method="wsdl", **kargs):
+    def EGQuery(self, term, **kargs):
         """Provides the number of records retrieved in all Entrez databases by a single text query.
 
         :param str term: Entrez text query. All special characters must be URL
@@ -412,31 +444,17 @@ class EUtils(WSDLService):
 
         ::
 
-            >>> ret = s.EGquery("asthma")
+            >>> ret = s.EGQuery("asthma")
             >>> [(x.DbName, x.Count) for x in ret.eGQueryResult.ResultItem if x.Count!='0']
 
-        .. note:: REST protocol is used only. WSDL could be used but
-            to keep code simple, we use only one protocol.
-        .. todo:: documentation and optional arguments
+            >>> ret = s.EGQuery("asthma")
+            >>> ret.eGQueryResult.ResultItem[0]
+            >>> ret.Term
+
         """
-        #self._check_retmode(retmode)
-        if method == "wsdl":
-            ret = self._egquery_wsdl(term, **kargs)
-        elif method == "rest":
-            ret = self._egquery_rest(term, **kargs)
-        else:
-            raise ValueError("method must be either wsdl or rest")
+        params = self.get_egquery_params(**kargs)
+        ret = self.serv.run_eGquery(term, params)
         return ret
-
-
-    #def esearch_rest(self, db, term):
-    ##    s = REST("test","http://eutils.ncbi.nlm.nih.gov/entrez/eutils/")
-    #    ret = s.http_get("esearch.fcgi", "xml", params={'term': term, 'db': db})
-    #    ret = self.easyXML(ret)
-    #    return ret
-
-    def get_esearch_params(self):
-        return self.wsdl_create_factory("nsese:eSearchRequest")
 
     def ESearch(self, db, term, **kargs):
         """
@@ -463,9 +481,6 @@ class EUtils(WSDLService):
             >>> e.efetch(identifiers)
 
 
-
-
-
         .. note:: valid parameters can be found by calling :meth:`get_esearch_params`  
         """
         params = self.wsdl_create_factory("nsese:eSearchRequest", **kargs)
@@ -485,12 +500,6 @@ class EUtils(WSDLService):
     #    ret = s.request("egquery.fcgi?term=%s&retmode=%s" % (term, retmode))
     #    return ret
 
-    def _egquery_wsdl(self, term, **kargs):
-        """retmode does not seem to work in the wsdl case"""
-        #self._check_retmode(retmode)
-        params = self.wsdl_create_factory("nseg:eGqueryRequest", **kargs)
-        ret = self.serv.run_eGquery(term, params)
-        return ret
 
 
     def ESpell(self, db, term, **kargs):
@@ -507,16 +516,19 @@ class EUtils(WSDLService):
             'asthmaa OR alergies'
             >>> ret.CorrectedQuery
             'asthma or allergy'
+            >>> ret = e.ESpell(db="pubmed", term="biosservices")
+            >>> ret.CorrectedQuery
+            bioservices
+
 
         .. note:: only WSDL protocol available
         """
-        params = self.wsdl_create_factory("nsesp:eSpellRequest", **kargs)
+        params = self.get_espell_params(**kargs)
         self._check_db(db)
         ret = self.serv.run_eSpell(db, term, params)
         return ret
 
-
-    def ELink(self, db, dbfrom, sid, cmd="neighbor"):
+    def ELink(self, dbfrom, sid, **kargs):
         """The Entrez links utility
 
         Responds to a list of UIDs in a given database with either a list of
@@ -545,15 +557,26 @@ class EUtils(WSDLService):
         ::
 
             >>> # Example: Find related articles to PMID 20210808
-            >>> ret = s.ELink("pubmed", "pubmed", sid="20210808", cmd="neighbor_score")
+            >>> ret = s.ELink("pubmed", sid="20210808", cmd="neighbor_score")
+            >>> ret.LinkSet[0].LinkSetDb[0].Link[0].Id
 
 
+            # FIXME: change example values
+            >>> s.Elink(dbfrom="nucleotide", db="protein",
+                              id="48819,7140345")
+            >>> s.Elink(dbfrom="nucleotide", db="protein",
+                              id="48819,7140345")
+
+            LinkSetDb, DbFrom , IdList
+
+        .. todo:: remove LinkSet : there is only 1 set ?
         """
         sid = self._check_ids(sid)
-        self._check_db(db)
         self._check_db(dbfrom)
-        assert cmd in ["neighbor", "neighbor_score", "neighbor_history",
-"acheck", "llinks", "lcheck", "ncheck", "llinkslib" ,"prlinks"]
+        if 'cmd' in kargs.keys():
+            assert kargs['cmd'] in ["neighbor", "neighbor_score", 
+                    "neighbor_history", "acheck", "llinks", "lcheck", 
+                    "ncheck", "llinkslib" ,"prlinks"]
 
         #s = REST("test","http://eutils.ncbi.nlm.nih.gov/entrez/eutils/")
         #request = "elink.fcgi?db=%s&dbfrom=%s" % (db, dbfrom)
@@ -561,16 +584,26 @@ class EUtils(WSDLService):
         #request += "&cmd=%s" % cmd
         #ret = s.request(request)
         #return ret
-        params = self.wsdl_create_factory("nsel:ELinkResult", **kargs)
-        ret = self.serv.run_eLink(db, term, params)
+        params = self.get_elink_params(**kargs)
+        params.dbfrom = dbfrom
+        params.id = sid
+
+        ret = self.serv.run_eLink(**dict(params))
         return ret
 
-    def EPost(self):
-        """Not implemented.
+    def EPost(self, db, sid, **kargs):
+        """
 
-         """
-        raise NotImplementedError
+        :param str db: a valid database
+        :param id: list of strings of strings
 
+
+        """
+        params = self.get_epost_params(**kargs)
+        params.id = sid
+        params.db = db
+        ret = self.serv.run_ePost(**dict(params))
+        return ret
 
 
 class AttrDict(dict):
@@ -583,6 +616,8 @@ class EUtilsParser(AttrDict):
     """Convert xml returned by EUtils into a structure easier to manipulate
     
     Tested and used for EInfo, 
+
+    Does not work for Esummary
     """
     def __init__(self, xml):
         super(EUtilsParser, self).__init__()
@@ -622,15 +657,6 @@ class EUtilsParser(AttrDict):
       "request",
       "http://www.ncbi.nlm.nih.gov/soap/eutils/",
    element = "('ePostRequest', 'http://www.ncbi.nlm.nih.gov/soap/eutils/epost')"
-   type = "None"
- }
-(Part){
-   root = <part element="nsel:eLinkRequest" name="request"/>
-   name = "request"
-   qname[] =
-      "request",
-      "http://www.ncbi.nlm.nih.gov/soap/eutils/",
-   element = "('eLinkRequest', 'http://www.ncbi.nlm.nih.gov/soap/eutils/elink')"
    type = "None"
  }
 """

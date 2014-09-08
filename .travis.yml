@@ -13,5 +13,5 @@ install:
 script:  
   - python setup.py nosetests  --with-coverage --cover-package bioservices --logging-level ERROR --attr '!slow,!skip,!fixme,!skip_travis' 
 
-#after_success:
-#  coveralls
+after_success:
+  coveralls

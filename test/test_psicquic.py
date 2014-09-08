@@ -38,7 +38,7 @@ class test_psicquic(object):
         # accessing the string DB
         self.s.query("string", "species:10090", firstResult=0, maxResults=100, output="tab25")
 
-@attr('slow')
+@attr('fixme')
 def test_appsPPI():
     p = psicquic.AppsPPI(verbose=False)
     p.queryAll("ZAP70", ["intact"])
