@@ -53,6 +53,21 @@ class test_EUtils(object):
         ret = self.e.EInfo("taxonomy")
         ret.Count
 
+        alldbs = self.e.EInfo()
+        for db in ['pubmed', 'genome', 'dbvar', 'gene']:
+            assert db in alldbs
+        assert len(alldbs) > 40 # 52 Aug 2014 but let us be on the safe side
+    def test_einfo_pubmed(self):
+        ret = self.e.EInfo('pubmed')
+        assert ret.DbName == 'pubmed'
+        assert ret.MenuName == 'PubMed'
+        assert ret.Description == 'PubMed bibliographic record'
+        assert int(ret.Count) >  17905967
+        assert ret.LastUpdate
+        assert len(ret.FieldList)>=40
+        assert ret.FieldList[0]['Name']
+        assert ret.FieldList[0]['FullName'], 'All Fields'
+ 
     def test_gquery(self):
         ret = self.e.EGQuery("asthma")
         [(x.DbName, x.Count) for x in ret.eGQueryResult.ResultItem if x.Count!='0']
@@ -65,7 +80,6 @@ class test_EUtils(object):
 
 
         ret = self.e.EFetch('pubmed', '12091962,9997',  retmode='xml', rettype='abstract')
-
         # sequences
         res1 = self.e.EFetch("sequences", "352, 234", retmode="text", rettype="fasta")
         res2 = self.e.EFetch("sequences", ["352", "234"], retmode="text", rettype="fasta")
@@ -74,7 +88,11 @@ class test_EUtils(object):
         assert res2 == res3
         assert res1 == res3
 
-        assert len(self.e.EFetch("sequences", "352, 234", retmode="text", rettype="fasta"))>20
+    def test_efetch_gene(self):
+        res = self.e.EFetch('gene', 4747, retmode="text")
+        assert 'neurofilament' in res
+        res = self.e.EFetch('gene', 4747, retmode="xml")
+
 
 
     def test_epost(self):

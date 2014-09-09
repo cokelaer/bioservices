@@ -17,15 +17,15 @@ class test_UniProt(UniProt):
             assert True
 
     @attr('slow')
-    def test_searchUniProtId(self):
-        self.searchUniProtId("P09958", frmt="rdf")
-        self.searchUniProtId("P09958", frmt="xml")
-        self.searchUniProtId("P09958", frmt="txt")
-        self.searchUniProtId("P09958", frmt="fasta")
-        self.searchUniProtId("P09958", frmt="gff")
+    def test_retrieve(self):
+        self.retrieve("P09958", frmt="rdf")
+        self.retrieve("P09958", frmt="xml")
+        self.retrieve("P09958", frmt="txt")
+        self.retrieve("P09958", frmt="fasta")
+        self.retrieve("P09958", frmt="gff")
 
         try:
-            self.searchUniProtId("P09958", frmt="dummy")
+            self.retrieve("P09958", frmt="dummy")
             assert False
         except:
             assert True
@@ -49,3 +49,8 @@ class test_UniProt(UniProt):
     def test_get_df(self):
         df = self.get_df(["P43403"])
 
+
+    def test_fasta(self):
+        "Q9Y617" in self.get_fasta(["Q9Y617-1"])
+        "Q9Y617" not in self.get_fasta_sequence(["Q9Y617-1"])
+        

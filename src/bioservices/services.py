@@ -68,7 +68,8 @@ class DevTools(object):
         easydev.check_range(a, b, value, strict=False)
 
     def transform_into_list(self, query):
-        return easydev.transform_into_list(query)
+        print("deprecated transform_to_list. use tolist instead")
+        return easydev.tolist(query)
 
     def check_param_in_list(self, param, valid_values):
         easydev.check_param_in_list(param, valid_values)
@@ -615,10 +616,10 @@ class REST(RESTbase):
 
 
     def _get_caching(self):
-        return self.settings.params['cache.on']
+        return self.settings.params['cache.on'][0]
     def _set_caching(self, caching):
-        self.checkParam(caching, [True ,False])
-        self.settings.params['cache.on'] = caching
+        self.devtools.check_param_in_list(caching, [True ,False])
+        self.settings.params['cache.on'][0] = caching
         # reset the session, which will be automatically created if we
         # access to the session attribute
         self._session = None

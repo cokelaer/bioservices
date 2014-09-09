@@ -4,7 +4,14 @@ Whats' new, what has changed
 
 Revision 1.3
 ------------------
+* 1.3.1
 
+  * CHANGES:
+    * uniprot: multi_mapping is deprecated. mapping can now handle long queries by itself.
+  * NEWS:
+    * readseq module added
+  * BUG fixes: 
+    * CACHING attribute had a typo
 
 * 1.3.0
 

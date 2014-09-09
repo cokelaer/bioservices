@@ -25,7 +25,7 @@ defaultParams = {
     'general.async_threshold': [10 , int, 'when to switch to asynchronous requests'],
     'cache.tag_suffix': ["_bioservices_database",str, 'suffix to append for cache databases'],
     'cache.on' : [False, bool, 'CACHING on/off'],
-    'cache.fast': [True, bool, "FAST_CACHE option"],
+    'cache.fast': [True, bool, "FAST_SAVE option"],
     'chemspider.token': [None, (str, type(None)), 'token see http://www.chemspider.com'],
 }
 
@@ -271,11 +271,13 @@ class BioServicesConfig(ConfigReadOnly):
     # some aliases
     def _get_caching(self):
         return self.params['cache.on'][0]
+    def _set_caching(self, value):
+        self.params['cache.on'][0] = value
     CACHING = property(_get_caching)
 
     def _get_fast_save(self):
         return self.params['cache.fast'][0]
-    FAST_CACHE = property(_get_fast_save)
+    FAST_SAVE = property(_get_fast_save)
 
     def _get_async_concurrent(self):
         return self.params['general.async_concurrent'][0]

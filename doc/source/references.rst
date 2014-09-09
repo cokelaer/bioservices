@@ -207,6 +207,15 @@ Reactome
     :undoc-members:
     :synopsis:
 
+Readseq
+============
+
+.. automodule:: bioservices.readseq
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
 UniChem
 ===================================================================
 

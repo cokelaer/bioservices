@@ -158,10 +158,6 @@ mapping = {"UniProtKB AC/ID":"ACC+ID",
     "GenomeRNAi": "GENOMERNAI_ID",
     "NextBio": "NEXTBIO_ID"}
 
-def _precision(x, digit=2):
-    x = int(x*pow(10, digit))
-    x /= pow(10., digit)
-    return x
 
 
 class UniProt(REST):
@@ -200,6 +196,10 @@ class UniProt(REST):
                 verbose=verbose, cache=cache)
         self.settings.params['general.timeout'][0] = 100
 
+    def _download_flat_files(self):
+        """Not implemented"""
+        url = "ftp://ftp.ebi.ac.uk/pub/databases/uniprot/knowledgebase/uniprot_sprot.dat.gz"
+        pass
 
     def mapping(self, fr="ID", to="KEGG_ID",  query="P13368"):
         """This is an interface to the UniProt mapping service
@@ -241,14 +241,16 @@ class UniProt(REST):
             instead of strings so as to store more than one values.
         .. versionchanged:: 1.2.0 input query can also be a list of strings
             instead of just a string
-
+        .. versionchanged:: 1.3.1:: use http_post instead of http_get. This is 3 times 
+            faster and allows queries with more than 600 entries in one go.
         """
-        url = 'mapping/'
+        url = 'mapping/'  # the slash matters
 
-        if isinstance(query, list):
-            query = " ".join(query)
+        query = self.devtools.list2string(query, sep=" ", space=False)
+        #if isinstance(query, list):
+        #    query = " ".join(query)
         params = {'from':fr, 'to':to, 'format':"tab", 'query':query}
-        result = self.http_get(url, frmt="tab", params=params)
+        result = self.http_post(url, frmt="txt", data=params)
 
         # changes in version 1.1.1 returns a dictionary instead of list
         try:
@@ -277,13 +279,10 @@ class UniProt(REST):
         frmt="tab", Nmax=100 ):
         """Calls mapping several times and concatenates results
 
-        The reson for this method is that if a query is too long then the
-        :meth:`mapping` method will fail. In such cases, you can use
-        :meth:`multi_mapping` instead. It will call :meth:`mapping` several
-        times and returns a unique dictionary instead of multiple ones if
-        you were to call :math:`mapping` yourself several times.
-
+        .. deprecated: 1.3.1 you can now use :meth:`mapping` even for long queries since
+            we are now using a POST request, which allows arbitrary length of entries.
         """
+        self.logging.warning("deprecated in version 1.3.1. Use mapping instead")
         if isinstance(query, list) is False:
             query = [query]
 
@@ -307,7 +306,8 @@ class UniProt(REST):
                 this_mapping = self.mapping(fr=fr, to=to, query=query)
                 for k,v in this_mapping.items():
                     mapping[k] = v
-                self.logging.info(str(_precision((i+1.)/N*100.,2)) + "%% completed")
+                from easydev import precision
+                self.logging.info(str(precision((i+1.)/N*100., 2)) + "%% completed")
         else:
             #query=",".join([x+"_" + species for x in unique_entry_names])
             query=",".join(unique_entry_names)
@@ -315,25 +315,49 @@ class UniProt(REST):
         return mapping
 
     def searchUniProtId(self, uniprot_id, frmt="xml"):
-        """Search for a uniprot ID in UniprotKB database
+        print("DEPRECATED SINCE VERSION 1.3.1. use retrieve instead")
 
-        :param str uniprot: a valid uniprotKB ID
+    def retrieve(self, uniprot_id, frmt="xml"):
+        """Search for a uniprot ID in UniProtKB database
+
+        :param str uniprot: a valid UniProtKB ID or a list of identifiers.
         :param str frmt: expected output format amongst xml, txt, fasta, gff, rdf
+        :return: is a list of identifiers is provided, the output is also a list
+            otherwise, a string. The content of the string of items in the list
+            depends on the value of **frmt**.
 
         ::
 
             >>> u = UniProt()
-            >>> res = u.searchUniProtId("P09958", frmt="xml")
-
+            >>> res = u.retrieve("P09958", frmt="xml")
+            >>> fasta = u.retrieve([u'P29317', u'Q5BKX8', u'Q8TCD6'], frmt='fasta')
+            >>> print(fasta[0])
+       
 
         """
         _valid_formats = ['txt', 'xml', 'rdf', 'gff', 'fasta']
         self.devtools.check_param_in_list(frmt, _valid_formats)
-        url = "uniprot/" + uniprot_id + '.' + frmt
-        res = self.http_get(url, frmt=frmt)
+
+        queries = self.devtools.tolist(uniprot_id)
+
+        # data = {'format':frmt}
+
+        url = ["uniprot/" + query + '.' + frmt for query in queries]
+        res = self.http_get(url, frmt="txt")
         if frmt=="xml":
-            res = self.easyXML(res)
+            res = [self.easyXML(x) for x in res]
+        if isinstance(res, list) and len(res) == 1:
+            res = res[0]
         return res
+
+    """def _batch(self, entries):
+        #TODO test and validation
+        entries = self.devtools.list2string(entries)
+        res = self.http_post("batch/", frmt="txt", 
+                data={'format':'txt'}, 
+                files={'file': entries}, headers={'Content_Type':'form-data'}  )
+        return res
+    """
 
     def get_fasta(self, id_):
         """Returns FASTA string given a valid identifier
@@ -469,7 +493,16 @@ class UniProt(REST):
         return res
 
     def quick_search(self, query, include=False,sort="score", limit=None):
+        """a specialised version of :meth:`search`
 
+        This is equivalent to::
+
+            u = uniprot.UniProt()
+            u.search(query, frmt="tab", include=False, sor="score", limit=None)
+
+        :returns: a dictionary. 
+
+        """
         res = self.search(query, "tab", include=include, sort=sort, limit=limit)
 
         #if empty result, nothing to do
@@ -511,7 +544,7 @@ class UniProt(REST):
 
 
         :param entries: list of valid entry name. if list is too large (about
-        >200), you need to split the list
+            >200), you need to split the list
         :param chunk:
         :return: dataframe with indices being the uniprot id (e.g. DIG1_YEAST)
 
