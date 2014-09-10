@@ -22,6 +22,7 @@ import sys
 import socket
 import platform
 
+from bioservices.settings import BioServicesConfig
 
 # fixing compatiblity python 2 and 3 related to merging or urllib and urllib2 in python 3
 try:
@@ -34,18 +35,16 @@ except:
     from urllib import urlencode
     from urllib2  import urlopen, Request, HTTPError
 
-
 # This is a hack in case suds is already installed.
 # Indded, we want suds_jurko instead
 sys.path = [x for x in sys.path if 'suds-' not in x]
 
-from bioservices.settings import BioServicesConfig
 
 import easydev
 from easydev import Logging
 
 
-__all__ = ["Service", "WSDLService", "DevTools", "RESTService",
+__all__ = ["Service", "WSDLService", "RESTService",
            "BioServicesError", "REST"]
 
 
@@ -90,6 +89,7 @@ class Service(Logging):
     .. seealso:: :class:`REST`, :class:`WSDLService`
     """
 
+    #: some useful response codes
     response_codes = {
         200: 'OK',
         201: 'Created',
@@ -106,7 +106,6 @@ class Service(Logging):
 
     def __init__(self, name, url=None, verbose=True):
         """.. rubric:: Constructor
-
 
         :param str name: a name for this service
         :param str url: its URL
@@ -144,11 +143,8 @@ class Service(Logging):
         self._fixing_unicode = False
         self._fixing_encoding = "utf-8"
 
-        # will be removed once WSDLService is removed.
-        self.trials = 5
-        self.timesleep = 1
-
         self.devtools = DevTools()
+        self.settings = BioServicesConfig()
 
     def _get_url(self):
         return self._url
@@ -166,8 +162,8 @@ class Service(Logging):
             raise TypeError("value must be a boolean value (True/False)")
         self._easyXMLConversion = value
     easyXMLConversion = property(_get_easyXMLConversion,
-        _set_easyXMLConversion, doc="""If True, xml output from a request are converted to
-easyXML object (Default behaviour).""")
+            _set_easyXMLConversion, 
+            doc="""If True, xml output from a request are converted to easyXML object (Default behaviour).""")
 
     def easyXML(self, res):
         """Use this method to convert a XML document into an
@@ -192,29 +188,6 @@ easyXML object (Default behaviour).""")
         return xmltools.easyXML(res, encoding=self._fixing_encoding,
                     fixing_unicode=self._fixing_unicode)
 
-    def urlencode(self, params):
-        """Returns a string compatible with a URL request.
-
-        :param dict params: a dictionary. Keys are parameters.
-
-        The pair of key/value are converted into a single string by concatenated
-        the "&key=value" string for each key/value in the dictionary.
-
-        ::
-
-            >>> params = {'a':1, 'b':2}
-            >>> urlencode(params)
-            "a=1&b=2"
-
-        .. note:: returns "a=1&b=2" or "b=2&a=1" since dictionary are not ordered. Note
-            that the first parameter is not preceded by a & sign that you will need
-            to add.
-
-        """
-        if isinstance(params, dict)==False:
-            raise TypeError("Params must be a dictionary.")
-        postData = urlencode(params)
-        return postData
 
     def __str__(self):
         txt = "This is an instance of %s service" % self.name
@@ -234,9 +207,6 @@ easyXML object (Default behaviour).""")
         webbrowser.open(url + str(Id))
 
     def on_web(self, url):
-        self.onWeb(url)
-
-    def onWeb(self, url):
         """Open a URL into a browser"""
         import webbrowser
         webbrowser.open(url)
@@ -248,14 +218,9 @@ easyXML object (Default behaviour).""")
             try:
                 #python3
                  newres = binascii.a2b_base64(bytes(data, "utf-8"))
-
-                 # for reacotme:
-
-
             except:
                 newres = binascii.a2b_base64(data)
             f.write(newres)
-
 
 
 class WSDLService(Service):
@@ -281,17 +246,21 @@ class WSDLService(Service):
         super(WSDLService, self).__init__(name, url, verbose=verbose)
 
         self.logging.info("Initialising %s service (WSDL)" % self.name)
-        self.settings = BioServicesConfig()
 
         try:
             #: attribute to access to the methods provided by this WSDL service
             from suds.client import Client
             self.suds = Client(self.url)
+            # reference to the service
             self.serv = self.suds.service
+            self._update_settings()
         except Exception:
             self.logging.error("Could not connect to the service %s " % self.url)
             raise Exception
 
+    def _update_settings(self):
+        self.TIMEOUT = self.settings.TIMEOUT
+    
     def wsdl_methods_info(self):
         methods = self.suds.wsdl.services[0].ports[0].methods.values()
         for method in methods:
@@ -329,6 +298,13 @@ class WSDLService(Service):
                 self.logging.error(msg.format(k, keys))
         return params
 
+    def _get_timeout(self):
+        return self.suds.options.timeout
+    def _set_timeout(self, value):
+        self.suds.set_options(timeout=value)
+        self.settings.TIMEOUT = value
+    TIMEOUT = property(_get_timeout, _set_timeout)
+
 
 class RESTbase(Service):
     _service = "REST"
@@ -358,7 +334,6 @@ class RESTService(RESTbase):
     :class:`Service`.
 
 
-
     For debugging:
 
     * last_response contains
@@ -373,6 +348,9 @@ class RESTService(RESTbase):
 
         """
         super(RESTService, self).__init__(name, url, verbose=verbose)
+        self.logging.error("Please use REST class instead of RESTService")
+        self.trials = 5
+        self.timesleep = 1
 
     def getUserAgent(self):
         self.logging.info('getUserAgent: Begin')
@@ -500,6 +478,30 @@ class RESTService(RESTbase):
             raise
         return jobId
 
+    def urlencode(self, params):
+        """Returns a string compatible with a URL request.
+
+        :param dict params: a dictionary. Keys are parameters.
+
+        The pair of key/value are converted into a single string by concatenated
+        the "&key=value" string for each key/value in the dictionary.
+
+        ::
+
+            >>> params = {'a':1, 'b':2}
+            >>> urlencode(params)
+            "a=1&b=2"
+
+        .. note:: returns "a=1&b=2" or "b=2&a=1" since dictionary are not ordered. Note
+            that the first parameter is not preceded by a & sign that you will need
+            to add.
+
+        """
+        if isinstance(params, dict)==False:
+            raise TypeError("Params must be a dictionary.")
+        postData = urlencode(params)
+        return postData
+
 
 import requests         # replacement for urllib2 (2-3 times faster)
 from requests.models import Response
@@ -549,7 +551,7 @@ class REST(RESTbase):
         'txt': 'text/plain',
         'default' : "application/x-www-form-urlencoded"
     }
-    special_characters = ['/', '#', '+']
+    #special_characters = ['/', '#', '+']
 
     def __init__(self, name, url=None, verbose=True, cache=False):
         super(REST, self).__init__(name, url, verbose=verbose)
@@ -557,15 +559,12 @@ class REST(RESTbase):
 
         self._session = None
 
-        self.settings = BioServicesConfig()
-
         self.settings.params['cache.on'][0] = cache
 
-        if self.settings.CACHING:
+        if self.CACHING:
             #import requests_cache
             self.logging.info("Using local cache %s" % self.CACHE_NAME)
             requests_cache.install_cache(self.CACHE_NAME)
-
 
     def delete_cache(self):
         import os
@@ -614,7 +613,6 @@ class REST(RESTbase):
                          backend='sqlite', fast_save=self.settings.FAST_SAVE)
         return self._session
 
-
     def _get_caching(self):
         return self.settings.params['cache.on'][0]
     def _set_caching(self, caching):
@@ -625,11 +623,11 @@ class REST(RESTbase):
         self._session = None
     CACHING = property(_get_caching, _set_caching)
 
-    #def _process_post_request(self, url, session, frmt, data=None, **kwargs):
-    #    try:
-    #        res = session.get(url, **kwargs)
-    #        #else:
-    #        #    res =
+    def _get_timeout(self):
+        return self.settings.TIMEOUT
+    def _set_timeout(self, value):
+        self.settings.TIMEOUT = value
+    TIMEOUT = property(_get_timeout, _set_timeout)
 
     def _process_get_request(self, url, session, frmt, data=None, **kwargs):
         try:
@@ -726,7 +724,7 @@ class REST(RESTbase):
                 url = '%s/%s' % (self.url, query)
         self.logging.debug(url)
         try:
-            res = self.session.get(url, **{'timeout':self.settings.TIMEOUT, 'params':params})
+            res = self.session.get(url, **{'timeout':self.TIMEOUT, 'params':params})
             self.last_response = res
             res = self._interpret_returned_request(res, frmt)
             try:

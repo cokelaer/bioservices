@@ -36,7 +36,7 @@
 
         -- ChemSpider home page, March 2013
 """
-from bioservices import REST, get_bioservices_env
+from bioservices import REST
 try:
     from urllib.parse import quote
 except:
@@ -122,7 +122,7 @@ class ChemSpider(REST):
             >>> ret = s.image(1020)
             >>> with open("test.png", "w") as f:
             ...     f.write(ret)
-            >>> s.onWeb("test.png")
+            >>> s.on_web("test.png")
         """
         url = "Search.asmx/GetCompoundThumbnail?id=%s&token=%s" % (Id, self._token)
         res = self.http_get(url, frmt="xml")

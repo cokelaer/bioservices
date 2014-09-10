@@ -78,7 +78,7 @@ class HGNC(REST):
     You can access to the links of a cross reference as well::
 
         values = s.get_xrefs("ZAP70")
-        s.onWeb(values['EntrezGene']['link'][0])
+        s.on_web(values['EntrezGene']['link'][0])
 
 
     :references: http://www.avatar.se/HGNC/doc/tutorial.html
@@ -90,7 +90,6 @@ class HGNC(REST):
         url = "http://www.avatar.se/HGNC/wr/"
         super(HGNC, self).__init__("HGNC", url=url, verbose=verbose, cache=cache)
         self.logging.warning("Service unavailable when testing (Aug 2014). May not work")
-
 
         self._always_return_list = False
 

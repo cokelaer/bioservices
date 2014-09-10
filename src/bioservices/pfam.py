@@ -65,7 +65,7 @@ class Pfam(REST):
 
         """
         url = self._url + "/protein/" + Id
-        self.onWeb(url)
+        self.on_web(url)
 
 
 

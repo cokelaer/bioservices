@@ -11,7 +11,7 @@ import shutil
 
 import appdirs
 
-__all__ = ["get_bioservices_env", "defaultParams", "BioServicesConfig"]
+__all__ = ["defaultParams", "BioServicesConfig"]
 
 
 # first item if the value
@@ -29,26 +29,6 @@ defaultParams = {
     'chemspider.token': [None, (str, type(None)), 'token see http://www.chemspider.com'],
 }
 
-
-def get_bioservices_env(section, option):
-    bs = BioServicesConfig()
-
-    # Create the configuration from scratch
-    if os.path.isfile(bs.config_file) == False:
-        bs.cf.add_section("chemspider")
-        bs.cf.set("chemspider", "token", "")
-        fh = open(bs.config_file, "w")
-        bs.cf.write(fh)
-        fh.close()
-        raise ValueError("""No token found for chemspider.
-        Creating one on http//www.chemspider.com and provide it when creating instance of ChemSpider""")
-    else:
-        bs.cf.read(bs.config_file)
-        value = bs.cf.get(section, option)
-        if value=="":
-            raise ValueError("""No token found for chemspider.
-            Creating one on http//www.chemspider.com and provide it when creating instance of ChemSpider""")
-        return value
 
 
 
@@ -266,7 +246,6 @@ class BioServicesConfig(ConfigReadOnly):
     def __init__(self):
         super(BioServicesConfig, self).__init__(name="bioservices",
                 default_params=defaultParams)
-
 
     # some aliases
     def _get_caching(self):

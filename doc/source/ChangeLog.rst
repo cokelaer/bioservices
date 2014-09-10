@@ -8,8 +8,13 @@ Revision 1.3
 
   * CHANGES:
     * uniprot: multi_mapping is deprecated. mapping can now handle long queries by itself.
+    * services/settings: 
+      * removed get_bioservices_env function, which is not used anymore
+      * move urlencode in Service class into WSDLService, which will be deprecated
+      * add TIMEOUT in WSDLService and REST as alias to settings.TIMEOUT so timeout
+        can now be used in both REST and WSDL.
   * NEWS:
-    * readseq module added
+    * readseq module added. 
   * BUG fixes: 
     * CACHING attribute had a typo
 
