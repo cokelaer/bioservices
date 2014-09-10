@@ -21,7 +21,7 @@ def test_readseq():
     while s.get_status(s._jobid) != "FINISHED" and count<20:
         count += 1
         time.sleep(1)
-        print count
+        print(count)
 
     genbank = s.get_result(s._jobid)
 

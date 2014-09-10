@@ -157,7 +157,7 @@ class Readseq(WSDLService):
             (e.g. images) this will be binary data rather than a text string.
         """
         if self.get_status(jobid) != 'FINISHED':
-            self.logging.warning("Your job did not finished", self.get_status(jobid))
+            self.logging.warning("Your job is not finished yet. Try again.")
             return
         type_ = self.get_result_types(jobid).type[0].identifier
         res = self.serv.getResult(jobid, type_)
