@@ -10,10 +10,6 @@ class test_Service(Service):
     def test_easyXML(self):
         self.easyXML("<xml><id></id></xml>")
 
-    def test_urlencode(self):
-        res = self.urlencode({'a':1, 'b':2})
-        assert res in ["a=1&b=2", "b=2&a=1"]
-
     @attr('skip')
     def test_pubmed(self):
         self.pubmed("24064416")
