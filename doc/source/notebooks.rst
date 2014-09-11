@@ -28,7 +28,7 @@ Here is a ipython notebook dedicated to ChEMBL, which can be downloaded :downloa
 Entrez/Eutils
 ---------------
 
-Here is a ipython notebook dedicated to EUtils, which can be downloaded :download:`notebook/Entrez_Eutils.ipynb` or view its results on `uniprot nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/Entrez_Eutils.ipynb>`_
+Here is a ipython notebook dedicated to EUtils, which can be downloaded :download:`notebook/Entrez_EUtils.ipynb` or view its results on `eutils nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/Entrez_EUtils.ipynb>`_
 
 KEGG
 ---------

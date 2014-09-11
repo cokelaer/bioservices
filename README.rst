@@ -19,6 +19,13 @@ BioServices
 .. image:: https://badge.waffle.io/cokelaer/bioservices.png?label=ready&title=Ready 
    :target: https://waffle.io/cokelaer/bioservices
 
+:note: BioServices is tested for Python 2.7, 3.3. Version 3.4 is currently not
+       available due to a gevent dependencies, which should be fixed soon.
+       Building may appear to fail sometimes but this is due to one or two services amongst 25 being
+       down temporarily and is independent of BioServices. Similarly the
+       coverage is actually higher than what is reported here above, which is
+       a subset of the tests available for developers.
+
 
 **Bioservices** is a Python package that provides access to many Bioinformatices Web Services (e.g.,
 UniProt) and a framework to easily implement Web Services wrappers (based on 

@@ -1,17 +1,18 @@
 from bioservices import readseq
-
+from nose.plugins.attrib import attr
 
 
 
 fasta = """MDAPRQVVNFGPGPAKLPHSVLLEIQKELLDYKGVGISVLEMSHRSSDFAKIINNTENLVRELLAVPDNYKVIFLQGGGCGQFSAVPLNLIGLKAGRCADYVVTGAWSAKAAEEAKKFGTINIVHPKLGSYTKIPDPSTWNLNPDASYVYYCANETVHGVEFDFIPDVKGAVLVCDMSSNFLSKPVDVSKFGVIFAGAQKNVGSAGVTVVIVRDDLLGFALRECPSVLEYKVQAGNSSLYNTPPCFSIYVMGLVLEWIKNNGGAAAMEKLSSIKSQTIYEIIDNSQGFYVCPVEPQNRSKMNIPFRIGNAKGDDALEKRFLDKALELNMLSLKGHRSVGGIRASLYNAVTIEDVQKLAAFMKKFLEMHQL"""
 
 
+@attr('fixme') # does not work on travis
 def test_readseq():
 
     # 8 is 
     # 2 is GenBank
     s = readseq.Readseq()
-    jobid = s.run("cokelaer@ebi.co.uk", "test", sequence=fasta, inputformat=8, 
+    jobid = s.run("cokelaer@test.co.uk", "test", sequence=fasta, inputformat=8, 
             outputformat=2)
     # should fail
     genbank = s.get_result(s._jobid)
@@ -30,4 +31,3 @@ def test_readseq():
     jobid = s.run("cokelaer@ebi.co.uk", "test", sequence=genbank, inputformat=2, 
             outputformat=8)
     #FIXME do not know yet how to check
-

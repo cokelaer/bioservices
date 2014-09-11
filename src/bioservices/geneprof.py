@@ -117,7 +117,7 @@ class GeneProf(REST):
         super(GeneProf, self).__init__(name="GeneProf",
                 url="http://www.geneprof.org/GeneProf/api", verbose=verbose)
 
-        self.settings.TIMEOUT = 100
+        self.TIMEOUT = 100
 
         # why is it set to False ?
         self.easyXMLConversion = False

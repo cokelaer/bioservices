@@ -96,8 +96,8 @@ from .psicquic import *
 from . import ncbiblast
 from .ncbiblast import *
 
-from . import readseq
-from .readseq import *
+#from . import readseq
+#from .readseq import *
 
 from . import biogrid
 from .biogrid import *

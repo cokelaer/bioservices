@@ -6,7 +6,7 @@
 #
 #  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -194,7 +194,7 @@ class UniProt(REST):
         """
         super(UniProt, self).__init__(name="UniProt", url=UniProt._url,
                 verbose=verbose, cache=cache)
-        self.settings.params['general.timeout'][0] = 100
+        self.TIMEOUT = 100
 
     def _download_flat_files(self):
         """Not implemented"""
@@ -241,7 +241,7 @@ class UniProt(REST):
             instead of strings so as to store more than one values.
         .. versionchanged:: 1.2.0 input query can also be a list of strings
             instead of just a string
-        .. versionchanged:: 1.3.1:: use http_post instead of http_get. This is 3 times 
+        .. versionchanged:: 1.3.1:: use http_post instead of http_get. This is 3 times
             faster and allows queries with more than 600 entries in one go.
         """
         url = 'mapping/'  # the slash matters
@@ -332,7 +332,7 @@ class UniProt(REST):
             >>> res = u.retrieve("P09958", frmt="xml")
             >>> fasta = u.retrieve([u'P29317', u'Q5BKX8', u'Q8TCD6'], frmt='fasta')
             >>> print(fasta[0])
-       
+
 
         """
         _valid_formats = ['txt', 'xml', 'rdf', 'gff', 'fasta']
@@ -353,8 +353,8 @@ class UniProt(REST):
     """def _batch(self, entries):
         #TODO test and validation
         entries = self.devtools.list2string(entries)
-        res = self.http_post("batch/", frmt="txt", 
-                data={'format':'txt'}, 
+        res = self.http_post("batch/", frmt="txt",
+                data={'format':'txt'},
                 files={'file': entries}, headers={'Content_Type':'form-data'}  )
         return res
     """
@@ -500,7 +500,7 @@ class UniProt(REST):
             u = uniprot.UniProt()
             u.search(query, frmt="tab", include=False, sor="score", limit=None)
 
-        :returns: a dictionary. 
+        :returns: a dictionary.
 
         """
         res = self.search(query, "tab", include=include, sort=sort, limit=limit)
