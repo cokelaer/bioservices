@@ -42,6 +42,9 @@ from .biomodels import *
 from . import chebi
 from .chebi import *
 
+from . import ensembl
+from .ensembl import *
+
 from . import geneprof
 from .geneprof import *
 
