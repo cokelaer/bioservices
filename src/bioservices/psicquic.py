@@ -436,17 +436,13 @@ class PSICQUIC(REST):
         if maxResults != None:
             params['maxResults'] = maxResults
 
-        postData = self.urlencode(params)
-
-        url = resturl  + 'query/' + query.replace(" ", "%20")
-        if params:
-            url += "?" + postData
-
+        url = resturl  + 'query/' + query
 
         if "xml" in output:
-            res = self.http_get(url, frmt="xml")
+            res = self.http_get(url, frmt="xml", params=params)
         else:
-            res = self.http_get(url, frmt="txt")
+            res = self.http_get(url, frmt="txt", params=params)
+            print(res)
             res = res.strip().split("\n")
 
         if output.startswith("tab"):

@@ -405,8 +405,9 @@ class ChEMBL(REST):
             >>> resjson = s.get_target_by_uniprotId(s._target_uniprotId_example)
         """
         res = self._process(query, frmt, "targets/uniprot/%s")
-        return self._postprocess(res, 'target')
-
+        if frmt == 'json':
+            res = res['target']
+        return res
 
     def get_target_by_refseq(self, query, frmt='json'):
         """Get individual target by RefSeq Accession identifier

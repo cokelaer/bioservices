@@ -650,14 +650,12 @@ class REST(RESTbase):
             return res
         # if a response, there is a status code that should be ok
         if not res.ok:
+            reason = res.reason
+            self.logging.warning("status is not ok with {0}".format(reason))
             return res.status_code
         if frmt == "json":
             try:
-                # FIXME: should remove that and put it in the code.
-                if self.name == "ChEMBL":
-                    return res.json().values()[0]
-                else:
-                    return res.json()
+                return res.json()
             except:
                 return res
         # finally
@@ -746,7 +744,7 @@ class REST(RESTbase):
             return res
         except Exception as err:
             print(err)
-            print("Your current timeout is {0}. Consider increasing it with"\
+            print("Issue while Your current timeout is {0}. Consider increasing it with"\
                     "settings.TIMEOUT attribute".format(self.settings.TIMEOUT))
 
     def http_post(self, query, params=None, data=None,
@@ -816,6 +814,11 @@ class REST(RESTbase):
         #"application/json;odata=verbose" required in reactome
         #headers['Content-Type'] = "application/json;odata=verbose" required in reactome
         return headers
+
+    def debug_message(self):
+        print(self.last_response.content)
+        print(self.last_response.reason)
+        print(self.last_response.status_code)
 
 
 
