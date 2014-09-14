@@ -803,7 +803,12 @@ class REST(RESTbase):
         self.logging.info('getUserAgent: End')
         return user_agent
 
-    def get_headers(self, content='txt'):
+    def get_headers(self, content='default'):
+        """
+        :param str content: ste to default that is application/x-www-form-urlencoded
+            so that it has the same behaviour as urllib2 (Sept 2014)
+
+        """
         headers = {}
         headers['User-Agent'] = self.getUserAgent()
         headers['Accept'] = self.content_types[content]
