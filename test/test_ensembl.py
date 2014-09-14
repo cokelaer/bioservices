@@ -62,8 +62,8 @@ class test_Ensembl(Ensembl):
         assert 'children' in res.keys()
 
     def test_get_ontology_name(self):
-        res = e.get_ontology_name('transcription factor complex')
+        res = self.s.get_ontology_name('transcription factor complex')
         assert res[0]['children']
-        res = e.get_ontology_name('transcription factor')
+        res = self.s.get_ontology_name('transcription factor')
         assert res == 400 # error here
 
