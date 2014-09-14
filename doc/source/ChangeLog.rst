@@ -4,6 +4,14 @@ Whats' new, what has changed
 
 Revision 1.3
 ------------------
+* 1.3.2
+
+  * CHANGES:
+    * services: http_get and http_post now accepts all optional arguments from requests.
+    * services: get_headers default content is now same as urrlib2
+    * pdb module: more functions added
+    * ensembl module added with some functionalities
+
 * 1.3.1
 
   * CHANGES:

@@ -86,10 +86,10 @@ class PDB(REST):
         res = [x.attrib['structureId'] for x in res.getchildren()]
         return res
 
-    def get_file(self, sid, frmt, compression=False, headerOnly=False):
+    def get_file(self, identifier, frmt, compression=False, headerOnly=False):
         """Download a file in a specified format
 
-        :param int Id: a valid Identifier. See :meth:`get_current_ids`.
+        :param int identifier: a valid Identifier. See :meth:`get_current_ids`.
         :param str fileFormat: a valid format in "pdb", "cif", "xml"
 
         .. doctest::
@@ -114,7 +114,7 @@ class PDB(REST):
         else:
             headerOnly = "NO"
 
-        query = "files/" + sid + "." + frmt
+        query = "files/" + identifier + "." + frmt
         if compression == True:
             query += ".gz"
 
@@ -128,3 +128,29 @@ class PDB(REST):
             res = self.http_get(query, frmt="txt", params=params)
         return res
 
+    def get_ligands(self, identifier):
+
+        res = self.http_get("rest/ligandInfo", frmt='text',
+                params={'structureId': identifier})
+        return res
+
+
+    def get_xml_query(self, query):
+        """Send an XML query
+
+        query = '<?xml version="1.0" encoding="UTF-8"?>
+        <orgPdbQuery>
+        <version>B0907</version>
+        <queryType>org.pdb.query.simple.ExpTypeQuery</queryType>
+        <description>Experimental Method Search : Experimental Method=SOLID-STATE NMR</description>
+        <mvStructure.expMethod.value>SOLID-STATE NMR</mvStructure.expMethod.value>
+        </orgPdbQuery>
+        '
+        """
+        res = self.http_post("query/post", 
+                data=query, 
+                headers=s.get_headers(content='default'))
+        return res
+
+
+     

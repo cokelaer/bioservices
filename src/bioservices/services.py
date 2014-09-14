@@ -549,7 +549,13 @@ class REST(RESTbase):
         'json': 'application/json',
         'xml': 'application/xml',
         'txt': 'text/plain',
-        'default' : "application/x-www-form-urlencoded"
+        'text': 'text/plain',
+        'default' : "application/x-www-form-urlencoded",
+        "jsonp": "text/javascript",
+        "nh": "text/x-nh",
+        'phyloxml': 'text/x-phyloxml',
+        'fasta': 'text/x-fasta',
+        'seqxml': 'text/x-seqxml+xml',
     }
     #special_characters = ['/', '#', '+']
 
@@ -647,13 +653,13 @@ class REST(RESTbase):
             return res.status_code
         if frmt == "json":
             try:
-                # this is for chembl only
-                return res.json().values()[0]
-            except:
-                try:
+                # FIXME: should remove that and put it in the code.
+                if self.name == "ChEMBL":
+                    return res.json().values()[0]
+                else:
                     return res.json()
-                except:
-                    return res
+            except:
+                return res
         # finally
         return res.content
 
@@ -682,14 +688,14 @@ class REST(RESTbase):
     def _get_all_urls(self, keys, frmt=None):
         return ('%s/%s' % (self.url, query) for query in keys)
 
-    def get_async(self, keys, frmt='json', params={} ):
-        ret = self._get_async(keys, frmt, params=params)
+    def get_async(self, keys, frmt='json', params={}, **kargs ):
+        ret = self._get_async(keys, frmt, params=params, **kargs)
         return self._apply(ret, self._interpret_returned_request, frmt)
 
-    def get_sync(self, keys, frmt='json'):
-        return [self.get_one(**{'frmt': frmt, 'query': key }) for key in keys]
+    def get_sync(self, keys, frmt='json', **kargs):
+        return [self.get_one(key, frmt=frmt, **kargs) for key in keys]
 
-    def http_get(self, query, frmt='json', params={}):
+    def http_get(self, query, frmt='json', params={}, **kargs):
         """
 
         * query is the suffix that will be appended to the main url attribute.
@@ -700,16 +706,17 @@ class REST(RESTbase):
         """
         if isinstance(query, list) and len(query) > self.settings.ASYNC_THRESHOLD:
             self.logging.debug("Running async call for a list")
-            return self.get_async(query, frmt, params=params)
+            return self.get_async(query, frmt, params=params, **kargs)
         if isinstance(query, list) and len(query) <= self.settings.ASYNC_THRESHOLD:
             self.logging.debug("Running sync call for a list")
-            return [self.get_one(**{'frmt': frmt, 'query': key, 'params':params }) for key in query]
+            return [self.get_one(key, frmt, params=params, **kargs) for key in query]
             #return self.get_sync(query, frmt)
         # OTHERWISE
         self.logging.debug("Running http_get (single call mode)")
-        return self.get_one(**{'frmt': frmt, 'query': query, 'params':params})
+        #return self.get_one(**{'frmt': frmt, 'query': query, 'params':params})
+        return self.get_one(query, frmt, params=params, **kargs)
 
-    def get_one(self, query, frmt='json', params={}):
+    def get_one(self, query, frmt='json', params={}, **kargs):
         """
 
         if query starts with http:// do not use self.url
@@ -724,7 +731,11 @@ class REST(RESTbase):
                 url = '%s/%s' % (self.url, query)
         self.logging.debug(url)
         try:
-            res = self.session.get(url, **{'timeout':self.TIMEOUT, 'params':params})
+            kargs['params'] = params
+            kargs['timeout'] = self.TIMEOUT
+            #res = self.session.get(url, **{'timeout':self.TIMEOUT, 'params':params})
+            res = self.session.get(url, **kargs)
+
             self.last_response = res
             res = self._interpret_returned_request(res, frmt)
             try:
@@ -737,17 +748,6 @@ class REST(RESTbase):
             print(err)
             print("Your current timeout is {0}. Consider increasing it with"\
                     "settings.TIMEOUT attribute".format(self.settings.TIMEOUT))
-
-
-    #def _post_one(self, url, async, frmt, data=None):
-    #    session = self._get_session()
-    ##    if async:
-    #        return grequests.post(url, session=session, data=data,
-    #                                  headers={'Accept': self.content_types[frmt]})
-    #    return self._process_post_request(url, session, frmt, timeout=self.TIMEOUT,
-    #                                 data=data)
-
-
 
     def http_post(self, query, params=None, data=None,
                     frmt='xml', headers=None, files=None, **kargs):
@@ -803,10 +803,12 @@ class REST(RESTbase):
         self.logging.info('getUserAgent: End')
         return user_agent
 
-    def get_headers(self, frmt='txt'):
+    def get_headers(self, content='txt'):
         headers = {}
         headers['User-Agent'] = self.getUserAgent()
-        headers['Accept'] = self.content_types[frmt]
+        headers['Accept'] = self.content_types[content]
+        headers['Content-Type'] = self.content_types[content]
+        #"application/json;odata=verbose" required in reactome
         #headers['Content-Type'] = "application/json;odata=verbose" required in reactome
         return headers
 
