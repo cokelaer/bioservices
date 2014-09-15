@@ -7,6 +7,7 @@ Revision 1.3
 * 1.3.2
 
   * CHANGES:
+
     * services: http_get and http_post now accepts all optional arguments from requests.
     * services: get_headers default content is now same as urrlib2
     * pdb module: more functions added
@@ -15,15 +16,21 @@ Revision 1.3
 * 1.3.1
 
   * CHANGES:
+
     * uniprot: multi_mapping is deprecated. mapping can now handle long queries by itself.
-    * services/settings: 
+    * services/settings:
+
       * removed get_bioservices_env function, which is not used anymore
       * move urlencode in Service class into WSDLService, which will be deprecated
       * add TIMEOUT in WSDLService and REST as alias to settings.TIMEOUT so timeout
         can now be used in both REST and WSDL.
+
   * NEWS:
+
     * readseq module added. 
+
   * BUG fixes: 
+
     * CACHING attribute had a typo
 
 * 1.3.0
@@ -42,6 +49,7 @@ Revision 1.3
       make its usage easier but functionalities are there.
 
   * CHANGES
+
     * update code to be python-3 compatible. There are still issues with suds/requests/gevent
       but the code itself is python3 executable.
     * WSDLservice now uses suds instead of SOAP package by default
@@ -56,8 +64,7 @@ Revision 1.3
       * renamed  get_target_by_refSeqId into get_target_by_refseq
       * kegg module: all Kegg strings replaced by KEGG so the kegg.Kegg class is
         now kegg.KEGG
-    * ChEBI
-      * getUpdatedPolymer: remove useless parameters (was failing with python3)
+    * ChEBI:  getUpdatedPolymer: remove useless parameters (was failing with python3)
     * Wikipathway class renamed as WikiPathways to agree with official name
     * biomart now uses python3 and we had to remove the threaded_request module,
       which does not seem to ba available. So, we used the new implementation
