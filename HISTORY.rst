@@ -1,50 +1,34 @@
-.. :changelog:
 
 Release History
 ------------------
-This is a summary of the changelog, which can be found in the main
-documentation.
+This is a summary of the changelog. Complete change can be found in the 
+`<main documentation <http://pythonhosted.org//bioservices/ChangeLog.html>`_.
 
 1.3.X
 +++++++++++
 
 * Source code moved to github.com
-* New REST class to use requests package instead of urllib2. 
-* Creation of a global configuration file in .config/bioservice/bioservices.cg
-* NEW services: Reactome, Readseq
+* New REST class to use **requests** package instead of urllib2. 
+* Creation of a global configuration file in .config/bioservice/bioservices.cfg
+* NEW services: Reactome, Readseq, Ensembl, EUtils
 
 1.2.X
 +++++++++++
 
 * add try/except for pandas library.
-* fixing typo in the init that fails bioservices ito be used if pkg_resources is not available.
 * added sub-package called apps with some useful tools (fasta,peptides, taxon) in bioservices.apps directory
-* NEW the BioDBnet service.
-* NEW Pathway Common
-* NEW Service: BioDBNet
-* Kegg class has now an alias called KEGG
-* NEW Services: MUSCLE
-* NEW Service: PathwayCommons
-* NEW Service: GeneProf service
+* NEW services: BioDBnet, BioDBNet, MUSCLE, PathwayCommons, GeneProf
 
 1.1.X
 +++++++++++ 
-* add biocarta, pfam modules (and htmltools. maybe not required.)
-* add documentation and examples related to Galaxy/BioPython.
+* NEW services: biocarta, pfam, ChEBI, UniChem
+* Add documentation and examples related to Galaxy/BioPython.
 * NEW Service : HGNC
 * Use BeautifulSoup4 instead of 3
-* add the ChEBI  Web Service.
-* add the UniChem  Web Service.
 
 1.0.X
 +++++++++++ 
-* add PDB
-* add ArrayExpress
-* add biomart + doc + test
-* add chemspider draft
-* complete eutils 
-* Add miriam module
-* Add arrayexpress 
+* add PDB, ArrayExpress,  biomart, chemspider draft, eutils, miriam, arrayexpress 
 
 1.0.0:
 +++++++++++ 
