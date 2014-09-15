@@ -21,11 +21,9 @@ BioServices
 
 :note: BioServices is tested for Python 2.7, 3.3. Version 3.4 is currently not
        available due to a gevent dependencies, which should be fixed soon.
-       Building may appear to fail sometimes but this is due to one or two services amongst 25 being
-       down temporarily and is independent of BioServices. Similarly the
-       coverage is actually higher than what is reported here above, which is
-       a subset of the tests available for developers.
 
+:contributions: Please join https://github.com/cokelaer/bioservices
+:issues: Please use https://github.com/cokelaer/bioservices/issues
 
 **Bioservices** is a Python package that provides access to many Bioinformatices Web Services (e.g.,
 UniProt) and a framework to easily implement Web Services wrappers (based on 
@@ -59,7 +57,7 @@ and more on `github <https://github.com/cokelaer/bioservices/tree/master/doc/sou
 An up-to-date list of Web Services is provided within 
 the online `documentation <http://pythonhosted.org/bioservices/>`_.
 
-Here is a little example using the UniProt Web Service to search for the zap70 specy in human
+Here is a small example using the UniProt Web Service to search for the zap70 specy in human
 organism::
 
     >>> from bioservices import UniProt
