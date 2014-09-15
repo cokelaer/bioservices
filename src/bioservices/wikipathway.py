@@ -201,12 +201,12 @@ class WikiPathways(WSDLService):
             output = {'interactions':[],'scores':[],'pathway_ids':[],'revision':[],}
             intA = []
             intB = []
-            if organism == None:
+            if organism is None:
                 organism = self.organism
             for x in self.serv.findInteractions(query=query):
                 if len(x) == 0:
                     continue
-                if hasattr(x, 'species') == False:
+                if hasattr(x, 'species') is False:
                     continue
                 if x['species'] == organism:
                     intA.append(x['fields'][1]['values'])
@@ -215,7 +215,7 @@ class WikiPathways(WSDLService):
                     output['pathway_ids'].append(x['id'])
                     output['revision'].append(x['revision'])
             output['interactions'] = zip(intA,intB)
-            if interactionOnly==False:
+            if interactionOnlyis False:
                 return output
             else:
                 return output['interactions']
@@ -227,7 +227,7 @@ class WikiPathways(WSDLService):
         :return: List of pathways for the selected organism.
 
         """
-        if organism == None:
+        if organism is None:
             return self.serv.listPathways(organism = self.organism)
         else:
             self.devtools.check_param_in_list(organism, self.organisms)
@@ -428,7 +428,7 @@ class WikiPathways(WSDLService):
         """
         raise NotImplementedError
         # use the login function to store the authInfo argument
-        #if text == None:
+        #if text is None:
         #   res = self.serv.saveCurationTag(pwId = pathwayId, tagName = name, revision = revisionNumb, auth = authInfo)
         #else:
         #   res =  self.serv.saveCurationTag(pwId = pathwayId, tagName = name, tagText = text, revision = revisionNumb, auth = authInfo)
@@ -487,7 +487,7 @@ class WikiPathways(WSDLService):
         .. todo:: graphId, color parameters
         """
         #graphIds, revisionNumb = 0, colors = None, filetype = 'pdf', verbose = False):
-        #if colors == None:
+        #if colors is None:
         #    colors = 'FF0000'
         #res = self.serv.getColoredPathway(pwId = pathwayId, revision = revisionNumb, graphId = graphIds, color = colors, fileType = filetype)
         res = self.serv.getColoredPathway(pwId=pathwayId, revision=revision)
@@ -524,7 +524,7 @@ class WikiPathways(WSDLService):
 
             s.findPathwaysByText(query="p53 OR mapk",species='Homo sapiens')
         """
-        if species == None:
+        if species is None:
             return self.serv.findPathwaysByText(query=query)
         else:
             return self.serv.findPathwaysByText(query=query,species=species)

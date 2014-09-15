@@ -229,7 +229,7 @@ class FASTA(object):
     identifier = property(_get_identifier)
 
     def _get_entry(self):
-         return self.header.split("|")[2].split(" ")[0]
+        return self.header.split("|")[2].split(" ")[0]
     entry = property(_get_entry, doc="returns entry only")
 
     # swiss prot only

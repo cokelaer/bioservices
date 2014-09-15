@@ -141,7 +141,7 @@ class GeneProf(REST):
 
     # buffering the ids from the experiments
     def _get_ids_exp(self):
-        if self._ids_exp == None:
+        if self._ids_exp is None:
             self.logging.info("Fetchin ids...")
             res = self.get_list_experiments(frmt="json")
             self._ids_exp = [x['id'] for x in res]
@@ -150,7 +150,7 @@ class GeneProf(REST):
     ids_exp = property(_get_ids_exp)
 
     def _get_rigid_ids_exp(self):
-        if self._rigid_ids_exp == None:
+        if self._rigid_ids_exp is None:
             self.logging.info("Fetchin ids...")
             res = self.get_list_experiments(frmt="json")
             self._rigid_ids_exp = [x['rigid_id'] for x in res]
@@ -160,7 +160,7 @@ class GeneProf(REST):
 
     # buffering the ids from the datasets
     def _get_ids_ds(self):
-        if self._ids_ds == None:
+        if self._ids_ds is None:
             self.logging.info("Fetchin ids...")
             res = self.get_list_reference_datasets(frmt="json")
             self._ids_ds = [x['id'] for x in res]
@@ -218,7 +218,7 @@ class GeneProf(REST):
         return res
 
     def _check_format(self, frmt):
-        if frmt == None:
+        if frmt is None:
             frmt_ = self.default_extension
         self.devtools.check_param_in_list(frmt, self._valid_format)
         return frmt
@@ -860,7 +860,7 @@ class GeneProf(REST):
         return res
 
     def get_targets_by_experiment_sample(self, ref, Id, frmt="json",
-        ats="C_NAME", include_unbound=False):
+            ats="C_NAME", include_unbound=False):
         """Get Targets by Experiment Sample
 
         Retrieve putative target genes for a transcription factor (or other
@@ -1372,11 +1372,11 @@ class GeneProf(REST):
         url += "%s.bed.gz" % (Id)
 
         params = {}
-        if with_track_description == False:
+        if with_track_description is False:
             params['with-track-description'] = False
-        if filter_column != None:
+        if filter_column is not None:
             params['filter-column'] = filter_column
-        if only_distinct == True:
+        if only_distinct is True:
             params['only-distinct'] = only_distinct
         if key:
             params['key'] = key
@@ -1445,13 +1445,13 @@ class GeneProf(REST):
         url += "%s.wig.gz" % (Id)
 
         params = {}
-        if with_track_description == False:
+        if with_track_description is False:
             params['with-track-description'] = False
         if frag_length != -1:
             params['frag-length'] = frag_length
         if bin_size != -1:
             params['bin-size'] = bin_size
-        if only_distinct == True:
+        if only_distinct is True:
             params['only-distinct'] = only_distinct
         if key:
             params['key'] = key

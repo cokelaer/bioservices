@@ -78,7 +78,8 @@ class MUSCLE(REST):
 
     _url = "http://www.ebi.ac.uk/Tools/services/rest/muscle"
     def __init__(self, verbose=True):
-        super(MUSCLE, self).__init__(name='MUSCLE', url=MUSCLE._url, verbose=verbose )
+        super(MUSCLE, self).__init__(name='MUSCLE', 
+                url=MUSCLE._url, verbose=verbose)
         self._parameters = None
         self._parametersDetails = {}
 
@@ -186,7 +187,7 @@ class MUSCLE(REST):
 
         """
         # There are compulsary arguments:
-        if frmt == None or sequence == None  or email == None:
+        if frmt is None or sequence is None  or email is None:
             raise ValueError("frmt, sequence and email must be provided")
 
         # Here, we will check the arguments values (not the type)
@@ -308,7 +309,3 @@ class MUSCLE(REST):
             if result == 'RUNNING' or result == 'PENDING':
                 time.sleep(checkInterval)
         return result
-
-
-
-

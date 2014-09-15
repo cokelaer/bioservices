@@ -176,7 +176,7 @@ class BioMart(REST):
 
 
         """
-        if host == None:
+        if host is None:
             host = "www.biomart.org"
         url = "http://%s/biomart/martservice" % host
 
@@ -193,8 +193,8 @@ class BioMart(REST):
     def _init(self):
         temp = self.debugLevel
         self.debugLevel = "ERROR"
-        res = self.lookfor("uniprot", verbose=False)
-        res2 = self.valid_attributes
+        _ = self.lookfor("uniprot", verbose=False)
+        _ = self.valid_attributes
         self.debugLevel = temp
         self._biomartQuery = BioMartQuery()
 
@@ -207,7 +207,7 @@ class BioMart(REST):
 
         aliases to some keys are provided: names, databases, displayNames
 
-    	 """
+        """
         ret = self.http_get("?type=registry", frmt="xml")
         ret = self.easyXML(ret)
         # the XML contains list of children called MartURLLocation made
@@ -232,7 +232,7 @@ class BioMart(REST):
             raise BioServicesError("Provided mart name (%s) is not valid. see 'names' attribute" % mart)
         ret = self.http_get("?type=datasets&mart=%s" %mart, frmt="txt")
 
-        if raw==False:
+        if raw is False:
             try:
                 ret2 = [x.split("\t") for x in ret.split("\n") if len(x.strip())]
                 ret = [x[1] for x in ret2]
@@ -312,7 +312,7 @@ class BioMart(REST):
     def query(self, xmlq):
         """Send a query to biomart
 
-    	 The query must be formatted in a XML format which looks like (
+        The query must be formatted in a XML format which looks like (
         example from https://gist.github.com/keithshep/7776579)::
 
             <?xml version="1.0" encoding="UTF-8"?>
@@ -372,7 +372,7 @@ class BioMart(REST):
         return attrib
 
     def _get_names(self):
-        if self._names == None:
+        if self._names is None:
             ret = self.registry()
             names = [x["name"] for x in ret]
             self._names = names[:]
@@ -380,7 +380,7 @@ class BioMart(REST):
     names = property(_get_names, doc="list of valid datasets")
 
     def _get_displayNames(self):
-        if self._display_names == None:
+        if self._display_names is None:
             ret = self.registry()
             names = [x["displayName"] for x in ret]
             self._display_names = names[:]
@@ -388,7 +388,7 @@ class BioMart(REST):
     displayNames = property(_get_displayNames, doc="list of valid datasets")
 
     def _get_databases(self):
-        if self._databases == None:
+        if self._databases is None:
             ret = self.registry()
             names = sorted([x.get("database", "?") for x in ret])
             self._databases = names[:]
@@ -396,7 +396,7 @@ class BioMart(REST):
     databases = property(_get_databases, doc="list of valid datasets")
 
     def _get_hosts(self):
-        if self._hosts == None:
+        if self._hosts is None:
             ret = self.registry()
             names = [x.get("host", "?") for x in ret]
             self._hosts = names[:]
@@ -406,7 +406,7 @@ class BioMart(REST):
 
     def _get_valid_attributes(self,):
         res = {}
-        if self._valid_attributes == None:
+        if self._valid_attributes is None:
             # we could use a loop and call self.datasets(name, raw=False) but it
             # can be a bit longish, so we use the asynchronous call using
             # requests
@@ -442,7 +442,7 @@ class BioMart(REST):
                 found = True
             if pattern.lower() in z.lower():
                 found = True
-            if found == True and verbose==True:
+            if found is True and verbose is True:
                 print("Candidate:")
                 print("     database: %s " %x)
                 print("    MART name: %s " %y)
@@ -480,7 +480,7 @@ datasetConfigVersion = "%(configVersion)s" >\n""" % params
         self.attributes.append(attribute)
 
     def add_dataset(self, dataset):
-	    self.dataset = """    <Dataset name = "%s" interface = "default" >""" % dataset
+        self.dataset = """    <Dataset name = "%s" interface = "default" >""" % dataset
 
     def reset(self):
         self.attributes = []
@@ -488,7 +488,7 @@ datasetConfigVersion = "%(configVersion)s" >\n""" % params
         self.dataset = None
 
     def get_xml(self):
-        if self.dataset == None:
+        if self.dataset is None:
             raise BioServicesError("data set must be set. Use add_dataset method")
         xml = self.header
         xml += self.dataset + "\n\n"

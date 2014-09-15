@@ -213,6 +213,7 @@ class KEGG(REST):
     _valid_databases_link = _valid_DB_base + ["pathway", "brite"]
 
     _docIds = "\n\n.. seealso:: :meth:`list`\n"
+
     def __init__(self, verbose=False, cache=False):
         """.. rubric:: Constructor
 
@@ -307,19 +308,19 @@ class KEGG(REST):
         isOrg = self.isOrganism(database)
 
         if mode == "info":
-            if database not in KEGG._valid_databases_info and isOrg == False:
+            if database not in KEGG._valid_databases_info and isOrg is False:
                 self.logging.error("database or organism provided is not correct (mode=info)")
                 raise
         elif mode == "list":
-            if database not in KEGG._valid_databases_list and isOrg == False:
+            if database not in KEGG._valid_databases_list and isOrg is False:
                 self.logging.error("database provided is not correct (mode=list)")
                 raise
         elif mode == "find":
-            if database not in KEGG._valid_databases_find and isOrg == False:
+            if database not in KEGG._valid_databases_find and isOrg is False:
                 self.logging.error("database provided is not correct (mode=find)")
                 raise
         elif mode == "link":
-            if database not in KEGG._valid_databases_link and isOrg == False:
+            if database not in KEGG._valid_databases_link and isOrg is False:
                 self.logging.error("database provided is not correct (mode=link)")
                 raise
 
@@ -346,7 +347,7 @@ class KEGG(REST):
         #url = self.url+"/"+"info"
         self._checkDB(database, mode="info")
 
-        res = self.http_get(database ,frmt="txt")
+        res = self.http_get(database, frmt="txt")
         return res
 
     def list(self, query, organism=None):
@@ -399,7 +400,7 @@ class KEGG(REST):
         if query:
             #can be something else than a database so we can not use checkDB
             #self._checkDB(database, mode="list")
-            url +=  "/" + query
+            url += "/" + query
 
         if organism:
             if organism not in self.organismIds:
@@ -475,7 +476,6 @@ class KEGG(REST):
         """
         url = "http://www.kegg.jp/dbget-bin/www_bget?" + entry
         self.logging.info(url)
-        import webbrowser
         webbrowser.open(url)
 
     def get(self, dbentries, option=None):
@@ -607,7 +607,7 @@ class KEGG(REST):
         # for now, we only check the first argument.
         # gene identifiers
         isOrg = self.isOrganism(target)
-        if isOrg==False and target not in ['ncbi-gi', 'ncbi-geneid', 'uniprot', 'pubchem',
+        if isOrgis False and target not in ['ncbi-gi', 'ncbi-geneid', 'uniprot', 'pubchem',
                 'chebi', 'drug', 'compound', 'glycan']:
                 raise ValueError("""
     Invalid syntax. target must be a KEGG ID or
@@ -734,7 +734,6 @@ class KEGG(REST):
                     url += "/%s%%09,%s/" % (k,"red")
 
         self.logging.info(url)
-        import webbrowser
         res = webbrowser.open(url)
         return res
 
@@ -750,7 +749,6 @@ class KEGG(REST):
             modId = modId.split(":")[1]
         url = "http://www.kegg.jp/module/" + modId
         self.logging.info(url)
-        import webbrowser
         res = webbrowser.open(url)
         return res
 
@@ -789,7 +787,7 @@ class KEGG(REST):
                 if e.code == 404:
                     status = False
                     allStatus = False
-                    if checkAll == False:
+                    if checkAll is False:
                         print(entry, status)
                         return False
                 else:
@@ -815,60 +813,60 @@ class KEGG(REST):
         return [x.split()[mode] for x in res.split("\n") if len(x)]
 
     def _get_organisms(self):
-        if self._organisms == None:
+        if self._organisms is None:
             self._organisms = self._get_database("organism", 1)
         return self._organisms
     organismIds = property(_get_organisms, doc="Returns list of organism Ids")
 
     def _get_reactions(self):
-        if self._reaction == None:
+        if self._reaction is None:
             self._reaction = self._get_database("reaction", 0)
         return self._reaction
     reactionIds = property(_get_reactions, doc="returns list of reaction Ids")
 
     def _get_enzyme(self):
-        if self._enzyme == None:
+        if self._enzyme is None:
             self._enzyme = self._get_database("enzyme", 0)
         return self._enzyme
     enzymeIds = property(_get_enzyme,
         doc="returns list of enzyme Ids" + _docIds)
 
     def _get_organisms_tnumbers(self):
-        if self._organisms_tnumbers == None:
+        if self._organisms_tnumbers is None:
             self._organisms_tnumbers = self._get_database("organism", 0)
         return self._organisms_tnumbers
     organismTnumbers = property(_get_organisms_tnumbers,
         doc="returns list of organisms (T numbers)" + _docIds)
 
     def _get_glycans(self):
-        if self._glycan == None:
+        if self._glycan is None:
             self._glycan = self._get_database("glycan", 0)
         return self._glycan
     glycanIds = property(_get_glycans,
         doc="Returns list of glycan Ids" + _docIds)
 
     def _get_brite(self):
-        if self._brite == None:
+        if self._brite is None:
             self._brite = self._get_database("brite", 0)
         return self._brite
     briteIds = property(_get_brite,
         doc="returns list of brite Ids." + _docIds)
 
     def _get_kos(self):
-        if self._ko == None:
+        if self._ko is None:
             self._ko = self._get_database("ko", 0)
         return self._ko
     koIds = property(_get_kos, doc="returns list of ko Ids" + _docIds)
 
     def _get_compound(self):
-        if self._compound == None:
+        if self._compound is None:
             self._compound =  self._get_database("compound", 0)
         return self._compound
     compoundIds = property(_get_compound,
         doc="returns list of compound Ids" + _docIds)
 
     def _get_drug(self):
-        if self._drug == None:
+        if self._drug is None:
             self._drug =  self._get_database("drug", 0)
         return self._drug
     drugIds = property(_get_drug, doc="returns list of drug Ids" + _docIds)
@@ -876,6 +874,7 @@ class KEGG(REST):
     # set the default organism used by pathways retrieval
     def _get_organism(self):
         return self._organism
+
     def _set_organism(self, organism):
         if organism in self.organismIds:
             self._organism = organism
@@ -894,11 +893,11 @@ class KEGG(REST):
     organism = property(_get_organism, _set_organism, doc="returns the current default organism ")
 
     def _get_pathways(self):
-        if self._organism == None:
+        if self._organism is None:
             self.logging.warning("You must set the organism first (e.g., self.organism = 'hsa')")
             return
 
-        if self._pathway == None:
+        if self._pathway is None:
             res = self.http_get("list/pathway/%s" % self.organism, frmt="txt")
             orgs = [x.split()[0] for x in res.split("\n") if len(x)]
             self._pathway = orgs[:]
@@ -915,11 +914,11 @@ class KEGG(REST):
     """)
 
     def _get_modules(self):
-        if self._organism == None:
+        if self._organism is None:
             self.logging.warning("You must set the organism first (e.g., self.organism = 'hsa')")
             return
 
-        if self._module == None:
+        if self._module is None:
             res = self.http_get("list/module/%s" % self.organism)
             orgs = [x.split()[0] for x in res.split("\n") if len(x)]
             self._module = orgs[:]
@@ -1044,7 +1043,7 @@ class KEGG(REST):
         """
         output = {'relations':[], 'entries':[]}
         # Fixing bug #24 assembla
-        if res == None:
+        if res is None:
             res = self.easyXML(self.get(pathwayId, "kgml"))
         else:
             res = self.easyXML(res)
@@ -1496,7 +1495,7 @@ class KEGGParser(KEGG):
 
             # REFERENCES are dealt with in the else
             if key in flatfile and \
-                key not in ["REFERENCE", "AUTHORS", "TITLE", "JOURNAL"]:
+                    key not in ["REFERENCE", "AUTHORS", "TITLE", "JOURNAL"]:
                 # store the first appearance of a key
                 output[key.lower()] = line.split(key)[1].strip()
                 current = key.lower()   # keep track of the current key
@@ -1514,7 +1513,7 @@ class KEGGParser(KEGG):
                 # remarks)
                 if current in ["gene", "reference", "rel_pathway", "orthology",\
                         "pathway","reaction", "compound", "dblinks", "marker"]:
-                    if isinstance(output[current], dict) == False:
+                    if isinstance(output[current], dict) is False:
                         # The item may be of different length. In the gene case, we
                         # want to provide a list of dictionaries with key being the
                         # gene id but in some other cases,
@@ -1525,7 +1524,7 @@ class KEGGParser(KEGG):
                         output[current] = {key:value}
                     mode = "dict"
                 else:
-                    if isinstance(output[current], list) == False:
+                    if isinstance(output[current], list) is False:
                         value = output[current]
                         output[current] = [value]
                     mode = "append"

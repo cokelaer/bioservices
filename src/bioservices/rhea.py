@@ -117,7 +117,7 @@ class Rhea(REST):
         the XML file.
 
         """
-        if frmt == None:
+        if frmt is None:
             frmt = "cmlreact" # default is cmlreact
         if frmt not in ["biopax2", "cmlreact"]:
             raise ValueError("format must be either cmlreact (default) or biopax2")

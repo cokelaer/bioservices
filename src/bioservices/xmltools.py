@@ -21,15 +21,13 @@
 from __future__ import print_function
 import xml.etree.ElementTree as ET
 import bs4
-from bioservices import unicodefix 
+#from bioservices import unicodefix 
 try:
     from urllib.request import urlopen
 except:
     from urllib2 import urlopen
 
 __all__ = ["easyXML", "readXML"]
-
-
 
 
 class easyXML(object):
@@ -59,7 +57,7 @@ class easyXML(object):
     There is also aliases findAll and prettify.
 
     """
-    def __init__(self, data, fixing_unicode=False, encoding="utf-8"):
+    def __init__(self, data, encoding="utf-8"):
         """.. rubric:: Constructor
 
         :param data: an XML document format
@@ -73,11 +71,11 @@ class easyXML(object):
         have an URL instead, use :class:`readXML`
 
         """
-        if fixing_unicode:
-            x = unicodefix.FixingUnicode(data, verbose=False, encoding=encoding)
-            self.data = x.fixed_string.encode("utf-8")
-        else:
-            self.data = data[:]
+        #if fixing_unicode:
+        #    x = unicodefix.FixingUnicode(data, verbose=False, encoding=encoding)
+        #    self.data = x.fixed_string.encode("utf-8")
+        #else:
+        self.data = data[:]
 
         try:
             self.root = ET.fromstring(self.data)
@@ -95,7 +93,7 @@ class easyXML(object):
         return self.root.getchildren()
 
     def _get_soup(self):
-        if self._soup == None:
+        if self._soup is None:
             self._soup = bs4.BeautifulSoup(self.data)
         return self._soup
     soup = property(_get_soup, doc="Returns the beautiful soup instance")
@@ -121,6 +119,3 @@ class readXML(easyXML):
         url = urlopen(filename, "r")
         self.data = url.read()
         super(readXML, self).__init__(self.data, fixing_unicode, encoding)
-
-
-

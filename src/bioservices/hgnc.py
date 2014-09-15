@@ -93,9 +93,10 @@ class HGNC(REST):
 
         self._always_return_list = False
 
+        # FIXME
         #: Force XML to be checked for unicode consistency see :class:`Service`
-        self._fixing_unicode = True
-        self._fixing_encoding = "utf-8"
+        #self._fixing_unicode = True
+        #self._fixing_encoding = "utf-8"
 
     def _set_return(self, mode):
         assert mode in [False, True]
@@ -279,7 +280,7 @@ class HGNC(REST):
         :param entries: list of values entries (e.g., returned by the :meth:`lookfor` method.)
             if not provided, this method looks for all entries.
         :returns: list of dictionaries with keys being all entry names. Values is a
-		dictionary of cross references.
+            dictionary of cross references.
 
         .. warning:: takes 10 minutes
 
@@ -287,7 +288,7 @@ class HGNC(REST):
         from math import ceil
         results = {}
 
-        if entries==None:
+        if entries is None:
             print("First, get all entries")
             entries = self.lookfor('*')
 
@@ -299,8 +300,8 @@ class HGNC(REST):
         dn = 300
         N = len(names)
         n = int(ceil(N/float(dn)))
-        for i in range(0,n):
-            print("Completed ", i+1 , "/", n)
+        for i in range(0, n):
+            print("Completed ", i+1, "/", n)
             query  = ";".join(names[i*dn:(i+1)*dn])
             xml = self.get_xml(query)
             genes = xml.findAll("gene")

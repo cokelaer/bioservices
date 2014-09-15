@@ -196,7 +196,7 @@ class WSDbfetch(WSDLService):
 
 
         """
-        if self._supportedFormats == None:
+        if self._supportedFormats is None:
             self._supportedFormats = self.serv.getSupportedFormats()
         return self._supportedFormats
     supportedFormats = property(getSupportedFormats)
@@ -208,7 +208,7 @@ class WSDbfetch(WSDLService):
 
         Returns: An array of strings containing the database and style names. 
         """
-        if self._supportedStyles == None:
+        if self._supportedStyles is None:
             self._supportedStyles = self.serv.getSupportedStyles()
         return self._supportedStyles
     supportedStyles = property(getSupportedStyles)

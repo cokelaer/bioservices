@@ -276,7 +276,7 @@ class UniProt(REST):
         return result_dict
 
     def multi_mapping(self, fr="ID", to="KEGG_ID", query="P13368",
-        frmt="tab", Nmax=100 ):
+            frmt="tab", Nmax=100):
         """Calls mapping several times and concatenates results
 
         .. deprecated: 1.3.1 you can now use :meth:`mapping` even for long queries since
@@ -388,7 +388,7 @@ class UniProt(REST):
         return f.sequence
 
     def search(self, query, frmt="tab", columns=None,
-        include=False,sort="score", compress=False, limit=None, offset=None, maxTrials=10):
+            include=False,sort="score", compress=False, limit=None, offset=None, maxTrials=10):
         """Provide some interface to the uniprot search interface.
 
         :param str query: query must be a valid uniprot query.
@@ -444,12 +444,12 @@ class UniProt(REST):
         """
         params = {}
 
-        if frmt != None:
+        if frmt is not None:
             _valid_formats = ['tab', 'xls', 'fasta', 'gff', 'txt', 'xml', 'rss', 'list', 'rss', 'html']
             self.devtools.check_param_in_list(frmt, _valid_formats)
             params['format'] = frmt
 
-        if columns!=None:
+        if columns is not None:
             self.devtools.check_param_in_list(frmt, ["tab","xls"])
 
             # remove unneeded spaces before/after commas if any
@@ -459,7 +459,7 @@ class UniProt(REST):
                 columns = [columns]
 
             for col in columns:
-                if col.startswith("database(") == True:
+                if col.startswith("database(") is True:
                     pass
                 else:
                     self.devtools.check_param_in_list(col, self._valid_columns)
@@ -467,21 +467,21 @@ class UniProt(REST):
             # convert back to a string as expected by uniprot
             params['columns'] = ",".join([x.strip() for x in columns])
 
-        if include == True and frmt in ["fasta", "rdf"]:
+        if include is True and frmt in ["fasta", "rdf"]:
             params['include'] = 'yes'
 
-        if compress == True:
+        if compress is True:
             params['compress'] = 'yes'
 
         if sort:
             self.devtools.check_param_in_list(sort, ["score"])
             params['sort'] = sort
 
-        if offset != None:
+        if offset is not None:
             if isinstance(offset, int):
                 params['offset'] = offset
 
-        if limit != None:
+        if limit is not None:
             if isinstance(limit, int):
                 params['limit'] = limit
 
@@ -514,12 +514,12 @@ class UniProt(REST):
             #print line
             Entry, a,b,c,d,e,f = line.split("\t")
             #print Entry, a, b, c, d, e, f
-            newres[Entry] = { 'Entry name': a,
+            newres[Entry] = {'Entry name': a,
                          'Status': b,
                          'Protein names': c,
                          'Gene names': d,
-                         'Organism' : e,
-                         'Length' : f}
+                         'Organism': e,
+                         'Length': f}
         return newres
 
     def uniref(self, query):
@@ -548,7 +548,6 @@ class UniProt(REST):
         :param chunk:
         :return: dataframe with indices being the uniprot id (e.g. DIG1_YEAST)
 
-
         .. todo:: cleanup the content of the data frame to replace strings
             separated by ; into a list of strings. e.g. the Gene Ontology IDs
 
@@ -576,7 +575,7 @@ class UniProt(REST):
             else:
                 break
             if len(res)==0:
-                 self.logging.warning("some entries %s not found" % entries)
+                self.logging.warning("some entries %s not found" % entries)
             else:
                 df = pd.read_csv(io.StringIO(unicode(res)), sep="\t")
                 if isinstance(output, types.NoneType):

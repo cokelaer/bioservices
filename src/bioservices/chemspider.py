@@ -66,7 +66,7 @@ class ChemSpider(REST):
         super(ChemSpider, self).__init__("ChemSpider", url=url, cache=cache,
             verbose=verbose)
 
-        if token == None:
+        if token is None:
             try:
                 token = self.settings.params["chemspider.token"][0]
             except Exception as err:
@@ -147,7 +147,7 @@ class ChemSpider(REST):
         return ret.root.text
 
     def _get_databases(self):
-        if self._databases == None:
+        if self._databases is None:
             ret = self.http_get("MassSpecAPI.asmx/GetDatabases?", frmt="xml")
             ret = self.easyXML(ret)
             self._databases = [x.text for x in ret.getchildren()]

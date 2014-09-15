@@ -133,9 +133,9 @@ class Ensembl(REST):
             >>> s.genetree('ENSGT00390000003602', frmt='phyloxml', sequence='none')
 
         """
-        if aligned == True:
+        if aligned is True:
             aligned = 1
-        elif aligned == False:
+        elif aligned is False:
             aligned = 0
         self.devtools.check_param_in_list(nh_format, 
                 ['full', 'display_label_composite', 'simple', 'species', 
@@ -183,7 +183,7 @@ class Ensembl(REST):
 
 
         """
-        if multiple_sequences == False:
+        if multiple_sequences is False:
             multiple_sequences = 0
         else:
             multiple_sequences = 1

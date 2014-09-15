@@ -157,13 +157,13 @@ class UniChem(REST):
         return res
 
     def get_src_compound_ids_all_from_src_compound_id(self, src_compound_id,
-        src_id, target=None):
+            src_id, target=None):
         self.logging.warning("Deprecated us get_compound_ids")
         return self.get_all_compound_ids_from_all_src_id(src_compound_id,
                 src_id, target=target)
 
     def get_all_compound_ids_from_all_src_id(self, src_compound_id,
-        src_id, target=None):
+            src_id, target=None):
         """Obtain a list of all src_compound_ids from all sources (including
         BOTH current AND obsolete assignments) to the same structure as a currently
         assigned query src_compound_id.
@@ -387,7 +387,7 @@ class UniChem(REST):
         return res
 
     def get_src_compound_ids_all_from_obsolete(self, obsolete_src_compound_id,
-        src_id, to_src_id=None):
+            src_id, to_src_id=None):
         """Obtain a list of all src_compound_ids from all sources with BOTH
         current AND obsolete to the same structure with an obsolete assignment to the
         query src_compound_id.

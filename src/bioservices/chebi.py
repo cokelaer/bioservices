@@ -122,6 +122,7 @@ chemical structures, using the ChEBI identifier.
         the wildcard character "*" and also unicode characters. You can get maximum
         results upto 5000 entries at a time.
 
+        ::
 
             >>> ch.getLiteEntity("CHEBI:27732")
             [(LiteEntity){
@@ -193,7 +194,7 @@ chemical structures, using the ChEBI identifier.
         return res
 
     def getAllOntologyChildrenInPath(self, chebiId, relationshipType,
-        onlyWithChemicalStructure=False):
+            onlyWithChemicalStructure=False):
         """Retrieves the ontology children of an entity including the relationship type
 
         :param str chebiId: a valid ChEBI identifier (string)
@@ -217,8 +218,8 @@ chemical structures, using the ChEBI identifier.
         return res
 
     def getStructureSearch(self, structure, mode="MOLFILE",
-        structureSearchCategory="SIMILARITY", totalResults=50,
-        tanimotoCutoff=0.25):
+            structureSearchCategory="SIMILARITY", totalResults=50,
+            tanimotoCutoff=0.25):
 
         """Does a substructure, similarity or identity search using a structure.
 

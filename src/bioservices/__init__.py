@@ -29,6 +29,10 @@ except:
     print("Some features requires this library and future version of BioServices may use it.")
 
 
+# Add bioservices.uniprot to sys.modules to prevent cycles in our imports
+#import bioservices.uniprot
+#bioservices.uniprot  # Stop flake8 error
+
 
 from . import settings
 from .settings import *
@@ -77,8 +81,6 @@ from .wsdbfetch import *
 
 from . import unicodefix
 
-from . import xmltools
-from .xmltools import *
 
 from . import reactome
 from .reactome import *

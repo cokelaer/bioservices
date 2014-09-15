@@ -21,10 +21,10 @@ defaultParams = {
     'user.email': ["unknown", (str), "email addresss that may be used in some utilities (e.g. EUtils)"],
     'general.timeout': [30, (int,float), ""],
     'general.max_retries': [3, int, ''],
-    'general.async_concurrent' : [50, int, ''],
-    'general.async_threshold': [10 , int, 'when to switch to asynchronous requests'],
+    'general.async_concurrent': [50, int, ''],
+    'general.async_threshold': [10, int, 'when to switch to asynchronous requests'],
     'cache.tag_suffix': ["_bioservices_database",str, 'suffix to append for cache databases'],
-    'cache.on' : [False, bool, 'CACHING on/off'],
+    'cache.on': [False, bool, 'CACHING on/off'],
     'cache.fast': [True, bool, "FAST_SAVE option"],
     'chemspider.token': [None, (str, type(None)), 'token see http://www.chemspider.com'],
 }
@@ -53,7 +53,7 @@ class ConfigReadOnly(object):
         e.g., /home/user/.config/<name>/<name>.cfg
 
         """
-        if name == None:
+        if name is None:
             raise Exception("Name parameter must be provided")
         else:
             # use input parameters
@@ -110,7 +110,7 @@ class ConfigReadOnly(object):
                     # the type should be self.params[newkey][1]
                     cast = self.params[newkey][1]
                     # somehow
-                    if isinstance(value, cast) == True:
+                    if isinstance(value, cast) is True:
                         self.params[newkey][0] = value
                     else:
                         print("Warning:: found an incorrect type while parsing {} file. In section '{}', the option '{}' should be a {}. Found value {}. Trying a cast...".format(self.user_config_file_path, section, key, cast, value))
@@ -215,7 +215,7 @@ class ConfigReadOnly(object):
         if os.path.exists(self.user_config_file_path):
             # we need to copy the file into a backup file
             filename = self.user_config_file_path + '.bk'
-            if os.path.exists(filename) and force==False:
+            if os.path.exists(filename) and forceis False:
                 print("""Trying to save the current config file {} into a backup file {}\n but it exists already. Please remove the backup file first or set the 'force' parameter to True""".format(self.user_config_file_path, filename))
                 return
             else:

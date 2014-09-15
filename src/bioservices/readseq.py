@@ -72,7 +72,7 @@ class Readseq(WSDLService):
         self._parameters = None
 
     def _get_parameter(self):
-        if self._parameters == None:
+        if self._parameters is None:
             self._parameters = self.get_parameters()
         return self._parameters
     parameters = property(_get_parameter, doc="Get list of parameter names")
@@ -219,4 +219,3 @@ description     string  Description of the result type, for use in help interfac
 mediaType   string  MIME type of the returned data.
 fileSuffix  string  Suggested suffix for file name, if writing data to disk. 
 """
-

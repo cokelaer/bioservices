@@ -222,7 +222,7 @@ returns a list of parameters. See :meth:`getParameters`.""")
 
         """
         # There are compulsary arguments:
-        if program==None or sequence==None or database==None or email==None:
+        if program is None or sequence is None or database is None or email is None:
             raise ValueError("program, sequence, email  and database must be provided")
 
         checkParam = self.devtools.check_param_in_list
@@ -245,10 +245,10 @@ returns a list of parameters. See :meth:`getParameters`.""")
         # this is fine for now but note for instance that stype could not be put
         # here because what is returned by parametersDetails is not exactly what
         # is expected.
-        for k,v in kargs.items():
-             print(k,v)
-             checkParam(v,self.parametersDetails(k))
-             params[k] = v
+        for k, v in kargs.items():
+            print(k, v)
+            checkParam(v,self.parametersDetails(k))
+            params[k] = v
 
         # similarly for the database, we must process it by hand because ther
         # can be more than one database

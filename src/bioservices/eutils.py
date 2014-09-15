@@ -200,7 +200,7 @@ class EUtils(WSDLService):
 
     def _get_databases(self):
         """alias to run_eInfo"""
-        if self._databases == None:
+        if self._databases is None:
             # DbData changed into DbList in rev 1.3.0
             self._databases = sorted(self.serv.run_eInfo().DbList.DbName)
         return self._databases
@@ -344,7 +344,7 @@ class EUtils(WSDLService):
         """
         #self._check_db(db)
         self._check_retmode(retmode)
-        if sid != None:
+        if sid is not None:
             sid = self._check_ids(sid)
 
         params = {'db':db, 'id':sid, 'retmode':retmode, 'tool':self.tool,
@@ -398,7 +398,7 @@ class EUtils(WSDLService):
             'Filter'
 
         """
-        if db == None:
+        if db is None:
             return self.databases
         else:
             self._check_db(db)
@@ -459,10 +459,10 @@ class EUtils(WSDLService):
 
 
         """
-        if sid!=None:
+        if sid is not None:
             sid = self._check_ids(sid)
 
-        if db == None:
+        if db is None:
             return self.databases
         else:
             self._check_db(db)
@@ -630,13 +630,13 @@ class EUtils(WSDLService):
 
         .. todo:: remove LinkSet : there is only 1 set ?
         """
-        if sid!=None:
+        if sid is not None:
             sid = self._check_ids(sid)
         self._check_db(dbfrom)
         if 'cmd' in kargs.keys():
             assert kargs['cmd'] in ["neighbor", "neighbor_score",
                     "neighbor_history", "acheck", "llinks", "lcheck",
-                    "ncheck", "llinkslib" ,"prlinks"]
+                    "ncheck", "llinkslib", "prlinks"]
 
         #s = REST("test","http://eutils.ncbi.nlm.nih.gov/entrez/eutils/")
         #request = "elink.fcgi?db=%s&dbfrom=%s" % (db, dbfrom)

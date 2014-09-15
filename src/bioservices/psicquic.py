@@ -227,10 +227,10 @@ class PSICQUIC(REST):
         "omim":"MIM_ID",
         "chebi": None,
         "chembl": None,
-#        "intact": None
-    }
+        #        "intact": None
+        }
 
-# unknown: hprd, omim, bind, bind complexid, mdl, 
+    # unknown: hprd, omim, bind, bind complexid, mdl, 
 
     def __init__(self, verbose=True):
         """.. rubric:: Constructor
@@ -251,7 +251,6 @@ class PSICQUIC(REST):
             self.uniprot = UniProt(verbose=False)
         except:
             self.logging.warning("UniProt service could be be initialised")
-
         self.buffer = {}
 
     def _get_formats(self):
@@ -315,7 +314,7 @@ class PSICQUIC(REST):
     # todo a property for the version of PISCQUIC
 
     def _get_registry(self):
-        if self._registry == None:
+        if self._registry is None:
             url = 'registry/registry?action=STATUS&format=xml'
             res = self.http_get(url, frmt="xml")
             res = self.easyXML(res)
@@ -326,39 +325,46 @@ class PSICQUIC(REST):
     def _get_registry_names(self):
         res = self.registry
         return [x.findAll('name')[0].text for x in res.findAll("service")]
-    registry_names = property(_get_registry_names, doc="returns all services available (names)")
+    registry_names = property(_get_registry_names, 
+            doc="returns all services available (names)")
 
     def _get_registry_restricted(self):
         res = self.registry
         return [x.findAll('restricted')[0].text for x in res.findAll("service")]
-    registry_restricted = property(_get_registry_restricted, doc="returns restricted status of services" )
+    registry_restricted = property(_get_registry_restricted, 
+            doc="returns restricted status of services")
 
     def _get_registry_resturl(self):
         res = self.registry
         data = [x.findAll('resturl')[0].text for x in res.findAll("service")]
         return data
-    registry_resturls = property(_get_registry_resturl, doc="returns URL of REST services")
+    registry_resturls = property(_get_registry_resturl, 
+            doc="returns URL of REST services")
 
     def _get_registry_restex(self):
         res = self.registry
         data = [x.findAll('restexample')[0].text for x in res.findAll("service")]
         return data
-    registry_restexamples = property(_get_registry_restex, doc="retuns REST example for each service")
+    registry_restexamples = property(_get_registry_restex, 
+            doc="retuns REST example for each service")
 
     def _get_registry_soapurl(self):
         res = self.registry
         return  [x.findAll('soapurl')[0].text for x in res.findAll("service")]
-    registry_soapurls = property(_get_registry_soapurl, doc="returns URL of WSDL service")
+    registry_soapurls = property(_get_registry_soapurl, 
+            doc="returns URL of WSDL service")
 
     def _get_registry_active(self):
         res = self.registry
         return  [x.findAll('active')[0].text for x in res.findAll("service")]
-    registry_actives = property(_get_registry_active, doc="returns active state of each service")
+    registry_actives = property(_get_registry_active, 
+            doc="returns active state of each service")
 
     def _get_registry_count(self):
         res = self.registry
         return  [x.findAll('count')[0].text for x in res.findAll("service")]
-    registry_counts = property(_get_registry_count, doc="returns number of entries in each service")
+    registry_counts = property(_get_registry_count, 
+            doc="returns number of entries in each service")
 
     def _get_registry_version(self):
         res = self.registry
@@ -372,7 +378,8 @@ class PSICQUIC(REST):
             else:
                 version[i] = None 
         return  version
-    registry_versions = property(_get_registry_version, doc="returns version of each service")
+    registry_versions = property(_get_registry_version, 
+            doc="returns version of each service")
 
     def query(self, service, query, output="tab25", version="current", firstResult=None, maxResults=None):
         """Send a query to a specific database 
@@ -416,7 +423,7 @@ class PSICQUIC(REST):
             raise ValueError("database %s not in active databases" % service)
 
         params = {}
-        if output!=None:
+        if output is not None:
             self.devtools.check_param_in_list(output, self.formats)
             params['format'] = output
         else: output="none"
@@ -431,9 +438,9 @@ class PSICQUIC(REST):
         # get the base url according to the service requested
         resturl = self.registry_resturls[index]
 
-        if firstResult != None:
+        if firstResult is not None:
             params['firstResult'] = firstResult
-        if maxResults != None:
+        if maxResults is not None:
             params['maxResults'] = maxResults
 
         url = resturl  + 'query/' + query
@@ -475,8 +482,8 @@ class PSICQUIC(REST):
         """
 
         results = {}
-        if databases == None:
-             databases = [x.lower() for x in self.activeDBs]
+        if databases is None:
+            databases = [x.lower() for x in self.activeDBs]
 
         for x in databases:
             if x not in self.activeDBs:
@@ -629,22 +636,22 @@ class PSICQUIC(REST):
         """
         if verbose:print("Before removing anything: ", len(data))
 
-        data = [x for x in data if x[0]!=None and x[1]!=None]
+        data = [x for x in data if x[0] is not None and x[1] is not None]
         if verbose:print("After removing the None: ", len(data))
     
-        data = [x for x in data if x[0].startswith("!")==False and x[1].startswith("!")==False]
+        data = [x for x in data if x[0].startswith("!")is False and x[1].startswith("!")is False]
         if verbose:print("After removing the !: ", len(data))
 
     
         for db in remove_db:
-            data = [x for x in data if x[0].startswith(db)==False]
-            data = [x for x in data if x[1].startswith(db)==False]
+            data = [x for x in data if x[0].startswith(db)is False]
+            data = [x for x in data if x[1].startswith(db)is False]
             if verbose:print("After removing entries that match %s : " % db, len(data))
 
         data = [x for x in data if keep_only in x[0] and keep_only in x[1]]
         if verbose:print("After removing entries that don't match %s : " % keep_only, len(data))
     
-        if keep_self_loop == False:
+        if keep_self_loop is False:
             data = [x for x in data if x[0]!=x[1]]
             if verbose:print("After removing self loop : ", len(data))
 
@@ -729,7 +736,7 @@ class PSICQUIC(REST):
                     this_query = list(query[k])
                     DBname = self._mapping_uniprot[k]
 
-                    if DBname != None:
+                    if DBname is not None:
                         self.logging.warning("Request sent to uniprot for %s database (%s/%s)" % (DBname, counter, N))
                         res = self.uniprot.mapping(fr=DBname, to="ID", query=" ".join(this_query))
                         for x in this_query:
@@ -879,7 +886,7 @@ class AppsPPI(object):
 
     def show_pie(self):
         """a simple example to demonstrate how to visualise number of
-            interactions found in various databases
+        interactions found in various databases
 
         """
         try:
@@ -887,7 +894,7 @@ class AppsPPI(object):
         except ImportError:
             from bioservices import BioServicesError
             raise BioServicesError("You must install pylab/matplotlib to use this functionality")
-        labels = range(1, self.N + 1 )
+        labels = range(1, self.N + 1)
         print(labels)
         counting = [len(self.relevant_interactions[i]) for i in labels]
 
@@ -898,6 +905,3 @@ class AppsPPI(object):
         title("Number of interactions found in N databases")
         legend([str(x) + " database(s)" for x in labels])
         show()
-
-
-

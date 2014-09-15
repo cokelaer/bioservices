@@ -123,11 +123,11 @@ class BioModels(WSDLService):
         return l
 
     def _item2list(self, sid):
-        valid_ids = self.modelsId
+        #valid_ids = self.modelsId
 
         if isinstance(sid, str):
             sid = [sid]
-        elif isinstance(sid, list) == False:
+        elif isinstance(sid, list) is False:
             raise TypeError("list of identifiers must be a list of string or one string")
 
         return sid
@@ -148,7 +148,7 @@ class BioModels(WSDLService):
         return self.serv.getAllModelsId()
 
     def _get_models_id(self):
-        if self._modelsId == None:
+        if self._modelsId is None:
             self._modelsId = self.serv.getAllModelsId()
         return self._modelsId
     modelsId = property(_get_models_id, doc="list of all model Ids")
@@ -441,7 +441,7 @@ records.
         """
         reacID = self._item2list(reacID)
         res = self.serv.getSimpleModelsByReactomeIds(reacID)
-        if raw!=True:
+        if raw is not True:
             res = self.easyXML(res)
         return res
 
@@ -611,7 +611,7 @@ records.
         for i in range(start, end+1):
             ChEBI = "CHEBI:" +  str(i)
             if i%100 == 0 and i>0:
-                if verbose==True:
+                if verboseis True:
                     print("%f %% done" % ((i-start)*100./float(end-start)))
             res = self.getModelsIdByChEBI(ChEBI)
             if res:
@@ -642,7 +642,7 @@ records.
         Ids = []
         for i in range(start, end+1):
             if i%100 == 0 and i>0:
-                if verbose==True:
+                if verboseis True:
                     print("%f %% done" % ((i-start)*100./float(end-start)))
             res = self.serv.getSimpleModelsByReactomeIds(['REACT_%s'%i])
             if 'REACT' in res:

@@ -44,11 +44,11 @@
 """
 from services import REST
 from xmltools import readXML
-__all__ = ["BioCarta"]
+__all__ = ["Panther"]
 
 
 class Panther(REST):
-    """Interface to `BioCarta <http://www.biocarta.com>`_ pages
+    """Interface to `Panther <http://www.biocarta.com>`_ pages
 
 
     HTML pages relatd to pathways.
@@ -56,7 +56,7 @@ class Panther(REST):
     One can retrieve the pathways names and their list of proteins. 
 
         >>> from bioservics import *
-        >>> b = BioCarta()
+        >>> b = Panther()
         >>> pathways = b.get_pathway_names()
         >>> proteins = b.get_pathway_protein_names(pathways[0])
 
@@ -70,7 +70,7 @@ class Panther(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(Panther, self).__init__(name="BioCarta", url=Panther._url, 
+        super(Panther, self).__init__(name="Panther", url=Panther._url, 
                 verbose=verbose, cache=cache)
 
         self._allPathwaysURL =  "http://www.pantherdb.org/pathway/pathwayList.jsp"

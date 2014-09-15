@@ -113,7 +113,8 @@ class BioCarta(REST):
         url = self._url + "/pathfiles/" + pathway
         x = readXML(url)
         self.logging.info("Reading " + url)
-        protein_url = [this.get("href") for this in x.findAll("a") if this.has_key("href") and "Protein" in this.get("href")]
+        protein_url = [this.get("href") for this in x.findAll("a") \
+                if 'href' in this and "Protein" in this.get("href")]
         if len(protein_url) == 0:
             return None
         else:
@@ -129,6 +130,6 @@ class BioCarta(REST):
             table = [this for this in x.findAll("table") if this.findAll("th")
                     and  this.findAll("th")[0].getText() == "Gene Name"][2]
             # now get the genename, locus and accession
-            rows = [[y.getText() for y in x.findAll("td")] for x in  table.findAll("tr")]
-            rows = [x for x in rows if len(x)]
+            rows = [[y.getText() for y in xx.findAll("td")] for xx in  table.findAll("tr")]
+            rows = [xx for xx in rows if len(x)]
             return rows

@@ -550,7 +550,7 @@ class ChEMBL(REST):
 class BenchmarkChembl(ChEMBL):
 
     def __init__(self):
-        super(BenchmarkChembl, self).__init__( cache=True)
+        super(BenchmarkChembl, self).__init__(cache=True)
 
     def benchmark(self, N=1000):
         #self.name = "compounds"

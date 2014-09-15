@@ -107,21 +107,21 @@ class BioGRID(object):
         :return: a search string for biogrid. """ 
 
 
-        if query == None:
+        if query is None:
             query = self.query
-        if taxid == None:
+        if taxid is None:
             taxid = self.taxId
-        if exp == None:
+        if exp is None:
             exp = self.exP
 
         asepNone = "%20AND%20None"
-        if exp != None:
+        if exp is not None:
             exp = exp.replace(" ",asepNone[:-4])
         if isinstance(query,str):
             conStr = "%s%s" % (query,asepNone)
         else:
             conStr = "%s" % ("%20OR%20".join(query))
-        if taxid != None or exp != None:
+        if taxid is not None or exp is not None:
             if isinstance(query,list):
                 conStr = "(%s)" % conStr
         conStr = "%s%s%s%s%s" % (conStr,asepNone[:-4],taxid,asepNone[:-4],exp)

@@ -94,7 +94,7 @@ class PICR(REST):
         return res
 
     def _get_databases(self):
-        if self._databases == None:
+        if self._databases is None:
             res = self.getMappedDatabaseNames()
             self._databases = [a.text for a in res.getchildren()]
         return self._databases
@@ -102,7 +102,7 @@ class PICR(REST):
         doc="Get a human-readable list of databases (obtained from XML returned by :meth:`getMappedDatabaseNames`)")
 
     def getUPIForSequence(self, sequence, database, taxid=None,
-        onlyactive=True, includeattributes=False):
+            onlyactive=True, includeattributes=False):
         """Get Protein identifier given an exact sequence
 
         :param sequence: the sequence to map [required]
@@ -145,13 +145,13 @@ class PICR(REST):
             # requests.get accepts multidict values, so nothing fancy to do here !
             params['database'] = database[:]
                 
-        #if taxid!=None or onlyactive==False or includeattributes==False:
+        #if taxid!=None or onlyactiveis False or includeattributesis False:
         #    raise NotImplementedError
         if taxid:
             params['taxonid'] = taxid
-        if includeattributes == False:
+        if includeattributes is False:
             params['includeattributes'] = 'false'
-        if onlyactive == False:
+        if onlyactive is False:
             params['onlyactive'] = "false"
 
         res = self.http_get(url, frmt="xml", params=params)
@@ -163,10 +163,7 @@ class PICR(REST):
             raise ValueError("Provided database name (%s) is not valid. Use database attribute to check the valid names" % db)
 
     def getUPIForAccession(self, accession, database,
-        taxid=None,
-        version=None,
-        onlyactive=True,
-        includeattributes=True):
+            taxid=None, version=None, onlyactive=True, includeattributes=True):
         """Get Protein identifier given an accession number
 
         :param str accession:  the accession to map [required]
@@ -212,9 +209,9 @@ class PICR(REST):
             params['database'] = database[:]
         if taxid:
             params['taxonid'] = taxid
-        if includeattributes == False:
+        if includeattributes is False:
             params['includeattributes'] = "false"
-        if onlyactive == False:
+        if onlyactive is False:
             params['onlyactive'] = "false"
 
         res = self.http_get(url, frmt="xml", params=params)
@@ -223,10 +220,8 @@ class PICR(REST):
         return res
 
     def getUPIForBLAST(self, blastfrag, database,
-        taxid=None,
-        version=None,
-        onlyactive=True,
-        includeattributes=False, **kargs):
+            taxid=None, version=None, onlyactive=True,
+            includeattributes=False, **kargs):
         """Get Protein identifier given a sequence similarity (BLAST)
 
         :param str blastfrag:  the AA fragment to map [required]
@@ -276,9 +271,9 @@ class PICR(REST):
                 params["database"] = params
         if taxid:
             params["taxonid"] = taxid
-        if includeattributes == False:
+        if includeattributes is False:
             params["includeattributes"] = "false"
-        if onlyactive == False:
+        if onlyactive is False:
             params["onlyactive"] = "false"
 
         res = self.http_get(url, frmt="xml", params=params)

@@ -110,7 +110,7 @@ class QuickGO(REST):
 
         """
         self.devtools.check_param_in_list(frmt, ["mini", "obo", "oboxml"])
-        if goid.startswith("GO:")==False:
+        if goid.startswith("GO:")is False:
             raise ValueError("GO id must start with 'GO:'")
 
         params = {'id':goid, 'frmt':frmt}
@@ -119,8 +119,9 @@ class QuickGO(REST):
         return res
 
     def Annotation(self, goid=None, protein=None, frmt="gaf", limit=10000,
-        gz=False, col=None, db=None, aspect=None, relType=None, termUse=None,
-        evidence=None, source=None, ref=None,  tax=None, qualifier=None, q=None, _with=None):
+            gz=False, col=None, db=None, aspect=None, relType=None, termUse=None,
+            evidence=None, source=None, ref=None,  tax=None, qualifier=None, q=None, 
+            _with=None):
         """Calling the Annotation service
 
         Mutual exclusive parameters are goid, protein
@@ -186,7 +187,7 @@ class QuickGO(REST):
         _valid_db = ['UniProtKB', 'UniGene', 'Ensembl']
         _valid_aspect = ['P', 'F', 'C']
 
-        if isinstance(limit, int)==False:
+        if isinstance(limit, int)is False:
             raise TypeError("limit parameter must be an integer greater than zero")
 
         # fill params with parameters that have default values.
@@ -197,32 +198,32 @@ class QuickGO(REST):
 
         # what is the ID being provided. We can have only one of:
         # protein, goid
-        if protein != None:
+        if protein is not None:
             url += "protein=" + protein
-        elif goid != None:
+        elif goid is not None:
             url += "goid=" + goid
-        elif tax != None:
+        elif tax is not None:
             url += "tax=" + tax
 
         #need to check that there are mutualy exclusive
-        if goid==None and protein==None and tax==None:
-             raise ValueError("you must provide at least one of the following parameter: goid, protein")
+        if goid is None and protein is None and tax is None:
+            raise ValueError("you must provide at least one of the following parameter: goid, protein")
 
         # aspect parameter
-        if aspect != None:
+        if aspect is not None:
             self.devtools.check_param_in_list(aspect, _valid_aspect)
             params['aspect'] = aspect
 
         # aspect parameter
-        if termUse != None:
+        if termUse is not None:
             self.devtools.check_param_in_list(termUse, ["slim"])
             params['termUse'] = termUse
 
         if relType:
-             raise NotImplementedError
+            raise NotImplementedError
 
         if q:
-             raise NotImplementedError
+            raise NotImplementedError
 
         if evidence:
             if isinstance(evidence,list):
@@ -267,7 +268,7 @@ or a string (e.g., 'PUBMED:*') """)
 
         # col parameter
         if frmt=="tsv":
-            if col == None:
+            if col is None:
                 col = 'proteinDB,proteinID,proteinSymbol,qualifier,'
                 col += 'goID,goName,aspect,evidence,ref,with,proteinTaxon,'
                 col += 'date,from,splice,proteinName,proteinSynonym,proteinType,'
@@ -281,12 +282,12 @@ or a string (e.g., 'PUBMED:*') """)
 
         if frmt not in ["tsv", "dict"]:
             # col is provided but format is not appropriate
-            if col!= None:
+            if col is not None:
                 raise ValueError("You provided the 'col' parameter but the format is not correct. You should use the frmt='tsv' or frmt='dict' ")
 
 
         # gz parameter. do not expect values so need to be added afterwards.
-        if gz==True:
+        if gzis True:
             url+='&gz'
 
         res = self.http_get(url, frmt="txt", params=params)

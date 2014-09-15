@@ -106,23 +106,23 @@ class PDB(REST):
 
         reference: http://www.rcsb.org/pdb/static.do?p=download/http/index.html
         """
-        valid_formats = [ "pdb", "cif", "xml"]
+        valid_formats = ["pdb", "cif", "xml"]
         self.devtools.check_param_in_list(frmt, valid_formats)
         self.devtools.check_param_in_list(headerOnly, [True, False])
-        if headerOnly == True:
+        if headerOnly is True:
             headerOnly = "YES"
         else:
             headerOnly = "NO"
 
         query = "files/" + identifier + "." + frmt
-        if compression == True:
+        if compression is True:
             query += ".gz"
 
         params = {'headerOnly': headerOnly}
 
         if frmt == "xml":
             res = self.http_get(query, frmt=frmt, params=params)
-            if compression == False:
+            if compression is False:
                 res = self.easyXML(res)
         else:
             res = self.http_get(query, frmt="txt", params=params)
@@ -149,7 +149,7 @@ class PDB(REST):
         """
         res = self.http_post("query/post", 
                 data=query, 
-                headers=s.get_headers(content='default'))
+                headers=self.get_headers(content='default'))
         return res
 
 

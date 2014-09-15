@@ -132,7 +132,7 @@ class Service(Logging):
 
         self._url = url
         try:
-            if self.url != None:
+            if self.url is not None:
                 urlopen(self.url)
         except Exception as err:
             self.logging.warning("The URL (%s) provided cannot be reached." % self.url)
@@ -140,23 +140,26 @@ class Service(Logging):
         self._easyXMLConversion = True
 
         # used by HGNC where some XML contains non-utf-8 characters !!
-        self._fixing_unicode = False
-        self._fixing_encoding = "utf-8"
+        # should be able to fix it with requests once HGNC works again
+        #self._fixing_unicode = False
+        #self._fixing_encoding = "utf-8"
 
         self.devtools = DevTools()
         self.settings = BioServicesConfig()
 
     def _get_url(self):
         return self._url
+
     def _set_url(self, url):
         # something more clever here to check the URL e.g. starts with http
-        if url!= None:
+        if url is not None:
             url = url.rstrip("/")
             self._url = url
     url = property(_get_url, _set_url, doc="URL of this service")
 
     def _get_easyXMLConversion(self):
         return self._easyXMLConversion
+
     def _set_easyXMLConversion(self, value):
         if isinstance(value, bool) is False:
             raise TypeError("value must be a boolean value (True/False)")
@@ -185,8 +188,7 @@ class Service(Logging):
 
         """
         from bioservices import xmltools
-        return xmltools.easyXML(res, encoding=self._fixing_encoding,
-                    fixing_unicode=self._fixing_unicode)
+        return xmltools.easyXML(res)
 
 
     def __str__(self):
@@ -217,7 +219,7 @@ class Service(Logging):
             import binascii
             try:
                 #python3
-                 newres = binascii.a2b_base64(bytes(data, "utf-8"))
+                newres = binascii.a2b_base64(bytes(data, "utf-8"))
             except:
                 newres = binascii.a2b_base64(data)
             f.write(newres)
@@ -230,6 +232,7 @@ class WSDLService(Service):
 
     """
     _service = "WSDL"
+
     def __init__(self, name, url, verbose=True):
         """.. rubric:: Constructor
 
@@ -275,7 +278,8 @@ class WSDLService(Service):
     def _get_methods(self):
         return [x.name for x in
                 self.suds.wsdl.services[0].ports[0].methods.values()]
-    wsdl_methods = property(_get_methods, doc="returns methods available in the WSDL service")
+    wsdl_methods = property(_get_methods, 
+            doc="returns methods available in the WSDL service")
 
     def wsdl_create_factory(self, name, **kargs):
         params = self.suds.factory.create(name)
@@ -292,7 +296,7 @@ class WSDLService(Service):
             from suds import sudsobject
             keys = sudsobject.asdict(params).keys()
             if k in keys:
-               params[k] = v
+                params[k] = v
             else:
                 msg = "{0} incorrect. Correct ones are {1}"
                 self.logging.error(msg.format(k, keys))
@@ -355,13 +359,15 @@ class RESTService(RESTbase):
     def getUserAgent(self):
         self.logging.info('getUserAgent: Begin')
         try:
+            import urllib2
             urllib_agent = 'Python-urllib/%s' % urllib2.__version__
         except:
+            import urllib
             urllib_agent = 'Python-urllib/%s' % urllib.__version__
         #clientRevision = ''
         clientVersion = ''
         user_agent = 'EBI-Sample-Client/%s (%s; Python %s; %s) %s' % (
-            clientVersion, os.path.basename( __file__ ),
+            clientVersion, os.path.basename(__file__),
             platform.python_version(), platform.system(),
             urllib_agent
         )
@@ -392,7 +398,7 @@ class RESTService(RESTbase):
         """
         for i in range(0, self.trials):
             res = self._get_request(path, format=format, baseUrl=baseUrl)
-            if res != None:
+            if res is not None:
                 break
             import time
             self.logging.warning("request seemed to have failed.")
@@ -407,7 +413,7 @@ class RESTService(RESTbase):
     def _get_request(self, path, format="xml", baseUrl=True):
         if path.startswith(self.url):
             url = path
-        elif baseUrl == False:
+        elif baseUrl is False:
             url = path
         else:
             url = self.url + "/" +  path
@@ -457,14 +463,14 @@ class RESTService(RESTbase):
         """
         requestData = urlencode(params)
         print(requestData)
-        if extra != None:
+        if extra is not None:
             requestData += extra
         # Concatenate the two parts.
         # Errors are indicated by HTTP status codes.
         try:
             # Set the HTTP User-agent.
             user_agent = self.getUserAgent()
-            http_headers = { 'User-Agent' : user_agent }
+            http_headers = {'User-Agent': user_agent}
             print(requestUrl)
             req = Request(requestUrl, None, http_headers)
             # Make the submission (HTTP POST).
@@ -497,7 +503,7 @@ class RESTService(RESTbase):
             to add.
 
         """
-        if isinstance(params, dict)==False:
+        if isinstance(params, dict)is False:
             raise TypeError("Params must be a dictionary.")
         postData = urlencode(params)
         return postData
@@ -550,7 +556,7 @@ class REST(RESTbase):
         'xml': 'application/xml',
         'txt': 'text/plain',
         'text': 'text/plain',
-        'default' : "application/x-www-form-urlencoded",
+        'default': "application/x-www-form-urlencoded",
         "jsonp": "text/javascript",
         "nh": "text/x-nh",
         'phyloxml': 'text/x-phyloxml',
@@ -622,7 +628,7 @@ class REST(RESTbase):
     def _get_caching(self):
         return self.settings.params['cache.on'][0]
     def _set_caching(self, caching):
-        self.devtools.check_param_in_list(caching, [True ,False])
+        self.devtools.check_param_in_list(caching, [True, False])
         self.settings.params['cache.on'][0] = caching
         # reset the session, which will be automatically created if we
         # access to the session attribute
@@ -671,13 +677,13 @@ class REST(RESTbase):
         try:
             # build the requests
             urls = self._get_all_urls(keys, frmt)
-            self.logging.debug("grequests.get processing" )
+            self.logging.debug("grequests.get processing")
             rs = (grequests.get(url, session=session, params=params)  for key,url in zip(keys, urls))
             # execute them
-            self.logging.debug("grequests.map call" )
+            self.logging.debug("grequests.map call")
             ret = grequests.map(rs, size=min(self.settings.CONCURRENT, len(keys)))
             self.last_response = ret
-            self.logging.debug("grequests.map call done" )
+            self.logging.debug("grequests.map call done")
             return ret
         except Exception as err:
             self.logging.warning("Error caught in async. " + err.message)
@@ -686,7 +692,7 @@ class REST(RESTbase):
     def _get_all_urls(self, keys, frmt=None):
         return ('%s/%s' % (self.url, query) for query in keys)
 
-    def get_async(self, keys, frmt='json', params={}, **kargs ):
+    def get_async(self, keys, frmt='json', params={}, **kargs):
         ret = self._get_async(keys, frmt, params=params, **kargs)
         return self._apply(ret, self._interpret_returned_request, frmt)
 
@@ -719,7 +725,7 @@ class REST(RESTbase):
 
         if query starts with http:// do not use self.url
         """
-        if query == None:
+        if query is None:
             url = self.url
         else:
             if query.startswith("http"):
@@ -749,12 +755,12 @@ class REST(RESTbase):
 
     def http_post(self, query, params=None, data=None,
                     frmt='xml', headers=None, files=None, **kargs):
-        ## query and frmt are bioservices parameters. Others are post parameters
-        ## NOTE in requests.get you can use params parameter
-        ## BUT in post, you use data
+        # query and frmt are bioservices parameters. Others are post parameters
+        # NOTE in requests.get you can use params parameter
+        # BUT in post, you use data
         # only single post implemented for now unlike get that can be asynchronous
         # or list of queries
-        if headers == None:
+        if headers is None:
             headers = {}
             headers['User-Agent'] = self.getUserAgent()
             headers['Accept'] = self.content_types[frmt]
@@ -769,7 +775,7 @@ class REST(RESTbase):
         return self.post_one(**kargs)
 
     def post_one(self, query, frmt='json', **kargs):
-        if query == None:
+        if query is None:
             url = self.url
         else:
             url = '%s/%s' % (self.url, query)
@@ -793,7 +799,7 @@ class REST(RESTbase):
         #clientRevision = ''
         clientVersion = ''
         user_agent = 'EBI-Sample-Client/%s (%s; Python %s; %s) %s' % (
-            clientVersion, os.path.basename( __file__ ),
+            clientVersion, os.path.basename(__file__),
             platform.python_version(), platform.system(),
             urllib_agent
         )
@@ -819,19 +825,3 @@ class REST(RESTbase):
         print(self.last_response.content)
         print(self.last_response.reason)
         print(self.last_response.status_code)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
