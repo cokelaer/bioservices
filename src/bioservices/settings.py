@@ -30,9 +30,6 @@ defaultParams = {
 }
 
 
-
-
-
 class ConfigReadOnly(object):
     """A generic Config file handler
 
@@ -215,7 +212,7 @@ class ConfigReadOnly(object):
         if os.path.exists(self.user_config_file_path):
             # we need to copy the file into a backup file
             filename = self.user_config_file_path + '.bk'
-            if os.path.exists(filename) and forceis False:
+            if os.path.exists(filename) and force is False:
                 print("""Trying to save the current config file {} into a backup file {}\n but it exists already. Please remove the backup file first or set the 'force' parameter to True""".format(self.user_config_file_path, filename))
                 return
             else:

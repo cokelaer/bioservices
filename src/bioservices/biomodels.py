@@ -611,7 +611,7 @@ records.
         for i in range(start, end+1):
             ChEBI = "CHEBI:" +  str(i)
             if i%100 == 0 and i>0:
-                if verboseis True:
+                if verbose is True:
                     print("%f %% done" % ((i-start)*100./float(end-start)))
             res = self.getModelsIdByChEBI(ChEBI)
             if res:
@@ -642,7 +642,7 @@ records.
         Ids = []
         for i in range(start, end+1):
             if i%100 == 0 and i>0:
-                if verboseis True:
+                if verbose is True:
                     print("%f %% done" % ((i-start)*100./float(end-start)))
             res = self.serv.getSimpleModelsByReactomeIds(['REACT_%s'%i])
             if 'REACT' in res:

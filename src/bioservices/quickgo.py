@@ -287,7 +287,7 @@ or a string (e.g., 'PUBMED:*') """)
 
 
         # gz parameter. do not expect values so need to be added afterwards.
-        if gzis True:
+        if gz is True:
             url+='&gz'
 
         res = self.http_get(url, frmt="txt", params=params)

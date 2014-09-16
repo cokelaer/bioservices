@@ -607,7 +607,7 @@ class KEGG(REST):
         # for now, we only check the first argument.
         # gene identifiers
         isOrg = self.isOrganism(target)
-        if isOrgis False and target not in ['ncbi-gi', 'ncbi-geneid', 'uniprot', 'pubchem',
+        if isOrg is False and target not in ['ncbi-gi', 'ncbi-geneid', 'uniprot', 'pubchem',
                 'chebi', 'drug', 'compound', 'glycan']:
                 raise ValueError("""
     Invalid syntax. target must be a KEGG ID or

@@ -215,7 +215,7 @@ class WikiPathways(WSDLService):
                     output['pathway_ids'].append(x['id'])
                     output['revision'].append(x['revision'])
             output['interactions'] = zip(intA,intB)
-            if interactionOnlyis False:
+            if interactionOnly is False:
                 return output
             else:
                 return output['interactions']
