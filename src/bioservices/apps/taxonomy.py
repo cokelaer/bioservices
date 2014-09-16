@@ -1,10 +1,9 @@
-from bioservices import *
-from easydev import Logging
+from bioservices import EUtils, Ensembl
 
 
 __all__ = ["Taxon"]
 
-class Taxon(Logging):
+class Taxon(object):
     """Utility to search for information related to a taxon
 
     Uses HGNC service to fetch information about a taxon.
@@ -28,9 +27,26 @@ class Taxon(Logging):
     .. versionadded:: 1.2.0
     """
     def __init__(self):
-        super(Taxon, self).__init__("INFO")
+        super(Taxon, self).__init__()
         # self.df = pd.DataFrame(index=[], columns=["Taxon", "Scientific Name"])
         self._eutils_service = EUtils()
+        self._ensembl_service = Ensembl() # there is a search by name, easier to use than EUtils
+
+
+    def search_by_name(self, name):
+        """using ensembl, tries to get the taxon identifier from the given  name
+
+        ::
+
+            >>> s.search_by_name('mouse')
+            10090
+
+        """
+        res = self._ensembl_service.get_taxonomy_name("mouse")[0]
+        try:
+            return res['id']
+        except:
+            return res
 
     def search_by_taxon(self, taxon):
         """

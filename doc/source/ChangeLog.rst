@@ -4,6 +4,16 @@ Whats' new, what has changed
 
 Revision 1.3
 ------------------
+
+* 1.3.3
+
+  * CHANGES
+
+  * NEWS 
+    
+    * taxonomy module: add new method in Taxon to look for a taxon identifier given a name
+
+
 * 1.3.2
 
   * CHANGES:

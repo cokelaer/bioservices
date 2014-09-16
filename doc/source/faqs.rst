@@ -39,6 +39,19 @@ code into your environment. For that, just copy and paste the code in a file cal
 General questions
 =====================
 
+How can I figure out the taxonomy identifier of the mouse ?
+-------------------------------------------------------------
+
+You can use the Taxon class that uses Ensembl/UniProt/Eutils depending on the
+tasks. Here, we do not know the scientific name of taxonomy identifier of the
+mouse. We can use the search_by_name fuction::
+
+    >>> from bioservices import Taxon
+    >>> t = Taxon()
+    >>> t.search_by_name("mouse")
+    u'10090'
+
+
 How to convert ID from one database to another ?
 -----------------------------------------------------
 
@@ -106,7 +119,8 @@ Interest of the BioServices classes REST and WSDL ?
 ====================================================
 
 There are a few technical aspects covered by BioServices to ease our life when
-adding new modules.
+adding new modules such as timeout, long request, headers, and so on.
+
 
 What is the difference between GET and POST
 -----------------------------------------------
@@ -120,15 +134,4 @@ name/value pairs inside the body of the HTTP request, which makes for a cleaner
 URL and imposes no size limitations on the forms output. It is also more
 secure.
 
-requests module in python
-----------------------------
-params is for GET-style URL parameters, data is for POST-style body information.
-It is perfectly legal to provide both types of information in a request, and
-your request does so too, but you encoded the URL parameters into the URL
-already.
 
-
-
-
-
-e.suds.wsdl.services[0].ports[0].methods.values()
