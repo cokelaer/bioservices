@@ -79,8 +79,6 @@ from .unichem import *
 from . import wsdbfetch
 from .wsdbfetch import *
 
-from . import unicodefix
-
 
 from . import reactome
 from .reactome import *
