@@ -571,14 +571,14 @@ class UniProt(REST):
                 if organism:
                     query += "+and+"+organism
                 res = self.search(query, frmt="tab",
-                        columns=",".join(self._valid_columns))
+                                  columns=",".join(self._valid_columns))
             else:
                 break
             if len(res)==0:
                 self.logging.warning("some entries %s not found" % entries)
             else:
-                df = pd.read_csv(io.StringIO(unicode(res)), sep="\t")
-                if isinstance(output, types.NoneType):
+                df = pd.read_csv(io.StringIO(str(res)), sep="\t")
+                if isinstance(output, type(None)):
                     output = df.copy()
                 else:
                     output = output.append(df, ignore_index=True)
