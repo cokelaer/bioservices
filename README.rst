@@ -52,7 +52,7 @@ look at some notebooks related to
 * NCBIBlast on `ncbiblast nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/NCBIBlast.ipynb>`_
 * WikiPathway on `wikipathway nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/WikiPathway.ipynb>`_
 
-and more on `nbviewer <http://nbviewer.ipython.org/github/cokelaer/bioservices/tree/master/doc/source/notebook/`_.
+and more on `nbviewer <http://nbviewer.ipython.org/github/cokelaer/bioservices/tree/master/doc/source/notebook/>`_.
 
 An up-to-date list of Web Services is provided within 
 the online `documentation <http://pythonhosted.org/bioservices/>`_.
