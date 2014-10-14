@@ -22,7 +22,7 @@ BioServices
 :note: BioServices is tested for Python 2.7, 3.3. Version 3.4 is currently not
        available due to a gevent dependencies, which should be fixed soon.
 
-:contributions: Please join https://github.com/cokelaer/bioservices
+:contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
 :issues: Please use https://github.com/cokelaer/bioservices/issues
 
 **Bioservices** is a Python package that provides access to many Bioinformatices Web Services (e.g.,
