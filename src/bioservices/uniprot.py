@@ -577,7 +577,7 @@ class UniProt(REST):
             if len(res)==0:
                 self.logging.warning("some entries %s not found" % entries)
             else:
-                df = pd.read_csv(io.StringIO(str(res)), sep="\t")
+                df = pd.read_csv(io.StringIO(unicode(res)), sep="\t")
                 if isinstance(output, type(None)):
                     output = df.copy()
                 else:
