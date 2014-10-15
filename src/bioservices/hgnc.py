@@ -43,7 +43,23 @@ try:
 except:
     from urllib2 import HTTPError
 
-__all__ = ["HGNC"]
+__all__ = ["HGNC", 'HGNCDraft']
+
+
+class HGNCDraft(REST):
+    """
+    """
+    def __init__(self, verbose=False, cache=False):
+        url = "http://www.genenames.org/"
+        super(HGNCDraft, self).__init__("HGNC", url=url, verbose=verbose, cache=cache)
+
+    def get_info(self, frmt='json'):
+        res = self.http_get("", frmt=frmt)
+        return res
+
+    def fetch(self):
+        pass
+        # http://rest.genenames.org/fetch/hgnc_id/6876
 
 
 class HGNC(REST):
