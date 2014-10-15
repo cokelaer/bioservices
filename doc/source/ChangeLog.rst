@@ -7,12 +7,18 @@ Revision 1.3
 
 * 1.3.3
 
+  * BUG FIX
+     * uniprot fixing a python 3 typo
+
   * CHANGES
+    * pdb: add a method
+    * hgnc: add new class related to HGNC
 
   * NEWS 
-    
+    * services.py: add a method to ease conversion of dict to json. add
+      attribute to limit number of requests per seconds but not yet used. 
     * taxonomy module: add new method in Taxon to look for a taxon identifier given a name
-
+    * NEW ensemble on the way. about 50% done
 
 * 1.3.2
 
