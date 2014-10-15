@@ -22,7 +22,7 @@ BioServices
 :note: BioServices is tested for Python 2.7, 3.3. Version 3.4 is currently not
        available due to a gevent dependencies, which should be fixed soon.
 
-:contributions: Please join https://github.com/cokelaer/bioservices
+:contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
 :issues: Please use https://github.com/cokelaer/bioservices/issues
 
 **Bioservices** is a Python package that provides access to many Bioinformatices Web Services (e.g.,
@@ -52,7 +52,7 @@ look at some notebooks related to
 * NCBIBlast on `ncbiblast nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/NCBIBlast.ipynb>`_
 * WikiPathway on `wikipathway nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/WikiPathway.ipynb>`_
 
-and more on `github <https://github.com/cokelaer/bioservices/tree/master/doc/source/notebook>`_.
+and more on `nbviewer <http://nbviewer.ipython.org/github/cokelaer/bioservices/tree/master/doc/source/notebook/>`_.
 
 An up-to-date list of Web Services is provided within 
 the online `documentation <http://pythonhosted.org/bioservices/>`_.
