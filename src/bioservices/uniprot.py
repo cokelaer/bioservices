@@ -488,7 +488,7 @@ class UniProt(REST):
         # + are interpreted and have a meaning.
         params['query'] = query.replace("+", " ")
         #res = s.request("/uniprot/?query=zap70+AND+organism:9606&format=xml", params)
-        print(params)
+        #print(params)
         res = self.http_get("uniprot/", frmt="txt", params=params)
         return res
 
