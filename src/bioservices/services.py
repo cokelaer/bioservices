@@ -21,6 +21,7 @@ import os
 import sys
 import socket
 import platform
+import json
 
 from bioservices.settings import BioServicesConfig
 
@@ -82,6 +83,9 @@ class DevTools(object):
     def list2string(self, query, sep=",", space=False):
         return easydev.codecs.list2string(query, sep=sep, space=space)
 
+    def to_json(self, dictionary):
+        return json.dumps(dictionary)
+
 
 class Service(Logging):
     """Base class for WSDL and REST classes
@@ -102,15 +106,22 @@ class Service(Logging):
         503: 'Service not available. The server is being updated, try again later'
         }
 
-    _error_codes = [400, 404]
-
-    def __init__(self, name, url=None, verbose=True):
+    def __init__(self, name, url=None, verbose=True, requests_per_sec=3):
         """.. rubric:: Constructor
 
         :param str name: a name for this service
         :param str url: its URL
         :param bool verbose: prints informative messages if True (default is
             True)
+        :param requests_per_sec: maximum number of requests per seconds
+            are restricted to 3. You can change that value. If you reach the
+            limit, an error is raise. The reason for this limitation is
+            that some services (e.g.., NCBI) may black list you IP. 
+            If you need or can do more (e.g., ChEMBL does not seem to have
+            restrictions), change the value. You can also have several instance
+            but again, if you send too many requests at the same, your future
+            requests may be retricted. Currently implemented for REST only
+
 
         All instances have an attribute called :attr:`~Service.logging` that
         is an instanceof the :mod:`logging` module. It can be used to print
@@ -129,6 +140,7 @@ class Service(Logging):
 
         """
         super(Service, self).__init__(level=verbose)
+        self.requests_per_sec = requests_per_sec
 
         self._url = url
         try:
@@ -263,7 +275,7 @@ class WSDLService(Service):
 
     def _update_settings(self):
         self.TIMEOUT = self.settings.TIMEOUT
-    
+
     def wsdl_methods_info(self):
         methods = self.suds.wsdl.services[0].ports[0].methods.values()
         for method in methods:
@@ -559,7 +571,10 @@ class REST(RESTbase):
         'default': "application/x-www-form-urlencoded",
         "jsonp": "text/javascript",
         "nh": "text/x-nh",
+
+        'phylip': 'text/x-phyloxml',
         'phyloxml': 'text/x-phyloxml',
+
         'fasta': 'text/x-fasta',
         'seqxml': 'text/x-seqxml+xml',
     }
