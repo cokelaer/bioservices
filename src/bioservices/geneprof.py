@@ -49,7 +49,6 @@ from __future__ import print_function
 
 from bioservices.services import REST, BioServicesError
 
-import json
 
 __all__ = ["GeneProf"]
 
