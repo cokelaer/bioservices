@@ -20,6 +20,7 @@ metainfo = {
     'license' : 'GPL',
     'download_url' : ['http://pypi.python.org/pypi/bioservices'],
     'url' : ['http://pypi.python.org/pypi/bioservices'],
+    'bugtrack_url': 'https://github.com/cokelaer/bioservices/issues',
     'description':'Access to Biological Web Services from Python' ,
     'platforms' : ['Linux', 'Unix', 'MacOsX', 'Windows'],
     'keywords' : [
