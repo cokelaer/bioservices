@@ -6,7 +6,6 @@
 #
 #  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -37,8 +36,6 @@
         -- from Reactome web site
 
 """
-
-
 from bioservices.services import WSDLService, REST
 import webbrowser
 import copy
