@@ -6,7 +6,7 @@
 #
 #  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -64,7 +64,6 @@ class PDB(REST):
         url="http://www.rcsb.org/pdb"
         super(PDB, self).__init__(name="PDB", url=url, verbose=verbose,
             cache=cache)
-        self.easyXMLConversion = True
 
     def search(self, query):
         """
@@ -129,8 +128,26 @@ class PDB(REST):
         return res
 
     def get_ligands(self, identifier):
+        """List the ligands that can be found in a PDB entry
 
-        res = self.http_get("rest/ligandInfo", frmt='text',
+        :param identifier: a valid PDB identifier (e.g., 4HHB)
+        :return: xml document
+
+
+            >>> from bioservices import PDB
+            >>> s = PDB()
+            >>> s.get_ligands("4HHB")
+
+        Then, ::
+
+            x = s.get_ligands("4HHB")
+            from pyquery import PyQuery as pq
+            d = pq(x)
+
+
+        """
+
+        res = self.http_get("rest/ligandInfo", frmt='xml',
                 params={'structureId': identifier})
         return res
 
@@ -147,10 +164,10 @@ class PDB(REST):
         </orgPdbQuery>
         '
         """
-        res = self.http_post("query/post", 
-                data=query, 
+        res = self.http_post("query/post",
+                data=query,
                 headers=self.get_headers(content='default'))
         return res
 
 
-     
+
