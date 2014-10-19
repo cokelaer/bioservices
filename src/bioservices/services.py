@@ -564,19 +564,20 @@ class REST(RESTbase):
     http://www.g-loaded.eu/2008/10/24/maximum-url-length/
     """
     content_types = {
-        'json': 'application/json',
-        'xml': 'application/xml',
-        'txt': 'text/plain',
-        'text': 'text/plain',
+        'bed': 'text/x-bed',
         'default': "application/x-www-form-urlencoded",
+        'gff3': 'text/x-gff3',
+        'fasta': 'text/x-fasta',
+        'json': 'application/json',
         "jsonp": "text/javascript",
         "nh": "text/x-nh",
-
-        'phylip': 'text/x-phyloxml',
-        'phyloxml': 'text/x-phyloxml',
-
-        'fasta': 'text/x-fasta',
+        'phylip': 'text/x-phyloxml+xml',
+        'phyloxml': 'text/x-phyloxml+xml',
         'seqxml': 'text/x-seqxml+xml',
+        'txt': 'text/plain',
+        'text': 'text/plain',
+        'xml': 'application/xml',
+        'yaml': 'text/x-yaml'
     }
     #special_characters = ['/', '#', '+']
 
