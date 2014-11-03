@@ -57,10 +57,10 @@ class Clinvitae(REST):
     >>> c = Clinvitae()
     >>> res = c.query_gene('brca1')
     >>> entry1 = res[0]
-    >>> print entry1.keys()  # display fields for first entry
-    >>> print entry1['accessionId']  # accession id for first entry
-    >>> print entry1['lastEvaluated']  # date first variant entry was last evaluated
-    >>> print entry1['source']  # source of first variant entry
+    >>> print(entry1.keys())  # display fields for first entry
+    >>> print(entry1['accessionId']) # accession id for first entry
+    >>> print(entry1['lastEvaluated'])  # date first variant entry was last evaluated
+    >>> print(entry1['source'])  # source of first variant entry
 
     """
 
@@ -81,6 +81,6 @@ class Clinvitae(REST):
         results = self.query_gene(gene)
         variants = set()
         for result in results:  # each result is json dict of single entry
-            print result
+            print(result)
             variants.add(result['defaultNucleotideChange'])
         return list(variants)
