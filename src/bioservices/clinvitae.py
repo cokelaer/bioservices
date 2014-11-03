@@ -24,6 +24,8 @@
 
 from bioservices.services import REST
 
+__all__ = ["Clinvitae"]
+
 
 class Clinvitae(REST):
     """

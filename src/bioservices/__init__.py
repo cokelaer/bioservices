@@ -132,3 +132,7 @@ from .biodbnet import *
 from . import apps
 from .apps import Taxon
 #import dev
+
+
+from . import clinvitae
+from .clinvitae import Clinvitae
