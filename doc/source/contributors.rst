@@ -10,6 +10,7 @@ In addition to the main authors of the papers the following developers have
 implemented modules now available in BioServices:
 
  * Sven-Maurice Althoff, Christian Knauth implemented the :class:`bioservices.muscle` module.
+ * Patrick Short implemented the :class:`bioservices.clinvitae` module
 
 And thank you also to the contributions from users who have sent communication
 via emails or via the `ticket system <https://github.com/cokelaer/bioservices/issues>`_.
