@@ -46,7 +46,7 @@ look at some notebooks related to
 
 * UniProt on `uniprot nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/UniProt.ipynb>`_
 * BioModels on `biomodels nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/BioModels.ipynb>`_
-* ChhEMBL on `chembl nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/ChEMBL.ipynb>`_
+* ChEMBL on `chembl nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/ChEMBL.ipynb>`_
 * KEGG on `KEGG nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/KEGG.ipynb>`_
 * MUSCLE on `MUSCLE  nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/MUSCLE.ipynb>`_
 * NCBIBlast on `ncbiblast nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/NCBIBlast.ipynb>`_
