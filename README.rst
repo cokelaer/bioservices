@@ -46,7 +46,8 @@ look at some notebooks related to
 
 * UniProt on `uniprot nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/UniProt.ipynb>`_
 * BioModels on `biomodels nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/BioModels.ipynb>`_
-* ChhEMBL on `chembl nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/ChEMBL.ipynb>`_
+* ChEMBL on `chembl nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/ChEMBL.ipynb>`_
+* Ensembl on `Ensembl nbviewer <https://github.com/bioservices/notebooks/tree/master/ensembl>`_
 * KEGG on `KEGG nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/KEGG.ipynb>`_
 * MUSCLE on `MUSCLE  nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/MUSCLE.ipynb>`_
 * NCBIBlast on `ncbiblast nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/NCBIBlast.ipynb>`_
@@ -72,3 +73,44 @@ organism::
 
 More examples and tutorials are available in the exhaustive 
 `On-line documentation <http://pythonhosted.org//bioservices>`_
+
+
+
+
+Release History
+------------------
+This is a summary of the changelog. Complete change can be found in the 
+`main documentation <http://pythonhosted.org//bioservices/ChangeLog.html>`_.
+
+1.3.X
++++++++++++
+
+* Source code moved to github.com
+* New REST class to use **requests** package instead of urllib2. 
+* Creation of a global configuration file in .config/bioservice/bioservices.cfg
+* NEW services: Reactome, Readseq, Ensembl, EUtils
+
+1.2.X
++++++++++++
+
+* add try/except for pandas library.
+* added sub-package called apps with some useful tools (fasta,peptides, taxon) in bioservices.apps directory
+* NEW services: BioDBnet, BioDBNet, MUSCLE, PathwayCommons, GeneProf
+
+1.1.X
++++++++++++ 
+* NEW services: biocarta, pfam, ChEBI, UniChem
+* Add documentation and examples related to Galaxy/BioPython.
+* NEW Service : HGNC
+* Use BeautifulSoup4 instead of 3
+
+1.0.X
++++++++++++ 
+* add PDB, ArrayExpress,  biomart, chemspider draft, eutils, miriam, arrayexpress 
+
+1.0.0
+++++++
+
+* First release of bioservices including the following services:
+  BioModels, Kegg, Reactome, Chembl, PICR, QuickGO, Rhea, UniProt,
+  WSDbfetch, NCBIblast, PSICQUIC, Wikipath

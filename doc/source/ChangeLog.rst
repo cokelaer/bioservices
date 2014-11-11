@@ -2,6 +2,8 @@ Whats' new, what has changed
 ================================
 
 
+
+
 Revision 1.3
 ------------------
 
@@ -16,9 +18,10 @@ Revision 1.3
 
   * NEWS 
     * services.py: add a method to ease conversion of dict to json. add
-      attribute to limit number of requests per seconds but not yet used. 
+      attribute to limit number of requests per seconds but not yet used.
     * taxonomy module: add new method in Taxon to look for a taxon identifier given a name
-    * NEW ensemble on the way. about 50% done
+    * NEW module ensembl completed
+    * NEW module clinvitae added (contribution from Patrick Short)
 
 * 1.3.2
 

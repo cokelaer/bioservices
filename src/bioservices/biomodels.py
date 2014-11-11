@@ -70,7 +70,19 @@ from bioservices.services import WSDLService
 __all__ = ["BioModels"]
 
 
-
+def encode(fn):
+    """a decorator that checks the validity of a model Id"""
+    @wraps(fn)
+    def wrapped(self, *args, **kwargs):
+        res = fn(self, *args, **kwargs)
+        # somehow this fixes the fact that the __repr__ fails because there
+        # are ascii characters in res whereas "" is a unicode so
+        # ""+res is cast into a unicode.
+        try:
+            return "" + res
+        except:
+            return res
+    return wrapped
 
 
 def checkId(fn):
@@ -83,7 +95,6 @@ def checkId(fn):
             return res
         else:
             raise ValueError("""Id provided is not a valid ID. See modelsId attribute.""")
-
     return wrapped
 
 
@@ -275,6 +286,7 @@ class BioModels(WSDLService):
         """
         return self.serv.getModelNameById(Id)
 
+    @encode
     @checkId
     def getModelSBMLById(self, Id):
         """Retrieves the SBML form of a model (in a string) given its identifier
@@ -290,7 +302,7 @@ class BioModels(WSDLService):
             >>> s.getModelSBMLById('MODEL1006230101')
 
         """
-        return self.serv.getModelSBMLById(Id)
+        return "" + self.serv.getModelSBMLById(Id)
 
     def getModelsIdByChEBI(self, Id):
         """Retrieves the identifiers of all models which are **associated** to
@@ -556,6 +568,7 @@ records.
         return self.serv.getModelsIdByTaxonomyId(taxonomyId)
 
 
+    @encode
     def getSubModelSBML(self, modelId, elementsIDs):
         """Generates the minimal sub-model of a given model in the database including all selected components.
 

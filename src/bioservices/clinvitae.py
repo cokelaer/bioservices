@@ -24,6 +24,8 @@
 
 from bioservices.services import REST
 
+__all__ = ["Clinvitae"]
+
 
 class Clinvitae(REST):
     """
@@ -55,10 +57,10 @@ class Clinvitae(REST):
     >>> c = Clinvitae()
     >>> res = c.query_gene('brca1')
     >>> entry1 = res[0]
-    >>> print entry1.keys()  # display fields for first entry
-    >>> print entry1['accessionId']  # accession id for first entry
-    >>> print entry1['lastEvaluated']  # date first variant entry was last evaluated
-    >>> print entry1['source']  # source of first variant entry
+    >>> print(entry1.keys())  # display fields for first entry
+    >>> print(entry1['accessionId']) # accession id for first entry
+    >>> print(entry1['lastEvaluated'])  # date first variant entry was last evaluated
+    >>> print(entry1['source'])  # source of first variant entry
 
     """
 
@@ -169,4 +171,3 @@ class Clinvitae(REST):
             if result['reportedClassification'].lower() not in ['pathogenic', 'likely pathogenic', 'benign', 'likely benign']:
                 variants.add(result['defaultNucleotideChange'])
         return list(variants)
-
