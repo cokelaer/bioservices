@@ -73,6 +73,8 @@ class ChEMBL(REST):
     _target_chemblId_example = "CHEMBL2477"
     _target_uniprotId_example = "Q13936"
     _target_bioactivities_example = "CHEMBL240"
+    _alt_compound_form_example = "CHEMBL278020"
+    _target_approved_drugs_example = "CHEMBL1824"
     _target_refseq_example = 'NP_015325'
     _assays_example = "CHEMBL1217643"
     _inspect_example = ('CHEMBL1','compound')
@@ -516,6 +518,35 @@ class ChEMBL(REST):
             >>> resjson = s.get_assays_bioactivities(s._assays_example)
         """
         res = self._process(query, frmt, "assays/%s/bioactivities")
+        return res
+
+    def get_alternative_compound_form(self, query, frmt="json"):
+        """ Get list of alternative compound forms (e.g. parent and salts) of compound
+
+        :param query: a valid compound ChEMBLId
+        :param frmt: json or xml (Default to json)
+        :return: List of ChEMBLIDs which correspond to alternative forms of query compound
+
+        >>> from bioservices import *
+        >>> s = ChEMBL(verbose=False)
+        >>> resjson = s.get_alternative_compound_form(s._alt_compound_form_example)
+        """
+
+        res = self._process(query, frmt, "compounds/%s/form")
+        return res
+
+    def get_approved_drugs(self, query, frmt="json"):
+        """Get list of approved drugs chembl compound details
+
+        :param query: a valid target ChEMBLId
+        :param frmt: json or xml (Default to json)
+        :return: list of approved drugs ChEMBL compound details (dictionary)
+
+        >>> from bioservices import *
+        >>> s = ChEMBL(verbose=False)
+        >>> resjson = s.get_approved_drugs(s._target_approved_drugs_example)
+        """
+        res = self._process(query, frmt, "targets/%s/approvedDrug")
         return res
 
     def inspect(self, query, item_type):
