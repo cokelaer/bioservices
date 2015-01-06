@@ -338,13 +338,13 @@ class UniProt(REST):
         _valid_formats = ['txt', 'xml', 'rdf', 'gff', 'fasta']
         self.devtools.check_param_in_list(frmt, _valid_formats)
 
-        queries = self.devtools.tolist(uniprot_id)
+        queries = self.devtools.to_list(uniprot_id)
 
         # data = {'format':frmt}
 
         url = ["uniprot/" + query + '.' + frmt for query in queries]
         res = self.http_get(url, frmt="txt")
-        if frmt=="xml":
+        if frmt == "xml":
             res = [self.easyXML(x) for x in res]
         if isinstance(res, list) and len(res) == 1:
             res = res[0]

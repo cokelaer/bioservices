@@ -627,7 +627,7 @@ class Ensembl(REST):
         .. todo: frmt can only be json or jsonp
         """
         self._check_frmt(frmt)
-        identifiers = self.devtools.tolist(identifiers)
+        identifiers = self.devtools.to_list(identifiers)
         expand = int(expand)
         res = self.http_post("lookup/id/", frmt=frmt,
                 headers = self.get_headers(content=frmt),

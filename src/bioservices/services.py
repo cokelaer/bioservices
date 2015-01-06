@@ -11,6 +11,7 @@
 #  See accompanying file LICENSE.txt or copy at
 #      http://www.gnu.org/licenses/gpl-3.0.html
 #
+#  source: http://github.com/cokelaer/bioservices
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
@@ -22,6 +23,7 @@ import sys
 import socket
 import platform
 import json
+import easydev
 
 from bioservices.settings import BioServicesConfig
 
@@ -41,8 +43,7 @@ except:
 sys.path = [x for x in sys.path if 'suds-' not in x]
 
 
-import easydev
-from easydev import Logging
+from easydev import Logging, DevTools
 
 
 __all__ = ["Service", "WSDLService", "RESTService",
@@ -55,36 +56,6 @@ class BioServicesError(Exception):
 
     def __str__(self):
         return repr(self.value)
-
-
-# could be part of easydev itself but for now, let us keep it here
-# inside bioservices
-class DevTools(object):
-    """wrapper around useful functions.
-
-    See easydev documentation for details.
-    """
-    def check_range(self, a, b, value):
-        easydev.check_range(a, b, value, strict=False)
-
-    def transform_into_list(self, query):
-        print("deprecated transform_to_list. use tolist instead")
-        return easydev.tolist(query)
-
-    def check_param_in_list(self, param, valid_values):
-        easydev.check_param_in_list(param, valid_values)
-
-    def swapdict(self, d):
-        return easydev.swapdict(d)
-
-    def tolist(self, query):
-        return easydev.codecs.tolist(query)
-
-    def list2string(self, query, sep=",", space=False):
-        return easydev.codecs.list2string(query, sep=sep, space=space)
-
-    def to_json(self, dictionary):
-        return json.dumps(dictionary)
 
 
 class Service(Logging):

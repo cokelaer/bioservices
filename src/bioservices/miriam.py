@@ -510,8 +510,8 @@ class Miriam(WSDLService):
 
         .. todo:: : chracter is not encoded correclty
         """
-        names = self.devtools.transform_into_list(names)
-        Ids = self.devtools.transform_into_list(Ids)
+        names = self.devtools.to_list(names)
+        Ids = self.devtools.to_list(Ids)
         res = self.serv.getURIs(names, Ids)
         return res
 

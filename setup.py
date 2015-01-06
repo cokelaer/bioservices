@@ -71,7 +71,7 @@ setup(
     packages = ['bioservices', 'bioservices.apps', 'bioservices.mapping'],
     #package_dir  = package_dir,
     install_requires = ["grequests", "requests", "requests_cache",
-        "easydev>=0.7.2", "beautifulsoup4",  "suds-jurko", "appdirs"],
+        "easydev>=0.8.2", "beautifulsoup4",  "suds-jurko", "appdirs"],
     )
 
 

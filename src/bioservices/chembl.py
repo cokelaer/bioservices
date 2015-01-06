@@ -311,7 +311,7 @@ class ChEMBL(REST):
         # NOTE: not async requests here.
         self.devtools.check_range(dimensions, 1,500)
         self.devtools.check_param_in_list(engine, ['rdkit'])
-        queries = self.devtools.transform_into_list(query)
+        queries = self.devtools.to_list(query)
 
         res = {'filenames':[], 'images':[], 'chemblids':[]}
         for query in queries:
