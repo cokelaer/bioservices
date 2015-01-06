@@ -39,35 +39,10 @@ from bioservices.services import REST
 __all__ = ["PRIDE"]
 
 
-# taken from cno, could be in easydev
-# issue: lose name of the parameters
-
-
 @wrapt.decorator
-def params_to_update2(wrapped, instance, args, kwargs):
-
-    vars(wrapped).setdefault('actual_kwargs', kwargs)
+def params_to_update(wrapped, instance, args, kwargs):
+    vars(wrapped)['actual_kwargs'] = kwargs
     return wrapped(*args, **kwargs)
-
-
-
-def params_to_update():
-    """
-    Decorator that provides the wrapped function with an attribute 'actual_kwargs'
-    containing just those keyword arguments actually passed in to the function.
-    """
-    def _decorator(function):
-        #@functools.wraps(function)
-        print(1)
-        def inner(self, *args, **kwargs):
-            print('inner')
-            inner.actual_kwargs = kwargs
-            #return function(self,  *args, **kwargs)
-            return function(self, *args, **kwargs) # with decorator package, no need for self anymore...
-        #return decorator(inner, function)
-        return inner
-    return _decorator
-
 
 
 
@@ -109,14 +84,14 @@ class PRIDE(REST):
             >>> from bioservices import PRIDE
             >>> p = PRIDE()
             >>> res = p.get_project_accession("PRD000001")
-            >>> res['numPeptides]
+            >>> res['numPeptides']
             6758
 
         """
         res = self.http_get('project/%s' % identifier)
         return res
 
-    @params_to_update2
+    @params_to_update
     def get_project_list(self, query="", show=10, page=0, sort=None, order='desc',
                          speciesFilter=None, ptmsFilter=None, tissueFilter=None, diseaseFilter=None,
                          titleFilter=None, instrumentFilter=None, experimentTypeFilter=None,
@@ -129,16 +104,8 @@ class PRIDE(REST):
             >>> p = PRIDE()
             >>> projects = p.get_project_list(show=100)
 
-
-
         """
-        params = {}
-        params['q'] = query
-        params['show'] = show
-        params['page'] = page
-        params['sort'] = sort
-        params['order'] = order
-        params['speciesFilter'] = speciesFilter
+        params = self.get_project_list.actual_kwargs
 
         res = self.http_get('project/list', params=params)
         try:
@@ -147,14 +114,20 @@ class PRIDE(REST):
             pass
         return res
 
-
+    @params_to_update
     def get_project_count(self,
         query="", show=10, page=0, sort=None, order='desc',
                          speciesFilter=None, ptmsFilter=None, tissueFilter=None, diseaseFilter=None,
                          titleFilter=None, instrumentFilter=None, experimentTypeFilter=None,
                          quantificationfilter=None, projectTagFilter=None):
 
-        """Count  projects for given criteria"""
-        res = self.http_get('project/list', params=params)
+        """Count  projects for given criteria
+        
+        .. todo:: show and sort and others probably not required.
+        """
+        params = self.get_project_count.actual_kwargs
+        res = self.http_get('project/count', params=params)
+
+        return res
 
 

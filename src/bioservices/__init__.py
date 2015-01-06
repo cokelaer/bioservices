@@ -70,6 +70,9 @@ from .wikipathway import *
 from . import pdb
 from .pdb import *
 
+from . import pride
+from .pride import *
+
 from . import uniprot
 from .uniprot import *
 

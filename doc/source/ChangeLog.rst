@@ -7,6 +7,18 @@ Whats' new, what has changed
 Revision 1.3
 ------------------
 
+* 1.3.4
+
+  * BUG FIXES
+
+  * CHANGES
+    * clinvitae: tests and doc added
+    * services modules: DevTools class moved to easydev
+
+  * NEWS
+
+    * add PRIDE service + test + doc
+
 * 1.3.3
 
   * BUG FIX
