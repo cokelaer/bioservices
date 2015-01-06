@@ -31,36 +31,36 @@ class Clinvitae(REST):
     """
     class for interfacing with the Clinvitae web service
 
-    Requests will return a list of json dicts. each dict has fields:
+    Requests will return a list of json dicts. each dict has the following fields::
 
-    accessionId
-    gene
-    nucleotideChanges
-    description
-    classification
-    reportedClassification
-    url
-    region
-    proteinChange
-    lastUpdated
-    alias
-    source
-    acmgClassification
-    submitter
-    defaultNucleotideChange
-    _id
-    transcripts
-    lastEvaluated
+        accessionId
+        gene
+        nucleotideChanges
+        description
+        classification
+        reportedClassification
+        url
+        region
+        proteinChange
+        lastUpdated
+        alias
+        source
+        acmgClassification
+        submitter
+        defaultNucleotideChange
+        _id
+        transcripts
+        lastEvaluated
 
-    example query on BRCA1:
+    example query on BRCA1::
 
-    >>> c = Clinvitae()
-    >>> res = c.query_gene('brca1')
-    >>> entry1 = res[0]
-    >>> print(entry1.keys())  # display fields for first entry
-    >>> print(entry1['accessionId']) # accession id for first entry
-    >>> print(entry1['lastEvaluated'])  # date first variant entry was last evaluated
-    >>> print(entry1['source'])  # source of first variant entry
+        >>> c = Clinvitae()
+        >>> res = c.query_gene('brca1')
+        >>> entry1 = res[0]
+        >>> print(entry1.keys())  # display fields for first entry
+        >>> print(entry1['accessionId']) # accession id for first entry
+        >>> print(entry1['lastEvaluated'])  # date first variant entry was last evaluated
+        >>> print(entry1['source'])  # source of first variant entry
 
     """
 
@@ -72,31 +72,34 @@ class Clinvitae(REST):
         """
         takes gene name and returns json of variants in gene (not case sensitive)
 
-        >>> c = Clinvitae()
-        >>> res = c.query_gene('brca1')
-        >>> entry1 = res[0]
-        >>> print entry1['accessionId']  # accession id for first entry
+        ::
+
+            >>> c = Clinvitae()
+            >>> res = c.query_gene('brca1')
+            >>> entry1 = res[0]
+            >>> print entry1['accessionId']  # accession id for first entry
             u'SCV000039520'
-        >>> print entry1['lastEvaluated']  # date first variant entry was last evaluated
+            >>> print entry1['lastEvaluated']  # date first variant entry was last evaluated
             u'2013-04-03'
-        >>> print entry1['source']  # source of first variant entry
+            >>> print entry1['source']  # source of first variant entry
             u'ClinVar'
 
         """
         return self.http_get("variants?q=%s" % gene, frmt='json')
 
     def query_hgvs(self, hgvs):
-        """
-        takes an hgvs (variant) tag and returns ALL reported variants in the gene in which hgvs is located
+        """Takes an hgvs (variant) tag and returns ALL reported variants in the gene in which hgvs is located
 
-        >>> c = Clinvitae()
-        >>> res = c.query_gene('NM_198578.3:c.1847A>G')  # returns all entries in LRRK2 gene
-        >>> entry1 = res[0]
-        >>> print entry1['accessionId']  # accession id for first entry
+        ::
+
+            >>> c = Clinvitae()
+            >>> res = c.query_gene('NM_198578.3:c.1847A>G')  # returns all entries in LRRK2 gene
+            >>> entry1 = res[0]
+            >>> print entry1['accessionId']  # accession id for first entry
             u'SCV000056058'
-        >>> print entry1['lastEvaluated']  # date first variant entry was last evaluated
+            >>> print entry1['lastEvaluated']  # date first variant entry was last evaluated
             u'2012-09-13'
-        >>> print entry1['source']  # source of first variant entry
+            >>> print entry1['source']  # source of first variant entry
             u'ClinVar'
 
         """
@@ -106,9 +109,11 @@ class Clinvitae(REST):
         """
         returns a list of unique hgvs tags reported in gene
 
-        >>> c = Clinvitae()
-        >>> res = c.all_variants('MUTYH')  # returns all reported variants in MUTYH gene
-        >>> print res[0:5]
+        ::
+        
+            >>> c = Clinvitae()
+            >>> res = c.all_variants('MUTYH')  # returns all reported variants in MUTYH gene
+            >>> print res[0:5]
             [u'NM_001048171.1:c.-2188C>T',
             u'NM_001048171.1:c.462+35A>G',
             u'NM_001048171.1:c.1099G>T',
@@ -126,10 +131,13 @@ class Clinvitae(REST):
         """
         returns all fields for entries reported as Pathogenic by any source in Clinvitae
 
-        >>> c = Clinvitae()
-        >>> pathogenic = c.get_pathogenic('brca1')  # returns pathogenic or likely pathogenic
-        >>> len(pathogenic)  # number of pathogenic variants
+        ::
+    
+            >>> c = Clinvitae()
+            >>> pathogenic = c.get_pathogenic('brca1')  # returns pathogenic or likely pathogenic
+            >>> len(pathogenic)  # number of pathogenic variants
             1100
+
         """
         results = self.query_gene(gene)
         variants = set()
@@ -142,9 +150,11 @@ class Clinvitae(REST):
         """
         returns all fields for entries reported as Benign by any source in Clinvitae
 
-        >>> c = Clinvitae()
-        >>> benign = c.get_benign('brca1')  # returns benign or likely benign
-        >>> len(benign)  # number of benign variants
+        ::
+
+            >>> c = Clinvitae()
+            >>> benign = c.get_benign('brca1')  # returns benign or likely benign
+            >>> len(benign)  # number of benign variants
             187
 
         """
@@ -159,12 +169,13 @@ class Clinvitae(REST):
         """
         returns all fields for entries not classified as benign or pathogenic -> variant of unknown significance (VUS)
 
-        >>> c = Clinvitae()
-        >>> vus = c.get_VUS('brca1')
-        >>> len(vus)  # number of benign variants
+        ::
+
+            >>> c = Clinvitae()
+            >>> vus = c.get_VUS('brca1')
+            >>> len(vus)  # number of benign variants
             2389
         """
-
         results = self.query_gene(gene)
         variants = set()
         for result in results:

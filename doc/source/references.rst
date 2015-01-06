@@ -91,6 +91,14 @@ ChemSpider
     :undoc-members:
     :synopsis:
 
+Clinvitae
+==============
+
+.. automodule:: bioservices.clinvitae
+    :members:
+    :undoc-members:
+    :synopsis:
+
 EUtils
 ==========
 
