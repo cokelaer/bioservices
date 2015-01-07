@@ -191,6 +191,15 @@ PICR module
     :undoc-members:
     :synopsis:
 
+PRIDE module
+=====================================
+
+.. automodule:: bioservices.pride
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
 PSICQUIC
 ================
 
