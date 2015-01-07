@@ -189,6 +189,9 @@ class BioModels(WSDLService):
         """
         return self.serv.getAllNonCuratedModelsId()
 
+
+
+    @encode
     @checkId
     def getModelById(self, Id):
         """Retrieves the SBML form of a model (in a string) given its identifier
@@ -430,7 +433,7 @@ class BioModels(WSDLService):
 
         ::
 
-             >>> print(s.getModelsIdByPerson(u"NovÃ¨re"))
+             >>> print(s.getModelsIdByPerson(u"Novère"))
 
         .. note:: the use of the letter **u** in front of the string to encode special characters.
 
