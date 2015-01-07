@@ -88,7 +88,7 @@ This is a summary of the changelog. Complete change can be found in the
 * Source code moved to github.com
 * New REST class to use **requests** package instead of urllib2. 
 * Creation of a global configuration file in .config/bioservice/bioservices.cfg
-* NEW services: Reactome, Readseq, Ensembl, EUtils
+* NEW services: Reactome, Readseq, Ensembl, EUtils, PRIDE, clinvitae ...
 
 1.2.X
 +++++++++++
