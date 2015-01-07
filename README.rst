@@ -19,8 +19,11 @@ BioServices
 .. image:: https://badge.waffle.io/cokelaer/bioservices.png?label=ready&title=Ready 
    :target: https://waffle.io/cokelaer/bioservices
 
-:note: BioServices is tested for Python 2.7, 3.3. Version 3.4 is currently not
-       available due to a gevent dependencies, which should be fixed soon.
+:note: BioServices is tested for Python 2.7, 3.3. . Version 3 is currently failing
+    due to a gevent dependencies, which should be fixed soon. Although 
+    the building icon may be red, 99 of the tests pass. Failure are usually due 
+    to a service being temporary down.
+       
 
 :contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
 :issues: Please use https://github.com/cokelaer/bioservices/issues
