@@ -92,6 +92,7 @@ This is a summary of the changelog. Complete change can be found in the
 * New REST class to use **requests** package instead of urllib2. 
 * Creation of a global configuration file in .config/bioservice/bioservices.cfg
 * NEW services: Reactome, Readseq, Ensembl, EUtils, PRIDE, clinvitae ...
+* CHANGES: all parameters called format have been renamed frmt (to avoid using Python keyword)
 
 1.2.X
 +++++++++++
