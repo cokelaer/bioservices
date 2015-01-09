@@ -113,7 +113,7 @@ class QuickGO(REST):
         if goid.startswith("GO:")is False:
             raise ValueError("GO id must start with 'GO:'")
 
-        params = {'id':goid, 'frmt':frmt}
+        params = {'id':goid, 'format': frmt}
         res = self.http_get("GTerm", frmt="xml", params=params)
 
         return res
@@ -191,7 +191,7 @@ class QuickGO(REST):
             raise TypeError("limit parameter must be an integer greater than zero")
 
         # fill params with parameters that have default values.
-        params = {'format':frmt, 'limit':limit}
+        params = {'format': frmt, 'limit': limit}
 
         # beginning of the URL
         url = "GAnnotation?"
@@ -267,7 +267,7 @@ or a string (e.g., 'PUBMED:*') """)
             params['qualifier'] = qualifier
 
         # col parameter
-        if frmt=="tsv":
+        if frmt == "tsv":
             if col is None:
                 col = 'proteinDB,proteinID,proteinSymbol,qualifier,'
                 col += 'goID,goName,aspect,evidence,ref,with,proteinTaxon,'
@@ -288,7 +288,7 @@ or a string (e.g., 'PUBMED:*') """)
 
         # gz parameter. do not expect values so need to be added afterwards.
         if gz is True:
-            url+='&gz'
+            url += '&gz'
 
         res = self.http_get(url, frmt="txt", params=params)
 
