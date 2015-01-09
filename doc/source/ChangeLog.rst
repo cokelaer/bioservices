@@ -7,6 +7,12 @@ Whats' new, what has changed
 Revision 1.3
 ------------------
 
+* 1.3.5
+
+  * BUG FIXES
+    * quickgo: fix bug https://github.com/cokelaer/bioservices/issues/22 
+
+
 * 1.3.4
 
   * BUG FIXES
