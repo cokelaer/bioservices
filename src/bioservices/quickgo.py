@@ -131,7 +131,7 @@ class QuickGO(REST):
             downloading. To bypass this default, and return the entire data set,
             specify a limit of -1).
         :param str frmt: one of "gaf", "gene2go", "proteinList", "fasta",
-            "tsv" or "dict". The "dict" frmt is the default and is a
+            "tsv" or "dict". The "dict" argument is the default and is a
             python dictionary.
         :param bool gz: gzips the downloaded file.
         :param str goid: GO identifiers either directly or indirectly
@@ -148,17 +148,17 @@ class QuickGO(REST):
             annotations up to these terms. See here for more details:
             http://www.ebi.ac.uk/QuickGO/GMultiTerm
         :param str db: protein database (identifier type). Can be UniProtKB, UniGene, Ensembl.
-        :param evidence: annotation evidence code category (Ev). Example of
+        :param str evidence: annotation evidence code category (Ev). Example of
             valid evidence are: be IDA, IC, ISS, IEA, IPI, ND, IMP, ISO, IGI
             should be either a string with comma separated values (e.g.,
             IEA,IDA) or a list of strings (e.g. ["IEA","IDA"]).
-        :param source: annotation provider. Examples are 'InterPro', 'UniPathway',
+        :param str source: annotation provider. Examples are 'InterPro', 'UniPathway',
             'MGI', 'FlyBase', 'GOC', 'Source', 'UniProtKB', 'RGD', 'ENSEMBL',
             'ZFIN', 'IntAct'.
-        :param ref: PubMed or GO reference supporting annotation. Can refer to a
+        :param str ref: PubMed or GO reference supporting annotation. Can refer to a
             specific reference identifier or category (for category level, use
             `*`  after ref type). Can be 'PUBMED:`*`', 'GO_REF:0000002'.
-        :param with: additional supporting information supplied in IEA, ISS, IPI, IC
+        :param str with: additional supporting information supplied in IEA, ISS, IPI, IC
             evidenced annotations; see GO documentation. Can refer to a specific
             identifier or category (for category level, use * after with type).
             Examples are: EC:2.5.1.30, IPR000092, HAMAP:*
@@ -187,7 +187,9 @@ class QuickGO(REST):
         _valid_db = ['UniProtKB', 'UniGene', 'Ensembl']
         _valid_aspect = ['P', 'F', 'C']
 
-        if isinstance(limit, int)is False:
+        self.devtools.check_param_in_list(frmt, _valid_formats)
+
+        if isinstance(limit, int) is False:
             raise TypeError("limit parameter must be an integer greater than zero")
 
         # fill params with parameters that have default values.
@@ -284,7 +286,6 @@ or a string (e.g., 'PUBMED:*') """)
             # col is provided but format is not appropriate
             if col is not None:
                 raise ValueError("You provided the 'col' parameter but the format is not correct. You should use the frmt='tsv' or frmt='dict' ")
-
 
         # gz parameter. do not expect values so need to be added afterwards.
         if gz is True:
