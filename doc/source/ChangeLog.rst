@@ -11,6 +11,8 @@ Revision 1.3
 
   * BUG FIXES
     * quickgo: fix bug https://github.com/cokelaer/bioservices/issues/22 
+    * uniprot: add missing columns (https://github.com/cokelaer/bioservices/issues/23)
+
 
 
 * 1.3.4
