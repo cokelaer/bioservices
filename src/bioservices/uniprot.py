@@ -179,13 +179,15 @@ class UniProt(REST):
     """
     _mapping = mapping.copy()
     _url = "http://www.uniprot.org"
-    _valid_columns = ['citation', 'clusters', 'comments','database',
-                'domains','domain', 'ec','id','entry name','existence',
-                'families', 'features', 'genes', 'go', 'go-id', 'interpro',
+    _valid_columns = ['citation', 'clusters', 'comments', 'database',
+                'domains','domain', 'ec', 'id', 'entry name', 'existence'
+                'families', 'feature', 'features', 'genes', 'go', 'go-id', 'interpro'
                 'interactor', 'keywords', 'keyword-id', 'last-modified',
                 'length', 'organism', 'organism-id', 'pathway', 'protein names',
                 'reviewed', 'score', 'sequence', '3d', 'subcellular locations',
-                'taxonomy', 'tools', 'version', 'virus hosts']
+                'taxonomy', 'tools', 'version', 'virus hosts', 'lineage-id',
+                'sequence-modified', 'proteome']
+
 
     def __init__(self, verbose=False, cache=False):
         """**Constructor**
@@ -563,10 +565,10 @@ class UniProt(REST):
 
         nChunk = min(nChunk, len(entries))
         N, rest = divmod(len(entries), nChunk)
-        for i in range(0,N+1):
+        for i in range(0, N+1):
             this_entries = entries[i*nChunk:(i+1)*nChunk]
             if len(this_entries):
-                self.logging.info("uniprot.get_df {}/{}".format(i+1,N))
+                self.logging.info("uniprot.get_df {}/{}".format(i+1, N))
                 query = "+or+".join(this_entries)
                 if organism:
                     query += "+and+"+organism
@@ -574,7 +576,7 @@ class UniProt(REST):
                                   columns=",".join(self._valid_columns))
             else:
                 break
-            if len(res)==0:
+            if len(res) == 0:
                 self.logging.warning("some entries %s not found" % entries)
             else:
                 df = pd.read_csv(io.StringIO(unicode(res)), sep="\t")
@@ -586,7 +588,7 @@ class UniProt(REST):
         # you may end up with duplicated...
         output.drop_duplicates(inplace=True)
         # you may have new entries...
-        #output = output[output.Entry.apply(lambda x: x in entries)]
+        # output = output[output.Entry.apply(lambda x: x in entries)]
         # to transform into list:
         columns = ['PubMed ID', 'Comments', u'Domains', 'Protein families',
                    'Gene names', 'Gene ontology (GO)', 'Gene ontology IDs',
@@ -597,10 +599,9 @@ class UniProt(REST):
                 res = output[col].apply(lambda x:[this.strip() for this in str(x).split(";") if this!="nan"])
                 output[col] = res
             except:
-                self.logging.warning("column could not be parsed. %s" %col)
-        # Sequences are splitted into chunks of 10 characters. let us rmeove the
-        # spaces:
-        output.Sequence = output['Sequence'].apply(lambda x: x.replace(" ",""))
+                self.logging.warning("column could not be parsed. %s" % col)
+        # Sequences are splitted into chunks of 10 characters. let us rmeove 
+        # the spaces:
+        output.Sequence = output['Sequence'].apply(lambda x: x.replace(" ", ""))
 
         return output
-
