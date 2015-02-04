@@ -40,9 +40,10 @@ from bioservices.services import WSDLService, REST
 import webbrowser
 import copy
 
-__all__ = ['Reactome']
+__all__ = ['Reactome', 'ReactomeAnalysis']
 # for reactome, content-type could be
 #  "Content-Type", "multipart/form-data; boundary=" +    boundary);
+
 
 class Reactome(REST):
     """Reactome interface
@@ -56,6 +57,7 @@ class Reactome(REST):
         super(Reactome, self).__init__("Reactome(URL)",url=Reactome._url,
             verbose="ERROR", cache=False)
         self.debugLevel = verbose
+        self.test = 2
 
         # for buffering
         self._list_pathways = None
@@ -350,6 +352,36 @@ class Reactome(REST):
         url = "sbmlExporter/{0}".format(identifier)
         res = self.http_get(url, frmt='xml')
         return res
+
+
+    def get_all_reactions(self):
+        """Return list of reactions from the Pathway"""
+        res = self.get_list_pathways()
+        return [x[0] for x in res]
+
+    def bioservices_get_reactants_from_reaction_identifier(self, reaction):
+        """Fetch information from the reaction HTML page
+
+        .. note:: draft version
+        """
+        res = self.http_get('http://www.reactome.org/content/detail/%s' % reaction) 
+        res = res.content
+
+        try:
+            reactants = [x for x in res.split("\n") if '<title>' in x]
+            reactants = reactants[0].split("|")[1].strip().strip('</title>')
+        except  Exception as err:
+            print('Could not interpret title')
+            return res
+
+        if reactants.count(':') == 1:
+            reactants = reactants.split(":")
+        else:
+            #self.logging.warning('Warning: did not find unique sign : for %s' % reaction)
+            #reactants = reactants.split(":", 1)
+            pass
+
+        return reactants
 
 
 """
