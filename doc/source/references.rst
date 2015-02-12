@@ -140,6 +140,15 @@ HGNC
     :undoc-members:
     :synopsis:
 
+Intact (complex)
+======================
+
+.. automodule:: bioservices.intact
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
 MUSCLE
 ==============
 
