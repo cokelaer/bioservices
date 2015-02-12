@@ -1471,8 +1471,7 @@ class KEGGParser(KEGG):
         return parser
 
     def _parse(self, res, flatfile):
-        """Reaction is currently a dictionary if more than one line maybe we
-        want a list instead.
+        """ 
 
 
         """
@@ -1512,7 +1511,7 @@ class KEGGParser(KEGG):
                 # but in other cases  we just want to append the text (e.g.
                 # remarks)
                 if current in ["gene", "reference", "rel_pathway", "orthology",\
-                        "pathway","reaction", "compound", "dblinks", "marker"]:
+                        "pathway", "compound", "dblinks", "marker"]:
                     if isinstance(output[current], dict) is False:
                         # The item may be of different length. In the gene case, we
                         # want to provide a list of dictionaries with key being the
@@ -1524,6 +1523,7 @@ class KEGGParser(KEGG):
                         output[current] = {key:value}
                     mode = "dict"
                 else:
+                    # reaction should be here
                     if isinstance(output[current], list) is False:
                         value = output[current]
                         output[current] = [value]
