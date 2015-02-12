@@ -14,6 +14,10 @@ Revision 1.3
     * uniprot: add missing columns (https://github.com/cokelaer/bioservices/issues/23)
     * kegg: fix parser related to reaction in the Compound data structure (https://github.com/cokelaer/bioservices/issues/27)
 
+  * NEWS
+
+    * add Intact complex web services
+
 
 * 1.3.4
 
