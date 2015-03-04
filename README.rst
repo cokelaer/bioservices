@@ -25,8 +25,11 @@ BioServices
     to a service being temporary down.
        
 
-:contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
-:issues: Please use https://github.com/cokelaer/bioservices/issues
+:Contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
+:Issues: Please use https://github.com/cokelaer/bioservices/issues
+:How to cite: Cokelaer et al. *BioServices: a common Python package to access biological Web Services programmatically*
+     `Bioinformatics <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ (2013) 29 (24): 3241-3242
+:Documentation: `Pypi documentation <http://pythonhosted.org/bioservices/>`_.
 
 **Bioservices** is a Python package that provides access to many Bioinformatices Web Services (e.g.,
 UniProt) and a framework to easily implement Web Services wrappers (based on 
