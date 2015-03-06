@@ -145,6 +145,7 @@ gene name.
 
 """
 from __future__ import print_function
+from __future__ import unicode_literals
 try:
     from functools import reduce # python3 compat
 except:
@@ -1215,10 +1216,13 @@ class KEGGParser(KEGG):
         entry = res.split("\n")[0].split()[0]
         if entry == "ENTRY":
             dbentry = res.split("\n")[0].split(None, 2)[2]
+        else:
+            raise ValueError
 
         if "Pathway" in dbentry and "Module" not in dbentry:
             parser = self.parsePathway(res)
-        elif dbentry.lower() == "pathway   module":
+        elif dbentry.lower() == "pathway   module" or \
+            dbentry.lower() == 'complex   module':
             parser = self.parseModule(res)
         elif "Drug" in dbentry: # can be Drug or "Mixture Drug"
             parser = self.parseDrug(res)
@@ -1251,7 +1255,8 @@ class KEGGParser(KEGG):
         elif "tRNA" in dbentry:
             parser = self.parsetRNA(res)
         else:
-            raise NotImplementedError("Entry %s not yet implemented" % dbentry)
+            self.warning("Entry %s not yet implemented" % entry)
+            parser = {}
         return parser
 
     def parsetRNA(self, res):
@@ -1319,7 +1324,8 @@ class KEGGParser(KEGG):
             >>> d = s.parseDisease(res)
         """
         flatfile = ["ENTRY", "NAME", "DESCRIPTION", "CATEGORY", "PATHWAY", "GENE",
-            "ENV_FACTOR", "MARKER", "DRUG", "COMMENT", "DBLINKS", "REFERENCE"]
+            "ENV_FACTOR", "MARKER", "DRUG", "COMMENT", "DBLINKS", "REFERENCE",
+            'BRITE', 'CARCINOGEN']
         parser = self._parse(res, flatfile)
         return parser
 
@@ -1378,7 +1384,7 @@ class KEGGParser(KEGG):
 
         flatfile = ["ENTRY", "NAME", "DEFINITION", "ORTHOLOGY", "ORGANISM",
             "PATHWAY", "MODULE", "DISEASE", "DRUG_TARGET", "CLASS", "MOTIF", "DBLINKS",
-            "STRUCTURE", "POSITION", "AASEQ", "NTSEQ"]
+            "STRUCTURE", "POSITION", "AASEQ", "NTSEQ", 'BRITE']
         parser = self._parse(res, flatfile)
         return parser
 
@@ -1470,107 +1476,221 @@ class KEGGParser(KEGG):
         parser = self._parse(res, flatfile)
         return parser
 
-    def _parse(self, res, flatfile):
-        """ 
 
+    def parse2(self, res):
+        keys = [x.split(" ")[0] for x in res.split("\n") if len(x) and x[0]!=" "
+                and x!="///"]
 
-        """
-        output = {}
-        lines = res.split("\n")
-
-        # scanning res and searching for flatfile keywords; keep track of
-        # current one. Should be an entry first.
-        current = None
-        countref = 1 # reference counter for reference without a value
-        for line in lines:
-            line = line.strip()
-            if line == "///" or len(line)==0:
-                continue
-
-            if len(line.split())>=2:# split each line to search for the first term
-                key, text = line.split(None,1)
-            else:
-                key = line
-
-            # REFERENCES are dealt with in the else
-            if key in flatfile and \
-                    key not in ["REFERENCE", "AUTHORS", "TITLE", "JOURNAL"]:
-                # store the first appearance of a key
-                output[key.lower()] = line.split(key)[1].strip()
-                current = key.lower()   # keep track of the current key
-            else:
-                # There are many instances of referneces that are followed
-                # by authors/title/journal triplet
-                if key == "REFERENCE":
-                    current = key.lower()
-                    if current not in output.keys():
-                        # the first time, we create a dictionary
-                        output[current] = {}
-
-                # Sometimes, we want to create a dictionary. For instance, genes
-                # but in other cases  we just want to append the text (e.g.
-                # remarks)
-                if current in ["gene", "reference", "rel_pathway", "orthology",\
-                        "pathway", "compound", "dblinks", "marker"]:
-                    if isinstance(output[current], dict) is False:
-                        # The item may be of different length. In the gene case, we
-                        # want to provide a list of dictionaries with key being the
-                        # gene id but in some other cases,
-                        try:
-                            key, value = output[current].split(" ",1)
-                        except:
-                            value = output[current]
-                        output[current] = {key:value}
-                    mode = "dict"
-                else:
-                    # reaction should be here
-                    if isinstance(output[current], list) is False:
-                        value = output[current]
-                        output[current] = [value]
-                    mode = "append"
-
-                # For references only
-                if current == "reference":
-                    try:
-                        key, value = line.strip().split(" ",1)
-                    except:
-                        key = line.strip()
-                        countref += 1
-                        value = str(countref)
-                    if key.upper() in ["AUTHORS", "TITLE", "JOURNAL"]:
-                        output[current][pubmed][key] = value
-                    elif key.upper() == "REFERENCE":
-                        pubmed = value.strip()
-                        if pubmed in output[current].keys():
-                            pubmed += "_" + str(countref)
-                            countref += 1
-                        output[current][pubmed] = {}
-                else: # and all others
-                    if mode == "dict":
-                        try:
-                            key, value = line.strip().split(" ",1)
-                        except: # needed in INTERACTION case (DRUG)
-                            key = line.strip()
-                            value = ""
-                        output[current][key.strip()] = value.strip()
-                    else:
-                        output[current].append(line)
-
-        # some cleanup
-        if "ntseq" in output.keys():
-            data = output['ntseq']
-            output['ntseq'] = {data[0]: reduce(lambda x,y:x+y, data[1:])}
-        if "aaseq" in output.keys():
-            data = output['aaseq']
-            output['aaseq'] = {data[0]: reduce(lambda x,y:x+y, data[1:])}
-        if "dblinks" in output.keys():
-            try:
-                data = output['dblinks']
-                output['dblinks'] = {k[0:-1]:v for k,v in output['dblinks'].items()}
-            except:
+        # let us go line by to not forget anything and know which entries are 
+        # found in the RHS. We may have duplicated once as can be found in th
+        # keys variable as well.
+        entries = []
+        entry = ""
+        start = True
+        for line in res.split("\n"):
+            if line == '///' or len(line) == 0:
                 pass
+            elif line[0] != " ":
+                if start == True:
+                    start = False
+                else:
+                    entries.append(entry)
+                entry = line[:]
+            else:
+                entry+= "\n"+line[:]
+        
+        # we can now look at each entry and create a dictionary.
+        # The dictionary will contain as key the name found in the LHS
+        # e.g., REACTION and the value will be either the entry content
+        # as a string or a list of strings if the key is not unique
+        # e.g., for references. This could be a bit annoying since
+        # for example References could appear only once if some cases.
+        # This can be tested though by checking the type
+        output = {}
+        for entry in entries:
+            name = entry.split("\n")[0].split()[0]
+            if keys.count(name) == 1:
+                output[name] = entry[:]
+            else:
+                if name in output.keys():
+                    output[name].append(entry[:])
+                else:
+                    output[name] = [entry[:]]
+
+        # remove name that are now the keys of the dictionary anyway
+        # if the values is not a list
+        for k,v in output.items():
+            try:
+                output[k] = output[k].strip().replace(k,'',1) # remove the name that
+            except: # skip the lists
+                pass
+            
+        # Now, let us do the real stuff. 
+        # This is tricky since format is not consistent with the names e,g
+        # REACTIONS could be sometimes a list of names and sometimes list
+        # of reactions with their description.
+        self.raw_parsing = copy.deepcopy(output)
+        for key, value in output.items():
+            if key == 'STATISTICS':
+                data = [x.split(":",1) for x in output[key].split("\n")]
+                data = dict([(x[0].strip(), float(x[1].strip())) for x in data])
+                output[key] = data
+            elif key in ['DEFINITION']:
+                pass
+            elif key in ['DESCRIPTION', 'ENTRY', 'ORGANISM', 'CLASS', 'NAME']: # get rid of \n
+                if "\n" in value:
+                    print("warnign for debugging")
+                # nothing to do here except strip 
+                output[key] = value.strip() 
+            elif key in ['GENE', 'DISEASE', 'PATHWAY_MAP']:
+                kp = {}
+                for line in value.split("\n"):
+                    k,v = line.strip().split(None,1)
+                    kp[k] = v
+                output[key] = kp.copy()
+            elif key == 'REFERENCE':
+                # transform to a list since you may have several entries
+                if isinstance(value, list) is False:
+                    value = [value]
+                newvalue = [self._interpret_references(this)
+                        for this in value]
+                output[key] = newvalue
+            elif key == 'PLASMID':
+                # transform to a list since you may have several entries
+                if isinstance(value, list) is False:
+                    value = [value]
+                newvalue = [self._interpret_plasmid(this)
+                        for this in value]
+                output[key] = newvalue
+            elif key == 'CHROMOSOME':
+                # transform to a list since you may have several entries
+                if isinstance(value, list) is False:
+                    value = [value]
+                newvalue = [self._interpret_chromosome(this)
+                    for this in value]
+                output[key] = newvalue
+            elif key in ['EXACT_MASS', 'MOL_WEIGHT']:
+                try:
+                    output[key] = float(value)
+                except:
+                    pass
+            else:
+                print('%s has not special parsing for now' % key)
 
         return output
+
+    def _tolist(self, value):
+        # transform to a list since you may have several entries
+        if isinstance(value, list) is False:
+            value = [value]
+        return value
+
+    def _interpret_references(self, data):
+        res = {}
+        for this in self._tolist(data).split("\n"):
+            if this.strip().startswith("REFERENCE"):
+                res['REFERENCE'] = this.strip().split(None,1)[1]
+            elif this.strip().startswith("JOURNAL"):
+                res['JOURNAL'] = this.strip().split(None,1)[1]
+            elif this.strip().startswith("AUTHORS"):
+                res['AUTHORS'] = this.strip().split(None,1)[1]
+            elif this.strip().startswith("TITLE"):
+                res['TITLE'] = this.strip().split(None,1)[1]
+        return res
+
+    def _interpret_plasmid(self, data):
+        res = {}
+        for this in self._tolist(data).split("\n"):
+            if this.strip().startswith("PLASMID"):
+                res['PLASMID'] = this.strip().split(None,1)[1]
+            elif this.strip().startswith("LENGTH"):
+                res['LENGTH'] = this.strip().split(None,1)[1]
+            elif this.strip().startswith("SEQUENCE"):
+                res['SEQUENCE'] = this.strip().split(None,1)[1]
+        return res
+
+    def _interpret_chromosome(self, data):
+        res = {}
+        for this in self._tolist(data).split("\n"):
+            if this.strip().startswith("CHROMOSOME"):
+                res['CHROMOSOME'] = this.strip().split(None,1)[1]
+            elif this.strip().startswith("LENGTH"):
+                res['LENGTH'] = this.strip().split(None,1)[1]
+            elif this.strip().startswith("SEQUENCE"):
+                res['SEQUENCE'] = this.strip().split(None,1)[1]
+        return res
+
+
+    def _convert(self, parser1):
+        for key in parser1.keys():
+            # we need to decide on what do to for each key in each flatfile
+
+            if key in ['NAME', 'ENTRY', 'DEFINITION', 'EQUATION', 'COMMENT',
+                'POSITION', 'ORGANISM', 'REMARK', 'FORMULA', 'KEYWORDS',
+                'CLASS']:
+                # Those should be on a single line
+                if "\n" in parser1[key]:
+                #    parser1[key] = parser1[key].replace("\n", ";")
+                    print('\\n found in  %s' % key)
+            elif key in ['STRUCTURE', 'DBLINKS', 'MOTIF']:
+                print(err.message)
+                    
+                new = {}
+                #print(key, parser1[key])
+                for line in parser1[key].split("\n"):
+                    thiskey, content = line.split(None, 1)
+                    if thiskey.endswith(":"):
+                        new[thiskey[:-1]] = content
+                    else:
+                        print("EERRO")
+                parser1[key] = new
+            elif key in ['AASEQ', 'NTSEQ']:
+                # let us get rid of the length
+                parser1[key] = parser1[key].split("\n", 1)[1].replace("\n","")
+            elif key in ['PATHWAY', 'ORTHOLOGY', 'RPAIR', 'MODULE',
+            'COMPOUND']:
+                parser1[key] = dict([x.split(None,1) for x in parser1[key].split("\n")])
+            elif key in ['ENZYME']:
+                try:
+                    parser1[key] = [x.strip() for x in parser1[key].split()]
+                except:
+                    pass
+            elif key in ['REACTION']:
+                if 'Complex   Module' in parser1['ENTRY']:
+                    parser1[key] = dict([x.split(None,1) for x in parser1[key].split("\n")])
+                else:
+                    parser1[key] = [x.strip() for x in parser1[key].split()]
+            elif key in ['ATOM', 'BOND']:
+                # starts with a number that defines number of entries. Let us
+                # get rid of that number and then send a list
+                try:
+                    lines = parser1[key].split("\n")
+                    if len(lines)>1:
+                        parser1[key] = lines[1:]
+                    else:
+                        parser1[key] = []
+                except:
+                    pass
+            elif key in ['TAXONOMY']:
+                data = [x.strip() for x in parser1[key].split("\n")]
+                lineages = [x.split(None,1)[1] for x in data if
+                        x.startswith('LINEAGE')]
+                names = [x for x in data if x.startswith('LINEAGE') is False]
+                entries = [] # must use a list since names can be identical
+                for i, name in enumerate(names):
+                    entry = {'TAXONOMY': name, 
+                            'LINEAGE':lineages[i],
+                            }
+                    entries.append(entry)
+                parser1[key] = entries
+
+            elif key in ['CARCINOGEN', 'BRITE']:
+                pass # no change for the others e.g. BRITE, CARCINOGEN
+            else:
+                print('KEGG Parser ', key , ' not included')
+
+
+        return parser1
 
 
 class KEGGTools(KEGG):
