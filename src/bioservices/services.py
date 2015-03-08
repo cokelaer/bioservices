@@ -711,7 +711,7 @@ class REST(RESTbase):
         #return self.get_one(**{'frmt': frmt, 'query': query, 'params':params})
         return self.get_one(query, frmt, params=params, **kargs)
 
-    def get_one(self, query, frmt='json', params={}, **kargs):
+    def get_one(self, query=None, frmt='json', params={}, **kargs):
         """
 
         if query starts with http:// do not use self.url
@@ -765,7 +765,7 @@ class REST(RESTbase):
         kargs.update({'frmt':frmt})
         return self.post_one(**kargs)
 
-    def post_one(self, query, frmt='json', **kargs):
+    def post_one(self, query=None, frmt='json', **kargs):
         if query is None:
             url = self.url
         else:
