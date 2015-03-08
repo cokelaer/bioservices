@@ -194,8 +194,7 @@ class KEGG(REST):
         s.reaction   # equivalent to s.list("reaction")
         s.reactionIds
 
-    Other methods of interest are :meth:`conv`, :meth:`find`, :meth:`get`. We also provide
-    a :meth:`check_dbentries` to check validity of an entry Id.
+    Other methods of interest are :meth:`conv`, :meth:`find`, :meth:`get`. 
 
     .. seealso:: :ref:`kegg_database`, :ref:`db_entries`, :ref:`terminology`.
 
@@ -237,10 +236,7 @@ class KEGG(REST):
         self._drug = None
         self._brite = None
 
-        self._buffer = {}
-
-        #self.keggParser = KEGGParser()
-
+        self.keggParser = KEGGParser(verbose=verbose)
 
     # we could use this to retrieve all databases Ids but
     def __getattr__(self, req):
@@ -414,7 +410,6 @@ class KEGG(REST):
                 raise
             url += "/" + organism
 
-
         res = self.http_get(url, "txt")
         return res
 
@@ -535,7 +530,6 @@ class KEGG(REST):
 
         return res
 
-
     def conv(self, target, source):
         """convert KEGG identifiers to/from outside identifiers
 
@@ -632,8 +626,6 @@ class KEGG(REST):
         else:
             self.logging.info("arguments not checked")
         """
-
-
         url = "conv/"+ target + '/' + source
         res = self.http_get(url, frmt="txt")
 
@@ -643,7 +635,6 @@ class KEGG(REST):
             return dict([(x,y) for x,y in zip(t, s)])
         except:
             return res
-
 
     def link(self, target, source):
         """Find related entries by using database cross-references
@@ -665,7 +656,6 @@ class KEGG(REST):
             # KEGG pathways linked from a human gene and an E. coli O157 gene.
             s.link("pathway", "hsa:10458+ece:Z5100")
         """
-
         self._checkDB(target, mode="link")
 
         url = "link/"+ target + '/' + source
@@ -680,7 +670,6 @@ class KEGG(REST):
 
         """
         raise NotImplementedError("Use :meth:`get` instead")
-
 
     def show_pathway(self, pathId, scale=None, dcolor="pink", keggid={}):
         """Show a given pathway inside a web browser
@@ -712,8 +701,6 @@ class KEGG(REST):
         """
         if pathId.startswith("path:"):
             pathId = pathId.split(":")[1]
-
-
 
         if scale:
             scale = int(scale/100.*100)/100. # just need 2 digits and a value in [0,1]
@@ -752,55 +739,6 @@ class KEGG(REST):
         self.logging.info(url)
         res = webbrowser.open(url)
         return res
-
-
-    def check_dbentries(self, dbentries, checkAll=True):
-        """Checks that all entries provided exist in the KEGG database
-
-        :param str dbentries: a dbentries list. entries are separated by the +'
-            sign (e.g., "hsa:10458+ece:Z5100")
-        :param bool checkAll: checks all entries (Default) or stop as soon as an
-            entry is not well formed.
-        :return: True if all entries are correct. False otherwise
-
-        ::
-
-            s = KEGG()
-            s.check_dbentries("hsa:10458+ece:Z5100")
-
-
-        """
-        try:
-            from urllib.error import HTTPError
-        except:
-            from urllib2 import HTTPError
-        entries = dbentries.split("+")
-        # we do not want logging here
-        debugLevel = self.debugLevel
-        self.debugLevel = "CRITICAL"
-        allStatus = True
-        for entry in entries:
-            try:
-                self.get(entry)
-                status = True
-            # if ill-formed, an entry will raise the 404 error.
-            except HTTPError as err:
-                if e.code == 404:
-                    status = False
-                    allStatus = False
-                    if checkAll is False:
-                        print(entry, status)
-                        return False
-                else:
-                    print(e)
-                    raise
-            except:
-                self.debugLevel = debugLevel
-                raise
-            print(entry, status)
-        # retrieve logging level
-        self.debugLevel = debugLevel
-        return allStatus
 
     # wrapper of all databases to ease access to them (buffered)
 
@@ -974,39 +912,12 @@ class KEGG(REST):
             ['path:hsa04064', 'path:hsa04650', 'path:hsa04660', 'path:hsa05340']
 
         """
-        p = KEGGParser(verbose=False)
-        p.organism = organism
         res = self.get(":".join([organism, gene]))
-        dic = p.parse(res)
-        if 'pathway' in dic.keys():
-            return dic['pathway']
+        dic = self.parse(res)
+        if 'PATHWAY' in dic.keys():
+            return dic['PATHWAY']
         else:
             print("No pathway found ?")
-
-
-    def _old_get_pathway_by_gene(self, gene, organism):
-        matches = []
-        p = KEGGParser()
-        # using existing buffered list if same organism are used
-        if self.organism == organism:
-            Ids = self.pathwayIds
-        else:
-            p.organism = organism
-            Ids = p.pathwayIds
-
-        for i,Id in enumerate(Ids):
-            print("scanning %s (%s/%s)" % (Id, i, len(Ids)))
-            if Id not in self._buffer.keys():
-                res = p.get(Id)
-                self._buffer[Id] = res
-            else:
-                res = self._buffer[Id]
-
-            parsed = p.parse(res)
-            if 'gene' in parsed.keys() and gene in parsed['gene']:
-                print("Found %s in pathway Ids %s" % (gene, Id))
-                matches.append(Id)
-        return matches
 
     def parse_kgml_pathway(self, pathwayId, res=None):
         """Parse the pathway in KGML format and returns a dictionary (relations and entries)
@@ -1014,9 +925,12 @@ class KEGG(REST):
         :param str pathwayId: a valid pathwayId e.g. hsa04660
         :param str res: if you already have the output of the query
             get(pathwayId), you can provide it, otherwise it is queried.
-        :return: a tuple with the first item being a list of relations. Each
-            relations is a dictionary with id2, id2, link, value, name. The
-            second item is a dictionary that maps the Ids to
+        :return: a dictionary with relations and entries as keys. Values 
+            of relations is a list of relations, each relation being
+            dictionary with entry1, entry2, link, value, name. The
+            list os entries is a list of dictionary as well. 
+            Entry contains contains more details about the entry found in the
+            relation. See example below for details.
 
 
         ::
@@ -1033,11 +947,8 @@ class KEGG(REST):
             >>> set([x['link'] for x in res['relations']])
             set([u'PPrel', u'PCrel'])
 
+            >>> # get information about an entry :
             >>> res['entries'][4]
-
-
-        ret = s.get("hsa04660", "kgml")
-
 
 
         .. seealso:: `KEGG API <http://www.kegg.jp/kegg/xml/docs/>`_
@@ -1048,12 +959,10 @@ class KEGG(REST):
             res = self.easyXML(self.get(pathwayId, "kgml"))
         else:
             res = self.easyXML(res)
-        # here entry1 and 2 are Id related to the kgml file
 
         # read and parse the entries
         entries = [x for x in res.findAll("entry")]
         for entry in entries:
-
             output['entries'].append({
                 'id': entry.get("id"),
                 'name': entry.get("name"),
@@ -1153,23 +1062,38 @@ class KEGG(REST):
 
         return sif
 
-    def __str__(self):
-        txt = self.info()
-        return txt
+    def parse(self, entry):
+        """See :class:`KEGGParser` for details
+        
+        Parse entry returned by :meth:`get`
+        
+        ::
+        
+            k = KEGG()
+            res = k.get("hsa04150")
+            d = k.parse(res)
+        
+        """
+        try:
+            res = self.keggParser.parse(entry)
+            return res
+        except:
+            self.logging.warning('Could not parse correctly the entry.')
+            return entry
 
 
-class KEGGParser(KEGG):
+from easydev import Logging
+class KEGGParser(Logging):
     """This is an extension of the :class:`KEGG` class to ease parsing of dbentries
 
     This class provides a generic method :meth:`parse` that will read the output
     of a dbentry returned by :meth:`KEGG.get` and converts it into a dictionary ready to use.
 
-    The :meth:`parse` method is a dispatcher so you do not have to worry about the
-    type of entry you are using. It can be a pathway, a gene, a compound...
+    The :meth:`parse` method parses any entry. It can be a pathway, a gene, a compound...
     ::
 
         from bioservices import *
-        s = KEGGParser()
+        s = KEGG()
 
         # Retrieve a KEGG entry
         res = s.get("hsa04150")
@@ -1181,7 +1105,7 @@ class KEGGParser(KEGG):
     the gene Ids found in the pathway into UniProt Ids::
 
         # Get the KEGG Ids in the pathway
-        kegg_geneIds = [x for x in d['gene']]
+        kegg_geneIds = [x for x in d['GENE']]
 
         # Convert them
         db_up, db_kegg = s.conv("hsa", "uniprot")
@@ -1193,43 +1117,27 @@ class KEGGParser(KEGG):
     However, you could also have done it simply as follows::
 
         kegg_geneIds = [x for x in d['gene']]
-        uprot_geneIds = [s.parse(s.get("hsa:"+str(e)))['dblinks']["UniProt:"] for e in d['gene']]
+        uprot_geneIds = [s.parse(s.get("hsa:"+str(e)))['DBLINKS']["UniProt:"] for e in d['GENE']]
 
     .. note:: The 2 outputs are slightly different.
 
     .. seealso:: http://www.kegg.jp/kegg/rest/dbentry.html
     """
-    def __init__(self, verbose=False, cache=False):
-        super(KEGGParser, self).__init__(verbose=verbose, cache=cache)
+    def __init__(self, verbose=False):
+        super(KEGGParser, self).__init__(level=verbose)
 
     def parse(self, res):
-        """A dispatcher to parse all outputs returned by :meth:`KEGG.get`
+        """Parse to any outputs returned by :meth:`KEGG.get`
 
         :param str res: output of a :meth:`KEGG.get`.
-        :return: a dictionary
+        :return: a dictionary. Keys are those found in the KEGG entry (e.g., 
+            REACTION, ENTRY, EQUATION, ...). The format of each value is
+            various. It could be a string, a list (of strings generally),
+            a dictionary, a float depending on the key. Depdending on
+            the type of the entry (e.g., module, pathway), the
+            type of the value may also differ (e.g., REACTION can be either
+            a list of reactions or a dictionary depending on the content)
 
-        ::
-
-            res = s.get("md:hsa_M00554")
-            d = s.parse(res)
-        """
-        entry = res.split("\n")[0].split()[0]
-        if entry == "ENTRY":
-            dbentry = res.split("\n")[0].split(None, 2)[2]
-        else:
-            raise ValueError
-
-        try:
-            parser = self._parse(res)
-        except Exception as err:
-            self.warning("Could not parse the entry %s correctly" % entry)
-            self.warning(err.message)
-            parser = res
-
-        return parser
-
-    def todo(self):
-        """parse a tRNA entry
 
         ::
 
@@ -1261,10 +1169,26 @@ class KEGGParser(KEGG):
             >>> res = s.get("rc:RC00001")
             >>> # Parses an enzyme entry
             >>> res = s.get('ec:1.1.1.1')
+            
+            >>> d = s.parse(res)
         """
-        pass
+        entry = res.split("\n")[0].split()[0]
+        if entry == "ENTRY":
+            dbentry = res.split("\n")[0].split(None, 2)[2]
+        else:
+            dbentry='?'
+            raise ValueError
+
+        try:
+            parser = self._parse(res)
+        except Exception as err:
+            self.warning("Could not parse the entry %s correctly" % dbentry)
+            self.warning(err.message)
+            parser = res
+        return parser
 
     def _parse(self, res):
+
         if res == 404:
             return 
         keys = [x.split(" ")[0] for x in res.split("\n") if len(x) and x[0]!=" "
@@ -1288,7 +1212,7 @@ class KEGGParser(KEGG):
                 entry = line[:]
             else:
                 entry+= "\n"+line[:]
-       
+      
         # we can now look at each entry and create a dictionary.
         # The dictionary will contain as key the name found in the LHS
         # e.g., REACTION and the value will be either the entry content
@@ -1306,6 +1230,7 @@ class KEGGParser(KEGG):
                     output[name].append(entry[:])
                 else:
                     output[name] = [entry[:]]
+
         # remove name that are now the keys of the dictionary anyway
         # if the values is not a list
         for k,v in output.items():
@@ -1352,7 +1277,12 @@ class KEGGParser(KEGG):
                 if '->' in value or "_" in value:
                     kp = {}
                     for line in value.split("\n"):
-                        k,v = line.strip().split(None,1)
+                        try:
+                            k,v = line.strip().split(None,1)
+                        except:
+                            self.warning("empty line in %s %s" % (key, line))
+                            k = line.strip()
+                            v = ''
                         kp[k] = v
                     output[key] = kp.copy()
                 else:
@@ -1398,12 +1328,13 @@ class KEGGParser(KEGG):
             # dictionary, interpreted as follows
             # on each line, there is an identifier followed by : character
             # looks like there is just one line...
-            elif key in ['STRUCTURE', 'DBLINKS', 'MOTIF']:
+            elif key in ['DRUG_TARGET', 'STRUCTURE', 'DBLINKS', 'MOTIF']:
                 new = {}
                 # some lines are split as
                 #     PDB: 1EAJ.....2J12
                 #          1RSF
-                # we need to replace "\n       " by just a space
+                # we need to replace "\n       " by just a space \n
+                # so as to split lines afterwards
                 import re
                 value = re.sub("\n {6,20}", " ", value)
                 for line in value.split("\n"):
@@ -1432,7 +1363,8 @@ class KEGGParser(KEGG):
                     'MARKER',  'PRODUCT']: # do not interpret to keep structure
                 pass
             else:
-                print('%s has not special parsing for now' % key)
+                print('Found keyword %s, which has not special parsing for now. %s' % (key, 
+                    output['ENTRY']))
 
         return output
 
