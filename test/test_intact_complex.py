@@ -1,9 +1,9 @@
-from bioservices.intact import Intact
+from bioservices.intact import IntactComplex
 
 
 
 def test_intact():
-    i = Intact()
+    i = IntactComplex()
     res = i.details('EBI-1163476')
     assert res['ac'] == 'EBI-1163476'
 
