@@ -7,6 +7,11 @@ Whats' new, what has changed
 Revision 1.3
 ------------------
 
+* 1.3.6:
+
+   * CHANGES: rename Intact class into IntactComplex
+
+
 * 1.3.5
 
   * BUG FIXES
