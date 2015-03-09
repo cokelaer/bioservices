@@ -58,6 +58,9 @@ from .kegg import *
 from . import hgnc
 from .hgnc import *
 
+from . import intact
+from intact import *
+
 from . import rhea
 from .rhea import *
 
