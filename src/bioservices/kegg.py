@@ -6,7 +6,7 @@
 #
 #  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -194,7 +194,7 @@ class KEGG(REST):
         s.reaction   # equivalent to s.list("reaction")
         s.reactionIds
 
-    Other methods of interest are :meth:`conv`, :meth:`find`, :meth:`get`. 
+    Other methods of interest are :meth:`conv`, :meth:`find`, :meth:`get`.
 
     .. seealso:: :ref:`kegg_database`, :ref:`db_entries`, :ref:`terminology`.
 
@@ -832,7 +832,7 @@ class KEGG(REST):
     organism = property(_get_organism, _set_organism, doc="returns the current default organism ")
 
     def _get_pathways(self):
-        if self._organism is None:
+        if self.organism is None:
             self.logging.warning("You must set the organism first (e.g., self.organism = 'hsa')")
             return
 
@@ -853,7 +853,7 @@ class KEGG(REST):
     """)
 
     def _get_modules(self):
-        if self._organism is None:
+        if self.organism is None:
             self.logging.warning("You must set the organism first (e.g., self.organism = 'hsa')")
             return
 
@@ -925,10 +925,10 @@ class KEGG(REST):
         :param str pathwayId: a valid pathwayId e.g. hsa04660
         :param str res: if you already have the output of the query
             get(pathwayId), you can provide it, otherwise it is queried.
-        :return: a dictionary with relations and entries as keys. Values 
+        :return: a dictionary with relations and entries as keys. Values
             of relations is a list of relations, each relation being
             dictionary with entry1, entry2, link, value, name. The
-            list os entries is a list of dictionary as well. 
+            list os entries is a list of dictionary as well.
             Entry contains contains more details about the entry found in the
             relation. See example below for details.
 
@@ -1064,15 +1064,15 @@ class KEGG(REST):
 
     def parse(self, entry):
         """See :class:`KEGGParser` for details
-        
+
         Parse entry returned by :meth:`get`
-        
+
         ::
-        
+
             k = KEGG()
             res = k.get("hsa04150")
             d = k.parse(res)
-        
+
         """
         try:
             res = self.keggParser.parse(entry)
@@ -1130,7 +1130,7 @@ class KEGGParser(Logging):
         """Parse to any outputs returned by :meth:`KEGG.get`
 
         :param str res: output of a :meth:`KEGG.get`.
-        :return: a dictionary. Keys are those found in the KEGG entry (e.g., 
+        :return: a dictionary. Keys are those found in the KEGG entry (e.g.,
             REACTION, ENTRY, EQUATION, ...). The format of each value is
             various. It could be a string, a list (of strings generally),
             a dictionary, a float depending on the key. Depdending on
@@ -1169,7 +1169,7 @@ class KEGGParser(Logging):
             >>> res = s.get("rc:RC00001")
             >>> # Parses an enzyme entry
             >>> res = s.get('ec:1.1.1.1')
-            
+
             >>> d = s.parse(res)
         """
         entry = res.split("\n")[0].split()[0]
@@ -1190,10 +1190,10 @@ class KEGGParser(Logging):
     def _parse(self, res):
 
         if res == 404:
-            return 
+            return
         keys = [x.split(" ")[0] for x in res.split("\n") if len(x) and x[0]!=" "
                 and x!="///"]
-        # let us go line by to not forget anything and know which entries are 
+        # let us go line by to not forget anything and know which entries are
         # found in the RHS. We may have duplicated once as can be found in th
         # keys variable as well.
         entries = []
@@ -1212,7 +1212,7 @@ class KEGGParser(Logging):
                 entry = line[:]
             else:
                 entry+= "\n"+line[:]
-      
+
         # we can now look at each entry and create a dictionary.
         # The dictionary will contain as key the name found in the LHS
         # e.g., REACTION and the value will be either the entry content
@@ -1240,34 +1240,34 @@ class KEGGParser(Logging):
                 output[k] = output[k].strip().replace(k,'',1) # remove the name that
             except: # skip the lists
                 pass
-            
-        # Now, let us do the real stuff. 
+
+        # Now, let us do the real stuff.
         # This is tricky since format is not consistent with the names e,g
         # REACTIONS could be sometimes a list of names and sometimes list
         # of reactions with their description.
         self.raw_parsing = copy.deepcopy(output)
 
         for key, value in output.items():
-            # convert to a dict 
+            # convert to a dict
             if key == 'STATISTICS':
                 data = [x.split(":",1) for x in output[key].split("\n")]
                 data = dict([(x[0].strip(), float(x[1].strip())) for x in data])
                 output[key] = data
             # strip only expecting a single line (string)
             elif key in ['POSITION', 'DESCRIPTION', 'ENTRY', 'ORGANISM', 'CLASS',
-                    'FORMULA', 'KEYWORDS', 'CATEGORY', 'ANNOTATION', 'DATA_SOURCE', 
+                    'FORMULA', 'KEYWORDS', 'CATEGORY', 'ANNOTATION', 'DATA_SOURCE',
                     'MASS', 'COMPOSITION', 'DEFINITION', 'KO_PATHWAY', 'EQUATION',
-                    'TYPE', 'RCLASS']: 
+                    'TYPE', 'RCLASS']:
                 # get rid of \n
 
                 if "\n" in value:
                     # happens in description path:hsa04915
                     print("warning for debugging in %s" % key)
                     value = value.replace("\n", " ")
-                # nothing to do here except strip 
-                output[key] = value.strip() 
+                # nothing to do here except strip
+                output[key] = value.strip()
             # list : set of lines
-            # COMMENT is sometimes on several lines 
+            # COMMENT is sometimes on several lines
             elif key in ['NAME', 'REMARK', 'ACTIVITY', 'COMMENT', 'ORIGINAL_DB']:
                 output[key] = [x.strip() for x in value.split("\n")]
             # list: long string splitted into items and therefore converted to a list
@@ -1288,8 +1288,8 @@ class KEGGParser(Logging):
                 else:
                     output[key] = [x.strip() for x in value.split()]
             # transform to dictionary
-            elif key in ['DRUG', 'ORTHOLOGY', 'GENE', 'COMPOUND', 'RMODULE', 
-                    'DISEASE', 'PATHWAY_MAP', 
+            elif key in ['DRUG', 'ORTHOLOGY', 'GENE', 'COMPOUND', 'RMODULE',
+                    'DISEASE', 'PATHWAY_MAP',
                     'PATHWAY', 'MODULE', 'GENES']:
                 kp = {}
                 for line in value.split("\n"):
@@ -1359,11 +1359,11 @@ class KEGGParser(Logging):
                 # get rid of that number and then send a list
                 output[key] = self._interpret_enumeration(output[key])
             # not interpreted
-            elif key in ['COMPONENT', 'SOURCE', 'BRITE', 'CARCINOGEN', 
+            elif key in ['COMPONENT', 'SOURCE', 'BRITE', 'CARCINOGEN',
                     'MARKER',  'PRODUCT']: # do not interpret to keep structure
                 pass
             else:
-                print('Found keyword %s, which has not special parsing for now. %s' % (key, 
+                print('Found keyword %s, which has not special parsing for now. %s' % (key,
                     output['ENTRY']))
 
         return output
@@ -1376,7 +1376,7 @@ class KEGGParser(Logging):
         lines = [line.strip() for line in lines]
         if len(lines) != N:
             self.warning('number of lines not as expected in %s' % data)
-            
+
         if N == 0:
             return []
         else:
@@ -1391,7 +1391,7 @@ class KEGGParser(Logging):
     def _interpret_entry(self, data):
         res = {}
 
-        return res 
+        return res
         for this in data.split("\n"):
             if this.strip().startswith("ENTRY"):
                 pass
