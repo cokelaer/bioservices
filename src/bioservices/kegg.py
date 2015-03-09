@@ -474,7 +474,7 @@ class KEGG(REST):
         self.logging.info(url)
         webbrowser.open(url)
 
-    def get(self, dbentries, option=None):
+    def get(self, dbentries, option=None, parse=False):
         """Retrieves given database entries
 
         :param str dbentries: KEGG database entries involving the following
@@ -527,6 +527,9 @@ class KEGG(REST):
             url +=  "/" + option
 
         res = self.http_get(url, frmt="txt")
+
+        if parse is True:
+            res = self.parse(res)
 
         return res
 
@@ -1290,6 +1293,7 @@ class KEGGParser(Logging):
             # transform to dictionary
             elif key in ['DRUG', 'ORTHOLOGY', 'GENE', 'COMPOUND', 'RMODULE',
                     'DISEASE', 'PATHWAY_MAP',
+                    'STR_MAP',
                     'PATHWAY', 'MODULE', 'GENES']:
                 kp = {}
                 for line in value.split("\n"):
@@ -1328,13 +1332,10 @@ class KEGGParser(Logging):
             # dictionary, interpreted as follows
             # on each line, there is an identifier followed by : character
             # looks like there is just one line...
-            elif key in ['DRUG_TARGET', 'STRUCTURE', 'DBLINKS', 'MOTIF']:
+            elif key in ['DRUG_TARGET', 'STRUCTURE', 'MOTIF']:
+                # STRUCTURE PDB can be long and span over several lines. e.g.,
+                # hsa:1525
                 new = {}
-                # some lines are split as
-                #     PDB: 1EAJ.....2J12
-                #          1RSF
-                # we need to replace "\n       " by just a space \n
-                # so as to split lines afterwards
                 import re
                 value = re.sub("\n {6,20}", " ", value)
                 for line in value.split("\n"):
@@ -1344,6 +1345,17 @@ class KEGGParser(Logging):
                     else:
                         self.logging.warning("Could not fully interpret %s " % key )
                 output[key] = new
+            elif key in ['DBLINKS', 'INTERACTION', 'METABOLISM']:
+                # D01441 for metabolism
+                # DBLINKS for C00624 should work out of the box
+                new = {}
+                import re
+                value = re.sub("\n {12,12+1}", "\n", value)
+                for line in value.split("\n"):
+                    thiskey, content = line.strip().split(":", 1)
+                    new[thiskey] = content.strip()
+                    #                       self.logging.warning("Could not fully interpret %s " % key )
+                output[key] = new
             # floats
             elif key in ['EXACT_MASS', 'MOL_WEIGHT']:
                 output[key] = float(value)
@@ -1352,7 +1364,7 @@ class KEGGParser(Logging):
                 output[key] = value.split("\n", 1)[1].replace("\n","")
             elif key.startswith("ENTRY"):
                 newvalue = self._interpret_entry(value)
-                output[key] = newvalue
+                output[key] = newvalue.strip()
             # extract list of strings from structure. These strings are not interpreted
             elif key in ['ATOM', 'BOND', 'NODE', 'EDGE', 'ALIGN', 'RDM']:
                 # starts with a number that defines number of entries. Let us
@@ -1363,8 +1375,8 @@ class KEGGParser(Logging):
                     'MARKER',  'PRODUCT']: # do not interpret to keep structure
                 pass
             else:
-                print('Found keyword %s, which has not special parsing for now. %s' % (key,
-                    output['ENTRY']))
+                print("""\nFound keyword %s, which has not special parsing for
+                now. please report this issue with the identifier (%s) into github.com/bioservices""" % (key,output['ENTRY']))
 
         return output
 
