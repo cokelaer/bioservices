@@ -7,10 +7,21 @@ Whats' new, what has changed
 Revision 1.3
 ------------------
 
-* 1.3.6:
 
-   * CHANGES: rename Intact class into IntactComplex
 
+* 1.3.6
+  * BUG FIXES
+    * KEGG: Fixed during the major changes described here below
+            https://github.com/cokelaer/bioservices/issues/29
+  * CHANGES
+    * IntactL rename Intact class into IntactComplex
+    * KEGG: revisited the parsing following requests from user
+      https://github.com/cokelaer/bioservices/issues/30
+    * KEGG: remove useless function (check_dbentries) 
+    * KEGG: The KEGGParser does not inherit from KEGG anymore and there is
+            now a parse() method inside KEGG so user do not need to play with the 
+            2 classes. Only KEGG is required. KEGGParser can still be used but
+            will not have the KEGG methods anymore
 
 * 1.3.5
 

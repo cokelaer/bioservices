@@ -202,21 +202,13 @@ class TestKEGGALL(object):
         self.ws.show_entry("path:hsa05416")
         self.ws.show_pathway("path:hsa05416", scale=50)
 
-    def test_check_dentries(self):
-        assert True == self.ws.check_dbentries("hsa:10458+ece:Z5100")
-        try:
-            self.ws.check_dbentries("hsa:10458+ece:Z510", checkAll=False)
-            assert False
-        except:
-            assert True
-
     def pathway2sif(self):
         sif = self.ws.pathway2sif("path:hsa05416")
 
 
 @attr('slow')
 def test_KEGGParser():
-    s = KEGGParser()
+    s = KEGG()
     d = s.parse(s.get("cpd:C00001"))
     d = s.parse(s.get("ds:H00001"))
     d = s.parse(s.get("dr:D00001"))

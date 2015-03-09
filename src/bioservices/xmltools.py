@@ -115,7 +115,6 @@ class readXML(easyXML):
     .. seealso:: :class:`easyXML`
 
     """
-    def __init__(self, filename, fixing_unicode=False, encoding="utf-8"):
-        url = urlopen(filename, "r")
-        self.data = url.read()
-        super(readXML, self).__init__(self.data, fixing_unicode, encoding)
+    def __init__(self, url, encoding="utf-8"):
+        self.data = urlopen(url).read()
+        super(readXML, self).__init__(self.data, encoding)

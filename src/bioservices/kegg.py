@@ -194,8 +194,7 @@ class KEGG(REST):
         s.reaction   # equivalent to s.list("reaction")
         s.reactionIds
 
-    Other methods of interest are :meth:`conv`, :meth:`find`, :meth:`get`. We also provide
-    a :meth:`check_dbentries` to check validity of an entry Id.
+    Other methods of interest are :meth:`conv`, :meth:`find`, :meth:`get`. 
 
     .. seealso:: :ref:`kegg_database`, :ref:`db_entries`, :ref:`terminology`.
 
@@ -237,10 +236,7 @@ class KEGG(REST):
         self._drug = None
         self._brite = None
 
-        self._buffer = {}
-
-        #self.keggParser = KEGGParser()
-
+        self.keggParser = KEGGParser(verbose=verbose)
 
     # we could use this to retrieve all databases Ids but
     def __getattr__(self, req):
@@ -414,7 +410,6 @@ class KEGG(REST):
                 raise
             url += "/" + organism
 
-
         res = self.http_get(url, "txt")
         return res
 
@@ -535,7 +530,6 @@ class KEGG(REST):
 
         return res
 
-
     def conv(self, target, source):
         """convert KEGG identifiers to/from outside identifiers
 
@@ -632,8 +626,6 @@ class KEGG(REST):
         else:
             self.logging.info("arguments not checked")
         """
-
-
         url = "conv/"+ target + '/' + source
         res = self.http_get(url, frmt="txt")
 
@@ -643,7 +635,6 @@ class KEGG(REST):
             return dict([(x,y) for x,y in zip(t, s)])
         except:
             return res
-
 
     def link(self, target, source):
         """Find related entries by using database cross-references
@@ -665,7 +656,6 @@ class KEGG(REST):
             # KEGG pathways linked from a human gene and an E. coli O157 gene.
             s.link("pathway", "hsa:10458+ece:Z5100")
         """
-
         self._checkDB(target, mode="link")
 
         url = "link/"+ target + '/' + source
@@ -680,7 +670,6 @@ class KEGG(REST):
 
         """
         raise NotImplementedError("Use :meth:`get` instead")
-
 
     def show_pathway(self, pathId, scale=None, dcolor="pink", keggid={}):
         """Show a given pathway inside a web browser
@@ -712,8 +701,6 @@ class KEGG(REST):
         """
         if pathId.startswith("path:"):
             pathId = pathId.split(":")[1]
-
-
 
         if scale:
             scale = int(scale/100.*100)/100. # just need 2 digits and a value in [0,1]
@@ -752,55 +739,6 @@ class KEGG(REST):
         self.logging.info(url)
         res = webbrowser.open(url)
         return res
-
-
-    def check_dbentries(self, dbentries, checkAll=True):
-        """Checks that all entries provided exist in the KEGG database
-
-        :param str dbentries: a dbentries list. entries are separated by the +'
-            sign (e.g., "hsa:10458+ece:Z5100")
-        :param bool checkAll: checks all entries (Default) or stop as soon as an
-            entry is not well formed.
-        :return: True if all entries are correct. False otherwise
-
-        ::
-
-            s = KEGG()
-            s.check_dbentries("hsa:10458+ece:Z5100")
-
-
-        """
-        try:
-            from urllib.error import HTTPError
-        except:
-            from urllib2 import HTTPError
-        entries = dbentries.split("+")
-        # we do not want logging here
-        debugLevel = self.debugLevel
-        self.debugLevel = "CRITICAL"
-        allStatus = True
-        for entry in entries:
-            try:
-                self.get(entry)
-                status = True
-            # if ill-formed, an entry will raise the 404 error.
-            except HTTPError as err:
-                if e.code == 404:
-                    status = False
-                    allStatus = False
-                    if checkAll is False:
-                        print(entry, status)
-                        return False
-                else:
-                    print(e)
-                    raise
-            except:
-                self.debugLevel = debugLevel
-                raise
-            print(entry, status)
-        # retrieve logging level
-        self.debugLevel = debugLevel
-        return allStatus
 
     # wrapper of all databases to ease access to them (buffered)
 
@@ -974,39 +912,12 @@ class KEGG(REST):
             ['path:hsa04064', 'path:hsa04650', 'path:hsa04660', 'path:hsa05340']
 
         """
-        p = KEGGParser(verbose=False)
-        p.organism = organism
         res = self.get(":".join([organism, gene]))
-        dic = p.parse(res)
-        if 'pathway' in dic.keys():
-            return dic['pathway']
+        dic = self.parse(res)
+        if 'PATHWAY' in dic.keys():
+            return dic['PATHWAY']
         else:
             print("No pathway found ?")
-
-
-    def _old_get_pathway_by_gene(self, gene, organism):
-        matches = []
-        p = KEGGParser()
-        # using existing buffered list if same organism are used
-        if self.organism == organism:
-            Ids = self.pathwayIds
-        else:
-            p.organism = organism
-            Ids = p.pathwayIds
-
-        for i,Id in enumerate(Ids):
-            print("scanning %s (%s/%s)" % (Id, i, len(Ids)))
-            if Id not in self._buffer.keys():
-                res = p.get(Id)
-                self._buffer[Id] = res
-            else:
-                res = self._buffer[Id]
-
-            parsed = p.parse(res)
-            if 'gene' in parsed.keys() and gene in parsed['gene']:
-                print("Found %s in pathway Ids %s" % (gene, Id))
-                matches.append(Id)
-        return matches
 
     def parse_kgml_pathway(self, pathwayId, res=None):
         """Parse the pathway in KGML format and returns a dictionary (relations and entries)
@@ -1014,9 +925,12 @@ class KEGG(REST):
         :param str pathwayId: a valid pathwayId e.g. hsa04660
         :param str res: if you already have the output of the query
             get(pathwayId), you can provide it, otherwise it is queried.
-        :return: a tuple with the first item being a list of relations. Each
-            relations is a dictionary with id2, id2, link, value, name. The
-            second item is a dictionary that maps the Ids to
+        :return: a dictionary with relations and entries as keys. Values 
+            of relations is a list of relations, each relation being
+            dictionary with entry1, entry2, link, value, name. The
+            list os entries is a list of dictionary as well. 
+            Entry contains contains more details about the entry found in the
+            relation. See example below for details.
 
 
         ::
@@ -1033,11 +947,8 @@ class KEGG(REST):
             >>> set([x['link'] for x in res['relations']])
             set([u'PPrel', u'PCrel'])
 
+            >>> # get information about an entry :
             >>> res['entries'][4]
-
-
-        ret = s.get("hsa04660", "kgml")
-
 
 
         .. seealso:: `KEGG API <http://www.kegg.jp/kegg/xml/docs/>`_
@@ -1048,12 +959,10 @@ class KEGG(REST):
             res = self.easyXML(self.get(pathwayId, "kgml"))
         else:
             res = self.easyXML(res)
-        # here entry1 and 2 are Id related to the kgml file
 
         # read and parse the entries
         entries = [x for x in res.findAll("entry")]
         for entry in entries:
-
             output['entries'].append({
                 'id': entry.get("id"),
                 'name': entry.get("name"),
@@ -1153,23 +1062,38 @@ class KEGG(REST):
 
         return sif
 
-    def __str__(self):
-        txt = self.info()
-        return txt
+    def parse(self, entry):
+        """See :class:`KEGGParser` for details
+        
+        Parse entry returned by :meth:`get`
+        
+        ::
+        
+            k = KEGG()
+            res = k.get("hsa04150")
+            d = k.parse(res)
+        
+        """
+        try:
+            res = self.keggParser.parse(entry)
+            return res
+        except:
+            self.logging.warning('Could not parse correctly the entry.')
+            return entry
 
 
-class KEGGParser(KEGG):
+from easydev import Logging
+class KEGGParser(Logging):
     """This is an extension of the :class:`KEGG` class to ease parsing of dbentries
 
     This class provides a generic method :meth:`parse` that will read the output
     of a dbentry returned by :meth:`KEGG.get` and converts it into a dictionary ready to use.
 
-    The :meth:`parse` method is a dispatcher so you do not have to worry about the
-    type of entry you are using. It can be a pathway, a gene, a compound...
+    The :meth:`parse` method parses any entry. It can be a pathway, a gene, a compound...
     ::
 
         from bioservices import *
-        s = KEGGParser()
+        s = KEGG()
 
         # Retrieve a KEGG entry
         res = s.get("hsa04150")
@@ -1181,7 +1105,7 @@ class KEGGParser(KEGG):
     the gene Ids found in the pathway into UniProt Ids::
 
         # Get the KEGG Ids in the pathway
-        kegg_geneIds = [x for x in d['gene']]
+        kegg_geneIds = [x for x in d['GENE']]
 
         # Convert them
         db_up, db_kegg = s.conv("hsa", "uniprot")
@@ -1193,294 +1117,82 @@ class KEGGParser(KEGG):
     However, you could also have done it simply as follows::
 
         kegg_geneIds = [x for x in d['gene']]
-        uprot_geneIds = [s.parse(s.get("hsa:"+str(e)))['dblinks']["UniProt:"] for e in d['gene']]
+        uprot_geneIds = [s.parse(s.get("hsa:"+str(e)))['DBLINKS']["UniProt:"] for e in d['GENE']]
 
     .. note:: The 2 outputs are slightly different.
 
     .. seealso:: http://www.kegg.jp/kegg/rest/dbentry.html
     """
     def __init__(self, verbose=False):
-        super(KEGGParser, self).__init__(verbose=verbose)
+        super(KEGGParser, self).__init__(level=verbose)
 
     def parse(self, res):
-        """A dispatcher to parse all outputs returned by :meth:`KEGG.get`
+        """Parse to any outputs returned by :meth:`KEGG.get`
 
         :param str res: output of a :meth:`KEGG.get`.
-        :return: a dictionary
+        :return: a dictionary. Keys are those found in the KEGG entry (e.g., 
+            REACTION, ENTRY, EQUATION, ...). The format of each value is
+            various. It could be a string, a list (of strings generally),
+            a dictionary, a float depending on the key. Depdending on
+            the type of the entry (e.g., module, pathway), the
+            type of the value may also differ (e.g., REACTION can be either
+            a list of reactions or a dictionary depending on the content)
+
 
         ::
 
-            res = s.get("md:hsa_M00554")
-            d = s.parse(res)
+            >>> # Parses a drug entry
+            >>> res = s.get("dr:D00001")
+            >>> # Parses a pathway entry
+            >>> res = s.get("path:hsa10584")
+            >>> # Parses a module entry
+            >>> res = s.get("md:hsa_M00554")
+            >>> # Parses a disease entry
+            >>> res = s.get("ds:H00001")
+            >>> # Parses a environ entry
+            >>> res = s.get("ev:E00001")
+            >>> # Parses Orthology entry
+            >>> res = s.get("ko:K00001")
+            >>> # Parses a Genome entry
+            >>> res = s.get('genome:T00001')
+            >>> # Parses a gene entry
+            >>> res = s.get("hsa:1525")
+            >>> # Parses a compound entry
+            >>> s.get("cpd:C00001")
+            >>> # Parses a glycan entry
+            >>> res = s.get("gl:G00001")
+            >>> # Parses a reaction entry
+            >>> res = s.get("rn:R00001")
+            >>> # Parses a rpair entry
+            >>> res = s.get("rp:RP00001")
+            >>> # Parses a rclass entry
+            >>> res = s.get("rc:RC00001")
+            >>> # Parses an enzyme entry
+            >>> res = s.get('ec:1.1.1.1')
+            
+            >>> d = s.parse(res)
         """
         entry = res.split("\n")[0].split()[0]
         if entry == "ENTRY":
             dbentry = res.split("\n")[0].split(None, 2)[2]
         else:
+            dbentry='?'
             raise ValueError
 
-        if "Pathway" in dbentry and "Module" not in dbentry:
-            parser = self.parsePathway(res)
-        elif dbentry.lower() == "pathway   module" or \
-            dbentry.lower() == 'complex   module':
-            parser = self.parseModule(res)
-        elif "Drug" in dbentry: # can be Drug or "Mixture Drug"
-            parser = self.parseDrug(res)
-        elif "Disease" in dbentry:
-            parser = self.parseDisease(res)
-        elif "Environ" in dbentry:
-            parser = self.parseEnviron(res)
-        elif "Orthology" in dbentry:
-            parser = self.parseOrthology(res)
-        elif "KO" in dbentry:
-            parser = self.parseOrthology(res)
-        elif "Genome" in dbentry:
-            parser = self.parseGenome(res)
-        elif "gene" in dbentry:
-            parser = self.parseGene(res)
-        elif "CDS" in dbentry:
-            parser = self.parseGene(res)
-        elif "Compound" in dbentry:
-            parser = self.parseCompound(res)
-        elif "Glycan" in dbentry:
-            parser = self.parseGlycan(res)
-        elif "Reaction" in dbentry:
-            parser = self.parseReaction(res)
-        elif "RPair" in dbentry:
-            parser = self.parseRpair(res)
-        elif "RClass" in dbentry:
-            parser = self.parseRclass(res)
-        elif "Enzyme" in dbentry:
-            parser = self.parseEnzyme(res)
-        elif "tRNA" in dbentry:
-            parser = self.parsetRNA(res)
-        else:
-            self.warning("Entry %s not yet implemented" % entry)
-            parser = {}
+        try:
+            parser = self._parse(res)
+        except Exception as err:
+            self.warning("Could not parse the entry %s correctly" % dbentry)
+            self.warning(err.message)
+            parser = res
         return parser
 
-    def parsetRNA(self, res):
-        """parse a tRNA entry
+    def _parse(self, res):
 
-        .. versionadded:: 1.2.0
-
-        """
-        flatfile = ["ENTRY", "NAME", "DEFINITION", "ORTHOLOGY", "ORGANISM", "PATHWAY",
-                "CLASS", "POSITION", "DBLINKS", "NTSEQ"]
-        parser = self._parse(res, flatfile)
-        return parser
-
-    def parseDrug(self, res):
-        """Parses a drug entry
-
-        ::
-
-            >>> res = s.get("dr:D00001")
-            >>> d = s.parseDrug(res)
-        """
-        flatfile = ["ENTRY", "NAME", "PRODUCTS", "FORMULA", "EXACT_MASS",
-            "MOL_WEIGHT", "COMPONENT", "SEQUENCE", "SOURCE", "ACTIVITY",
-            "REMARK", "COMMENT", "TARGET", "METABOLISM", "INTERACTION",
-           "PATHWAY","STR_MAP","BRITE","DBLINKS", "ATOM", "BOND", "BRACKET"]
-        parser = self._parse(res, flatfile)
-        return parser
-
-    def parsePathway(self, res):
-        """Parses a pathway entry
-
-        ::
-
-            >>> res = s.get("path:hsa10584")
-            >>> d = s.parsePathway(res)
-
-        """
-        flatfile = ["ENTRY", "NAME", "DESCRIPTION", "CLASS", "PATHWAY_MAP",
-            "MODULE", "DISEASE", "DRUG", "DBLINKS", "ORGANISM", "ORTHOLOGY",
-            "GENE", "ENZYME", "REACTION", "COMPOUND", "REFERENCE",
-            "REL_PATHWAY", "KO_PATHWAY"]
-        parser = self._parse(res, flatfile)
-        return parser
-
-    def parseModule(self, res):
-        """Parses a module entry
-
-        ::
-
-            >>> res = s.get("md:hsa_M00554")
-            >>> d = s.parseModule(res)
-        """
-        flatfile = ["ENTRY", "NAME", "DEFINITION",  "PATHWAY",
-            "ORTHOLOGY", "CLASS", "BRITE", "ORGANISM", "GENE", "REACTION",
-            "COMPOUND", "COMMENT", "DBLINKS", "REFERENCE", "REF_MODULE"]
-        parser = self._parse(res, flatfile)
-        return parser
-
-    def parseDisease(self, res):
-        """Parses a disease entry
-
-        ::
-
-            >>> res = s.get("ds:H00001")
-            >>> d = s.parseDisease(res)
-        """
-        flatfile = ["ENTRY", "NAME", "DESCRIPTION", "CATEGORY", "PATHWAY", "GENE",
-            "ENV_FACTOR", "MARKER", "DRUG", "COMMENT", "DBLINKS", "REFERENCE",
-            'BRITE', 'CARCINOGEN']
-        parser = self._parse(res, flatfile)
-        return parser
-
-    def parseEnviron(self, res):
-        """Parses a environ entry
-        ::
-
-            >>> res = s.get("ev:E00001")
-            >>> d = s.parseEnviron(res)
-        """
-        flatfile = ['ENTRY', "NAME", "CATEGORY", "COMPONENT", "SOURCE",
-            "REMARK", "COMMENT", "BRITE", "DBLINKS"]
-        parser = self._parse(res, flatfile)
-        return parser
-
-    def parseOrthology(self, res):
-        """Parses Orthology entry
-
-        ::
-
-            >>> res = s.get("ko:K00001")
-            >>> d = s.parseOrthology(res)
-
-        .. note:: in other case genes key is "gene". Here it is "genes".
-        """
-        flatfile = ['ENTRY', "NAME", "DEFINITION", "PATHWAY", "MODULE",
-            "DISEASE", "BRITE", "DBLINKS", "GENES", "REFERENCE"]
-        parser = self._parse(res, flatfile)
-        return parser
-
-    def parseGenome(self, res):
-        """Parses a Genome entry
-
-        ::
-
-            >>> res = s.get('genome:T00001')
-            >>> d = s.parseGenome(res)
-
-        """
-
-        flatfile = ["ENTRY", "NAME", "DEFINITION", "ANNOTATION", "TAXONOMY",
-            "DATA_SOURCE", "ORIGINAL_DB", "KEYWORDS", "DISEASE", "COMMENT",
-            "CHROMOSOME", "PLASMID", "STATISTICS", "REFERENCE"]
-        parser = self._parse(res, flatfile)
-        return parser
-
-    def parseGene(self, res):
-        """Parses a gene entry
-
-        ::
-
-            >>> res = s.get("hsa:1525")
-            >>> d = s.parseGene(res)
-
-        """
-
-        flatfile = ["ENTRY", "NAME", "DEFINITION", "ORTHOLOGY", "ORGANISM",
-            "PATHWAY", "MODULE", "DISEASE", "DRUG_TARGET", "CLASS", "MOTIF", "DBLINKS",
-            "STRUCTURE", "POSITION", "AASEQ", "NTSEQ", 'BRITE']
-        parser = self._parse(res, flatfile)
-        return parser
-
-
-    def parseCompound(self, res):
-        """Parses a compound entry
-
-        ::
-
-            >>> s.get("cpd:C00001")
-            >>> d = s.parseCompound(res)
-        """
-        flatfile = ["ENTRY", "NAME", "FORMULA", "EXACT_MASS", "MOL_WEIGHT",
-            "SEQUENCE", "REMARK", "COMMENT", "REACTION", "PATHWAY", "ENZYME", "BRITE",
-            "REFERENCE", "DBLINKS", "ATOM", "BOND", "BRACKET"]
-        parser = self._parse(res, flatfile)
-        return parser
-
-    def parseGlycan(self, res):
-        """Parses a glycan entry
-
-        ::
-
-            >>> res = s.get("gl:G00001")
-            >>> d = s.parseGlycan(res)
-        """
-        flatfile = ["ENTRY", "NAME", "COMPOSITION", "MASS", "CLASS", "REMARK",
-            "COMMENT", "REACTION", "PATHWAY", "ENZYME", "ORTHOLOGY",
-            "REFERENCE", "DBLINKS", "NODE", "EDGE", "BRACKET"]
-        parser = self._parse(res, flatfile)
-        return parser
-
-    def parseReaction(self, res):
-        """Parses a reaction entry
-
-        ::
-
-            >>> res = s.get("rn:R00001")
-            >>> d = s.parseReaction(res)
-        """
-        flatfile = ["ENTRY", "NAME", "DEFINITION", "EQUATION", "REMARK",
-            "COMMENT", "RPAIR", "ENZYME", "PATHWAY", "ORTHOLOGY", "REFERENCE"]
-        parser = self._parse(res, flatfile)
-        return parser
-
-    def parseRpair(self, res):
-        """Parses a rpair entry
-
-        ::
-
-            >>> res = s.get("rp:RP00001")
-            >>> d = s.parseRpair(res)
-
-
-        .. todo:: a better parsing
-        """
-        flatfile = ["ENTRY", "NAME", "COMPOUND", "TYPE", "RDM", "RCLASS",
-            "RELATEDPAIR", "REACTION", "Enzyme  ENZYME", "ALIGN", "ENTRY1", "ENTRY2"]
-        parser = self._parse(res, flatfile)
-        return parser
-
-
-    def parseRclass(self, res):
-        """Parses a rclass entry
-
-        ::
-
-            >>> res = s.get("rc:RC00001")
-            >>> d = s.parseRclass(res)
-
-        .. todo:: a better parsing
-        """
-        flatfile = ["ENTRY", "DEFINITION", "RPAIR", "REACTION",
-            "ENZYME","PATHWAY", "ORTHOLOGY"]
-        parser = self._parse(res, flatfile)
-        return parser
-
-    def parseEnzyme(self, res):
-        """Parses an enzyme entry
-
-        ::
-
-            >>> res = s.get('ec:1.1.1.1')
-            >>> d = s.parseEnzyme(res)
-        """
-        flatfile = ["ENTRY", "NAME", "CLASS", "SYSNAME", "REACTION", "ALL_REAC",
-            "SUBSTRATE", "PRODUCT", "COMMENT", "PATHWAY", "ORTHOLOGY", "GENES",
-            "REFERENCE"]
-        parser = self._parse(res, flatfile)
-        return parser
-
-
-    def parse2(self, res):
+        if res == 404:
+            return 
         keys = [x.split(" ")[0] for x in res.split("\n") if len(x) and x[0]!=" "
                 and x!="///"]
-
         # let us go line by to not forget anything and know which entries are 
         # found in the RHS. We may have duplicated once as can be found in th
         # keys variable as well.
@@ -1488,7 +1200,9 @@ class KEGGParser(KEGG):
         entry = ""
         start = True
         for line in res.split("\n"):
-            if line == '///' or len(line) == 0:
+            if line == '///':
+                entries.append(entry)
+            elif len(line) == 0:
                 pass
             elif line[0] != " ":
                 if start == True:
@@ -1498,7 +1212,7 @@ class KEGGParser(KEGG):
                 entry = line[:]
             else:
                 entry+= "\n"+line[:]
-        
+      
         # we can now look at each entry and create a dictionary.
         # The dictionary will contain as key the name found in the LHS
         # e.g., REACTION and the value will be either the entry content
@@ -1520,6 +1234,8 @@ class KEGGParser(KEGG):
         # remove name that are now the keys of the dictionary anyway
         # if the values is not a list
         for k,v in output.items():
+            if k in ['CHROMOSOME', 'TAXONOMY']:
+                continue
             try:
                 output[k] = output[k].strip().replace(k,'',1) # remove the name that
             except: # skip the lists
@@ -1530,54 +1246,141 @@ class KEGGParser(KEGG):
         # REACTIONS could be sometimes a list of names and sometimes list
         # of reactions with their description.
         self.raw_parsing = copy.deepcopy(output)
+
         for key, value in output.items():
+            # convert to a dict 
             if key == 'STATISTICS':
                 data = [x.split(":",1) for x in output[key].split("\n")]
                 data = dict([(x[0].strip(), float(x[1].strip())) for x in data])
                 output[key] = data
-            elif key in ['DEFINITION']:
-                pass
-            elif key in ['DESCRIPTION', 'ENTRY', 'ORGANISM', 'CLASS', 'NAME']: # get rid of \n
+            # strip only expecting a single line (string)
+            elif key in ['POSITION', 'DESCRIPTION', 'ENTRY', 'ORGANISM', 'CLASS',
+                    'FORMULA', 'KEYWORDS', 'CATEGORY', 'ANNOTATION', 'DATA_SOURCE', 
+                    'MASS', 'COMPOSITION', 'DEFINITION', 'KO_PATHWAY', 'EQUATION',
+                    'TYPE', 'RCLASS']: 
+                # get rid of \n
+
                 if "\n" in value:
-                    print("warnign for debugging")
+                    # happens in description path:hsa04915
+                    print("warning for debugging in %s" % key)
+                    value = value.replace("\n", " ")
                 # nothing to do here except strip 
                 output[key] = value.strip() 
-            elif key in ['GENE', 'DISEASE', 'PATHWAY_MAP']:
+            # list : set of lines
+            # COMMENT is sometimes on several lines 
+            elif key in ['NAME', 'REMARK', 'ACTIVITY', 'COMMENT', 'ORIGINAL_DB']:
+                output[key] = [x.strip() for x in value.split("\n")]
+            # list: long string splitted into items and therefore converted to a list
+            elif key in ['ENZYME', 'REACTION',  'RPAIR', 'RELATEDPAIR']:
+                # RPAIR/rn:R00005 should be a dict if "_" found
+                # REACTION/md:hsa_M00554 should be a dict if '->' found
+                if '->' in value or "_" in value:
+                    kp = {}
+                    for line in value.split("\n"):
+                        try:
+                            k,v = line.strip().split(None,1)
+                        except:
+                            self.warning("empty line in %s %s" % (key, line))
+                            k = line.strip()
+                            v = ''
+                        kp[k] = v
+                    output[key] = kp.copy()
+                else:
+                    output[key] = [x.strip() for x in value.split()]
+            # transform to dictionary
+            elif key in ['DRUG', 'ORTHOLOGY', 'GENE', 'COMPOUND', 'RMODULE', 
+                    'DISEASE', 'PATHWAY_MAP', 
+                    'PATHWAY', 'MODULE', 'GENES']:
                 kp = {}
                 for line in value.split("\n"):
-                    k,v = line.strip().split(None,1)
+                    try: # empty orthology in rc:RC00004
+                        k,v = line.strip().split(None,1)
+                    except:
+                        self.warning("empty line in %s %s" % (key, line))
+                        k = line.strip()
+                        v = ''
+                    if k.endswith(":"):
+                        k = k.strip().rstrip(":")
                     kp[k] = v
                 output[key] = kp.copy()
+            # list of dictionaries
             elif key == 'REFERENCE':
                 # transform to a list since you may have several entries
-                if isinstance(value, list) is False:
-                    value = [value]
                 newvalue = [self._interpret_references(this)
-                        for this in value]
+                        for this in self._tolist(value)]
                 output[key] = newvalue
+            # list of dictionaries
             elif key == 'PLASMID':
-                # transform to a list since you may have several entries
-                if isinstance(value, list) is False:
-                    value = [value]
                 newvalue = [self._interpret_plasmid(this)
-                        for this in value]
+                        for this in self._tolist(value)]
                 output[key] = newvalue
+            # list of dictionaries
             elif key == 'CHROMOSOME':
-                # transform to a list since you may have several entries
-                if isinstance(value, list) is False:
-                    value = [value]
                 newvalue = [self._interpret_chromosome(this)
-                    for this in value]
+                    for this in self._tolist(value)]
                 output[key] = newvalue
+            # list of dictionaries
+            elif key == 'TAXONOMY':
+                newvalue = [self._interpret_taxonomy(this)
+                    for this in self._tolist(value)]
+                output[key] = newvalue
+
+            # dictionary, interpreted as follows
+            # on each line, there is an identifier followed by : character
+            # looks like there is just one line...
+            elif key in ['DRUG_TARGET', 'STRUCTURE', 'DBLINKS', 'MOTIF']:
+                new = {}
+                # some lines are split as
+                #     PDB: 1EAJ.....2J12
+                #          1RSF
+                # we need to replace "\n       " by just a space \n
+                # so as to split lines afterwards
+                import re
+                value = re.sub("\n {6,20}", " ", value)
+                for line in value.split("\n"):
+                    thiskey, content = line.split(None, 1)
+                    if thiskey.endswith(":"):
+                        new[thiskey[:-1]] = content
+                    else:
+                        self.logging.warning("Could not fully interpret %s " % key )
+                output[key] = new
+            # floats
             elif key in ['EXACT_MASS', 'MOL_WEIGHT']:
-                try:
-                    output[key] = float(value)
-                except:
-                    pass
+                output[key] = float(value)
+            # get rid of the length
+            elif key in ['AASEQ', 'NTSEQ']:
+                output[key] = value.split("\n", 1)[1].replace("\n","")
+            elif key.startswith("ENTRY"):
+                newvalue = self._interpret_entry(value)
+                output[key] = newvalue
+            # extract list of strings from structure. These strings are not interpreted
+            elif key in ['ATOM', 'BOND', 'NODE', 'EDGE', 'ALIGN', 'RDM']:
+                # starts with a number that defines number of entries. Let us
+                # get rid of that number and then send a list
+                output[key] = self._interpret_enumeration(output[key])
+            # not interpreted
+            elif key in ['COMPONENT', 'SOURCE', 'BRITE', 'CARCINOGEN', 
+                    'MARKER',  'PRODUCT']: # do not interpret to keep structure
+                pass
             else:
-                print('%s has not special parsing for now' % key)
+                print('Found keyword %s, which has not special parsing for now. %s' % (key, 
+                    output['ENTRY']))
 
         return output
+
+    def _interpret_enumeration(self, data):
+        N = data.strip().split("\n")[0]
+        # must be a number
+        N = int(N)
+        lines = data.strip().split("\n")[1:]
+        lines = [line.strip() for line in lines]
+        if len(lines) != N:
+            self.warning('number of lines not as expected in %s' % data)
+            
+        if N == 0:
+            return []
+        else:
+            return lines
 
     def _tolist(self, value):
         # transform to a list since you may have several entries
@@ -1585,9 +1388,33 @@ class KEGGParser(KEGG):
             value = [value]
         return value
 
+    def _interpret_entry(self, data):
+        res = {}
+
+        return res 
+        for this in data.split("\n"):
+            if this.strip().startswith("ENTRY"):
+                pass
+            elif this.strip().startswith("COMPOUND"):
+                res['COMPOUND'] = this.strip().split(None,1)[1]
+            elif this.strip().startswith("ATOM"):
+                res['AUTHORS'] = this.strip().split(None,1)[1]
+            elif this.strip().startswith("TITLE"):
+                res['TITLE'] = this.strip().split(None,1)[1]
+        return res
+
+    def _interpret_taxonomy(self, data):
+        res = {}
+        for this in data.split("\n"):
+            if this.strip().startswith("TAXONOMY"):
+                res['TAXONOMY'] = this.strip()
+            elif this.strip().startswith('LINEAGE'):
+                res['LINEAGE'] = this.strip().split(None,1)[1]
+        return res
+
     def _interpret_references(self, data):
         res = {}
-        for this in self._tolist(data).split("\n"):
+        for this in data.split("\n"):
             if this.strip().startswith("REFERENCE"):
                 res['REFERENCE'] = this.strip().split(None,1)[1]
             elif this.strip().startswith("JOURNAL"):
@@ -1600,7 +1427,7 @@ class KEGGParser(KEGG):
 
     def _interpret_plasmid(self, data):
         res = {}
-        for this in self._tolist(data).split("\n"):
+        for this in data.split("\n"):
             if this.strip().startswith("PLASMID"):
                 res['PLASMID'] = this.strip().split(None,1)[1]
             elif this.strip().startswith("LENGTH"):
@@ -1611,9 +1438,13 @@ class KEGGParser(KEGG):
 
     def _interpret_chromosome(self, data):
         res = {}
-        for this in self._tolist(data).split("\n"):
+        for this in data.split("\n"):
             if this.strip().startswith("CHROMOSOME"):
-                res['CHROMOSOME'] = this.strip().split(None,1)[1]
+                try:
+                    res['CHROMOSOME'] = this.strip().split(None,1)[1]
+                except:
+                    #genome:T00012 has no name
+                    res['CHROMOSOME'] = this.strip()
             elif this.strip().startswith("LENGTH"):
                 res['LENGTH'] = this.strip().split(None,1)[1]
             elif this.strip().startswith("SEQUENCE"):
@@ -1621,89 +1452,16 @@ class KEGGParser(KEGG):
         return res
 
 
-    def _convert(self, parser1):
-        for key in parser1.keys():
-            # we need to decide on what do to for each key in each flatfile
-
-            if key in ['NAME', 'ENTRY', 'DEFINITION', 'EQUATION', 'COMMENT',
-                'POSITION', 'ORGANISM', 'REMARK', 'FORMULA', 'KEYWORDS',
-                'CLASS']:
-                # Those should be on a single line
-                if "\n" in parser1[key]:
-                #    parser1[key] = parser1[key].replace("\n", ";")
-                    print('\\n found in  %s' % key)
-            elif key in ['STRUCTURE', 'DBLINKS', 'MOTIF']:
-                print(err.message)
-                    
-                new = {}
-                #print(key, parser1[key])
-                for line in parser1[key].split("\n"):
-                    thiskey, content = line.split(None, 1)
-                    if thiskey.endswith(":"):
-                        new[thiskey[:-1]] = content
-                    else:
-                        print("EERRO")
-                parser1[key] = new
-            elif key in ['AASEQ', 'NTSEQ']:
-                # let us get rid of the length
-                parser1[key] = parser1[key].split("\n", 1)[1].replace("\n","")
-            elif key in ['PATHWAY', 'ORTHOLOGY', 'RPAIR', 'MODULE',
-            'COMPOUND']:
-                parser1[key] = dict([x.split(None,1) for x in parser1[key].split("\n")])
-            elif key in ['ENZYME']:
-                try:
-                    parser1[key] = [x.strip() for x in parser1[key].split()]
-                except:
-                    pass
-            elif key in ['REACTION']:
-                if 'Complex   Module' in parser1['ENTRY']:
-                    parser1[key] = dict([x.split(None,1) for x in parser1[key].split("\n")])
-                else:
-                    parser1[key] = [x.strip() for x in parser1[key].split()]
-            elif key in ['ATOM', 'BOND']:
-                # starts with a number that defines number of entries. Let us
-                # get rid of that number and then send a list
-                try:
-                    lines = parser1[key].split("\n")
-                    if len(lines)>1:
-                        parser1[key] = lines[1:]
-                    else:
-                        parser1[key] = []
-                except:
-                    pass
-            elif key in ['TAXONOMY']:
-                data = [x.strip() for x in parser1[key].split("\n")]
-                lineages = [x.split(None,1)[1] for x in data if
-                        x.startswith('LINEAGE')]
-                names = [x for x in data if x.startswith('LINEAGE') is False]
-                entries = [] # must use a list since names can be identical
-                for i, name in enumerate(names):
-                    entry = {'TAXONOMY': name, 
-                            'LINEAGE':lineages[i],
-                            }
-                    entries.append(entry)
-                parser1[key] = entries
-
-            elif key in ['CARCINOGEN', 'BRITE']:
-                pass # no change for the others e.g. BRITE, CARCINOGEN
-            else:
-                print('KEGG Parser ', key , ' not included')
-
-
-        return parser1
 
 
 class KEGGTools(KEGG):
-    """
+    """Load all genes from the database.
 
-    k = kegg.KEGGTools()
-    k.load_genes("hsa")
-    k.dbentries = []
-    for i, this in enumerate(k.genes[0:50]):
-        res = k.scan_genes(i)
-        print(float(i)/len(k.genes))
-        k.dbentries.append(res)
+    ::
 
+        k = kegg.KEGGTools()
+        k.load_genes("hsa")
+        genes = k.scan_genes()
 
 
     """
@@ -1711,13 +1469,37 @@ class KEGGTools(KEGG):
         self.kegg = KEGG()
         self.parser = KEGGParser()
         print("initialisation")
+        self.load_genes(organism)
 
     def load_genes(self, organism):
         res = self.parser.list(organism)
         self.genes =  [x.split("\t")[0] for x in res.strip().split("\n")]
         return self.genes
 
+    def scan_genes(self):
+        from easydev import progress_bar
+        pb = progress_bar(len(self.genes))
+        import time
+        genes = {}
+        for i, gene in enumerate(self.genes):
+            genes[gene] = self.parser.parse(self.kegg.get(self.genes[i]))
+            pb.animate(i, time.time()-pb.start)
+        return genes
+
+    def load_reactions(self, organism):
+        reactions = self.kegg.list('reaction')
+        self.reactions = [x.split()[0] for x in reactions.split("\n") if len(x)]
+        return self.reactions
+
+    def scan_reactions(self):
+        from easydev import progress_bar
+        pb = progress_bar(len(self.reactions))
+        import time
+        reactions = {}
+        for i, this in enumerate(self.reactions):
+            reactions[this] = self.parser.parse(self.kegg.get(self.reactions[i]))
+            pb.animate(i, time.time()-pb.start)
+        return reactions
 
 
-    def scan_genes(self, i):
-        return self.parser.parse(self.kegg.get(self.genes[i]))
+
