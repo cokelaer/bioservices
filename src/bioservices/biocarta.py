@@ -66,6 +66,8 @@ class BioCarta(REST):
 
     """
     _url = "http://www.biocarta.com/"
+    _organisms = {'Homo sapiens': 'h', 'Mus musculus': 'm')
+
     def __init__(self, verbose=True):
         """**Constructor**
 
@@ -75,6 +77,14 @@ class BioCarta(REST):
         self.fname  = "biocarta_pathways.txt"
 
         self._allPathwaysURL =  "http://www.biocarta.com/genes/allPathways.asp"
+
+        self._pathway_categories = None
+
+    def _get_pathway_categories(self):
+        if self._pathway_categories is None:
+            self._pathway_categories = self.http_get_ou_post()
+        return self._pathway_categories
+    pathway_categories = property(_get_pathway_categories)
 
     def get_pathway_names(self, startswith=""):
         """returns pathways from biocarta
