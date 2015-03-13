@@ -38,24 +38,32 @@ from bioservices import REST
 import json
 
 
-class Intact(REST):
+__all__ = ['IntactComplex']
+
+
+class Intact(object):
+    def __init__(self):
+        print("Not implemented yet. For Intact Complex, please use IntactComplex class")
+
+
+class IntactComplex(REST):
     """Interface to the `Intact <http://www.ebi.ac.uk/intact/>`_ service
 
     .. doctest::
 
             >>> from bioservices import Intact
-            >>> u = Intact()
+            >>> u = IntactComplex()
 
     """
 
     _url = "http://www.ebi.ac.uk/intact/complex-ws"
 
     def __init__(self, verbose=False, cache=False):
-        """**Constructor** Intact
+        """**Constructor** IntactComplex
 
         :param verbose: set to False to prevent informative messages
         """
-        super(Intact, self).__init__(name="Intact", url=Intact._url,
+        super(IntactComplex, self).__init__(name="IntactComplex", url=IntactComplex._url,
                 verbose=verbose, cache=cache)
 
     def search(self, query, frmt='json', facets=None, first=None, number=None, filters=None):
@@ -67,11 +75,11 @@ class Intact(REST):
         :param str facets: lists of facets as a string (separated by comma)
         :param int first:
         :param int number:
-        :param str filter: list of filters.
+        :param str filter: list of filters. See examples here below.
 
         .. code-block:: python
 
-            s = Intact()
+            s = IntactComplex()
             # search for ndc80
             s.search('ncd80')
 
@@ -115,6 +123,29 @@ class Intact(REST):
             # Search for GO:0016491 and paginate (first is for the offset and number
             # is how many do you want):
             s.search('GO:0016491', first=10, number=10)
+
+        The organism name used in the filter must be exact. Here is the list
+        found by typing::
+
+            res = set(ci.search('*', frmt='pandas')['organismName'])
+
+        ::
+
+           'Bos taurus; 9913',
+           'Caenorhabditis elegans; 6239',
+           'Canis familiaris; 9615',
+           'Drosophila melanogaster; 7227',
+           'Escherichia coli (strain K12); 83333',
+           'Gallus gallus; 9031',
+           'Homo sapiens; 9606',
+           'Mus musculus; 10090',
+           'Oryctolagus cuniculus; 9986',
+           'Rattus norvegicus; 10116',
+           'Saccharomyces cerevisiae (strain ATCC 204508 / S288c);559292',
+           'Schizosaccharomyces pombe (strain 972 / ATCC 24843);284812',
+           'Xenopus laevis; 8355'
+
+
         """
         self.devtools.check_param_in_list(frmt, ['pandas', 'json'])
 
@@ -143,6 +174,5 @@ class Intact(REST):
         """
         result = self.http_get('details/' + query, frmt="json")
         return result
-
 
 

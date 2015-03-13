@@ -572,13 +572,13 @@ class REST(RESTbase):
         import os
         cache_file = self.CACHE_NAME + '.sqlite'
         if os.path.exists(cache_file):
-            msg = "You are about to delete this bioservices cache: %s. Proceed? (y/n) "
+            msg = "You are about to delete this bioservices cache: %s. Proceed? (y/[n]) "
             res = input(msg % cache_file)
             if res == "y":
                 os.remove(cache_file)
-                print("Done.")
+                print("Removed cache")
             else:
-                print("Reply 'y' to delete the file.")
+                print("Reply 'y' to delete the file")
 
     def clear_cache(self):
         from requests_cache import clear
@@ -741,8 +741,8 @@ class REST(RESTbase):
             return res
         except Exception as err:
             print(err)
-            print("Issue while Your current timeout is {0}. Consider increasing it with"\
-                    "settings.TIMEOUT attribute".format(self.settings.TIMEOUT))
+            print("""Issue. Maybe your current timeout is {0} is not sufficient. 
+Consider increasing it with settings.TIMEOUT attribute""".format(self.settings.TIMEOUT))
 
     def http_post(self, query, params=None, data=None,
                     frmt='xml', headers=None, files=None, **kargs):
@@ -766,19 +766,20 @@ class REST(RESTbase):
         return self.post_one(**kargs)
 
     def post_one(self, query=None, frmt='json', **kargs):
+        self.logging.debug("BioServices:: Entering post_one function")
         if query is None:
             url = self.url
         else:
             url = '%s/%s' % (self.url, query)
         self.logging.debug(url)
         try:
-
-            res = self.session.post(url,  **kargs)
+            res = self.session.post(url, **kargs)
             self.last_response = res
             res = self._interpret_returned_request(res, frmt)
             try:
                 return res.decode()
             except:
+                self.debug("BioServices:: Could not decode the response")
                 return res
         except Exception as err:
             print(err)
