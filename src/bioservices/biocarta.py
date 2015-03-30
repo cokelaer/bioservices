@@ -42,10 +42,16 @@
 .. http://www.uniprot.org/docs/pkinfam
 
 """
+import re
 from services import REST
 from xmltools import readXML
 __all__ = ["BioCarta"]
 
+# method for unicode transformation
+try:
+    text = unicode
+except NameError:
+    text = str
 
 class BioCarta(REST):
     """Interface to `BioCarta <http://www.biocarta.com>`_ pages
@@ -70,6 +76,10 @@ class BioCarta(REST):
     _organism_prefixes = {'Homo sapiens': 'h', 'Mus musculus': 'm'}
     organisms = list(_organism_prefixes.keys())
 
+    _all_pathways = None
+    _pathway_categories = None
+    _all_pathways_url =  "http://www.biocarta.com/genes/allPathways.asp"
+
     def __init__(self, verbose=True):
         """**Constructor**
 
@@ -78,9 +88,9 @@ class BioCarta(REST):
         super(BioCarta, self).__init__(name="BioCarta", url=BioCarta._url, verbose=verbose)
         self.fname  = "biocarta_pathways.txt"
 
-        self._allPathwaysURL =  "http://www.biocarta.com/genes/allPathways.asp"
         self._organism = None
         self._organism_prefix = None
+        self._pathways = None
 
     # set the default organism used by pathways retrieval
     def _get_organism(self):
@@ -94,6 +104,7 @@ class BioCarta(REST):
 
         self._organism = organism
         self._organism_prefix = BioCarta._organism_prefixes[organism]
+        self._pathways = None
 
     organism = property(_get_organism, _set_organism, doc="returns the current default organism")
 
@@ -103,17 +114,23 @@ class BioCarta(REST):
         return self._pathway_categories
     pathway_categories = property(_get_pathway_categories)
 
-    def get_pathway_names(self, startswith=""):
+    def _get_all_pathways(self):
         """returns pathways from biocarta
 
         all human and mouse. can perform a selectiom
         """
-        x = readXML(self._allPathwaysURL)
-        pathways = [this.get("href") for this in x.findAll("a") if "pathfiles" in this.get("href")]
-        pathways =  [str(xx.split("/")[-1]) for xx in pathways] # split the drive
-        pathways = sorted(list(set(pathways)))
-        pathways = [xx for xx in pathways if xx.startswith(startswith)]
-        return pathways
+        if BioCarta._all_pathways is None:
+            BioCarta._all_pathways = readXML(self._all_pathways_url)
+        if self._pathways is None:
+            url_pattern = re.compile("^/pathfiles/%s_(.+)[Pp]athway.asp" % self._organism_prefix)
+            is_pathway_url = lambda tag: tag.name == "a" and not tag.has_attr("class")
+            self._pathways = BioCarta._all_pathways.findAll(is_pathway_url, href=url_pattern)
+            self._pathways = {url_pattern.match(a["href"]).group(1):
+                              text(a.find_previous_sibling("a", class_="genesrch").string)
+                              for a in self._pathways}
+        return self._pathways
+
+    all_pathways = property(_get_all_pathways)
 
     def get_pathway_protein_names(self, pathway):
         """returns list of list. Each elements is made of 3 items: gene name,
