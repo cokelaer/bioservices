@@ -66,7 +66,9 @@ class BioCarta(REST):
 
     """
     _url = "http://www.biocarta.com/"
-    _organisms = {'Homo sapiens': 'h', 'Mus musculus': 'm')
+
+    _organism_prefixes = {'Homo sapiens': 'h', 'Mus musculus': 'm'}
+    organisms = list(_organism_prefixes.keys())
 
     def __init__(self, verbose=True):
         """**Constructor**
@@ -77,8 +79,23 @@ class BioCarta(REST):
         self.fname  = "biocarta_pathways.txt"
 
         self._allPathwaysURL =  "http://www.biocarta.com/genes/allPathways.asp"
+        self._organism = None
+        self._organism_prefix = None
 
-        self._pathway_categories = None
+    # set the default organism used by pathways retrieval
+    def _get_organism(self):
+        return self._organism
+
+    def _set_organism(self, organism):
+        organism = organism[:1].upper() + organism[1:].lower()
+        if organism == self._organism: return
+        if organism not in BioCarta.organisms:
+            raise ValueError("Invalid organism. Check the list in :attr:`organisms` attribute")
+
+        self._organism = organism
+        self._organism_prefix = BioCarta._organism_prefixes[organism]
+
+    organism = property(_get_organism, _set_organism, doc="returns the current default organism")
 
     def _get_pathway_categories(self):
         if self._pathway_categories is None:
