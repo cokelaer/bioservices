@@ -154,26 +154,21 @@ class BioCarta(REST):
         file itself. To be checked and made more robust.
 
         """
-        url = self._url + "/pathfiles/" + pathway
-        x = readXML(url)
+        url_pattern = re.compile('pathfiles/PathwayProteinList\.asp\?showPFID=\d+')
+        url = self._url + "pathfiles/{organism}_{name}Pathway.asp"
+        url = url.format(organism=self._organism_prefix, name=pathway)
         self.logging.info("Reading " + url)
-        protein_url = [this.get("href") for this in x.findAll("a") \
-                if 'href' in this and "Protein" in this.get("href")]
-        if len(protein_url) == 0:
-            return None
-        else:
-            link = protein_url[0]
-            link = link.split("/pathfiles/")[-1]
-            link = str(link) # get rid of unicode ?
-            link = link.strip("')")
-            url = self._url + "/pathfiles/" + link
-            self.logging.info("Reading " + url)
-            x = readXML(url)
+        url = readXML(url).soup.find('a', href=url_pattern)
 
-            # seems to work
-            table = [this for this in x.findAll("table") if this.findAll("th")
-                    and  this.findAll("th")[0].getText() == "Gene Name"][2]
-            # now get the genename, locus and accession
-            rows = [[y.getText() for y in xx.findAll("td")] for xx in  table.findAll("tr")]
-            rows = [xx for xx in rows if len(x)]
-            return rows
+        url = self._url + url_pattern.search(url['href']).group(0)
+        self.logging.info("Reading " + url)
+        html = readXML(url).soup
+
+        proteins = {}
+        header = html.th.parent
+        for row in header.find_next_siblings('tr'):
+            gene_info = list(row.stripped_strings)
+            gene_id = gene_info[1]
+            gene_name = gene_info[0]
+            proteins[gene_id] = gene_name
+        return proteins
