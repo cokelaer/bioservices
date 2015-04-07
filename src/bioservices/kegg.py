@@ -1265,7 +1265,7 @@ class KEGGParser(Logging):
 
                 if "\n" in value:
                     # happens in description path:hsa04915
-                    print("warning for debugging in %s" % key)
+                    self.logging.warning("warning for debugging in %s" % key)
                     value = value.replace("\n", " ")
                 # nothing to do here except strip
                 output[key] = value.strip()
@@ -1427,14 +1427,19 @@ class KEGGParser(Logging):
     def _interpret_references(self, data):
         res = {}
         for this in data.split("\n"):
-            if this.strip().startswith("REFERENCE"):
-                res['REFERENCE'] = this.strip().split(None,1)[1]
-            elif this.strip().startswith("JOURNAL"):
-                res['JOURNAL'] = this.strip().split(None,1)[1]
-            elif this.strip().startswith("AUTHORS"):
-                res['AUTHORS'] = this.strip().split(None,1)[1]
-            elif this.strip().startswith("TITLE"):
-                res['TITLE'] = this.strip().split(None,1)[1]
+            fields = this.strip().split(None, 1)
+            if len(fields) <= 1: continue
+            if fields[0] in ("REFERENCE", "AUTHORS", "TITLE", "JOURNAL"):
+                res[fields[0]] = fields[1]
+
+            #if this.strip().startswith("REFERENCE"):
+            #    res['REFERENCE'] = this.strip().split(None,1)[1]
+            #elif this.strip().startswith("JOURNAL"):
+            #    res['JOURNAL'] = this.strip().split(None,1)[1]
+            #elif this.strip().startswith("AUTHORS"):
+            #    res['AUTHORS'] = this.strip().split(None,1)[1]
+            #elif this.strip().startswith("TITLE"):
+            #    res['TITLE'] = this.strip().split(None,1)[1]
         return res
 
     def _interpret_plasmid(self, data):
