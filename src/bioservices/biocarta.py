@@ -44,7 +44,7 @@
 """
 import re
 from services import REST
-from xmltools import readXML
+from xmltools import readXML, HTTPError
 __all__ = ["BioCarta"]
 
 # method for unicode transformation
@@ -74,7 +74,7 @@ class BioCarta(REST):
     _url = "http://www.biocarta.com/"
 
     _organism_prefixes = {'Homo sapiens': 'h', 'Mus musculus': 'm'}
-    organisms = list(_organism_prefixes.keys())
+    organisms = set(_organism_prefixes.keys())
 
     _all_pathways = None
     _pathway_categories = None
@@ -126,7 +126,7 @@ class BioCarta(REST):
             is_pathway_url = lambda tag: tag.name == "a" and not tag.has_attr("class")
             self._pathways = BioCarta._all_pathways.findAll(is_pathway_url, href=url_pattern)
             self._pathways = {url_pattern.match(a["href"]).group(1):
-                              text(a.find_previous_sibling("a", class_="genesrch").string)
+                              text(a.find_previous_sibling("a", class_="genesrch").string.rstrip())
                               for a in self._pathways}
         return self._pathways
 
@@ -158,17 +158,24 @@ class BioCarta(REST):
         url = self._url + "pathfiles/{organism}_{name}Pathway.asp"
         url = url.format(organism=self._organism_prefix, name=pathway)
         self.logging.info("Reading " + url)
-        url = readXML(url).soup.find('a', href=url_pattern)
+        try:
+            url = readXML(url).soup.find('a', href=url_pattern)
+        except HTTPError as error:
+            if error.code == 404:
+                raise ValueError("Pathway not found ({}): {}".format(self.organism, pathway))
+            raise
 
         url = self._url + url_pattern.search(url['href']).group(0)
         self.logging.info("Reading " + url)
         html = readXML(url).soup
 
-        proteins = {}
+        genes = {}
         header = html.th.parent
         for row in header.find_next_siblings('tr'):
-            gene_info = list(row.stripped_strings)
+            gene_info = [x.string for x in row.find_all('td')]
+            if any(x is None for x in gene_info[:2]):
+                raise RuntimeError("Information missing: {}".format(gene_info))
             gene_id = gene_info[1]
-            gene_name = gene_info[0]
-            proteins[gene_id] = gene_name
-        return proteins
+            gene_name = gene_info[0].rstrip()
+            genes[gene_id] = gene_name
+        return genes
