@@ -132,6 +132,10 @@ from .muscle import *
 
 from . import biodbnet
 from .biodbnet import *
+
+from . import biocarta
+from biocarta import *
+
 # sub packages inside bioservices.
 
 #import mapping
