@@ -59,7 +59,7 @@ from . import hgnc
 from .hgnc import *
 
 from . import intact
-from intact import *
+from .intact import *
 
 from . import rhea
 from .rhea import *
@@ -134,7 +134,7 @@ from . import biodbnet
 from .biodbnet import *
 
 from . import biocarta
-from biocarta import *
+from .biocarta import *
 
 # sub packages inside bioservices.
 

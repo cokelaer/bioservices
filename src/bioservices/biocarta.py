@@ -43,8 +43,8 @@
 
 """
 import re
-from services import REST
-from xmltools import readXML, HTTPError
+from bioservices.services import REST
+from bioservices.xmltools import readXML, HTTPError
 __all__ = ["BioCarta"]
 
 # method for unicode transformation
