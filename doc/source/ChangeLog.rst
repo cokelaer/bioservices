@@ -6,7 +6,12 @@ Whats' new, what has changed
 
 Revision 1.3
 ------------------
+* 1.3.7
+  * CHANGES
+    * ArrayExpress: add new 2 methods to ease the usage
 
+  * BUG FIXES
+    * KEGG: fix https://github.com/cokelaer/bioservices/issues/39
 
 
 * 1.3.6
