@@ -1257,10 +1257,10 @@ class KEGGParser(Logging):
                 data = dict([(x[0].strip(), float(x[1].strip())) for x in data])
                 output[key] = data
             # strip only expecting a single line (string)
-            elif key in ['POSITION', 'DESCRIPTION', 'ENTRY', 'ORGANISM', 'CLASS',
-                    'FORMULA', 'KEYWORDS', 'CATEGORY', 'ANNOTATION', 'DATA_SOURCE',
-                    'MASS', 'COMPOSITION', 'DEFINITION', 'KO_PATHWAY', 'EQUATION',
-                    'TYPE', 'RCLASS']:
+            elif key in ['POSITION', 'DESCRIPTION', 'ENTRY', 'ORGANISM', 
+                    'CLASS', 'FORMULA', 'KEYWORDS', 'CATEGORY', 'ANNOTATION',
+                    'DATA_SOURCE', 'MASS', 'COMPOSITION', 'DEFINITION', 
+                    'KO_PATHWAY', 'EQUATION', 'TYPE', 'RCLASS']:
                 # get rid of \n
 
                 if "\n" in value:
@@ -1293,8 +1293,7 @@ class KEGGParser(Logging):
             # transform to dictionary
             elif key in ['DRUG', 'ORTHOLOGY', 'GENE', 'COMPOUND', 'RMODULE',
                     'DISEASE', 'PATHWAY_MAP',
-                    'STR_MAP',
-                    'PATHWAY', 'MODULE', 'GENES']:
+                    'STR_MAP', 'PATHWAY', 'MODULE', 'GENES']:
                 kp = {}
                 for line in value.split("\n"):
                     try: # empty orthology in rc:RC00004
@@ -1365,18 +1364,18 @@ class KEGGParser(Logging):
             elif key.startswith("ENTRY"):
                 newvalue = self._interpret_entry(value)
                 output[key] = newvalue.strip()
-            # extract list of strings from structure. These strings are not interpreted
+            # extract list of strings from structure. These strings are not 
+            # interpreted
             elif key in ['ATOM', 'BOND', 'NODE', 'EDGE', 'ALIGN', 'RDM']:
                 # starts with a number that defines number of entries. Let us
                 # get rid of that number and then send a list
                 output[key] = self._interpret_enumeration(output[key])
             # not interpreted
-            elif key in ['COMPONENT', 'SOURCE', 'BRITE', 'CARCINOGEN',
-                    'MARKER',  'PRODUCT']: # do not interpret to keep structure
+            elif key in ['BRACKET', 'COMPONENT', 'SOURCE', 'BRITE', 
+                    'CARCINOGEN', 'MARKER', 'PRODUCT']: # do not interpret to keep structure
                 pass
             else:
-                print("""\nFound keyword %s, which has not special parsing for
-                now. please report this issue with the identifier (%s) into github.com/bioservices""" % (key,output['ENTRY']))
+                print("""\nWarning. Found keyword %s, which has not special parsing for now. please report this issue with the identifier (%s) into github.com/bioservices""" % (key,output['ENTRY']))
 
         return output
 
