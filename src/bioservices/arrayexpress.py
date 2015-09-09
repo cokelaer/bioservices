@@ -6,7 +6,7 @@
 #
 #  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -35,13 +35,27 @@ from __future__ import print_function
 
 from bioservices.services import REST
 
+
 __all__ = ["ArrayExpress"]
+
 
 class ArrayExpress(REST):
     """Interface to the `ArrayExpress <http://www.ebi.ac.uk/arrayexpress>`_ service
 
-    ArrayExpress allows to retrieve data sets used in various experiments. If
-    you know the file and experiment name, you can retrieve a file as follows::
+    ArrayExpress allows to retrieve data sets used in various experiments.
+
+    **QuickStart** Given an experiment name (e.g., E-MEXP-31), type::
+
+        s = ArrayExpress()
+        s.getEA('E-MEXP-31')
+
+    You can also quickyl retrieve experiments matching some search queries as
+    follows::
+
+        a.queryAE(keywords="pneumonia", species='homo+sapiens')
+
+    Now let us look at other methods.If you know the file and experiment
+    name, you can retrieve a specific file as follows::
 
         >>> from bioservices import ArrayExpress
         >>> s = ArrayExpress()
@@ -100,6 +114,9 @@ class ArrayExpress(REST):
          'E-MEXP-31.idf.txt',
          'E-MEXP-31.sdrf.txt']
 
+    Nnew in version 1.3.7 you can use the method :meth:`getEA`
+
+
     Then, you may want to download a particular file::
 
         >>> s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")
@@ -119,17 +136,16 @@ class ArrayExpress(REST):
         for http requests. It is replaced internally by spaces if found
     .. warning:: filtering is not implemented (e.g., assaycount:[x TO y]syntax.)
     """
-
-
-
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=False, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose: prints informative messages
 
         """
         super(ArrayExpress, self).__init__(name="ArrayExpress",
-            url="http://www.ebi.ac.uk/arrayexpress", verbose=verbose)
+            url="http://www.ebi.ac.uk/arrayexpress", cache=cache,
+            verbose=verbose)
+
         self.easyXMLConversion = True
         self._format = "xml"
         self.version = "v2"
@@ -207,7 +223,6 @@ class ArrayExpress(REST):
             res = self.easyXML(res)
         return res
 
-
     def queryFiles(self, **kargs):
         """Retrieve a list of files associated with a set of experiments
 
@@ -256,7 +271,6 @@ class ArrayExpress(REST):
         """
         res = self._search("files", **kargs)
         return res
-
 
     def queryExperiments(self, **kargs):
         """Retrieve experiments
@@ -334,12 +348,49 @@ class ArrayExpress(REST):
         .. warning:: if format is json, filenames cannot be found so you
             must use format set to xml
         """
-        assert self.format == "xml", "json format not supported to retrieve the filenames"
-        res = self.queryExperiments(keywords=experiment)
-        exp = res.getchildren()[0]
-        files = [x.getchildren() for x in exp.getchildren() if x.tag == "files"]
-        return [x.get("name") for x in files[0]]
+        if self.format != "xml":
+            frmt = 'xml'
+        try:
+            res = self.queryExperiments(keywords=experiment)
+            exp = res.getchildren()[0]
+            files = [x.getchildren() for x in exp.getchildren() if x.tag == "files"]
+            output = [x.get("name") for x in files[0]]
+            if self.format != 'xml':
+                self.format = frmt
+        except Exception as err:
+            if self.format != 'xml':
+                self.format = frmt
+            raise Exception(err)
+        return output
 
+    def queryAE(self, **kargs):
+        """Returns list of experiments
 
+        See :meth:`queryExperiments` for parameters and usage
 
+        This is a wrapper around :meth:`queryExperiments` that returns only
+        the accession values.
 
+        ::
+
+            a.queryAE(keywords="pneumonia", species='homo+sapiens')
+        """
+        frmt = self.format
+        self.format = 'json'
+        try:
+            sets = self.queryExperiments(**kargs)
+        except:
+            pass
+        self.format = frmt
+        return [x['accession'] for x in sets['experiments']['experiment']]
+
+    def getAE(self, accession, type='full'):
+        """retrieve all files from an experiments and save them locally"""
+        filenames = self.retrieveFilesFromExperiment(accession)
+        self.info("Found %s files" % len(filenames))
+        for i,filename in enumerate(filenames):
+            res = self.retrieveFile(accession, filename)
+            fh = open(filename, 'w')
+            self.info("Downloading %s" % filename)
+            fh.write(res)
+            fh.close()
