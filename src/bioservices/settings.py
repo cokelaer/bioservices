@@ -14,6 +14,8 @@ import appdirs
 __all__ = ["defaultParams", "BioServicesConfig"]
 
 
+#TODO Move some contents to easydev.config_tools
+
 # first item if the value
 # second item if a type or TUPLE of types possible
 # third item is documentation

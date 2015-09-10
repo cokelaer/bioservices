@@ -65,13 +65,14 @@ class BioDBNet(WSDLService):
 
     """
     _url = 'http://biodbnet.abcc.ncifcrf.gov/webServices/bioDBnet.wsdl'
-    def __init__(self, verbose=True):
+    def __init__(self, verbose=True, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose:
 
         """
-        super(BioDBNet, self).__init__(name="BioDBNet", url=BioDBNet._url, verbose=verbose)
+        super(BioDBNet, self).__init__(name="BioDBNet", 
+                url=BioDBNet._url, verbose=verbose, cache=cache)
 
     def _interpret_input_db(self, inputValues):
         if isinstance(inputValues, list):
@@ -98,7 +99,7 @@ class BioDBNet(WSDLService):
         return outputs
 
     def db2db(self, input_db, output_db, inputValues, taxon=9606):
-        """Retrieves the models which are associated to the provided Taxonomy text.
+        """Retrieves models associated to the provided Taxonomy text.
 
         :param str text: free (Taxonomy based) text
         :return:  list of model identifiers

@@ -29,6 +29,13 @@ except:
     print("Some features requires this library and future version of BioServices may use it.")
 
 
+# Initialise the config directory if not already done
+from easydev import CustomConfig
+configuration = CustomConfig("bioservices", verbose=False)
+bspath = configuration.user_config_dir
+
+
+
 # Add bioservices.uniprot to sys.modules to prevent cycles in our imports
 #import bioservices.uniprot
 #bioservices.uniprot  # Stop flake8 error

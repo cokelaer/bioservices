@@ -129,6 +129,16 @@ class Service(Logging):
 
         self.devtools = DevTools()
         self.settings = BioServicesConfig()
+    
+    def _get_caching(self):
+        return self.settings.params['cache.on'][0]
+    def _set_caching(self, caching):
+        self.devtools.check_param_in_list(caching, [True, False])
+        self.settings.params['cache.on'][0] = caching
+        # reset the session, which will be automatically created if we
+        # access to the session attribute
+        self._session = None
+    CACHING = property(_get_caching, _set_caching)
 
     def _get_url(self):
         return self._url
@@ -216,7 +226,7 @@ class WSDLService(Service):
     """
     _service = "WSDL"
 
-    def __init__(self, name, url, verbose=True):
+    def __init__(self, name, url, verbose=True, cache=False):
         """.. rubric:: Constructor
 
         :param str name: a name e.g. Kegg, Reactome, ...
@@ -232,15 +242,21 @@ class WSDLService(Service):
         super(WSDLService, self).__init__(name, url, verbose=verbose)
 
         self.logging.info("Initialising %s service (WSDL)" % self.name)
+        self.CACHING = cache
 
         try:
             #: attribute to access to the methods provided by this WSDL service
             from suds.client import Client
-            self.suds = Client(self.url)
+            from suds.cache import ObjectCache
+            oc = ObjectCache(self.settings.user_config_dir, days=0)
+            if self.CACHING is True:
+                self.suds = Client(self.url, cache=oc, cachingpolicy=1)
+            else:
+                self.suds = Client(self.url)
             # reference to the service
             self.serv = self.suds.service
             self._update_settings()
-        except Exception:
+        except Exception :
             self.logging.error("Could not connect to the service %s " % self.url)
             raise Exception
 
@@ -554,7 +570,8 @@ class REST(RESTbase):
 
     def __init__(self, name, url=None, verbose=True, cache=False):
         super(REST, self).__init__(name, url, verbose=verbose)
-        self.CACHE_NAME = self.name + "_bioservices_database"
+        bspath = self.settings.user_config_dir
+        self.CACHE_NAME = bspath + os.sep + self.name + "_bioservices_db"
 
         self._session = None
 
@@ -611,16 +628,6 @@ class REST(RESTbase):
             self._session = requests_cache.CachedSession(self.CACHE_NAME,
                          backend='sqlite', fast_save=self.settings.FAST_SAVE)
         return self._session
-
-    def _get_caching(self):
-        return self.settings.params['cache.on'][0]
-    def _set_caching(self, caching):
-        self.devtools.check_param_in_list(caching, [True, False])
-        self.settings.params['cache.on'][0] = caching
-        # reset the session, which will be automatically created if we
-        # access to the session attribute
-        self._session = None
-    CACHING = property(_get_caching, _set_caching)
 
     def _get_timeout(self):
         return self.settings.TIMEOUT

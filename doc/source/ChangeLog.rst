@@ -6,6 +6,11 @@ Whats' new, what has changed
 
 Revision 1.3
 ------------------
+
+* 1.3.8 (progress)
+  * CHANGES: cache files are now stored in the ./config/bioservices directory,
+    this fixes https://github.com/cokelaer/bioservices/issues/40
+
 * 1.3.7
   * CHANGES
     * ArrayExpress: add new 2 methods to ease the usage

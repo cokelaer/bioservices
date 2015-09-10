@@ -7,6 +7,8 @@ This is a summary of the changelog. Complete change can be found in the
 1.3.X
 +++++++++++
 
+* CACHE files are now stored in a general directory in the home, rather than
+  locally
 * Source code moved to github.com
 * New REST class to use **requests** package instead of urllib2. 
 * Creation of a global configuration file in .config/bioservice/bioservices.cfg
