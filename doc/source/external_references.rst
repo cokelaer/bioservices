@@ -9,3 +9,4 @@ References to BioServices on the Web
 * http://www.scoop.it/t/bioinformatique
 * http://bioinfo-fr.net/bioservices-module-python
 *  http://devbio.eu/?p=resources&presel=bioinfo
+* biomartian from Endre Bakken Stovner https://github.com/endrebak/biomartian
