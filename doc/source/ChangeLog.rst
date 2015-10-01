@@ -3,6 +3,15 @@ Whats' new, what has changed
 
 
 
+Revision 1.4
+---------------
+
+*1.4.0
+  * CHANGES: 
+    * Fully update EUtils since WSDL is now down; implementation uses REST now.
+      This fixes https://github.com/cokelaer/bioservices/issues/41
+
+
 
 Revision 1.3
 ------------------
