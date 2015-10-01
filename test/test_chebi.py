@@ -47,7 +47,7 @@ def test_completelist():
     names = [x.chebiAsciiName for x in ch.getCompleteEntityByList(["CHEBI:27732","CHEBI:36707"])]
 
     names = [str(x) for x in names]
-    assert names == ["caffeine", "2-acetyl-1-alkyl-sn-glycero-3-phosphocholine(1+)"]
+    assert names == ["caffeine", "2-acetyl-1-alkyl-sn-glycero-3-phosphocholine"]
 
 def test_search():
     ch = ChEBI()
