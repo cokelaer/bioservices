@@ -15,7 +15,7 @@ class test_biomart(object):
         self.s.version("ensembl")
 
     def test_datasets(self):
-        assert self.s.datasets("prod-intermart_1") == ['protein', 'entry', 'uniparc']
+        assert self.s.datasets("prod-intermart_1") == ['protein', 'entry']
 
         assert "mmusculus_gene_ensembl" in self.s.datasets("ensembl")
 
