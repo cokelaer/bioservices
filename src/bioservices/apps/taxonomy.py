@@ -3,6 +3,7 @@ from bioservices import EUtils, Ensembl
 
 __all__ = ["Taxon"]
 
+
 class Taxon(object):
     """Utility to search for information related to a taxon
 
@@ -54,7 +55,7 @@ class Taxon(object):
         """
         assert isinstance(taxon, str)
         assert "," not in taxon
-        ret = self._eutils_service.taxonomy(taxon)
+        ret = self._eutils_service.taxonomy_summary(taxon)
         if ret == "\n":
             # nothing found
             pass
@@ -62,21 +63,6 @@ class Taxon(object):
             res = {'taxon': taxon, 'Scientific Name': ret.Taxon[0].ScientificName}
             # self.df.append(res)
             return res
-
-    def info(self, taxon, lineage=False):
-        """Prints information about a Taxon
-
-        :param str taxon: taxon identifier
-        :param bool lineage: prints lineage is set to True
-        """
-        ret = self._eutils_service.taxonomy(taxon)
-        print("Display Name: %s" % ret.Taxon[0].OtherNames.Name.DispName)
-        print("GenBank Common name: %s" % ret.Taxon[0].OtherNames.GenbankCommonName)
-        print("Taxon Id: %s " % ret.Taxon[0].TaxId)
-        if lineage:
-            print("Lineage:")
-            for i, x in enumerate(ret.Taxon[0].Lineage.split(";")):
-                print(i*" "+x)
 
     def uniprot_onweb(self, taxon):
         """Open Uniprot taxonomy page for a given taxon
