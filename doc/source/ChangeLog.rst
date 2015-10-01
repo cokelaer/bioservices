@@ -10,7 +10,9 @@ Revision 1.4
   * CHANGES: 
     * Fully update EUtils since WSDL is now down; implementation uses REST now.
       This fixes https://github.com/cokelaer/bioservices/issues/41
-
+  * NEWS:
+     * add small XML tools to parse XML dynamically in xmltools module
+     * add http_delete in services.py
 
 
 Revision 1.3
