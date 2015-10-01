@@ -118,3 +118,21 @@ class readXML(easyXML):
     def __init__(self, url, encoding="utf-8"):
         self.data = urlopen(url).read()
         super(readXML, self).__init__(self.data, encoding)
+
+
+class XMLObjectify(object):
+    def __init__(self, obj):
+        """obj can be easyXML data set"""
+        from lxml import objectify
+        try:
+            self.root = objectify.fromstring(obj.data)
+        except:
+            # try something else
+            self.root = objectify.fromstring(obj)
+        self.obj = obj
+
+    def __str__(self):
+        txt = ""
+        for child in self.root.getchildren():
+            txt += child.tag + "\n"
+        return txt
