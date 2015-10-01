@@ -820,3 +820,32 @@ Consider increasing it with settings.TIMEOUT attribute""".format(self.settings.T
         print(self.last_response.content)
         print(self.last_response.reason)
         print(self.last_response.status_code)
+
+    def http_delete(self, query, params=None, 
+                    frmt='xml', headers=None,  **kargs):
+        kargs.update({'query': query})
+        kargs.update({'params': params})
+        kargs.update({'frmt': frmt})
+        return self.delete_one(**kargs)
+
+    def delete_one(self, query, frmt='json', **kargs):
+        self.logging.debug("BioServices:: Entering delete_one function")
+        if query is None:
+            url = self.url
+        else:
+            url = '%s/%s' % (self.url, query)
+        self.logging.debug(url)
+        try:
+            res = self.session.delete(url, **kargs)
+            self.last_response = res
+            res = self._interpret_returned_request(res, frmt)
+            try:
+                return res.decode()
+            except:
+                self.debug("BioServices:: Could not decode the response")
+                return res
+        except Exception as err:
+            print(err)
+            return None
+        except:
+            pass
