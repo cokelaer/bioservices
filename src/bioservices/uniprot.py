@@ -199,13 +199,14 @@ class UniProt(REST):
         self.TIMEOUT = 100
 
     def _download_flat_files(self):
-        """Not implemented"""
+        """could be used to get all data in flat files (about compressed 500Mb )"""
         url = "ftp://ftp.ebi.ac.uk/pub/databases/uniprot/knowledgebase/uniprot_sprot.dat.gz"
-        pass
+        self.logging.info('Downloading uniprot file from the web. May take some time.:')
+        import urllib
+        urllib.urlretrieve(url, 'uniprot_sprot.dat.gz')
 
     def mapping(self, fr="ID", to="KEGG_ID",  query="P13368"):
         """This is an interface to the UniProt mapping service
-
 
         :param fr: the source database identifier. See :attr:`_mapping`.
         :param to: the targetted database identifier. See :attr:`_mapping`.
@@ -229,14 +230,11 @@ class UniProt(REST):
             defaultdict(<type 'list'>, {'P43403': ['1FBV', '1M61', '1U59',
             '2CBL', '2OQ1', '2OZO', '2Y1N', '3ZNI', '4A4B', '4A4C', '4K2R']})
 
-
-
         There is a web page that gives the list of correct `database identifiers
         <http://www.uniprot.org/faq/28>`_. You can also look at the
         :attr:`_mapping` attribute.
 
         :URL: http://www.uniprot.org/mapping/
-
 
         .. versionchanged:: 1.1.1 to return a dictionary instaed of a list
         .. versionchanged:: 1.1.2 the values for each key is now made of a list
@@ -277,45 +275,6 @@ class UniProt(REST):
                 result_dict[key].append(values[i])
         return result_dict
 
-    def multi_mapping(self, fr="ID", to="KEGG_ID", query="P13368",
-            frmt="tab", Nmax=100):
-        """Calls mapping several times and concatenates results
-
-        .. deprecated: 1.3.1 you can now use :meth:`mapping` even for long queries since
-            we are now using a POST request, which allows arbitrary length of entries.
-        """
-        self.logging.warning("deprecated in version 1.3.1. Use mapping instead")
-        if isinstance(query, list) is False:
-            query = [query]
-
-        unique_entry_names = list(set(query))
-
-        if len(unique_entry_names) > Nmax:
-            unique_entry_names = list(unique_entry_names)
-            self.logging.info("There are more than %s unique species. Using multi stage uniprot mapping" % Nmax)
-            mapping = {}
-            # we need to split
-            # this is a hack rigt now but could be put inside bioservices
-            N, rest = divmod(len(unique_entry_names), Nmax)
-            if rest>0:
-                N+=1
-            for i in range(0,N):
-                i1 = i*Nmax
-                i2 = (i+1)*Nmax
-                if i2>len(unique_entry_names):
-                    i2 = len(unique_entry_names)
-                query=",".join(unique_entry_names[i1:i2])
-                this_mapping = self.mapping(fr=fr, to=to, query=query)
-                for k,v in this_mapping.items():
-                    mapping[k] = v
-                from easydev import precision
-                self.logging.info(str(precision((i+1.)/N*100., 2)) + "%% completed")
-        else:
-            #query=",".join([x+"_" + species for x in unique_entry_names])
-            query=",".join(unique_entry_names)
-            mapping = self.mapping(fr=fr, to=to, query=query)
-        return mapping
-
     def searchUniProtId(self, uniprot_id, frmt="xml"):
         print("DEPRECATED SINCE VERSION 1.3.1. use retrieve instead")
 
@@ -335,14 +294,11 @@ class UniProt(REST):
             >>> fasta = u.retrieve([u'P29317', u'Q5BKX8', u'Q8TCD6'], frmt='fasta')
             >>> print(fasta[0])
 
-
         """
         _valid_formats = ['txt', 'xml', 'rdf', 'gff', 'fasta']
         self.devtools.check_param_in_list(frmt, _valid_formats)
 
         queries = self.devtools.to_list(uniprot_id)
-
-        # data = {'format':frmt}
 
         url = ["uniprot/" + query + '.' + frmt for query in queries]
         res = self.http_get(url, frmt="txt")
@@ -527,9 +483,13 @@ class UniProt(REST):
     def uniref(self, query):
         """Calls UniRef service
 
-        >>> u = UniProt()
-        >>> df = u.uniref("member:Q03063")
-        >>> df.Size
+        :return: if you have Pandas installed, returns a dataframe (see example)
+
+        ::
+
+            >>> u = UniProt()
+            >>> df = u.uniref("member:Q03063")  # of just A03063
+            >>> df.Size
 
         """
         try:
