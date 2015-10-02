@@ -10,6 +10,7 @@ Revision 1.4
   * CHANGES: 
     * Fully update EUtils since WSDL is now down; implementation uses REST now.
       This fixes https://github.com/cokelaer/bioservices/issues/41
+    * Remove the apps/taxonomy module now part of biokit. 
   * NEWS:
      * add small XML tools to parse XML dynamically in xmltools module
      * add http_delete in services.py
