@@ -21,7 +21,7 @@
 from __future__ import print_function
 import xml.etree.ElementTree as ET
 import bs4
-#from bioservices import unicodefix 
+
 try:
     from urllib.request import urlopen
 except:
@@ -94,7 +94,7 @@ class easyXML(object):
 
     def _get_soup(self):
         if self._soup is None:
-            self._soup = bs4.BeautifulSoup(self.data)
+            self._soup = bs4.BeautifulSoup(self.data, "html.parser")
         return self._soup
     soup = property(_get_soup, doc="Returns the beautiful soup instance")
 
