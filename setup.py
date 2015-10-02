@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 __revision__ = "$Id$"
-import sys
 import os
 from setuptools import setup, find_packages
 import glob
