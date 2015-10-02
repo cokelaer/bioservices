@@ -54,6 +54,9 @@ class Ensembl(REST):
     .. todo:: some methods have a parameter called *feature*. The official
        Ensembl API allows one to provide several features at the same time.
        This is not yet implemented. Only one at a time is accepted.
+
+    .. note:: Some function uses SQL wildcards. See e.g. http://www.w3schools.com/sql/sql_wildcards.asp
+        In brief, "_" can be use to substitute a single character and '%' a set of characters.
     """
     _url = "http://rest.ensembl.org"
 
@@ -519,7 +522,8 @@ class Ensembl(REST):
         :param str species: Species name/alias
         :param str filter: Restrict external DB searches to a single
             source or pattern. SQL-LIKE patterns are supported.
-            (e.g., HGNC, GO%)
+            See :class:`Ensembl` doc.
+
 
         """
         self._check_frmt(frmt, ['xml'])
@@ -817,8 +821,7 @@ class Ensembl(REST):
             ontology=None, relation=None, simple=False):
         """Search for a list of ontological terms by their name
 
-        :param str name: An ontology name. SQL wildcards are supported (e.g.,
-            transcription factor complex)
+        :param str name: An ontology name. SQL wildcards See :class:`Ensembl` doc.
         :param str frmt: response formats in json, xml, yaml, jsonp
         :param str simple: If set the API will avoid the fetching of parent and child terms
         :param str relation: The types of relationships to include in the output. Fetches
@@ -863,6 +866,7 @@ class Ensembl(REST):
         """Search for a taxonomic id by a non-scientific name
 
         :param str name: A non-scientific species name. Can include SQL wildcards
+            See :class:`Ensembl` doc.
         :param str frmt: response formats in json, xml, yaml, jsonp
 
         ::
