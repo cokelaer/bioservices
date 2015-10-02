@@ -143,7 +143,6 @@ from .biodbnet import *
 
 #import mapping
 from . import apps
-from .apps import Taxon
 #import dev
 
 
