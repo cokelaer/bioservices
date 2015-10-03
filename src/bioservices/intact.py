@@ -35,7 +35,6 @@
 
 """
 from bioservices import REST
-import json
 
 
 __all__ = ['IntactComplex']
@@ -51,7 +50,7 @@ class IntactComplex(REST):
 
     .. doctest::
 
-            >>> from bioservices import Intact
+            >>> from bioservices import IntactComplex
             >>> u = IntactComplex()
 
     """

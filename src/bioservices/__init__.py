@@ -65,11 +65,8 @@ from .kegg import *
 from . import hgnc
 from .hgnc import *
 
-try:
-    from . import intact
-    from intact import *
-except:
-    print("Issue loading intact module. Skipped.")
+from . import intact
+from .intact import *
 
 from . import rhea
 from .rhea import *
