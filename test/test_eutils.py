@@ -107,7 +107,7 @@ class test_EUtils(object):
 
     def test_efetch_gene(self):
         res = self.e.EFetch('gene', 4747, retmode="text")
-        assert 'neurofilament' in res
+        assert b'neurofilament' in res
         res = self.e.EFetch('gene', 4747, retmode="xml")
 
     def test_epost(self):
