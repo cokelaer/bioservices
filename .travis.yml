@@ -1,6 +1,7 @@
 language: python
 # python 3.4 fails for now because of gevents dependencies, which cannot be installed via pip
 python:
+  - "3.4"
   - "3.3"
   - "2.7"
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
