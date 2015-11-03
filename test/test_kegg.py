@@ -32,8 +32,8 @@ class TestKEGG(object):
 
     @attr('slow')
     def test_info(self):
-        self.ws.info("kegg")
-        self.ws.info("brite")
+        self.ws.dbinfo("kegg")
+        self.ws.dbinfo("brite")
 
     def test_list(self):
         self.ws.list("pathway", "hsa")      # returns the list of human pathways
@@ -109,9 +109,9 @@ class TestKEGGALL(object):
         self.ws.pathwayIds
 
     def test_info(self):
-        self.ws.info("hsa")
+        self.ws.dbinfo("hsa")
         try:
-            self.ws.info("dummy")
+            self.ws.dbinfo("dummy")
             assert False
         except:
             assert True
