@@ -6,7 +6,7 @@
 #
 #  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -141,7 +141,7 @@ class Rhea(REST):
 
         ::
 
-            >>> print r.entry(10281, frmt="rxn")
+            >>> print(r.entry(10281, frmt="rxn"))
 
         The output is in XML format. This page from the Rhea web site explains
         what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of
