@@ -142,7 +142,6 @@ class BioMart(REST):
         xmlq = s.biomartQuery.get_xml()
         res = s.query(xmlq)
 
-
     .. note:: the biomart sevice is slow (in my experience, 2013-2014) so please be patient...
 
     """
@@ -188,7 +187,10 @@ class BioMart(REST):
         self._valid_attributes = None
         self._hosts = None
 
-        self._init()   # can be commented if we do not want to check the validity of attributes
+        #self._init()   # can be commented if we do not want to 
+                       # check the validity of attributes
+
+        self._biomartQuery = BioMartQuery()
 
     def _init(self):
         temp = self.debugLevel
@@ -196,7 +198,6 @@ class BioMart(REST):
         _ = self.lookfor("uniprot", verbose=False)
         _ = self.valid_attributes
         self.debugLevel = temp
-        self._biomartQuery = BioMartQuery()
 
     def registry(self):
         """to retrieve registry information
@@ -219,13 +220,13 @@ class BioMart(REST):
     def datasets(self, mart, raw=False):
         """to retrieve datasets available for a mart:
 
-        :param str mart: e.g. ensembl. see :attr:`names` for a list of valid MART names
-            the mart is the database. see lookfor method or databases attributes
+        :param str mart: e.g. ensembl. see :attr:`names` for a list of valid 
+            MART names the mart is the database. see lookfor method or 
+            databases attributes
 
         >>> s = BioMart(verbose=False)
         >>> s.datasets("prod-intermart_1")
         ['protein', 'entry', 'uniparc']
-
 
         """
         if mart not in self.names:
