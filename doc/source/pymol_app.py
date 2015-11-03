@@ -9,13 +9,13 @@ if os.path.isfile("bioservices_pdb.png"):
 from bioservices import *
 print("Retrieving PDB ID")
 u = UniProt(verbose=False)
-res = u.mapping(fr="ID", to="PDB_ID", query="P43403", format="tab")
-pdb_id = res[3]   # "1FBV"
+res = u.mapping(fr="ID", to="PDB_ID", query="P43403")
+pdb_id = res['P43403'][3]   # e.g, "1FBV"
 
 # BioServices 2: Download the PDB file from the PDB Web Service
 print("Fetching PDB file")
 p = pdb.PDB()
-res = p.getFile(pdb_id, "pdb")
+res = p.get_file(pdb_id, "pdb")
 
 # General: save the fetched file in a temporary file
 import tempfile

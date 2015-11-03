@@ -15,8 +15,8 @@ First, let us retrieve two FASTA sequences and save them in 2 files::
 
     from bioservices import UniProt
     u = UniProt()
-    akt1 = u.searchUniProtId("P31749", "fasta")
-    akt2 = u.searchUniProtId("P31751", "fasta")
+    akt1 = u.retrieve("P31749", "fasta")
+    akt2 = u.retrieve("P31751", "fasta")
 
     fh = open("akt1.fasta", "w")
     fh.write(akt1)

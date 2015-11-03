@@ -67,7 +67,7 @@ WSDL service. In order to easily access this service, use the :class:`WSDLServic
 
 You can now see which methods are available::
 
-    >>> ols.methods
+    >>> ols.wsdl_methods
 
 and call one (getVersion) using the :meth:`bioservices.services.WSDLService.serv`::
 
@@ -89,18 +89,11 @@ Others
 ========
 
 When wrapper a WSDL services, it may be difficult to know what parameters
-to provide. This can be knwon as follows. First, you need the name of the
-method::
+to provide if the API doc is not clear. This can be known as follows using 
+the **suds** factory. In this previous examples, we could use::
 
-    s.methods
-
-Then, the name of the structure that contains the parameter::
-
-    ?
-
-Finally, introspect the structure itself::
-
-    s.suds.factory.resolver.find("db2dbParams")
+    >>> ols.suds.factory.resolver.find('getTermById')
+    <Element:0xa848b50 name="getTermById" />
 
 
 For eutils, this was more difficult::

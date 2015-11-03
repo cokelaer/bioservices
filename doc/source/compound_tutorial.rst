@@ -35,7 +35,7 @@ We can get a mapping dictionary from the KEGG compound to ChEBI as follows:
 
     >>> map_kegg_chebi = k.conv("chebi", "compound")
     >>> len(map_kegg_chebi) # doctest: +SKIP
-    6896
+    15845
 
     >>> print(k.find("compound", "geldanamycin"))
     cpd:C11222  Geldanamycin
@@ -82,13 +82,13 @@ the UniProt web service from BioServices as follows::
 
    >>> from bioservices import *
    >>> u = UniProt()
-   >>> u.mapping(fr='ID', to='KEGG_ID', format='tab', query="ZAP70_HUMAN")
+   >>> u.mapping(fr='ID', to='KEGG_ID', query="ZAP70_HUMAN")
    {'ZAP70_HUMAN':  'hsa:7535'}
 
 You can get accession number or protein name identifier from the KEGG identifier
 as follows::
 
-   >>> u.mapping(fr='KEGG_ID', to='ID', format='tab', query='hsa:7535')
+   >>> u.mapping(fr='KEGG_ID', to='ID', query='hsa:7535')
    {'hsa7535': 'ZAP70_HUMAN'}
-   >>> u.mapping(fr='KEGG_ID', to='ACC', format='tab', query='hsa:7535')
+   >>> u.mapping(fr='KEGG_ID', to='ACC', query='hsa:7535')
    {'hsa7535': 'P43403'}

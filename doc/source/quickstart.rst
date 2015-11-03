@@ -68,7 +68,7 @@ Note that the returned response from uniprot web service is converted into a lis
 
 You can also search for a specific UniProtKB ID to get exhaustive information::
 
-    >>> print u.search("P43403", format="txt")
+    >>> print(u.search("P43403", frmt="txt"))
     ID   ZAP70_HUMAN             Reviewed;         619 AA.
     AC   P43403; A6NFP4; Q6PIA4; Q8IXD6; Q9UBS6;
     DT   01-NOV-1995, integrated into UniProtKB/Swiss-Prot.
@@ -78,8 +78,8 @@ You can also search for a specific UniProtKB ID to get exhaustive information::
 To obtain the FASTA sequence, you can use :meth:`~bioservices.uniprot.UniProt.searchUniProtId`::
 
 
-    >>> res = u.searchUniProtId("P09958", format="xml")
-    >>> print(u.searchUniProtId("P09958", format="fasta"))
+    >>> res = u.searchUniProtId("P09958", frmt="xml")
+    >>> print(u.searchUniProtId("P09958", frmt="fasta"))
     sp|P09958|FURIN_HUMAN Furin OS=Homo sapiens GN=FURIN PE=1 SV=2
     MELRPWLLWVVAATGTLVLLAADAQGQKVFTNTWAVRIPGGPAVANSVARKHGFLNLGQI
     FGDYYHFWHRGVTKRSLSPHRPRHSRLQREPQVQWLEQQVAKRRTKRDVYQEPTDPKFPQ
@@ -112,10 +112,19 @@ the KEGG itnerface in details, but let us have a quick overview. First, let us s
     from bioservices import KEGG
     k = KEGG(verbose=False)
 
-You can use the :meth:`~bioservices.kegg.KEGG.info` to obtain statistics on the
-**pathway** database::
+KEGG contains biological data for many organisms. By default, no organism is
+set, which can be checked in the following attribute ::
 
-    >>> print k.info("pathway")
+    k.organism
+
+We can set it to human using KEGG terminology for homo sapiens::
+
+    k.organis = 'hsa'
+
+You can use the :meth:`~bioservices.kegg.KEGG.dbinfo` to obtain statistics 
+on the **pathway** database::
+
+    >>> print(k.info("pathway"))
     pathway          KEGG Pathway Database
     path             Release 65.0+/01-15, Jan 13
                      Kanehisa Laboratories
@@ -149,11 +158,11 @@ pathways iIs for the current organism as follows::
 For a given gene, you can get the full information related to that gene by using
 the method :meth:`~bioservices.kegg.KEGG.get`::
 
-    print k.get("hsa:3586")
+    print(k.get("hsa:3586"))
 
 or a pathway::
 
-    print k.get("path:hsa05416")
+    print(k.get("path:hsa05416"))
 
 .. seealso:: Reference guide of :class:`bioservices.kegg.KEGG` for more details
 .. seealso:: :ref:`kegg_tutorial` for more details
@@ -184,7 +193,7 @@ using the :meth:`bioservices.quickgo.QuickGO.Term` method:
 
     >>> from bioservices import QuickGO
     >>> g = QuickGO(verbose=False)
-    >>> print(g.Term("GO:0003824"), format="obo")
+    >>> print(g.Term("GO:0003824", frmt="obo"))
     [Term]
     id: GO:0003824
     name: catalytic activity

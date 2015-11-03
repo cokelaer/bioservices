@@ -39,8 +39,8 @@ In the example below, we use geneprof to
     >>> res = g.search_gene_ids("nanog", "mouse")
     >>> print(res)
     {10090: [29640, 14899]}
-    >>> expr1 = g.get_expression("mouse", 29640)
-    >>> expr2  = g.get_expression("mouse", 14899)
+    >>> expr1 = g.get_expression("mouse", 29640)['values']
+    >>> expr2  = g.get_expression("mouse", 14899)['values']
 
     >>> import math
     >>> values1 = [math.log(x["RPKM"]+1, 2.) for x in expr1]
@@ -72,7 +72,7 @@ and visualise the final network. Please use with care::
     >>> g = GeneProf(verbose=False)
     >>>
     >>> # find all pubic experimental mouse samples in geneprof
-    >>> samples = g.get_list_experiment_samples("mouse")
+    >>> samples = g.get_list_experiment_samples("mouse")['samples']
     >>> # look at entries that contains "Gene"
     >>> graph = {}
     >>> mapgene = {}
@@ -107,7 +107,7 @@ and visualise the final network. Please use with care::
     >>> simple_graph = {}
     >>> for k, v in graph.iteritems():
     ...     simple_graph[k] = [mapgene[x] for x in v if x in mapgene.keys()]
-    >>> len(simple_grapg.keys())
+    >>> len(simple_graph.keys())
     72
     >>> sum([len(simple_graph[x]) for x in simple_graph.keys()])
     2137
@@ -118,15 +118,16 @@ Finally, you can look at the graph with your favorite tool such as Cytoscape, Ge
 Here below, I'm using a basic graph visualisation tool implemented in `CellNOpt <http://www.cellnopt.org>`_, which is not dedicated
 for Network visualisation but contains a small interface to graphviz useful in this context (it has a python interface)::
 
-    >>> from cellnopt.core import CNOGraph
+    >>> from cno import CNOGraph
     >>> c = CNOGraph()
     >>> for k in simple_graph.keys():
     ...     for v in simple_graph[k]:
     ...         c.add_edge(k, v, link="+")
     >>> c.centrality_degree()
-    >>> c.degree_histogram()
-    >>> c.graph['graph'] = {"splines":"true", "size":(20,20), "dpi":200, "fixedsize":True}
-    >>> c.graph['node'] = {"width":.01, "height":.01, 'size':0.01, "fontsize":8}
+    >>> c.graph['graph'] = {"splines":"true", "size":(20,20), 
+        "dpi":200, "fixedsize":True}
+    >>> c.graph['node'] = {"width":.01, "height":.01, 
+        'size':0.01, "fontsize":8}
     >>> c.plotdot(prog="fdp", node_attribute="degree")
 
 .. image:: geneprof_network.png
@@ -148,11 +149,11 @@ on selected KEGG pathways
 
 ::
 
-    >>> from bioservices import KEGGParser, GeneProf, UniProt
+    >>> from bioservices import KEGG, GeneProf, UniProt
     >>> import StringIO
     >>> import pandas
     >>> g = GeneProf()
-    >>> k = KEGGParser()
+    >>> k = KEGG()
     >>> u = UniProt()
 
     >>> # load ENCODE RNA-seq into a DataFrame for later
@@ -162,15 +163,15 @@ on selected KEGG pathways
 
     >>> # get a pathway diagram for the KEGG path hsa05202 ("Transcriptional 
     >>> # misregulation in cancers")
-    >>> res = k.parsePathway(k.get("hsa05202"))
+    >>> res = k.parse(k.get("hsa05202"))
     >>> # extract KEGG identifiers corresponding to the genes found in the pathway
-    >>> keggids = ["hsa:"+x for x in res['gene'].keys()]
+    >>> keggids = ["hsa:"+x for x in res['GENE'].keys()]
 
     >>> # we need to map the KEGG Ids to Ensembl Ids. We will use KEGG mapping and uniprot mapping
     >>> # for cases where the former does not have associated mapping.
     >>> ensemblids = {}
     >>> for id_ in keggids:
-    ...     res = k.parse(k.get(id_))['dblinks']
+    ...     res = k.parse(k.get(id_))['DBLINKS']
     ...     if 'Ensembl' in res.keys(): 
     ...         print id_, res['Ensembl']
     ...         ensemblids[id_] = res['Ensembl']

@@ -1,13 +1,18 @@
 BioMart service
 ====================
 
-BioMart provides a uniformed interface to many services such as Cosmic, Ensembl
+BioMart provides a uniform interface to many services such as Cosmic, Ensembl
 and many more. In BioMart terminology a service is called a **mart**. As an 
 example, we will consider the COSMIC interface provided by
 BioMart (see `COSMIC <http://cancer.sanger.ac.uk/biomart/martview/>`_). You 
 can play with the interface itself to get an idea of what can be selected (e.g.,
 datasets, filters, attributes) but let us use BioServices to access to the
 Cosmic mart programmatically. 
+
+.. note:: the cosmic mart was available at the time of 1.0 but not during
+    release 1.4.1 . This is not a BioServices issue but the COSMIC mart being 
+    down. Hopefully, it will be available again soon. meanwhile this
+    example should help you get a feeling of what can be done with a MART.
 
 In **BioServices**, you can create a biomart request (which is a XML document) but first 
 we need to figure out what are the datasets associated with the COSMIC mart. The tricky part is to know

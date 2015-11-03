@@ -28,7 +28,7 @@ useful later on. Let us try to use the :meth:`~bioservices.uniprot.UniProt.searc
 
 The default format of the returned answer is "tabulated"::
 
-    >>> res = u.search("ZAP70_HUMAN", format="tab")
+    >>> res = u.search("ZAP70_HUMAN", frmt="tab")
     >>> print(res)
     Entry   Entry name  Status  Protein names   Gene names  Organism    Length
     P43403  ZAP70_HUMAN reviewed    Tyrosine-protein kinase ZAP-70 (EC 2.7.10.2) (70 kDa zeta-chain associated protein) (Syk-related tyrosine kinase)    ZAP70 SRK Homo sapiens (Human)    619
@@ -38,7 +38,7 @@ of the tabulated format contains several columns but we can select only a subset
 such as the Entry (accession number) and the gene names, which are coded as "id"
 and "genes" in uniprot database::
 
-    >>> res = u.search("ZAP70_HUMAN", format="tab", columns="id,genes")
+    >>> res = u.search("ZAP70_HUMAN", frmt="tab", columns="id,genes")
     >>> print(res)
     Entry   Gene names
     P43403  ZAP70 SRK
@@ -46,7 +46,7 @@ and "genes" in uniprot database::
 So here we got the Entry P43403. Entry and Gene names can be saved in two
 variables as follows::
 
-    >>> res = u.search("ZAP70_HUMAN", format="tab", columns="id,genes")
+    >>> res = u.search("ZAP70_HUMAN", frmt="tab", columns="id,genes")
     >>> entry, gene_names = res.split("\n")[1].split("\t") 
 
 
@@ -54,12 +54,12 @@ Getting the fasta sequence
 ---------------------------
 
 It is then straightforward to obtain the FASTA sequence of ZAP70 using another
-method from the UniProt class called :meth:`~bioservices.uniprot.UniProt.searchUniProtId`:
+method from the UniProt class called :meth:`~bioservices.uniprot.UniProt.retrieve`:
 
 
 .. doctest:: protein
 
-    >>> sequence = u.searchUniProtId("P43403", "fasta")
+    >>> sequence = u.retrieve("P43403", "fasta")
     >>> print(sequence)
     >sp|P43403|ZAP70_HUMAN Tyrosine-protein kinase ZAP-70 OS=Homo sapiens GN=ZAP70 PE=1 SV=1
     MPDPAAHLPFFYGSISRAEAEEHLKLAGMADGLFLLRQCLRSLGGYVLSLVHDVRFHHFP
@@ -205,7 +205,7 @@ between ZAP70 and another component::
 
 Let us look at the first one::
 
-    >>> for x in data[0].split("\t"): print(x)
+    >>> for x in data[0]: print(x)
     uniprotkb:P15498
     uniprotkb:P43403
     -
@@ -279,6 +279,7 @@ interactions and overlap between databases:
     Found 0 interactions in 3 common databases
     Found 1 interactions in 4 common databases
 
+This may be different depending on the available databases.    
 Finally, you can obtain the relation that was found in the 4 databases:
 
 .. doctest:: 
@@ -356,7 +357,7 @@ and so on.
     >>> p.queryAll("ZAP70 AND species:9606")
     >>> p.summary()
     >>> for i in range(1,p.N+1):
-    ...    print i, len(p.relevant_interactions[i])
+    ...    print(i, len(p.relevant_interactions[i]))
     1 265
     2 62
     3 31

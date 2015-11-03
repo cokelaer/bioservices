@@ -44,11 +44,26 @@ How can I figure out the taxonomy identifier of the mouse ?
 
 You can use the Taxon class that uses Ensembl/UniProt/Eutils depending on the
 tasks. Here, we do not know the scientific name of taxonomy identifier of the
-mouse. We can use the search_by_name fuction::
+mouse. We can use the search_by_name fuction:
+
+.. warning:: Taxon class is not part of BioServices but some 
+    utilities have been added to BioKit (github.com/biokit)
+
+.. versionchanged:: 1.3
+
+In earlier version of BioServices, you could use::
 
     >>> from bioservices import Taxon
     >>> t = Taxon()
     >>> t.search_by_name("mouse")
+    u'10090'
+
+But this is now in BioKit::
+
+    >>> from biokit import Taxonomy
+    >>> t = Taxonomy()
+    >>> results = t.fetch_by_name('mouse')
+    >>> results[0]['id']
     u'10090'
 
 
@@ -60,6 +75,7 @@ and UniProt that both provides convertor. For instance with Kegg, you can
 convert all human (hsa) Kegg Id to uniprot Id with::
 
     from bioservices import *
+    s = KEGG()
     kegg_ids, uniprot_ids = s.conv("hsa", "uniprot")
 
 Or you can use the uniprot mapping function::
@@ -68,7 +84,6 @@ Or you can use the uniprot mapping function::
     u = UniProt()
     u.mapping(to="KEGG_ID", fr="ACC", query="ZAP70_HUMAN")
 
-.. seealso:: :ref:`mapping`
 
 Specific Usage
 ===================

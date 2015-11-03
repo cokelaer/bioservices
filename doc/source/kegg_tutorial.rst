@@ -27,7 +27,7 @@ queried with the :meth:`bioservices.kegg.KEGG.list` method::
 The output contains Id of the organism and some oter information. To retrieve
 the Ids, you will need to process the output. However, we provide an alias::
 
-    print k.organismIds
+    print(k.organismIds)
 
 In general, methods require an access to the on-line KEGG database
 therefore it takes time. For instance, the command above takes a couple of
@@ -48,7 +48,7 @@ interested into the human gene with the code 7535::
     k.get("hsa:7535")    #hsa:7535 is also known as ZAP70
 
 It is quite verbose and is a single string, which may be tricky to handle. We
-provide a tool to ease the parsing (see below and :class:`bioservices.kegg.KEGGParser`)
+provide a tool to ease the parsing (see below and :meth:`bioservices.kegg.KEGG.parse`) returned by :meth:`bioservices.kegg.KEGG.parse`.
 
 
 
@@ -89,7 +89,7 @@ Look for pathways (by name)
 Searching for pathways is quite similar. You can use the **find** method as
 above::
 
-    >>> print s.find("pathway", "B+cell")
+    >>> print(s.find("pathway", "B+cell"))
     path:map04112   Cell cycle - Caulobacter
     path:map04662   B cell receptor signaling pathway
     path:map05100   Bacterial invasion of epithelial cells
@@ -141,19 +141,15 @@ Introspecting a pathway
 Let us focus on one pathway ( **path:hsa04660**). You can use the :meth:`get`
 command to obtain information about the pathway. ::
 
-    print s.get("hsa04660")
+    print(s.get("hsa04660"))
 
 The output is a single string where you can recognise different fields such as 
-NAME, GENE, DESCRIPTION and so on. This is quite limited. We provide another 
-class called :class:`bioservices.kegg.KEGGParser` that inherits from the KEGG class used so
-far (i.e., all functions seen so far works with KEGGParser). In addition, it will help us to
-convert the output of the previous command into a dictionary to easily extract
-information contained in the pathway (e.g., gene name)::
+NAME, GENE, DESCRIPTION and so on. This is quite limited. In BioServices, we provide a convenient parser that converts the output of the previous command into a dictionary::
 
-    >>> s = KEGGParser()
+    >>> s = KEGG()
     >>> data = s.get("hsa04660")
     >>> dict_data = s.parse(data)
-    >>> print dict_data['gene']
+    >>> print(dict_data['GENE'])
     '10000': 'AKT3; v-akt murine thymoma viral oncogene homolog 3 (protein kinase B, gamma) [KO:K04456] [EC:2.7.11.1]',
     '10125': 'RASGRP1; RAS guanyl releasing protein 1 (calcium and DAG-regulated) [KO:K04350]',
     '1019': 'CDK4; cyclin-dependent kinase 4 [KO:K02089] [EC:2.7.11.22]',
@@ -236,7 +232,7 @@ You can then extract more information such as the type of relations::
     >>> data = list(flatten([[x['name'] for x in rel] for rel in relations]))
 
     >>> counter = collections.Counter(data)
-    >>> print counter
+    >>> print(counter)
     Counter({u'compound': 5235, u'activation': 3265, u'binding/association': 1087,
     u'phosphorylation': 940, u'inhibition': 672, u'indirect effect': 559,
     u'expression': 542, u'dephosphorylation': 93, u'missing interaction': 80,
@@ -334,7 +330,7 @@ You can then extract more information such as the type of relations::
     You can also obtain the drug Ids in other databases::
     >>> drugs = k.get_drugs_by_pathway("path:hsa00010")
     ['dr:D00009', 'dr:D00010', 'dr:D00068', 'dr:D02798', 'dr:D04855','dr:D06542']
-    >>> print k.bconv("dr:D00010")
+    >>> print(k.bconv("dr:D00010"))
 
 
 

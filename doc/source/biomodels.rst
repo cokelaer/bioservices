@@ -25,7 +25,7 @@ Start a biomodels interface:
 
 look at the list of models Id::
 
-    print s.modelsId
+    print(s.modelsId)
 
 Get a specific model given its Id. Let us play with the first model:
 
@@ -39,7 +39,7 @@ and look at some meta information:
 .. doctest:: biomodels
     :options: +SKIP
 
-    >>> print s.getSimpleModelsByIds(s.modelsId[0])
+    >>> print(s.getSimpleModelsByIds(s.modelsId[0]))
     <?xml version="1.0" encoding="UTF-8"?>
     <simpleModels>
     <simpleModel>
@@ -68,7 +68,7 @@ Some of these information can be retrieved specifically:
 .. doctest:: biomodels
 
     >>> ID = s.modelsId[0]
-    >>> print s.getPublicationByModelId(ID)
+    >>> print(s.getPublicationByModelId(ID))
     10643740
 
 
