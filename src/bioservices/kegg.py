@@ -164,8 +164,8 @@ class KEGG(REST):
     are partially accesible. All dbentries can be parsed into dictionaries using
     the :class:`KEGGParser`
 
-    Here are some examples. In order to retrieve the entry of the gene identifier 7535 of the
-    **hsa** organism, type::
+    Here are some examples. In order to retrieve the entry of the 
+    gene identifier 7535 of the **hsa** organism, type::
 
         from bioservices import KEGG
         s = KEGG()
@@ -324,7 +324,7 @@ class KEGG(REST):
         else:
             raise ValueError("mode can be only info, list, ")
 
-    def info(self, database="kegg"):
+    def dbinfo(self, database="kegg"):
         """Displays the current statistics of a given database
 
         :param str database: can be one of: kegg (default), brite, module,
@@ -336,15 +336,15 @@ class KEGG(REST):
 
             from bioservices import KEGG
             s = KEGG()
-            s.info("hsa") # human organism
-            s.info("T01001") # same as above
-            s.info("pathway")
+            s.dbinfo("hsa") # human organism
+            s.dbinfo("T01001") # same as above
+            s.dbinfo("pathway")
 
+        .. versionchanged:: 1.4.1 renamed info method into :meth:`dbinfo`, 
+            which clashes with Logging framework info() method.
         """
-        #url = self.url+"/"+"info"
         self._checkDB(database, mode="info")
-
-        res = self.http_get(database, frmt="txt")
+        res = self.http_get('info/' + database, frmt="txt")
         return res
 
     def list(self, query, organism=None):
