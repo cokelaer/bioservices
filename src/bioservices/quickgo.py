@@ -175,10 +175,10 @@ class QuickGO(REST):
 
         ::
 
-            >>> print s.Annotation(protein='P12345', frmt='tsv', col="ref,evidence",
-            ... ref='PMID:*')
-            >>> print s.Annotation(protein='P12345,Q4VCS5', frmt='tsv',
-            ...     col="ref,evidence",ref='PMID:,Reactome:')
+            >>> print(s.Annotation(protein='P12345', frmt='tsv', col="ref,evidence",
+            ... ref='PMID:*'))
+            >>> print(s.Annotation(protein='P12345,Q4VCS5', frmt='tsv',
+            ...     col="ref,evidence",ref='PMID:,Reactome:'))
 
 
 
