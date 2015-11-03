@@ -69,7 +69,7 @@ organism::
 
     >>> from bioservices import UniProt
     >>> u = UniProt(verbose=False)
-    >>> data = u.search("zap70+and+taxonomy:9606", format="tab", limit=3, 
+    >>> data = u.search("zap70+and+taxonomy:9606", frmt="tab", limit=3, 
     ...                 columns="entry name,length,id, genes")
     >>> print(data)
     Entry name   Length  Entry   Gene names
