@@ -422,7 +422,7 @@ class GeneProf(REST):
         """
         results = self.search_genes(query, taxons)
         geneIds = {}
-        for res in results:
+        for res in results['matches_per_dataset']:
             ids = [x["numeric_id"] for x in res['genes']]
             taxon = res["reference"]["taxon"]
             geneIds[taxon] = ids
@@ -679,15 +679,9 @@ class GeneProf(REST):
 
     def get_expression(self, ref, Id, frmt="json", with_sample_info=False,
             output="RPKM"):
-        """Alias to :meth:`get_gene_expression`
-
-
-
-
-        """
+        """Alias to :meth:`get_gene_expression"""
         return self.get_gene_expression(ref, Id, frmt=frmt,
                 with_sample_info=with_sample_info, output=output)
-
 
     def get_gene_expression(self, ref, Id, frmt="json",
             with_sample_info=False,  output="RPKM"):
