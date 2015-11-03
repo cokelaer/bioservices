@@ -101,7 +101,7 @@ class WikiPathways(WSDLService):
       * u'getRelations': No API found in Wikipathway web page
     """
     _url = 'http://www.wikipathways.org/wpi/webservice/webservice.php?wsdl'
-    def __init__(self, verbose=True):
+    def __init__(self, verbose=True, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose:
@@ -109,7 +109,7 @@ class WikiPathways(WSDLService):
         """
 
         super(WikiPathways, self).__init__(name="WikiPathways", 
-                url=WikiPathways._url, verbose=verbose)
+                url=WikiPathways._url, verbose=verbose, cache=cache)
         self._organism = 'Homo sapiens' # This function is redundant (see class service)
         self.logging.info("Fetching organisms...")
 
@@ -341,9 +341,12 @@ class WikiPathways(WSDLService):
         """Save a pathway.
 
         :param str pathwayId: the pathway identifier.
-        :param str filename: the name of the file. If a filename extension is not provided the pathway will be saved as a pdf (default).
-        :param int revisionNumb: the revision number of the pathway (use '0 for most recent version).
-        :param bool display: if True the pathway will be displayed in your browser.
+        :param str filename: the name of the file. If a filename extension 
+            is not provided the pathway will be saved as a pdf (default).
+        :param int revisionNumb: the revision number of the pathway (use 
+            '0 for most recent version).
+        :param bool display: if True the pathway will be displayed in your 
+            browser.
 
         .. note:: Method from bioservices. Not a WikiPathways function
         """
