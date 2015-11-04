@@ -84,6 +84,21 @@ Release History
 This is a summary of the changelog. Complete change can be found in the 
 `main documentation <http://pythonhosted.org//bioservices/ChangeLog.html>`_.
 
+
+
+1.4.X
+---------------
+
+* Renamed kegg.KEGG.info into dbinfo , which was overloaded with Logging
+* Replaced deprecated HGNC with the official web service from genenames.org
+* Fully updated EUtils since WSDL is now down; implementation uses REST now.
+* Removed the apps/taxonomy module now part of http://github.com/biokit. 
+* added http_delete in services.py
+
+
+
+
+
 1.3.X
 +++++++++++
 
