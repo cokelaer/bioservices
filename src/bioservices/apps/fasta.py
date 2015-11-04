@@ -1,5 +1,5 @@
 try:
-    from collection import OrderedDict
+    from collections import OrderedDict
 except:
     # for python 2.6
     from ordereddict import OrderedDict
