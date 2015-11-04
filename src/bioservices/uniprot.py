@@ -498,7 +498,11 @@ class UniProt(REST):
             print("uniref method requires Pandas")
             return
         res = self.http_get("uniref/", params={"query":query, 'format':'tab'}, frmt="txt")
-        res = pd.read_csv(io.StringIO(unicode(res.strip())), sep="\t")
+        try:
+            #python 2.X
+            res = pd.read_csv(io.StringIO(unicode(res)), sep="\t")
+        except:
+            res = pd.read_csv(io.StringIO(str(res.strip())), sep="\t")
         return res
 
     def get_df(self, entries, nChunk=100, organism=None):
@@ -539,7 +543,11 @@ class UniProt(REST):
             if len(res) == 0:
                 self.logging.warning("some entries %s not found" % entries)
             else:
-                df = pd.read_csv(io.StringIO(unicode(res)), sep="\t")
+                try:
+                    #python 2.X
+                    df = pd.read_csv(io.StringIO(unicode(res)), sep="\t")
+                except:
+                    df = pd.read_csv(io.StringIO(str(res)), sep="\t")
                 if isinstance(output, type(None)):
                     output = df.copy()
                 else:
