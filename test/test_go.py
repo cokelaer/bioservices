@@ -22,6 +22,7 @@ class test_quickGO(QuickGO):
         except:
             assert True
 
+    # very slow !
     @attr('slow')
     def test_annotation_wrong_limit(self):
         try:
