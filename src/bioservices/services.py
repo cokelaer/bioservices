@@ -22,8 +22,6 @@ import os
 import sys
 import socket
 import platform
-import json
-import easydev
 
 from bioservices.settings import BioServicesConfig
 
@@ -549,6 +547,16 @@ class REST(RESTbase):
 
     requests length is not limited to 2000 characters
     http://www.g-loaded.eu/2008/10/24/maximum-url-length/
+
+
+    There is no need for authentication if the web services available
+    in bioservices except for a few exception. In such case, the username and
+    password are to be provided with the method call. However, 
+    in the future if a services requires authentication, one can set the
+    attribute :attr:`authentication` to a tuple::
+
+        s = REST()
+        s.authentication = ('user', 'pass')
     """
     content_types = {
         'bed': 'text/x-bed',
@@ -731,6 +739,11 @@ class REST(RESTbase):
         try:
             kargs['params'] = params
             kargs['timeout'] = self.TIMEOUT
+            # Used only in biomart with cosmic database
+            # See doc/source/biomart.rst for an example
+            if hasattr(self, 'authentication'):
+                kargs['auth'] = self.authentication
+
             #res = self.session.get(url, **{'timeout':self.TIMEOUT, 'params':params})
             res = self.session.get(url, **kargs)
 
