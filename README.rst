@@ -4,11 +4,12 @@ BioServices
 .. image:: https://badge.fury.io/py/bioservices.svg
     :target: https://pypi.python.org/pypi/bioservices
 
-.. image:: https://pypip.in/d/bioservices/badge.png
-    :target: https://crate.io/packages/bioservices/
-
 .. image:: https://secure.travis-ci.org/cokelaer/bioservices.png
     :target: http://travis-ci.org/cokelaer/bioservices
+
+.. image:: https://img.shields.io/bioservices/dm/scriptcs.svg
+    :target: https://img.shields.io/bioservices/dm/scriptcs.svg
+    :alt: Number of PyPI downloads
 
 .. image:: https://coveralls.io/repos/cokelaer/bioservices/badge.png?branch=master 
    :target: https://coveralls.io/r/cokelaer/bioservices?branch=master 
