@@ -168,8 +168,11 @@ class BioMart(REST):
 
             http://www.biomart.org/biomart/martservice
 
-        Sometimes, the server is down, in which case you may want to use another
-        one (e.g., www.ensembl.org). To do so, use the **host** parameter.
+        It may be busy or take lots of time to initialise since it 
+        encompasses lots of different MARTS. Usually, one knows which 
+        MART to look at, in which case you may want to use a specific host
+        (e.g., www.ensembl.org) that will speed up significantly the
+        initialisation time. To do so, use the **host** parameter.
 
         :param str host: a valid host (e.g. "www.ensembl.org")
 
