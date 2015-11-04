@@ -1,5 +1,4 @@
-from collections import OrderedDict
-
+from ordereddict import OrderedDict
 from easydev.decorators import ifpylab, ifpandas
 
 __all__ = ["FASTA", "MultiFASTA"]
@@ -52,9 +51,11 @@ class MultiFASTA(object):
     """
     def __init__(self):
         # fetch the sequence using this attribute
+        print("Will be moved to BioKit github.com/biokit")
         self._fasta_fetcher = FASTA()
 
         # an ordered dictionary to store the fasta contents
+        # not python2.6 compatible
         self._fasta = OrderedDict()
 
     def __len__(self):
@@ -196,6 +197,7 @@ class FASTA(object):
 
     known_dbtypes = ["sp", "gi"]
     def __init__(self):
+        print("Will be moved to BioKit github.com/biokit")
         self._fasta = None
 
     def _get_fasta(self):
