@@ -7,8 +7,8 @@ BioServices
 .. image:: https://secure.travis-ci.org/cokelaer/bioservices.png
     :target: http://travis-ci.org/cokelaer/bioservices
 
-.. image:: https://img.shields.io/bioservices/dm/scriptcs.svg
-    :target: https://img.shields.io/bioservices/dm/scriptcs.svg
+.. image:: https://img.shields.io/pypi/dw/bioservices.svg
+    :target: https://img.shields.io/pypi/dw/bioservices.svg
     :alt: Number of PyPI downloads
 
 .. image:: https://coveralls.io/repos/cokelaer/bioservices/badge.png?branch=master 
