@@ -257,8 +257,9 @@ class PathwayCommons(REST):
         if organism:
             params['organism'] = organism
 
-        if len(params):
-            url += "&" + self.urlencode(params)
+        # version 1.4.3 not required anymore 
+        #if len(params):
+        #    url += "&" + self.urlencode(params)
 
         res = self.http_get(url, frmt=self.default_extension,
                 params=params)
