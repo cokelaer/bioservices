@@ -258,6 +258,8 @@ class PICR(REST):
             >>> res = s.getUPIForBLAST(s._blastfrag_example, "SWISSPROT",
                    program="blastp", matrix="BLOSUM80")
 
+        .. todo:: add missing parameters such as filtertype, blast parameters,
+            identity Value and so on.
         """
         url = "getUPIForBLAST"
         params = {'blastfrag': blastfrag}
