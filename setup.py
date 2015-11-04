@@ -69,8 +69,10 @@ setup(
     package_dir = {'':'src'},
     packages = ['bioservices', 'bioservices.apps', 'bioservices.mapping'],
     #package_dir  = package_dir,
+
+    # If user of python2.6 ordereddict must be installed manually
     install_requires = ["grequests", "requests", "requests_cache", 
-        'ordereddict', "easydev>=0.9.3", "beautifulsoup4",  
+        "easydev>=0.9.3", "beautifulsoup4",  
         "suds-jurko", "appdirs", 'wrapt'],
     )
 

@@ -1,4 +1,8 @@
-from ordereddict import OrderedDict
+try:
+    from collection import OrderedDict
+except:
+    # for python 2.6
+    from ordereddict import OrderedDict
 from easydev.decorators import ifpylab, ifpandas
 
 __all__ = ["FASTA", "MultiFASTA"]
