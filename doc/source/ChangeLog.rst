@@ -10,6 +10,12 @@ Revision 1.4
   * CHANGES:
      * Renamed kegg.KEGG.info into dbinfo , which was overloaded with Logging
      * Updated all documentation to check examples
+     * Fixed tests and notebooks
+     * clean and tested doctests in the documentation
+  * NEWS:
+     * Replace deprecated HGNC with the official web service from genenames.org
+     
+
 
 *1.4.0
   * CHANGES: 
