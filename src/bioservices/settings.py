@@ -232,7 +232,13 @@ class ConfigReadOnly(object):
             for option in options:
                 key = section + '.' + option
                 value = self._default_params[key]
-                fh.write("# {}\n{} = {}\n".format(value[2], option, value[0]))
+                try:
+                    fh.write("# {}\n{} = {}\n".format(value[2], 
+                        option, value[0]))
+                except:
+                    print('Could not write this value/option. skipped')
+                    print(value, option)
+
             fh.write("\n")
         fh.close()
 
@@ -276,7 +282,3 @@ class BioServicesConfig(ConfigReadOnly):
     def _set_max_retries(self, max_retries):
         self.params['general.max_retries'][0] = max_retries
     MAX_RETRIES = property(_get_max_retries, _set_max_retries)
-
-
-
-
