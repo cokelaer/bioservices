@@ -20,7 +20,7 @@ BioServices
 .. image:: https://badge.waffle.io/cokelaer/bioservices.png?label=ready&title=Ready 
    :target: https://waffle.io/cokelaer/bioservices
 
-:Python version available: BioServices is tested for Python 2.6,2.7, 3.3. 3.4
+:Python version available: BioServices is tested for Python 2.6,2.7, 3.3, 3.4, 3.5
 :Contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
 :Issues: Please use https://github.com/cokelaer/bioservices/issues
 :How to cite: Cokelaer et al. *BioServices: a common Python package to access biological Web Services programmatically*
