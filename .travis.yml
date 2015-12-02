@@ -22,7 +22,8 @@ before_install:
 
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION grequests requests requests_cache
+  - pip install grequests
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION requests requests_cache
   - pip install easydev>=0.9.7 beautifulsoup4 suds-jurko appdirs
   - pip install coveralls nose
 # # command to run tests, e.g. python setup.py test
