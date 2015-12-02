@@ -6,6 +6,9 @@ Whats' new, what has changed
 Revision 1.4
 ---------------
 
+* 1.4.2
+  * CHANGES: update setup dependencies.
+
 *1.4.1
   * CHANGES:
      * Renamed kegg.KEGG.info into dbinfo , which was overloaded with Logging
