@@ -18,10 +18,11 @@ before_install:
     # This help testing code with pylab
     - "export DISPLAY=:99.0"
     - "sh -e /etc/init.d/xvfb start"
-    - conda install --name grequests requests requests_cache
+
 
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION grequests requests requests_cache
   - pip install easydev>=0.9.7 beautifulsoup4 suds-jurko appdirs
   - pip install coveralls nose
 # # command to run tests, e.g. python setup.py test
