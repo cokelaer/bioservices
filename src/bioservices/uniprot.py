@@ -180,8 +180,8 @@ class UniProt(REST):
     _mapping = mapping.copy()
     _url = "http://www.uniprot.org"
     _valid_columns = ['citation', 'clusters', 'comments', 'database',
-                'domains','domain', 'ec', 'id', 'entry name', 'existence'
-                'families', 'feature', 'features', 'genes', 'go', 'go-id', 'interpro'
+                'domains','domain', 'ec', 'id', 'entry name', 'existence',
+                'families', 'feature', 'features', 'genes', 'go', 'go-id', 'interpro',
                 'interactor', 'keywords', 'keyword-id', 'last-modified',
                 'length', 'organism', 'organism-id', 'pathway', 'protein names',
                 'reviewed', 'score', 'sequence', '3d', 'subcellular locations',
@@ -568,7 +568,7 @@ class UniProt(REST):
                 output[col] = res
             except:
                 self.logging.warning("column could not be parsed. %s" % col)
-        # Sequences are splitted into chunks of 10 characters. let us rmeove 
+        # Sequences are splitted into chunks of 10 characters. let us rmeove
         # the spaces:
         output.Sequence = output['Sequence'].apply(lambda x: x.replace(" ", ""))
 
