@@ -1,0 +1,11 @@
+# Distribution / packaging
+
+src/*.egg-info
+
+# Byte-compiled
+
+*.pyc
+
+# Unit test / coverage reports
+
+.coverage
