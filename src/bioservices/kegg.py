@@ -1375,7 +1375,9 @@ class KEGGParser(Logging):
                     'CARCINOGEN', 'MARKER', 'PRODUCT']: # do not interpret to keep structure
                 pass
             else:
-                print("""\nWarning. Found keyword %s, which has not special parsing for now. please report this issue with the identifier (%s) into github.com/bioservices""" % (key,output['ENTRY']))
+                print("""\nWarning. Found keyword %s, which has not special
+    parsing for now. please report this issue with the KEGG 
+    identifier (%s) into github.com/bioservices. Thanks T.C.""" % (key,output['ENTRY']))
 
         return output
 

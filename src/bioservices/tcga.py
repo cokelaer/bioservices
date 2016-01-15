@@ -57,7 +57,7 @@ class TCGA(REST):
                 self).__init__(url="http://tcga-data.nci.nih.gov",
             name="TCGA", verbose=verbose, cache=cache)
 
-    def search_annotations(self, item=None, annotationId):
+    def search_annotations(self, item, annotationId):
         """Obtain Term information
 
         """
