@@ -1,4 +1,8 @@
 language: python
+os:
+    -linux
+    -osx
+
 matrix:
   include:
     - python: 2.6
