@@ -42,6 +42,7 @@ try:
 except:
     from urllib2 import quote
 
+
 class ChemSpider(REST):
     """ChemSpider Web Service Interface
 

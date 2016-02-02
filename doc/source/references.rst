@@ -298,10 +298,3 @@ FASTA
     :members:
     :undoc-members:
     :synopsis:
-
-Taxonomy
-=============
-.. automodule:: bioservices.apps.taxonomy
-    :members:
-    :undoc-members:
-    :synopsis:

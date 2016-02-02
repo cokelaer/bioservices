@@ -6,8 +6,15 @@ Whats' new, what has changed
 Revision 1.4
 ---------------
 
+* 1.4.4:
+  * NEWS: ENA module and class added
+
+* 1.4.3
+  * BUG: fix typo in a draft tcga module
+
 * 1.4.2
   * CHANGES: update setup dependencies.
+  * Typo fixed in uniprot list of valid columns #47
 
 *1.4.1
   * CHANGES:

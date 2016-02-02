@@ -1,13 +1,4 @@
 from bioservices import UniProt
-from easydev import Logging
-
-
-
-
-
-
-
-
 
 
 class Mapping(object):

@@ -42,8 +42,11 @@
 .. http://www.uniprot.org/docs/pkinfam
 
 """
-from services import REST
-from xmltools import readXML
+import re
+from bioservices.services import REST
+from bioservices.xmltools import readXML
+
+
 __all__ = ["BioCarta"]
 
 

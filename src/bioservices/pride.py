@@ -354,9 +354,11 @@ class PRIDE(REST):
         """
         params = self.get_peptide_list.actual_kwargs
         if sequence is None:
-            res = self.http_get('peptide/list/project/%s' % identifier, params=params)
+            res = self.http_get('peptide/list/project/%s' % identifier, 
+                    params=params)
         else:
-            res = self.http_get('peptide/list/project/%s/sequence/%s' % (identifier, sequence))
+            res = self.http_get('peptide/list/project/%s/sequence/%s' 
+                    % (identifier, sequence))
 
         try:
             res = res['list']
