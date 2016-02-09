@@ -6,7 +6,7 @@
 #
 #  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -43,6 +43,9 @@
 
 """
 import re
+import urllib
+
+from bs4 import BeautifulSoup
 from bioservices.services import REST
 from bioservices.xmltools import readXML, HTTPError
 
@@ -54,12 +57,12 @@ try:
 except NameError:
     text = str
 
+
 class BioCarta(REST):
     """Interface to `BioCarta <http://www.biocarta.com>`_ pages
 
-
     This is not a REST interface actually but rather a parser to some of the
-    HTML pages relatd to pathways.
+    HTML pages related to pathways.
 
     One can retrieve the pathways names and their list of proteins.
 
@@ -72,14 +75,14 @@ class BioCarta(REST):
     .. warning:: biocarta pathways layout can be accesses from PID
 
     """
-    _url = "http://www.biocarta.com/"
+    _url = "http://cgap.nci.nih.gov/Pathways/BioCarta_Pathways"
 
     _organism_prefixes = {'Homo sapiens': 'h', 'Mus musculus': 'm'}
     organisms = set(_organism_prefixes.keys())
 
     _all_pathways = None
     _pathway_categories = None
-    _all_pathways_url =  "http://www.biocarta.com/genes/allPathways.asp"
+    _all_pathways_url =  "http://cgap.nci.nih.gov/Pathways/BioCarta_Pathways"
 
     def __init__(self, verbose=True):
         """**Constructor**
@@ -118,65 +121,73 @@ class BioCarta(REST):
     def _get_all_pathways(self):
         """returns pathways from biocarta
 
-        all human and mouse. can perform a selectiom
+        human and mouse organisms are available but only those corresponding
+        to the organism defined in :attr:`organism` are returned.
         """
+        if self.organism is None:
+           raise ValueError(
+                "Please set the organism attribute to one of %s" %
+                self._organism_prefixes.keys())
+
         if BioCarta._all_pathways is None:
             BioCarta._all_pathways = readXML(self._all_pathways_url)
+
         if self._pathways is None:
-            url_pattern = re.compile("^/pathfiles/%s_(.+)[Pp]athway.asp" % self._organism_prefix)
+
+            url_pattern = re.compile("http://cgap.nci.nih.gov/Pathways/BioCarta/%s_(.+)[Pp]athway" \
+                % (self._organism_prefix))
             is_pathway_url = lambda tag: tag.name == "a" and not tag.has_attr("class")
             self._pathways = BioCarta._all_pathways.findAll(is_pathway_url, href=url_pattern)
-            self._pathways = {url_pattern.match(a["href"]).group(1):
-                              text(a.find_previous_sibling("a", class_="genesrch").string.rstrip())
-                              for a in self._pathways}
-        return self._pathways
 
+            # Now let us select only the name.
+            self._pathways = sorted([entry.attrs['href'].rsplit("/", 1)[1]
+                              for entry in self._pathways])
+        return self._pathways
     all_pathways = property(_get_all_pathways)
 
     def get_pathway_protein_names(self, pathway):
-        """returns list of list. Each elements is made of 3 items: gene name,
-        locusId and accession (often empty
+        """returns list of genes for the corresponding pathway
 
-        Requires to parse HTML page such as
-        http://www.biocarta.com/pathfiles/m_actinYPathway.asp
+        This function scans an HTML page. We have not found another way to 
+        get the gene list in a more reobust way. This function was tested on 
+        one pathway. Please use with caution.
 
-        to figure out the URL that would pop up if we press the protein list
-        button. For instance:
-
-        http://www.biocarta.com/pathfiles/PathwayProteinList.asp?showPFID=175
-
-        but now we need to parse the HTML, which is not necessaray very robust.
-        THere are many tables and we want to access one that is a children of
-        another... Finally, We scan the table for tr and td tags.
-
-        The most difficult is to find the good table which is hardcoded to be
-        the third that contains a th[0] == "Gene name". Although there is only
-        one, 3 are returned due probably to an error in the parsing or the HTMl
-        file itself. To be checked and made more robust.
 
         """
-        url_pattern = re.compile('pathfiles/PathwayProteinList\.asp\?showPFID=\d+')
-        url = self._url + "pathfiles/{organism}_{name}Pathway.asp"
-        url = url.format(organism=self._organism_prefix, name=pathway)
-        self.logging.info("Reading " + url)
-        try:
-            url = readXML(url).soup.find('a', href=url_pattern)
-        except HTTPError as error:
-            if error.code == 404:
-                raise ValueError("Pathway not found ({}): {}".format(self.organism, pathway))
-            raise
+        self.logging.info("Fetching the pathway")
+        # first identify gene from GeneInfo tag
+        # this is not XML but HTML
+        url = "http://cgap.nci.nih.gov/Pathways/BioCarta/%s" % pathway
+        html_doc = urllib.urlopen(url).read()
+        soup = BeautifulSoup(html_doc, 'html.parser')
+        links = soup.find_all('area')
+        links = [link for link in links if 'GeneInfo' in link.get('href')]
 
-        url = self._url + url_pattern.search(url['href']).group(0)
-        self.logging.info("Reading " + url)
-        html = readXML(url).soup
+        links = set([link.attrs['href'] for link in links])
 
+        self.logging.info("Scanning information about %s genes" % len(links))
+        # open each page and get info
         genes = {}
-        header = html.th.parent
-        for row in header.find_next_siblings('tr'):
-            gene_info = [x.string for x in row.find_all('td')]
-            if any(x is None for x in gene_info[:2]):
-                raise RuntimeError("Information missing: {}".format(gene_info))
-            gene_id = gene_info[1]
-            gene_name = gene_info[0].rstrip()
-            genes[gene_id] = gene_name
+        for link in links:
+            html_doc = urllib.urlopen(link).read()
+            soup = BeautifulSoup(html_doc, 'html.parser')
+
+            table_gene_info = soup.findAll("table")[1]
+
+            gene_name = link.rsplit("=", 1)[1]
+            self.logging.info(" - " + gene_name)
+
+            genes[gene_name] = {}
+            self.tt = table_gene_info
+            for row in table_gene_info.find_all('tr'):
+                entry = row.find_all('td')
+                try:key = entry[0].text.strip()
+                except:continue
+                try:value = entry[1].text.strip()
+                except:continue
+                if "[Text]" in key:
+                    continue
+                genes[gene_name][key] = value
+
+
         return genes
