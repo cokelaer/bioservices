@@ -44,11 +44,15 @@
 """
 import re
 from bioservices.services import REST
-from bioservices.xmltools import readXML
-
+from bioservices.xmltools import readXML, HTTPError
 
 __all__ = ["BioCarta"]
 
+# method for unicode transformation
+try:
+    text = unicode
+except NameError:
+    text = str
 
 class BioCarta(REST):
     """Interface to `BioCarta <http://www.biocarta.com>`_ pages
@@ -69,6 +73,14 @@ class BioCarta(REST):
 
     """
     _url = "http://www.biocarta.com/"
+
+    _organism_prefixes = {'Homo sapiens': 'h', 'Mus musculus': 'm'}
+    organisms = set(_organism_prefixes.keys())
+
+    _all_pathways = None
+    _pathway_categories = None
+    _all_pathways_url =  "http://www.biocarta.com/genes/allPathways.asp"
+
     def __init__(self, verbose=True):
         """**Constructor**
 
@@ -77,19 +89,49 @@ class BioCarta(REST):
         super(BioCarta, self).__init__(name="BioCarta", url=BioCarta._url, verbose=verbose)
         self.fname  = "biocarta_pathways.txt"
 
-        self._allPathwaysURL =  "http://www.biocarta.com/genes/allPathways.asp"
+        self._organism = None
+        self._organism_prefix = None
+        self._pathways = None
 
-    def get_pathway_names(self, startswith=""):
+    # set the default organism used by pathways retrieval
+    def _get_organism(self):
+        return self._organism
+
+    def _set_organism(self, organism):
+        organism = organism[:1].upper() + organism[1:].lower()
+        if organism == self._organism: return
+        if organism not in BioCarta.organisms:
+            raise ValueError("Invalid organism. Check the list in :attr:`organisms` attribute")
+
+        self._organism = organism
+        self._organism_prefix = BioCarta._organism_prefixes[organism]
+        self._pathways = None
+
+    organism = property(_get_organism, _set_organism, doc="returns the current default organism")
+
+    def _get_pathway_categories(self):
+        if self._pathway_categories is None:
+            self._pathway_categories = self.http_get_ou_post()
+        return self._pathway_categories
+    pathway_categories = property(_get_pathway_categories)
+
+    def _get_all_pathways(self):
         """returns pathways from biocarta
 
         all human and mouse. can perform a selectiom
         """
-        x = readXML(self._allPathwaysURL)
-        pathways = [this.get("href") for this in x.findAll("a") if "pathfiles" in this.get("href")]
-        pathways =  [str(xx.split("/")[-1]) for xx in pathways] # split the drive
-        pathways = sorted(list(set(pathways)))
-        pathways = [xx for xx in pathways if xx.startswith(startswith)]
-        return pathways
+        if BioCarta._all_pathways is None:
+            BioCarta._all_pathways = readXML(self._all_pathways_url)
+        if self._pathways is None:
+            url_pattern = re.compile("^/pathfiles/%s_(.+)[Pp]athway.asp" % self._organism_prefix)
+            is_pathway_url = lambda tag: tag.name == "a" and not tag.has_attr("class")
+            self._pathways = BioCarta._all_pathways.findAll(is_pathway_url, href=url_pattern)
+            self._pathways = {url_pattern.match(a["href"]).group(1):
+                              text(a.find_previous_sibling("a", class_="genesrch").string.rstrip())
+                              for a in self._pathways}
+        return self._pathways
+
+    all_pathways = property(_get_all_pathways)
 
     def get_pathway_protein_names(self, pathway):
         """returns list of list. Each elements is made of 3 items: gene name,
@@ -113,26 +155,28 @@ class BioCarta(REST):
         file itself. To be checked and made more robust.
 
         """
-        url = self._url + "/pathfiles/" + pathway
-        x = readXML(url)
+        url_pattern = re.compile('pathfiles/PathwayProteinList\.asp\?showPFID=\d+')
+        url = self._url + "pathfiles/{organism}_{name}Pathway.asp"
+        url = url.format(organism=self._organism_prefix, name=pathway)
         self.logging.info("Reading " + url)
-        protein_url = [this.get("href") for this in x.findAll("a") \
-                if 'href' in this and "Protein" in this.get("href")]
-        if len(protein_url) == 0:
-            return None
-        else:
-            link = protein_url[0]
-            link = link.split("/pathfiles/")[-1]
-            link = str(link) # get rid of unicode ?
-            link = link.strip("')")
-            url = self._url + "/pathfiles/" + link
-            self.logging.info("Reading " + url)
-            x = readXML(url)
+        try:
+            url = readXML(url).soup.find('a', href=url_pattern)
+        except HTTPError as error:
+            if error.code == 404:
+                raise ValueError("Pathway not found ({}): {}".format(self.organism, pathway))
+            raise
 
-            # seems to work
-            table = [this for this in x.findAll("table") if this.findAll("th")
-                    and  this.findAll("th")[0].getText() == "Gene Name"][2]
-            # now get the genename, locus and accession
-            rows = [[y.getText() for y in xx.findAll("td")] for xx in  table.findAll("tr")]
-            rows = [xx for xx in rows if len(x)]
-            return rows
+        url = self._url + url_pattern.search(url['href']).group(0)
+        self.logging.info("Reading " + url)
+        html = readXML(url).soup
+
+        genes = {}
+        header = html.th.parent
+        for row in header.find_next_siblings('tr'):
+            gene_info = [x.string for x in row.find_all('td')]
+            if any(x is None for x in gene_info[:2]):
+                raise RuntimeError("Information missing: {}".format(gene_info))
+            gene_id = gene_info[1]
+            gene_name = gene_info[0].rstrip()
+            genes[gene_id] = gene_name
+        return genes

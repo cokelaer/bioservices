@@ -24,8 +24,9 @@ import bs4
 
 try:
     from urllib.request import urlopen
+    from urllib.error import HTTPError
 except:
-    from urllib2 import urlopen
+    from urllib2 import urlopen, HTTPError
 
 __all__ = ["easyXML", "readXML"]
 

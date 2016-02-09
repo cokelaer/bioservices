@@ -36,6 +36,9 @@ except:
     from urllib import urlencode
     from urllib2  import urlopen, Request, HTTPError
 
+# fixing compatibility issue of input/raw_input
+if 'raw_input' in __builtins__: input = raw_input
+
 # This is a hack in case suds is already installed.
 # Indded, we want suds_jurko instead
 sys.path = [x for x in sys.path if 'suds-' not in x]
@@ -592,14 +595,15 @@ class REST(RESTbase):
 
     def delete_cache(self):
         import os
-        if os.path.exists(self.CACHE_NAME + '.sqlite'):
-            msg = "You are about to delete this bioservices cache %s. proceed y/n"
-            res = raw_input(msg % self.CACHE_NAME)
+        cache_file = self.CACHE_NAME + '.sqlite'
+        if os.path.exists(cache_file):
+            msg = "You are about to delete this bioservices cache: %s. Proceed? (y/[n]) "
+            res = input(msg % cache_file)
             if res == "y":
-                os.remove(self.CACHE_NAME + '.sqlite')
+                os.remove(cache_file)
                 print("Removed cache")
             else:
-                print("reply 'y' to delete the file")
+                print("Reply 'y' to delete the file")
 
     def clear_cache(self):
         from requests_cache import clear
@@ -722,7 +726,7 @@ class REST(RESTbase):
         #return self.get_one(**{'frmt': frmt, 'query': query, 'params':params})
         return self.get_one(query, frmt, params=params, **kargs)
 
-    def get_one(self, query, frmt='json', params={}, **kargs):
+    def get_one(self, query=None, frmt='json', params={}, **kargs):
         """
 
         if query starts with http:// do not use self.url
@@ -781,7 +785,7 @@ Consider increasing it with settings.TIMEOUT attribute""".format(self.settings.T
         kargs.update({'frmt':frmt})
         return self.post_one(**kargs)
 
-    def post_one(self, query, frmt='json', **kargs):
+    def post_one(self, query=None, frmt='json', **kargs):
         self.logging.debug("BioServices:: Entering post_one function")
         if query is None:
             url = self.url
