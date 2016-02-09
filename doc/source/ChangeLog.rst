@@ -6,8 +6,14 @@ Whats' new, what has changed
 Revision 1.4
 ---------------
 * 1.4.5:
-  * CHANGES: Uniprot valid columns update
-  * BUG: fix a test in test_eutils 
+  * CHANGES: 
+    * Uniprot valid columns update
+    * https://github.com/cokelaer/bioservices/pull/35 with biocarta module updates
+  * BUG: 
+    * fix a test in test_eutils 
+    * Fix KEGG parser  https://github.com/cokelaer/bioservices/pull/35
+    * Fix Service input py2/3 compat and unset argument https://github.com/cokelaer/bioservices/pull/35
+
 
 
 * 1.4.4:
