@@ -5,6 +5,10 @@ Whats' new, what has changed
 
 Revision 1.4
 ---------------
+* 1.4.5:
+  * CHANGES: Uniprot valid columns update
+  * BUG: fix a test in test_eutils 
+
 
 * 1.4.4:
   * NEWS: ENA module and class added

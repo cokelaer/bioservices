@@ -187,27 +187,36 @@ class UniProt(REST):
     #                   'sequence-modified', 'proteome']
     _valid_columns = [
         # Names & Taxonomy
-        'id', 'entry name', 'genes', 'genes(PREFERRED)', 'genes(ALTERNATIVE)', 'genes(OLN)', 'genes(ORF)', 'organism',
-        'organism-id', 'protein names', 'proteome', 'lineage(ALL)', 'lineage-id', 'virus hosts',
+        'id', 'entry name', 'genes', 'genes(PREFERRED)', 'genes(ALTERNATIVE)', 
+        'genes(OLN)', 'genes(ORF)', 'organism', 'organism-id', 'protein names', 
+        'proteome', 'lineage(ALL)', 'lineage-id', 'virus hosts',
         # Sequences
-        'fragement', 'sequence', 'length', 'mass', 'encodedon', 'comment(ALTERNATIVE PRODUCTS)',
-        'comment(ERRONEOUS GENE MODEL PREDICTION)', 'comment(ERRONEOUS INITIATION)', 'comment(ERRONEOUS TERMINATION)',
-        'comment(ERRONEOUS TRANSLATION)', 'comment(FRAMESHIFT)', 'comment(MASS SPECTROMETRY)', 'comment(POLYMORPHISM)',
-        'comment(RNA EDITING)', 'comment(SEQUENCE CAUTION)', 'feature(ALTERNATIVE SEQUENCE)',
-        'feature(NATURAL VARIANT)', 'feature(NON ADJACENT RESIDUES)', 'feature(NON STANDARD RESIDUE)',
-        'feature(NON TERMINAL RESIDUE)', 'feature(SEQUENCE CONFLICT)', 'feature(SEQUENCE UNCERTAINTY)',
+        'fragement', 'sequence', 'length', 'mass', 'encodedon', 
+        'comment(ALTERNATIVE PRODUCTS)', 'comment(ERRONEOUS GENE MODEL PREDICTION)', 
+        'comment(ERRONEOUS INITIATION)', 'comment(ERRONEOUS TERMINATION)', 
+        'comment(ERRONEOUS TRANSLATION)', 'comment(FRAMESHIFT)', 
+        'comment(MASS SPECTROMETRY)', 'comment(POLYMORPHISM)',
+        'comment(RNA EDITING)', 'comment(SEQUENCE CAUTION)', 
+        'feature(ALTERNATIVE SEQUENCE)', 'feature(NATURAL VARIANT)', 
+        'feature(NON ADJACENT RESIDUES)', 
+        'feature(NON STANDARD RESIDUE)', 'feature(NON TERMINAL RESIDUE)', 
+        'feature(SEQUENCE CONFLICT)', 'feature(SEQUENCE UNCERTAINTY)',  
         'version(sequence)',
         # Family and Domains
-        'domains', 'domain', 'comment(DOMAIN)', 'comment(SIMILARITY)', 'feature(COILED COIL)',
-        'feature(COMPOSITIONAL BIAS)', 'feature(DOMAIN EXTENT)', 'feature(MOTIF)', 'feature(REGION)',
+        'domains', 'domain', 'comment(DOMAIN)', 'comment(SIMILARITY)', 
+        'feature(COILED COIL)', 'feature(COMPOSITIONAL BIAS)', 
+        'feature(DOMAIN EXTENT)', 'feature(MOTIF)', 'feature(REGION)',
         'feature(REPEAT)', 'feature(ZINC FINGER)',
         # Function
-        'ec', 'comment(ABSORPTION)', 'comment(CATALYTIC ACTIVITY)', 'comment(COFACTOR)', 'comment(ENZYME REGULATION)',
-        'comment(FUNCTION)', 'comment(KINETICS)', 'comment(PATHWAY)', 'comment(REDOX POTENTIAL)',
-        'comment(TEMPERATURE DEPENDENCE)', 'comment(PH DEPENDENCE)', 'feature(ACTIVE SITE)', 'feature(BINDING SITE)',
-        'feature(DNA BINDING)', 'feature(METAL BINDING)', 'feature(NP BIND)', 'feature(SITE)',
+        'ec', 'comment(ABSORPTION)', 'comment(CATALYTIC ACTIVITY)', 
+        'comment(COFACTOR)', 'comment(ENZYME REGULATION)', 'comment(FUNCTION)', 
+        'comment(KINETICS)', 'comment(PATHWAY)', 'comment(REDOX POTENTIAL)',
+        'comment(TEMPERATURE DEPENDENCE)', 'comment(PH DEPENDENCE)', 
+        'feature(ACTIVE SITE)', 'feature(BINDING SITE)', 'feature(DNA BINDING)',
+        'feature(METAL BINDING)', 'feature(NP BIND)', 'feature(SITE)',
         # Gene Ontologys
-        'go', 'go(biological process)', 'go(molecular function)', 'go(cellular component)', 'go-id',
+        'go', 'go(biological process)', 'go(molecular function)', 
+        'go(cellular component)', 'go-id',
         # InterPro
         'interpro',
         # Interaction
@@ -219,12 +228,15 @@ class UniProt(REST):
         # Structure
         '3d', 'feature(BETA STRAND)', 'feature(HELIX)', 'feature(TURN)',
         # Subcellular location
-        'comment(SUBCELLULAR LOCATION)', 'feature(INTRAMEMBRANE)', 'feature(TOPOLOGICAL DOMAIN)',
+        'comment(SUBCELLULAR LOCATION)', 'feature(INTRAMEMBRANE)', 
+        'feature(TOPOLOGICAL DOMAIN)',
         'feature(TRANSMEMBRANE)',
         # Miscellaneous
-        'annotation score', 'score', 'features', 'comment(CAUTION)', 'comment(GENERAL)', 'keywords', 'context',
-        'existence', 'tools', 'reviewed', 'feature', 'families', 'subcellular locations', 'taxonomy', 'version',
-        'clusters', 'comments', 'database', 'keyword-id', 'pathway', 'score']
+        'annotation score', 'score', 'features', 'comment(CAUTION)', 
+        'comment(GENERAL)', 'keywords', 'context', 'existence', 'tools', 
+        'reviewed', 'feature', 'families', 'subcellular locations', 'taxonomy', 
+        'version', 'clusters', 'comments', 'database', 'keyword-id', 'pathway', 
+        'score']
 
     def __init__(self, verbose=False, cache=False):
         """**Constructor**
