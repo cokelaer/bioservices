@@ -54,7 +54,7 @@ from . import chebi
 from .chebi import *
 
 from . import ena
-from ena import ENA
+from .ena import ENA
 
 from . import ensembl
 from .ensembl import *

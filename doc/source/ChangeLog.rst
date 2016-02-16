@@ -5,7 +5,10 @@ Whats' new, what has changed
 
 Revision 1.4
 ---------------
-* 1.4.5:
+* 1.4.5: 
+  * BUG: Fixes a python3 wrong import
+
+* 1.4.4:
   * CHANGES: 
     * Uniprot: update valid columns
     * https://github.com/cokelaer/bioservices/pull/35 with biocarta module updates
@@ -14,10 +17,6 @@ Revision 1.4
     * Fix KEGG parser  https://github.com/cokelaer/bioservices/pull/35
     * Fix Service input py2/3 compat and unset argument https://github.com/cokelaer/bioservices/pull/35
     * Update biocarta: the website has changed and the code needed to be updated
-
-
-
-* 1.4.4:
   * NEWS: ENA module and class added
 
 * 1.4.3
