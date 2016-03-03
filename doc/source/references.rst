@@ -241,6 +241,16 @@ Readseq
     :undoc-members:
     :synopsis:
 
+RNASEQ Analysis
+======================
+
+.. automodule:: bioservices.rrnaseq_ebi
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
+
 
 UniChem
 ===================================================================

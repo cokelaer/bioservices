@@ -47,6 +47,12 @@ from .settings import *
 from . import services
 from .services import *
 
+from . import biodbnet
+from .biodbnet import *
+
+from . import biocarta
+from .biocarta import *
+
 from . import biomodels
 from .biomodels import *
 
@@ -92,9 +98,8 @@ from .uniprot import *
 from . import unichem
 from .unichem import *
 
-from . import wsdbfetch
-from .wsdbfetch import *
-
+from . import rnaseq_ebi
+from .rnaseq_ebi import RNASEQ_EBI
 
 from . import reactome
 from .reactome import *
@@ -140,11 +145,10 @@ from .pathwaycommons import *
 from . import muscle
 from .muscle import *
 
-from . import biodbnet
-from .biodbnet import *
 
-from . import biocarta
-from .biocarta import *
+
+from . import wsdbfetch
+from .wsdbfetch import *
 
 # sub packages inside bioservices.
 
