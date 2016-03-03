@@ -1,7 +1,9 @@
 from bioservices.muscle import MUSCLE
 from bioservices import uniprot
+from nose.plugins.attrib import attr
 
 
+@attr('skip_travis')
 def test_muscle():
     m = MUSCLE(verbose=False)
     m.parameters
