@@ -9,14 +9,18 @@ def test1():
 
     r.get_run_by_organism("homo_sapiens", "tsv")
     r.get_run_by_organism("homo_sapiens", "json")
+    
+    r.get_run_by_organism("homo_sapiens",condition="central nervous system")
 
 def test2():
 
     r.get_run_by_study("SRP033494", mapping_quality=90, frmt='tsv')
 
 def test3():
-    res = r.get_study("SRP033494")
+    res = r.get_study("SRP033494", "tsv")
+    
 
+    res = r.get_study("SRP033494", frmt="json")
     assert res[0]['STUDY_ID'] == "SRP033494"
 
 def test4():
@@ -26,10 +30,16 @@ def test4():
         studies = res['STUDY_ID'].values
     except:
         res = r.get_studies_by_organism("arabidopsis_thaliana", frmt='tsv')
-        studies = [x['STUDY_ID'] for x in res]
+        studies = [x[0] for x in res[1:]]
+
 
 def test5():
     r.get_sample_attribute_per_run("SRR805786")
+    r.get_sample_attribute_per_run("SRR805786", frmt='tsv')
+    
     r.get_sample_attribute_per_study("SRP020492")
+    r.get_sample_attribute_per_study("SRP020492", frmt='tsv')
+    
     r.get_sample_attribute_per_study("SRP020492")
+    r.get_sample_attribute_per_study("SRP020492", frmt='tsv')
 
