@@ -244,7 +244,7 @@ Readseq
 RNASEQ Analysis
 ======================
 
-.. automodule:: bioservices.rrnaseq_ebi
+.. automodule:: bioservices.rnaseq_ebi
     :members:
     :undoc-members:
     :synopsis:

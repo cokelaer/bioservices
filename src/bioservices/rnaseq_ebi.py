@@ -86,7 +86,7 @@ class RNASEQ_EBI(REST):
         :param organism: Check the :attr:`organism` attributes for valid names
         :param frmt: json or tsv
         :param mapping_quality: Min. percentage of reads mapped to genome reference
-        :param condition:: check if them existsi n EFO (e.g. cancer)
+        :param condition: check if it exists in EFO (e.g. cancer)
             ( http://www.ebi.ac.uk/efo)
 
         :return: If Pandas is installed and frmt is set to *tsv*, the
@@ -104,22 +104,24 @@ class RNASEQ_EBI(REST):
                             condition="central nervous system")
 
 
-        Returned fields:
-
-        ASSEMBLY_USED :      Genome reference assembly name
-        BIOREP_ID:           ENA Run ID or a unique label for tech. replicates in RUN_IDS
-        ENA_LAST_UPDATED :   Date ENA record for was last updated
-        FTP_LOCATION:        FTP location of the CRAM file
-        LAST_PROCESSED_DATE: Date the run(s) were last analysed
-        ORGANISM:            Organism of samples in SAMPLE_IDS
-        MAPPING_QUALITY :    Percentage of reads mapped to the genome reference
-        REFERENCE_ORGANISM:  Genome reference organism
-        RUN_IDS:             List of ENA Run ID's corresponding to BIOREP_ID
-        SAMPLE_ATTRIBUTE_TYPE: Matched sample attribute type
-        SAMPLE_ATTRIBUTE_VALUE: Matched sample attribute value
-        SAMPLE_IDS:         List of BioSamples DB ID's corresponding to BIOREP_ID
-        STATUS:             Processing status
-        STUDY_ID:           ENA Study ID
+        .. csv-table:: Returned fields
+            :header: "name", "description"
+            :widths: 30,70
+        
+            ASSEMBLY_USED ,      Genome reference assembly name
+            BIOREP_ID,           ENA Run ID or a unique label for tech. replicates in RUN_IDS
+            ENA_LAST_UPDATED ,   Date ENA record for was last updated
+            FTP_LOCATION,        FTP location of the CRAM file
+            LAST_PROCESSED_DATE, Date the run(s) were last analysed
+            ORGANISM,            Organism of samples in SAMPLE_IDS
+            MAPPING_QUALITY ,    Percentage of reads mapped to the genome reference
+            REFERENCE_ORGANISM,  Genome reference organism
+            RUN_IDS,             List of ENA Run ID's corresponding to BIOREP_ID
+            SAMPLE_ATTRIBUTE_TYPE, Matched sample attribute type
+            SAMPLE_ATTRIBUTE_VALUE, Matched sample attribute value
+            SAMPLE_IDS,         List of BioSamples DB ID's corresponding to BIOREP_ID
+            STATUS,             Processing status
+            STUDY_ID,           ENA Study ID
 
 
         """
@@ -140,7 +142,8 @@ class RNASEQ_EBI(REST):
         return results
 
     def get_run_by_study(self, study, frmt="json", mapping_quality=70):
-        """See :meth:`get_run_by_organism`
+        """Access to the RUNS for a given study
+
 
         :param study: a valid study name eg SRP1042759
         :param frmt: json or tsv
@@ -148,7 +151,11 @@ class RNASEQ_EBI(REST):
 
 
         :return: See :meth:`get_run_by_organism`
-        r.get_run_by_study("SRP033494", mapping_quality=90, frmt='tsv')
+        
+
+        Example::
+
+            r.get_run_by_study("SRP033494", mapping_quality=90, frmt='tsv')
 
         """
 
@@ -214,18 +221,23 @@ class RNASEQ_EBI(REST):
         Note that in addition to study names, each study stores a set of fields
         as follows:
 
-        ASSEMBLY_USED   Genome reference assembly name
-        EXONS_FPKM_COUNTS_FTP_LOCATION: FTP location of exon FPKM counts
-        EXONS_RAW_COUNTS_FTP_LOCATION: FTP location of exon raw counts
-        GENES_FPKM_COUNTS_FTP_LOCATION: FTP location of gene FPKM counts
-        GENES_RAW_COUNTS_FTP_LOCATION: FTP location of genes raw counts
-        GTF_USED:               Ensembl GTF file used for quantification
-        LAST_PROCESSED_DATE:    Date the run(s) were last analysed
-        ORGANISM:               Organism studied in STUDY_ID
-        REFERENCE_ORGANISM:         Genome reference organism
-        SOFTWARE_VERSIONS_FTP_LOCATION:     FTP location of pipeline tools info
-        STATUS: processing status:       
-        STUDY_ID: ENA Study I
+        .. csv-table:: Returned fields
+            :header: "name", "description"
+            :widths: 30,70
+
+
+            ASSEMBLY_USED,                  Genome reference assembly name
+            EXONS_FPKM_COUNTS_FTP_LOCATION, FTP location of exon FPKM counts
+            EXONS_RAW_COUNTS_FTP_LOCATION,  FTP location of exon raw counts
+            GENES_FPKM_COUNTS_FTP_LOCATION, FTP location of gene FPKM counts
+            GENES_RAW_COUNTS_FTP_LOCATION,  FTP location of genes raw counts
+            GTF_USED,                       Ensembl GTF file used for quantification
+            LAST_PROCESSED_DATE,            Date the run(s) were last analysed
+            ORGANISM,                       Organism studied in STUDY_ID
+            REFERENCE_ORGANISM,             Genome reference organism
+            SOFTWARE_VERSIONS_FTP_LOCATION,  FTP location of pipeline tools info
+            STATUS,                         processing status
+            STUDY_ID,                       ENA Study I
 
         """
         assert frmt in ["tsv", "json"]
@@ -262,7 +274,7 @@ class RNASEQ_EBI(REST):
 
             self._organisms = res
         return self._organisms
-    organisms = property(_get_organism)
+    organisms = property(_get_organism, doc="return list of valid organisms")
 
     def get_sample_attribute_per_run(self, run_id, frmt='json'):
         """Return attributes of a given RUN ID
@@ -271,13 +283,17 @@ class RNASEQ_EBI(REST):
         :param frmt: tsv or json
         :return: list of entries with the following fields
 
-        FO_URL: URL of EFO term matching VALUE
-        RUN_ID: ENA Run ID
-        STUDY_ID: ENA Study ID
-        TYPE: Sample Attribute Type
-        VALUE: Sample Attribute Value
-        NUM_OF_RUNS: Number of runs annotated with TYPE/VALUE
-        PCT_OF_ALL_RUNS: Runs annotated with TYPE/VALUE, as a percentage of all runs
+        .. csv-table:: Returned fields
+            :header: "name", "description"
+            :widths: 30,70
+        
+            FO_URL,     URL of EFO term matching VALUE
+            RUN_ID,     ENA Run ID
+            STUDY_ID,   ENA Study ID
+            TYPE,       Sample Attribute Type
+            VALUE,      Sample Attribute Value
+            NUM_OF_RUNS, Number of runs annotated with TYPE/VALUE
+            PCT_OF_ALL_RUNS, Runs annotated with TYPE/VALUE as a percentage of all runs
 
         Example::
 
