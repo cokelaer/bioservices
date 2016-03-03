@@ -1,4 +1,5 @@
 from bioservices import Ensembl
+from nose.plugins.attrib import attr
 
 
 class test_Ensembl(Ensembl):
@@ -171,7 +172,8 @@ class test_Ensembl(Ensembl):
     def test_regulation(self):
         res = self.s.get_regulatory_by_id('ENSR00001348195', 'human')
         assert 'ID' in res[0].keys()
-   
+  
+    @attr('skip_travis') 
     def test_sequences(self):
         sequence = self.s.get_sequence_by_id('ENSG00000157764', frmt='text')
         assert sequence[0:120] == """CGCCTCCCTTCCCCCTCCCCGCCCGACAGCGGCCGCTCGGGCCCCGGCTCTCGGTTATAAGATGGCGGCGCTGAGCGGTGGCGGTGGTGGCGGCGCGGAGCCGGGCCAGGCTCTGTTCAA"""
