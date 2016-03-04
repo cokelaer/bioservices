@@ -6,6 +6,8 @@ Whats' new, what has changed
 Revision 1.4
 ---------------
 
+* 1.4.7:
+    * NEWS: add method get_run in RNASEQ_EBI class.
 * 1.4.6:
     * NEWS:
         * RNASEQ analysis REST API included (http://www.ebi.ac.uk/~rpetry/geteam/rnaseq/apispec.pdf)

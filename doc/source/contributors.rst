@@ -15,4 +15,4 @@ implemented modules now available in BioServices:
 And thank you also to the contributions from users who have sent communication
 via emails or via the `ticket system <https://github.com/cokelaer/bioservices/issues>`_.
 
-Note that origially code (and earlier tickets) were hosted  `elsewhere <https://www.assembla.com/spaces/bioservices/tickets>`_.
+Note that originally code (and earlier tickets) were hosted  `elsewhere <https://www.assembla.com/spaces/bioservices/tickets>`_.

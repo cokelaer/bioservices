@@ -141,6 +141,24 @@ class RNASEQ_EBI(REST):
 
         return results
 
+    def get_run(self, run_id, frmt="json", mapping_quality=70):
+        """
+
+        :param run_id: a valid run identifier (e.g., SRR1042759)
+        :param frmt: json or tsv
+        :param mapping_quality: Min. percentage of reads mapped to genome reference
+
+        """
+        assert frmt in ["tsv", "json"]
+        assert mapping_quality >0 and mapping_quality <100
+        results = self.http_get("%s/%s/getRun/%s" % 
+            (frmt, mapping_quality, run_id), frmt=frmt)
+        if frmt == 'tsv':
+            results = tsv_parser(results)
+
+        return results
+        
+
     def get_run_by_study(self, study, frmt="json", mapping_quality=70):
         """Access to the RUNS for a given study
 
