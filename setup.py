@@ -7,7 +7,7 @@ import glob
 
 _MAJOR               = 1
 _MINOR               = 4
-_MICRO               = 7
+_MICRO               = 8
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -73,7 +73,7 @@ setup(
     # If user of python2.6 ordereddict must be installed manually
     install_requires = ["grequests", "requests", "requests_cache", 
         "easydev>=0.9.7", "beautifulsoup4",  
-        "suds-jurko", "appdirs", 'wrapt'],
+         "suds-jurko", "appdirs", 'wrapt'],
     )
 
 
