@@ -31,6 +31,7 @@
 
 """
 from bioservices import REST
+from easydev import to_list 
 
 
 
@@ -61,12 +62,15 @@ class OmniPath(REST):
         res = self.http_get(self.url + "about").content
         return res
 
-    def get_network(self):
+    def get_network(self, frmt='json'):
         """Get basic statistics about the whole network"""
-        res = self.http_get(o.url + "network")
+        assert frmt in ['json', 'tsv'] ,"frmt must be set to json or tsv"
+        res = self.http_get(self.url + "network", frmt=frmt, 
+            params={'format': frmt})
+
         return res
 
-    def get_interactions(self, entry="", frmt='json', fields=[]):
+    def get_interactions(self, query="", frmt='json', fields=[]):
         """Interactions of proteins
 
         :param str query: a valid uniprot identifier (e.g. P00533). It can also
@@ -83,27 +87,55 @@ class OmniPath(REST):
 
             res_one = o.get_interactions('P00533')
             res_many = o.get_interactions('P00533,O15117,Q96FE5')
+            res_many = o.get_interactions(['P00533','O15117','Q96FE5'])
+
+        
+            res_one = o.get_interactions('P00533', fields='sources')
+            res_one = o.get_interactions('P00533', fields=['source'])
+            res_one = o.get_interactions('P00533', fields=['source', 'references'])
+
+        You may also keep query to an empty string, but the entire DB will then
+        be downloaded. This may take time ans the :attr:`timeout` may need to be
+        increased manually.
+
+        If frmt is set to TSV, the output is a TZV table with a header. If set
+        to json, a dictionary is returned.
         """
         # make sure there is no spaces
-        query = query.replace(' ', '')
-        assert frmt in ["json", ""]
+        if isinstance(query, list):
+            query=",".join(query)
+        else:
+            try: # if input is a string
+                query = query.replace(' ', '')
+            except:
+                pass
+        assert frmt in ['json', 'tsv'] ,"frmt must be set to json or tsv"
         params = {}
         params['format'] = frmt
+        from easydev import to_list 
+        fields = to_list(fields)
+
+        if len(fields):
+            params['fields'] = fields
+
         #TODO handle multiple fields
-        res = self.http_get(o.url + "interactions/%s" % entry,
-            frmt='json', params=params)
+        res = self.http_get(self.url + "interactions/%s" % query,
+            frmt=frmt, params=params)
         return res
 
     def get_resources(self):
-        res = self.http_get(o.url + "resources")
-        return res.content
+        """Return 
 
-    def get_info(self):
+        """
+        res = self.http_get(self.url + "resources")
+        return res
+
+    def _get_info(self):
         """Currently returns HTML page"""
-        res = self.http_get(o.url + "info")
-        return res.content
+        res = self.http_get(self.url + "info")
+        return res
 
-    def get_ptms(self, query="", ptm_type=None, fields=[]):
+    def get_ptms(self, query="", ptm_type=None, frmt='json', fields=[]):
         """List enzymes, substrates and PTMs
 
         :param str query: a valid uniprot identifier (e.g. P00533). It can also
@@ -116,7 +148,21 @@ class OmniPath(REST):
 
 
         """
-        res = self.http_get(o.url + "ptms/%s" % entry,
+        # make sure there is no spaces
+        if isinstance(query, list):
+            query=",".join(query)
+        else:
+            try: # if input is a string
+                query = query.replace(' ', '')
+            except:
+                pass
+        assert frmt in ['json', 'tsv'] ,"frmt must be set to json or tsv"
+        params = {}
+        params['format'] = frmt
+        if len(fields):
+            params['fields'] = fields
+
+        res = self.http_get(self.url + "ptms/%s" % query,
             frmt='json', params=params)
         return res
 
