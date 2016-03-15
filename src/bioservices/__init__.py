@@ -12,6 +12,7 @@ see online documentation for details on pypi or github.
 from __future__ import print_function
 from __future__ import division
 
+
 import pkg_resources
 __version__ = "$Id$$, $Rev$"
 try:
@@ -86,6 +87,9 @@ from .xmltools import *
 from . import wikipathway
 from .wikipathway import *
 
+from . import omnipath
+from .omnipath import *
+
 from . import pdb
 from .pdb import *
 
@@ -106,7 +110,6 @@ from .reactome import *
 
 from . import quickgo
 from .quickgo import *
-
 
 from . import chembl
 from .chembl import *
