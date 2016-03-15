@@ -176,6 +176,14 @@ NCBIblast
     :undoc-members:
     :synopsis:
 
+OmniPath Commons
+=========================
+
+.. automodule:: bioservices.omnipath
+    :members:
+    :undoc-members:
+    :synopsis:
+
 Pathway Commons
 =========================
 

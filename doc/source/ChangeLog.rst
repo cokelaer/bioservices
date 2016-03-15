@@ -6,6 +6,8 @@ Whats' new, what has changed
 Revision 1.4
 ---------------
 
+* 1.4.8:
+    * NEW: add new module for the omnipath web service in :mod:`bioservices.omnipath`.
 * 1.4.7:
     * NEWS: add method get_run in RNASEQ_EBI class.
 * 1.4.6:
