@@ -43,6 +43,7 @@ class OmniPath(REST):
             >>> from bioservices import OmniPath
             >>> o = OmniPath()
             >>> net = o.get_network()
+            >>> interactions = o.get_interactions('P00533')
 
     """
 
@@ -76,8 +77,6 @@ class OmniPath(REST):
         :param str query: a valid uniprot identifier (e.g. P00533). It can also
             be a list of uniprot identifiers, or a string with
             comma-separated identifiers.
-        :param str ptm_type: restrict the output to this type of PTM
-            (e.g., phosphorylation)
         :param str fields: additional fields to be added to the output
             (e.g., sources, references)
         :param str frmt: format of the output (json or tabular)
@@ -95,10 +94,10 @@ class OmniPath(REST):
             res_one = o.get_interactions('P00533', fields=['source', 'references'])
 
         You may also keep query to an empty string, but the entire DB will then
-        be downloaded. This may take time ans the :attr:`timeout` may need to be
+        be downloaded. This may take time and the :attr:`timeout` may need to be
         increased manually.
 
-        If frmt is set to TSV, the output is a TZV table with a header. If set
+        If frmt is set to TSV, the output is a TSV table with a header. If set
         to json, a dictionary is returned.
         """
         # make sure there is no spaces
