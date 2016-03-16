@@ -63,7 +63,7 @@ class OmniPath(REST):
         return res
 
     def get_network(self, frmt='json'):
-        """Get basic statistics about the whole network"""
+        """Get basic statistics about the whole network including sources"""
         assert frmt in ['json', 'tsv'] ,"frmt must be set to json or tsv"
         res = self.http_get(self.url + "network", frmt=frmt, 
             params={'format': frmt})
@@ -123,17 +123,18 @@ class OmniPath(REST):
             frmt=frmt, params=params)
         return res
 
-    def get_resources(self):
-        """Return 
+    def get_resources(self, frmt='json'):
+        """Return statistics about the databases and their contents 
 
         """
-        res = self.http_get(self.url + "resources")
+        res = self.http_get(self.url + "resources", frmt=frmt, 
+            params={"format": frmt})
         return res
 
-    def _get_info(self):
+    def get_info(self):
         """Currently returns HTML page"""
-        res = self.http_get(self.url + "info")
-        return res
+        from easydev import browser
+        browser.browse(self.url + "info")
 
     def get_ptms(self, query="", ptm_type=None, frmt='json', fields=[]):
         """List enzymes, substrates and PTMs
