@@ -288,6 +288,7 @@ class RNASEQ_EBI(REST):
             res = res1 + res2 + res3 + res4
             res = sorted(list(set(res)))
 
+            res = [this.split('\t')[0] for this in res]
             res.remove("ORGANISM")
 
             self._organisms = res

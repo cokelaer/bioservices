@@ -1,7 +1,7 @@
 from bioservices import RNASEQ_EBI
 
 
-r = RNASEQ_EBI(cache=True)
+r = RNASEQ_EBI(cache=False)
 assert 'homo_sapiens' in r.organisms
 
 
