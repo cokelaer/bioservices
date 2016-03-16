@@ -2,7 +2,7 @@ from bioservices import OmniPath
 
 
 
-o = OmniPath()
+o = OmniPath(cache=True)
 
 
 def test_omnipath():
