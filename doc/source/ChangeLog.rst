@@ -11,6 +11,8 @@ Revision 1.4
         * KeggParser missing parser for the SEQUENCE keyword is now available
           https://github.com/cokelaer/bioservices/issues/46 , 
           https://github.com/cokelaer/bioservices/issues/51
+    * CHANGES:
+        * Improves way biomart handles errors (see https://github.com/cokelaer/bioservices/issues/50)
 * 1.4.8:
     * NEW: add new module for the omnipath web service in :mod:`bioservices.omnipath`.
 * 1.4.7:
