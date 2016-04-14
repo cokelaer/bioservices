@@ -53,14 +53,14 @@ class test_Reactome(object):
         assert len(res)>1
 
     def test_query_by_ids(self):
-        res = self.e.query_by_ids("Pathway", 'CDC2')
+        res = self.e.query_by_ids("Pathway", 'TP53')
         assert len(res)>=1
 
     def test_query_hit_pathways(self):
-        assert len(self.e.query_hit_pathways("CDC2"))>1
+        assert len(self.e.query_hit_pathways("TP53"))>1
 
     def test_pathway_for_entities(self):
-        res = self.e.query_pathway_for_entities("CDC2")
+        res = self.e.query_pathway_for_entities("TP53")
 
     def test_species_list(self):
         res = self.e.species_list()

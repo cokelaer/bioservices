@@ -6,6 +6,11 @@ Whats' new, what has changed
 Revision 1.4
 ---------------
 
+* 1.4.9:
+    * BUG
+        * KeggParser missing parser for the SEQUENCE keyword is now available
+          https://github.com/cokelaer/bioservices/issues/46 , 
+          https://github.com/cokelaer/bioservices/issues/51
 * 1.4.8:
     * NEW: add new module for the omnipath web service in :mod:`bioservices.omnipath`.
 * 1.4.7:
