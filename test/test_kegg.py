@@ -223,3 +223,11 @@ def test_KEGGParser():
     d = s.parse(s.get("rc:RC00001"))
     d = s.parse(s.get("rn:R00001"))
     d = s.parse(s.get("rp:RP00001"))
+
+
+    d = s.parse(s.get('C15682'))
+    assert d['SEQUENCE'][0]['TYPE'] == 'PK'
+    assert d['SEQUENCE'][0]['GENE'] =="0-2 mycAI [UP:Q83WF0]; 3 mycAII [UP:Q83WE9]; 4-5 mycAIII[UP:Q83WE8]; 6 mycAIV [UP:Q83WE7]; 7 mycAV [UP:Q83WE6]"
+    assert d['SEQUENCE'][0]['ORGANISM'] == "Micromonospora griseorubida"
+
+

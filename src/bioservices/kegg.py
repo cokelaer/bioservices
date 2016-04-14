@@ -1327,6 +1327,10 @@ class KEGGParser(Logging):
                 newvalue = [self._interpret_taxonomy(this)
                     for this in self._tolist(value)]
                 output[key] = newvalue
+            elif key == "SEQUENCE":
+                newvalue = [self._interpret_sequence(this)
+                    for this in self._tolist(value)]
+                output[key] = newvalue
 
             # dictionary, interpreted as follows
             # on each line, there is an identifier followed by : character
@@ -1415,6 +1419,36 @@ class KEGGParser(Logging):
             elif this.strip().startswith("TITLE"):
                 res['TITLE'] = this.strip().split(None,1)[1]
         return res
+
+    def _interpret_sequence(self, data):
+        res = {}
+        gene = False
+        count = 0
+        for this in data.split("\n"):
+            if this.strip().startswith("GENE"):
+                res['GENE'] = this.strip().split(None,1)[1]
+                gene = True
+            elif this.strip().startswith('ORGANISM'):
+                res['ORGANISM'] = this.strip().split(None,1)[1]
+                gene = False
+            elif this.strip().startswith('TYPE'):
+                res['TYPE'] = this.strip().split(None, 1)[1]
+                gene = False
+            elif gene is True:
+                res['GENE'] += this.strip()
+            else:
+                assert gene is False
+                res['SEQUENCE'] = this.strip()
+        return res
+    """
+    [u'    0 Mtk  1 Mtd  2 Mad  3 Man  4 Mte  5 Mtk  6 Mtd  7 Man',
+ u'  GENE      0-2 mycAI [UP:Q83WF0]; 3 mycAII [UP:Q83WE9]; 4-5 mycAIII',
+ u'            [UP:Q83WE8]; 6 mycAIV [UP:Q83WE7]; 7 mycAV [UP:Q83WE6]',
+ u'  ORGANISM  Micromonospora griseorubida',
+ u'  TYPE      PK']
+    """
+
+            
 
     def _interpret_taxonomy(self, data):
         res = {}
