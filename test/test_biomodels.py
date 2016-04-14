@@ -43,7 +43,8 @@ class test_biomodels(object):
 
     def test_getDateLastModifByModelId(self):
         res = self.s.getDateLastModifByModelId(modelId)
-        assert res == '2012-05-16T14:44:17+00:00'
+        # This changes with time so no need to check 
+        #assert res == '2012-05-16T14:44:17+00:00'
 
     def test_getEncodersByModelId(self):
         res = self.s.getEncodersByModelId("BIOMD0000000256")
