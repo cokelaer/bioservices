@@ -224,10 +224,9 @@ class BioMart(REST):
                 self.url = url
                 self._init()
             else:
-                print("host %s is not reachable")
+                print("host %s is not reachable " % host)
         except:
             print("Could not reach the host %s" % host)
-            pass
     host = property(_get_host, _set_host)
 
     def _init(self):

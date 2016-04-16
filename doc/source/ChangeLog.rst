@@ -6,6 +6,9 @@ Whats' new, what has changed
 Revision 1.4
 ---------------
 
+* 1.4.10:
+    * BUG 
+      * Fix typo introduced in previous commits reported in `comments <https://github.com/cokelaer/bioservices/commit/792dc134a1f850031da2719871ccdaf57140b5ac#commitcomment-17115499>`_        
 * 1.4.9:
     * BUG
         * KeggParser missing parser for the SEQUENCE keyword is now available
