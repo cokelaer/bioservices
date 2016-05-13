@@ -6,6 +6,12 @@ Whats' new, what has changed
 Revision 1.4
 ---------------
 
+* 1.4.10:
+    * NEWS:
+        * EUTils can now return a dictionary rather than a xml
+        * New method get_taxon in ENA class
+        * EnsemblFTP added to ensembl module
+
 * 1.4.9:
     * BUG
         * KeggParser missing parser for the SEQUENCE keyword is now available

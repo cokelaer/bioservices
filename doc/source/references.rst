@@ -99,6 +99,14 @@ Clinvitae
     :undoc-members:
     :synopsis:
 
+
+ENA
+==========
+
+.. automodule:: bioservices.ena
+    :members:
+    :undoc-members:
+
 EUtils
 ==========
 

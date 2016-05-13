@@ -32,6 +32,9 @@ class test_EUtils(object):
         assert ret.Query == 'aasthma OR alergy'
         assert ret.CorrectedQuery == 'asthma or allergy'
 
+    def test_esearch(self):
+        ret = self.e.ESearch('protein', 'human', RetMax=5)
+
     def test_elink(self):
         ret = self.e.ELink(db="pubmed", dbfrom="pubmed", id="20210808",
                            cmd="neighbor_score")
@@ -111,3 +114,40 @@ class test_EUtils(object):
         assert ret['QueryKey']
         assert ret['WebEnv']
         print(ret)
+
+    def test_check_db(self):
+        try:
+            self.e._check_db('dummy')
+            assert False
+        except:
+            assert True
+
+    def test_check_retmode(self):
+        try:
+            self.e._check_retmode('dummy')
+            assert False
+        except:
+            assert True
+    
+    def test_check_ids(self):
+        assert self.e._check_ids(None) == None
+
+        self.e._check_ids(",".join([str(x) for x in range(199)]))
+        try:
+            self.e._check_ids(",".join([str(x) for x in range(201)]))
+            assert False
+        except:
+            assert True
+
+
+    def test_efetch_xml(self):
+        xml = self.e.EFetch(db="nuccore",id="AP013055", rettype="docsum",
+            retmode="xml")
+        res = self.e.parse_xml(xml, "EUtilsParser")
+        assert res['eSummaryResult']['DocSum']['Id'] == '578887486'
+        assert res['eSummaryResult']['DocSum']['Item'][0] == 'AP013055'
+
+
+
+
+
