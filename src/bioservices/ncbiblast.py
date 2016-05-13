@@ -86,6 +86,7 @@ class NCBIblast(REST):
         super(NCBIblast, self).__init__(name="NCBIblast", url=NCBIblast._url, verbose=verbose)
         self._parameters = None
         self._parametersDetails = {}
+        self.checkInterval = 2
 
     def getParameters(self):
         """List parameter names.
@@ -220,6 +221,12 @@ returns a list of parameters. See :meth:`getParameters`.""")
 
         .. warning:: Cases are not important. Spaces in the database case should be replaced by underscore.
 
+        .. note:: database returned by the server have meaningless names since
+they do not map to the expected names. An example is "ENA Sequence Release" than
+should bie provided as em_rel
+
+http://www.ebi.ac.uk/Tools/sss/ncbiblast/help/index-nucleotide.html
+
         """
         # There are compulsary arguments:
         if program is None or sequence is None or database is None or email is None:
@@ -315,7 +322,7 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
         """
         if self.getStatus(jobid)!='FINISHED':
             self.logging.warning("waiting for the job to be finished. May take a while")
-            self.wait(jobid, verbose=False)
+            self.wait(jobid)
         url = 'resulttypes/' + jobid
         res = self.http_get(url, frmt="xml")
         res = self.easyXML(res)
@@ -344,7 +351,31 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
 
 
         :param str jobid: a job identifier returned by :meth:`run`.
-        :param str  resultType: type of result to retrieve. See :meth:`getResultTypes`.
+        :pariam str  resultType: type of result to retrieve. See :meth:`getResultTypes`.
+
+   The output from the tool itself.
+    Use the 'format' parameter to retireve the output in different formats,
+    the 'compressed' parameter to retrieve the xml output in compressed form.
+     Format options:
+
+     0 = pairwise,
+     1 = query-anchored showing identities,
+     2 = query-anchored no identities,
+     3 = flat query-anchored showing identities,
+     4 = flat query-anchored no identities,
+     5 = XML Blast output,
+     6 = tabular,
+     7 = tabular with comment lines,
+     8 = Text ASN.1,
+     9 = Binary ASN.1,
+    10 = Comma-separated values,
+    11 = BLAST archive format (ASN.1).
+See NCBI Blast documentation for details.
+Use the 'compressed' parameter to return the XML output in compressed form.
+e.g. '?format=5&compressed=true'.
+
+
+    em_rel_vrl
         """
         if self.getStatus(jobid)!='FINISHED':
             self.logging.warning("waiting for the job to be finished. May take a while")
@@ -358,7 +389,7 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
 
         return res
 
-    def wait(self, jobId, checkInterval=5, verbose=True):
+    def wait(self, jobId):
         """This function checks the status of a jobid while it is running
 
         :param str jobid: a job identifier returned by :meth:`run`.
@@ -366,15 +397,13 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
 
         """
 
-        if checkInterval<1:
-            raise ValueError("checkInterval must be positive and less than minute")
+        if self.checkInterval<1:
+            raise ValueError("checkInterval must be positive and less than a second")
         result = 'PENDING'
         while result == 'RUNNING' or result == 'PENDING':
             result = self.getStatus(jobId)
-            if verbose:
-                print >> sys.stderr, jobId, " is ", result
             if result == 'RUNNING' or result == 'PENDING':
-                time.sleep(checkInterval)
+                time.sleep(self.checkInterval)
         return result
 
 
