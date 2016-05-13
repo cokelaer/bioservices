@@ -91,10 +91,21 @@ class EUtils(REST):
         Correct: term=#2+AND+"gene in genomic"[properties]
         Correct: term=%232+AND+%22gene+in+genomic%22[properties]
 
+
+
+    For information about retmode and retype, please see:
+
+    
+    http://www.ncbi.nlm.nih.gov/books/NBK25499/table/chapter4.T._valid_values_of__retmode_and/?report=objectonly
+
+
+
     """
-    def __init__(self, verbose=False, email="unknown"):
+    def __init__(self, verbose=False, email="unknown", cache=False,
+                xmlparser="EUtilsParser"):
         url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
-        super(EUtils, self).__init__(name="EUtils", verbose=verbose, url=url)
+        super(EUtils, self).__init__(name="EUtils", verbose=verbose, url=url,
+            cache=cache)
 
 
         warning = """
@@ -126,6 +137,8 @@ class EUtils(REST):
 
 
         """
+        self._xmlparser = xmlparser
+
         self._databases = None
         self.tool = "BioServices, " + __version__
 
@@ -281,6 +294,8 @@ class EUtils(REST):
         :param rettype: could be fasta, summary, ...
         :return: depends on retmode parameter.
 
+
+        .. note:: addition to NCBI: settings rettype to "dict" returns a dictionary
         ::
 
             >>> ret = s.EFetch("omim", "269840")  --> ZAP70
@@ -321,7 +336,23 @@ class EUtils(REST):
         Other special characters, such as quotation marks (") or the # symbol
         used in referring to a query key on the History server, should be
         represented by their URL encodings (%22 for "; %23 for #).
+
+
+        A useful command is the following one that allows to get back a GI
+        identifier from its accession, which is common to NCBI/EMBL::
+
+            e.EFetch(db="nuccore",id="AP013055", rettype="seqid", retmode="text")
+
+        .. versionchanged:: 1.5.0
+            instead of "xml", retmode can now be set to dict, in which case an 
+            XML is retrieved and converted to a dictionary if possible.
+
         """
+        _retmode = retmode[:]
+
+        if retmode == "dict":
+            retmode = "xml"
+
         self._check_db(db)
         #self._check_retmode(retmode, valids=['text', 'xml'])
         sid = self._check_ids(id)
@@ -338,6 +369,9 @@ class EUtils(REST):
         ret = self.http_get(query, params=params)
         try: ret = ret.content
         except: pass
+
+        if _retmode == "dict":
+            ret = self.parse_xml(ret, "dict")
 
         return ret
 
@@ -401,15 +435,19 @@ class EUtils(REST):
             ret = ret['einforesult']['dbinfo']
         return ret
 
-    def parse_xml(self, ret, method='easyxml'):
+    def parse_xml(self, ret, method=None):
+        if method is None:
+            method = self._xmlparser
+
         if method == 'EUtilsParser':
             ret = self.easyXML(ret)
             return EUtilsParser(ret)
-        elif method == 'objectify':
+        elif method == 'objectify': # used in docstrings
             from bioservices.xmltools import XMLObjectify
             return XMLObjectify(ret)
-        elif method == 'easyxml':
-            return self.easyXML(ret)
+        elif method == 'dict':
+            import xmltodict
+            return xmltodict.parse(ret)
 
     def ESummary(self, db, id=None,  retmode='json', **kargs):
         """Returns document summaries for a list of input UIDs
@@ -651,6 +689,12 @@ class EUtils(REST):
             >>> s.ELink(dbfrom='nuccore', id='21614549,219152114',
                     cmd='ncheck')
 
+        Convert GI number to Taxon identifiers::
+
+            >>> s.ELink(dbfrom='nuccore', db="taxonomy", id='21614549,219152114')
+
+
+
         """
         # unlike other EUtils, db and dbfrom are here optional
         sid = self._check_ids(id)
@@ -730,11 +774,11 @@ class AttrDict(dict):
 class EUtilsParser(AttrDict):
     """Convert xml returned by EUtils into a structure easier to manipulate
 
-    Used by :meth:`EGQuery` method in EUtils class. Also by ESpell.
+    Used by :meth:`EUtils.EGQuery`, :meth:`EUtils.ELink`.
     """
     def __init__(self, xml):
         super(EUtilsParser, self).__init__()
-
+        
         try:
             name = xml.root.tag
             self[name] = EUtilsParser(xml.root)
@@ -748,7 +792,14 @@ class EUtilsParser(AttrDict):
 
         for i, child in enumerate(children):
             if len(child.getchildren()) == 0:
-                self[child.tag] = child.text
+                if child.tag in self.keys():
+                    try:
+                        self[child.tag].append(child.text)
+                    except:
+                        self[child.tag] = [self[child.tag]]
+                        self[child.tag].append(child.text)
+                else:
+                    self[child.tag] = child.text
             else:
                 # This is probably a list then
                 e = EUtilsParser(child)
@@ -775,5 +826,11 @@ class EUtilsParser(AttrDict):
         else:
             print("Not implemented for {0}".format(name))
 
+
+
+
+class XMLEUtils(object):
+    def __init__(self, xml):
+        self.xml = xml
 
 
