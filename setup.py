@@ -72,7 +72,7 @@ setup(
 
     # If user of python2.6 ordereddict must be installed manually
     install_requires = ["grequests", "requests", "requests_cache", 
-        "easydev>=0.9.7", "beautifulsoup4",  
+        "easydev>=0.9.7", "beautifulsoup4", "xmltodict",
          "suds-jurko", "appdirs", 'wrapt'],
     )
 
