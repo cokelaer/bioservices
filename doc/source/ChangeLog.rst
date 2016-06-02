@@ -5,6 +5,10 @@ Whats' new, what has changed
 
 Revision 1.4
 ---------------
+* 1.4.12:
+    * BUG:
+        * Fix a regression bug in ncbiblast introduced in earlier commits 
+          https://github.com/cokelaer/bioservices/issues/61
 
 * 1.4.11:
     * NEWS:
