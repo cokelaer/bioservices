@@ -379,7 +379,7 @@ e.g. '?format=5&compressed=true'.
         """
         if self.getStatus(jobid)!='FINISHED':
             self.logging.warning("waiting for the job to be finished. May take a while")
-            self.wait(jobid, verbose=False)
+            self.wait(jobid)
         if self.getStatus(jobid) != "FINISHED":
             raise ValueError("job is not finished")
         url = 'result/' + jobid + '/' + resultType
