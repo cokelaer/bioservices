@@ -9,6 +9,9 @@ Revision 1.4
     * BUG:
         * Fix a regression bug in ncbiblast introduced in earlier commits 
           https://github.com/cokelaer/bioservices/issues/61
+    * CHANGES: 
+        * add PRODUCT/ALL_REAC/HISTORY/SYSNAME in KEGG parser thanks to issue
+          reported in https://github.com/cokelaer/bioservices/issues/60
 
 * 1.4.11:
     * NEWS:
