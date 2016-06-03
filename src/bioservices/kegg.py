@@ -1260,7 +1260,7 @@ class KEGGParser(Logging):
             elif key in ['POSITION', 'DESCRIPTION', 'ENTRY', 'ORGANISM', 
                     'CLASS', 'FORMULA', 'KEYWORDS', 'CATEGORY', 'ANNOTATION',
                     'DATA_SOURCE', 'MASS', 'COMPOSITION', 'DEFINITION', 
-                    'KO_PATHWAY', 'EQUATION', 'TYPE', 'RCLASS']:
+                    'KO_PATHWAY', 'EQUATION', 'TYPE', 'RCLASS', 'SYSNAME', "HISTORY"]:
                 # get rid of \n
 
                 if "\n" in value:
@@ -1271,10 +1271,12 @@ class KEGGParser(Logging):
                 output[key] = value.strip()
             # list : set of lines
             # COMMENT is sometimes on several lines
-            elif key in ['NAME', 'REMARK', 'ACTIVITY', 'COMMENT', 'ORIGINAL_DB']:
+            elif key in ['NAME', 'REMARK', 'ACTIVITY', 'COMMENT', 'ORIGINAL_DB',
+                "SUBSTRATE", "PRODUCT"]:
                 output[key] = [x.strip() for x in value.split("\n")]
             # list: long string splitted into items and therefore converted to a list
-            elif key in ['ENZYME', 'REACTION',  'RPAIR', 'RELATEDPAIR']:
+            elif key in ['ENZYME', 'REACTION',  'RPAIR', 'RELATEDPAIR',
+                  "ALL_REAC"]:
                 # RPAIR/rn:R00005 should be a dict if "_" found
                 # REACTION/md:hsa_M00554 should be a dict if '->' found
                 if '->' in value or "_" in value:
@@ -1376,7 +1378,7 @@ class KEGGParser(Logging):
                 output[key] = self._interpret_enumeration(output[key])
             # not interpreted
             elif key in ['BRACKET', 'COMPONENT', 'SOURCE', 'BRITE', 
-                    'CARCINOGEN', 'MARKER', 'PRODUCT']: # do not interpret to keep structure
+                    'CARCINOGEN', 'MARKER']: # do not interpret to keep structure
                 pass
             else:
                 print("""\nWarning. Found keyword %s, which has not special
