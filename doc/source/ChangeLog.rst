@@ -5,6 +5,12 @@ Whats' new, what has changed
 
 Revision 1.4
 ---------------
+* 1.4.13:
+    *  NEWS:
+        * Add a download_fasta dedicated function to download a fasta file
+          either from ENA or NCBI given its accession. See
+          bioservices.apps.download_fasta. Used within Sequana project
+
 * 1.4.12:
     * BUG:
         * Fix a regression bug in ncbiblast introduced in earlier commits 
