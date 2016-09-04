@@ -10,6 +10,8 @@ Revision 1.4
         * Add a download_fasta dedicated function to download a fasta file
           either from ENA or NCBI given its accession. See
           bioservices.apps.download_fasta. Used within Sequana project
+    * CHANGES:
+        * update http to https in EUtils
 
 * 1.4.12:
     * BUG:
