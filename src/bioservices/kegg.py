@@ -1256,7 +1256,7 @@ class KEGGParser(Logging):
                 data = [x.split(":",1) for x in output[key].split("\n")]
                 data = dict([(x[0].strip(), float(x[1].strip())) for x in data])
                 output[key] = data
-            # strip only expecting a single line (string)
+            # strip only: expecting a single line (string)
             elif key in ['POSITION', 'DESCRIPTION', 'ENTRY', 'ORGANISM', 
                     'CLASS', 'FORMULA', 'KEYWORDS', 'CATEGORY', 'ANNOTATION',
                     'DATA_SOURCE', 'MASS', 'COMPOSITION', 'DEFINITION', 
@@ -1269,7 +1269,8 @@ class KEGGParser(Logging):
                     value = value.replace("\n", " ")
                 # nothing to do here except strip
                 output[key] = value.strip()
-            # list : set of lines
+            # list : set iof lines. Could be split by ; character but we use the
+            # \n instead to be sure
             # COMMENT is sometimes on several lines
             elif key in ['NAME', 'REMARK', 'ACTIVITY', 'COMMENT', 'ORIGINAL_DB',
                 "SUBSTRATE", "PRODUCT"]:
@@ -1377,7 +1378,7 @@ class KEGGParser(Logging):
                 # get rid of that number and then send a list
                 output[key] = self._interpret_enumeration(output[key])
             # not interpreted
-            elif key in ['BRACKET', 'COMPONENT', 'SOURCE', 'BRITE', 
+            elif key in ['BRACKET', 'COMPONENT', 'SOURCE', 'BRITE', "TARGET",
                     'CARCINOGEN', 'MARKER']: # do not interpret to keep structure
                 pass
             else:
