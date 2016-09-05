@@ -143,7 +143,7 @@ chemical structures, using the ChEBI identifier.
             "CHEBI NAME", "DEFINITION", "ALL NAMES", "IUAPC", "MASS", 
             "FORMULA", "INCHI", "INCHI KEY"])
         res = self.serv.getLiteEntity(search, searchCategory, maximumResults, stars)
-        if len(res):
+        if res and len(res):
             return res[0]
         else:
             return res

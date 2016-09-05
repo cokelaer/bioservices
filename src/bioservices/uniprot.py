@@ -513,7 +513,7 @@ class UniProt(REST):
         res = self.search(query, "tab", include=include, sort=sort, limit=limit)
 
         # if empty result, nothing to do
-        if len(res) == 0:
+        if res and len(res) == 0:
             return res
         # else populate a dictionary
         newres = {}
