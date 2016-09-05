@@ -233,6 +233,7 @@ class UniProt(REST):
         'feature(TRANSMEMBRANE)',
         # Miscellaneous
         'annotation score', 'score', 'features', 'comment(CAUTION)', 
+        'comment(TISSUE SPECIFICITY)',
         'comment(GENERAL)', 'keywords', 'context', 'existence', 'tools', 
         'reviewed', 'feature', 'families', 'subcellular locations', 'taxonomy', 
         'version', 'clusters', 'comments', 'database', 'keyword-id', 'pathway', 
