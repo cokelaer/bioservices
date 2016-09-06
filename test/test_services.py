@@ -18,7 +18,7 @@ class test_Service(Service):
 class test_WSDLService(WSDLService):
     def __init__(self):
         super(test_WSDLService, self).__init__("test",
-            "http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices?wsdl", 
+            "http://biomodels.caltech.edu/services/BioModelsWebServices?wsdl", 
             verbose=False)
 
     def test_methods(self):
