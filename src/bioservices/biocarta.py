@@ -43,7 +43,10 @@
 
 """
 import re
-import urllib
+try:
+    from urllib2 import urlopen
+except:
+    from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
 from bioservices.services import REST
@@ -158,7 +161,7 @@ class BioCarta(REST):
         # first identify gene from GeneInfo tag
         # this is not XML but HTML
         url = "http://cgap.nci.nih.gov/Pathways/BioCarta/%s" % pathway
-        html_doc = urllib.urlopen(url).read()
+        html_doc = urlopen(url).read()
         soup = BeautifulSoup(html_doc, 'html.parser')
         links = soup.find_all('area')
         links = [link for link in links if 'GeneInfo' in link.get('href')]
@@ -169,7 +172,7 @@ class BioCarta(REST):
         # open each page and get info
         genes = {}
         for link in links:
-            html_doc = urllib.urlopen(link).read()
+            html_doc = urlopen(link).read()
             soup = BeautifulSoup(html_doc, 'html.parser')
 
             table_gene_info = soup.findAll("table")[1]
