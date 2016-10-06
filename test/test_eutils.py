@@ -1,10 +1,7 @@
 from bioservices import eutils
 
 
-
-
 class test_EUtils(object):
-
     @classmethod
     def setup_class(klass):
         klass.e = eutils.EUtils(verbose=False)
@@ -35,13 +32,16 @@ class test_EUtils(object):
         assert ret.Query == 'aasthma OR alergy'
         assert ret.CorrectedQuery == 'asthma or allergy'
 
+    def test_esearch(self):
+        ret = self.e.ESearch('protein', 'human', RetMax=5)
+
     def test_elink(self):
-        ret = self.e.ELink(db="pubmed", dbfrom="pubmed", id="20210808", 
-                cmd="neighbor_score")
+        ret = self.e.ELink(db="pubmed", dbfrom="pubmed", id="20210808",
+                           cmd="neighbor_score")
 
         ret = self.e.ELink(db="pubmed", id="24064416")
 
-        #assert len(ret.LinkSet[0].LinkSetDb[0].Link) > 10
+        # assert len(ret.LinkSet[0].LinkSetDb[0].Link) > 10
 
         self.e.ELink(dbfrom="nucleotide", id="48819,7140345", db="protein")
 
@@ -50,9 +50,9 @@ class test_EUtils(object):
         dbinfo = self.e.EInfo("gtr", retmode='xml')
         dbinfo = self.e.parse_xml(dbinfo, 'EUtilsParser').eInfoResult
         dbinfo = dbinfo.DbInfo
-        assert dbinfo.DbName ==  'gtr'
+        assert dbinfo.DbName == 'gtr'
         assert dbinfo.MenuName == 'GTR'
-        assert dbinfo.Description == 'GTR database'
+        assert dbinfo.Description == 'GTR Database'
         assert dbinfo.FieldList.Field[0].Name == 'ALL'
 
         # use JSON
@@ -62,7 +62,7 @@ class test_EUtils(object):
         alldbs = self.e.EInfo()
         for db in ['pubmed', 'genome', 'dbvar', 'gene']:
             assert db in alldbs
-        assert len(alldbs) > 40 # 52 Aug 2014 but let us be on the safe side
+        assert len(alldbs) > 40  # 52 Aug 2014 but let us be on the safe side
 
     def test_einfo_pubmed(self):
         ret = self.e.EInfo('pubmed')
@@ -74,32 +74,31 @@ class test_EUtils(object):
         assert len(ret['fieldlist']) >= 40
         assert ret['fieldlist'][0]['name'] == 'ALL'
         assert ret['fieldlist'][0]['fullname'], 'All Fields'
- 
+
     def test_gquery(self):
         ret = self.e.EGQuery("asthma")
-        [(x.DbName, x.Count) for x in ret.eGQueryResult.ResultItem 
-                if x.Count!='0']
+        [(x.DbName, x.Count) for x in ret.eGQueryResult.ResultItem
+         if x.Count != '0']
 
     def test_efetch(self):
         ret = self.e.EFetch("omim", "269840")
-        ret1 = self.e.EFetch("protein", "34577063", 
-                retmode="text", rettype="fasta", stand=1)
-        ret2 = self.e.EFetch("protein", "34577063", 
-                retmode="text", rettype="fasta", stand=2)
-        self.e.EFetch("protein", "34577063", 
-                retmode="text", rettype="fasta",strand=2,
-                seq_start=10, seq_stop=20)
+        ret1 = self.e.EFetch("protein", "34577063",
+                             retmode="text", rettype="fasta", stand=1)
+        ret2 = self.e.EFetch("protein", "34577063",
+                             retmode="text", rettype="fasta", stand=2)
+        self.e.EFetch("protein", "34577063",
+                      retmode="text", rettype="fasta", strand=2,
+                      seq_start=10, seq_stop=20)
 
-
-        ret = self.e.EFetch('pubmed', '12091962,9997',  
-                retmode='xml', rettype='abstract')
+        ret = self.e.EFetch('pubmed', '12091962,9997',
+                            retmode='xml', rettype='abstract')
         # sequences
-        res1 = self.e.EFetch("protein", "352, 234", 
-                retmode="text", rettype="fasta")
-        res2 = self.e.EFetch("protein", ["352", "234"], 
-                retmode="text", rettype="fasta")
-        res3 = self.e.EFetch("protein", [352, 234], 
-                retmode="text", rettype="fasta")
+        res1 = self.e.EFetch("protein", "352, 234",
+                             retmode="text", rettype="fasta")
+        res2 = self.e.EFetch("protein", ["352", "234"],
+                             retmode="text", rettype="fasta")
+        res3 = self.e.EFetch("protein", [352, 234],
+                             retmode="text", rettype="fasta")
 
         assert res1 == res2
         assert res2 == res3
@@ -115,6 +114,40 @@ class test_EUtils(object):
         assert ret['QueryKey']
         assert ret['WebEnv']
         print(ret)
+
+    def test_check_db(self):
+        try:
+            self.e._check_db('dummy')
+            assert False
+        except:
+            assert True
+
+    def test_check_retmode(self):
+        try:
+            self.e._check_retmode('dummy')
+            assert False
+        except:
+            assert True
+    
+    def test_check_ids(self):
+        assert self.e._check_ids(None) == None
+
+        self.e._check_ids(",".join([str(x) for x in range(199)]))
+        try:
+            self.e._check_ids(",".join([str(x) for x in range(201)]))
+            assert False
+        except:
+            assert True
+
+
+    def test_efetch_xml(self):
+        xml = self.e.EFetch(db="nuccore",id="AP013055", rettype="docsum",
+            retmode="xml")
+        res = self.e.parse_xml(xml, "EUtilsParser")
+        assert res['eSummaryResult']['DocSum']['Id'] == '578887486'
+        assert res['eSummaryResult']['DocSum']['Item'][0] == 'AP013055'
+
+
 
 
 

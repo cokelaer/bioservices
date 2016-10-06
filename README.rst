@@ -89,6 +89,7 @@ This is a summary of the changelog. Complete change can be found in the
 1.4.X
 ---------------
 
+* Update uniprot valid column names.
 * Renamed kegg.KEGG.info into dbinfo , which was overloaded with Logging
 * Replaced deprecated HGNC with the official web service from genenames.org
 * Fully updated EUtils since WSDL is now down; implementation uses REST now.

@@ -39,7 +39,7 @@ we know that **hsa** (human) is valid organism Id, so let us set it and then get
 the list of pathways::
 
     k.organism = "hsa"
-    k.pathwaysIds
+    k.pathwayIds
 
 Another function provided by the KEGG API is the
 :meth:`bioservices.kegg.KEGG.get` one that query a specific entry. Here we are

@@ -86,7 +86,7 @@ class test_miriam(Miriam):
 
     def test_getResourceInstitution(self):
         res = self.getResourceInstitution("MIR:00100005")
-        assert res == "European Bioinformatics Institute"
+        assert res == "European Bioinformatics Institute, Hinxton, Cambridge"
 
     def test_getResourceLocation(self):
         res = self.getResourceLocation("MIR:00100005")

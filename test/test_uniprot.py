@@ -33,8 +33,10 @@ class test_UniProt(UniProt):
     @attr('slow')
     def test_search(self):
         self.search('zap70+AND+organism:9606', frmt='list')
-        self.search("zap70+and+taxonomy:9606", frmt="tab", limit=3, columns="entry name,length,id, genes, interpro, interactor")
-        self.search("zap70+and+taxonomy:9606", frmt="tab", limit=3, columns="entry name")
+        self.search("zap70+and+taxonomy:9606", frmt="tab", limit=3,
+                    columns="entry name,length,id, genes, genes(PREFERRED), interpro, interactor")
+        self.search("zap70+and+taxonomy:9606", frmt="tab", limit=3,
+                    columns="entry name, go(biological process), comment(FUNCTION), comment(DOMAIN)")
 
         self.search("ZAP70_HUMAN", frmt="tab", columns="sequence", limit=1)
 
@@ -49,8 +51,6 @@ class test_UniProt(UniProt):
     def test_get_df(self):
         df = self.get_df(["P43403"])
 
-
     def test_fasta(self):
         "Q9Y617" in self.get_fasta(["Q9Y617-1"])
         "Q9Y617" not in self.get_fasta_sequence(["Q9Y617-1"])
-

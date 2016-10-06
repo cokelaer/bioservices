@@ -1333,3 +1333,51 @@ class Ensembl(REST):
         raise NotImplementeError
 
 
+
+class EnsemblFTP(object):
+    def __init__(self):
+       pass
+
+    def download(self, db="fungi", release="release-31"):
+
+        import ftplib
+        f = ftplib.FTP('ftp.ensemblgenomes.org')
+        f.login("anonymous", "anonymous")
+        f.cwd("pub/%s/%s" % (db, release))
+        f.cwd("fasta")
+        species = f.nlst()
+
+        print(species)
+
+        for this in species:
+            print(this)
+            if this.endswith('collection'):
+                f.cwd(this)
+                subdirs = f.nlst()
+                for thisdir in subdirs:
+                    print(thisdir)
+                    f.cwd(thisdir)
+                    f.cwd('dna')
+                    files = f.nlst()
+                    todownload = [x for x in files if x.endswith("dna.genome.fa.gz") ]
+                    for filename in todownload:
+                        f.retrbinary('RETR %s'%filename ,open(filename, "wb").write)
+                    f.cwd("../../")
+                f.cwd('..')
+
+            else:
+                continue
+                f.cwd(this)
+                f.cwd('dna')
+                files = f.nlst()
+                todownload = [x for x in files if x.endswith("dna.genome.fa.gz") ]
+                for filename in todownload:
+                    f.retrbinary('RETR %s'%filename ,open(filename, "wb").write)
+                f.cwd("../../")
+
+
+
+
+
+
+

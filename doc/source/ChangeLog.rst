@@ -6,57 +6,110 @@ Whats' new, what has changed
 Revision 1.4
 ---------------
 
+* 1.4.14:
+    * CHANGES:
+        * update http to https in EUtils
+        * missing TARGET field in KEGGParser reported in issue #66
+
+* 1.4.13:
+    *  NEWS:
+        * Add a download_fasta dedicated function to download a fasta file
+          either from ENA or NCBI given its accession. See
+          bioservices.apps.download_fasta. Used within Sequana project
+
+* 1.4.12:
+    * BUG:
+        * Fix a regression bug in ncbiblast introduced in earlier commits 
+          https://github.com/cokelaer/bioservices/issues/61
+    * CHANGES: 
+        * add PRODUCT/ALL_REAC/HISTORY/SYSNAME in KEGG parser thanks to issue
+          reported in https://github.com/cokelaer/bioservices/issues/60
+
+* 1.4.11:
+    * NEWS:
+        * EUTils can now return a dictionary rather than a xml
+        * New method get_taxon in ENA class
+        * EnsemblFTP added to ensembl module
+* 1.4.10: fixing a bug/typo in pypi
+* 1.4.9:
+    * BUG
+        * KeggParser missing parser for the SEQUENCE keyword is now available
+          https://github.com/cokelaer/bioservices/issues/46 , 
+          https://github.com/cokelaer/bioservices/issues/51
+    * CHANGES:
+        * Improves way biomart handles errors (see https://github.com/cokelaer/bioservices/issues/50)
+* 1.4.8:
+    * NEW: add new module for the omnipath web service in :mod:`bioservices.omnipath`.
+* 1.4.7:
+    * NEWS: add method get_run in RNASEQ_EBI class.
+* 1.4.6:
+    * NEWS:
+        * RNASEQ analysis REST API included (http://www.ebi.ac.uk/~rpetry/geteam/rnaseq/apispec.pdf)
+* 1.4.5: 
+    * BUG: 
+        * Fixes a python3 wrong import
 * 1.4.4:
-  * NEWS: ENA module and class added
-
+    * CHANGES: 
+        * Uniprot: update valid columns
+        * https://github.com/cokelaer/bioservices/pull/35 with biocarta module updates
+    * BUGS: 
+        * Fix a test in test_eutils 
+        * Fix KEGG parser  https://github.com/cokelaer/bioservices/pull/35
+        * Fix Service input py2/3 compat and unset argument https://github.com/cokelaer/bioservices/pull/35
+        * Update biocarta: the website has changed and the code needed to be updated
+    * NEWS: ENA module and class added
 * 1.4.3
-  * BUG: fix typo in a draft tcga module
-
+    * BUG: fix typo in a draft tcga module
 * 1.4.2
-  * CHANGES: update setup dependencies.
-  * Typo fixed in uniprot list of valid columns #47
-
-*1.4.1
-  * CHANGES:
-     * Renamed kegg.KEGG.info into dbinfo , which was overloaded with Logging
-     * Updated all documentation to check examples
-     * Fixed tests and notebooks
-     * clean and tested doctests in the documentation
-  * NEWS:
-     * Replace deprecated HGNC with the official web service from genenames.org
-     
-
-
-*1.4.0
-  * CHANGES: 
-    * Fully update EUtils since WSDL is now down; implementation uses REST now.
-      This fixes https://github.com/cokelaer/bioservices/issues/41
-    * Remove the apps/taxonomy module now part of biokit. 
-  * NEWS:
-     * add small XML tools to parse XML dynamically in xmltools module
-     * add http_delete in services.py
+    * CHANGES: update setup dependencies.
+    * BUG: Typo fixed in uniprot list of valid columns #47
+* 1.4.1
+    * CHANGES:
+       * Renamed kegg.KEGG.info into dbinfo , which was overloaded with Logging
+       * Updated all documentation to check examples
+       * Fixed tests and notebooks
+       * clean and tested doctests in the documentation
+    * NEWS:
+        * Replace deprecated HGNC with the official web service from genenames.org
+* 1.4.0
+    * CHANGES: 
+        * Fully update EUtils since WSDL is now down; implementation uses REST now.
+          This fixes https://github.com/cokelaer/bioservices/issues/41
+        * Remove the apps/taxonomy module now part of biokit. 
+    * NEWS:
+        * add small XML tools to parse XML dynamically in xmltools module
+        * add http_delete in services.py
 
 
 Revision 1.3
 ------------------
 
 * 1.3.8 (progress)
-  * CHANGES: cache files are now stored in the ./config/bioservices directory,
-    this fixes https://github.com/cokelaer/bioservices/issues/40
+
+  * CHANGES:
+
+    * cache files are now stored in the ./config/bioservices directory,
+      this fixes https://github.com/cokelaer/bioservices/issues/40
 
 * 1.3.7
+
   * CHANGES
+
     * ArrayExpress: add new 2 methods to ease the usage
 
   * BUG FIXES
+
     * KEGG: fix https://github.com/cokelaer/bioservices/issues/39
 
 
 * 1.3.6
+
   * BUG FIXES
+
     * KEGG: Fixed during the major changes described here below
             https://github.com/cokelaer/bioservices/issues/29
   * CHANGES
+
     * IntactL rename Intact class into IntactComplex
     * KEGG: revisited the parsing following requests from user
       https://github.com/cokelaer/bioservices/issues/30
@@ -68,7 +121,8 @@ Revision 1.3
 
 * 1.3.5
 
-  * BUG FIXES
+  * BUG FIXES:
+
     * quickgo: fix bug https://github.com/cokelaer/bioservices/issues/22 
     * uniprot: add missing columns (https://github.com/cokelaer/bioservices/issues/23)
     * kegg: fix parser related to reaction in the Compound data structure (https://github.com/cokelaer/bioservices/issues/27)

@@ -118,6 +118,8 @@ class BioModels(WSDLService):
 
     """
     _url = "http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices?wsdl"
+    # New (Aug 2016)
+    _url = "http://biomodels.caltech.edu/services/BioModelsWebServices?wsdl"
     def __init__(self, verbose=True):
         """.. rubric:: Constructor
 

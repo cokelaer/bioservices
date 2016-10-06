@@ -107,7 +107,7 @@ class ENA(REST):
     .. todo:: Taxon viewer, image retrieval.
 
     """
-    _url = "http://www.ebi.ac.uk/ena/data/view"
+    _url = "http://www.ebi.ac.uk/ena/data"
 
 
     def __init__(self, verbose=False, cache=False):
@@ -120,11 +120,22 @@ class ENA(REST):
         self.TIMEOUT = 100
 
     def get_data(self, identifier, frmt, fasta_range=None, expanded=None,
-            header=None):
+            header=None, download=None):
+        """
+
+        :param frmt : xml, text, fasta, fastq, html
+
+
+        .. todo:: download and save at the same time. Right now the fasta is
+            retuned as a string and needs to be saved manually. It may also be
+            an issue with very large fasta files.
+        """
+
         # somehow the params param does not work, we need to construct the
         # entire url
-        url = self.url + '/' + identifier
-        assert frmt in ['fasta', 'xml', 'text']
+        url = self.url + '/view/' + identifier
+        #assert frmt in ['fasta', 'xml', 'text'], \
+        #    "Only fasta, xml and text are recognised"
         url += "&display=%s" % frmt
 
         if fasta_range is not None:
@@ -136,18 +147,23 @@ class ENA(REST):
         if header is not None and header is True:
             url += "&header=true"
 
+        if download is not None:
+            url += "&download=%s" % download
 
         res = self.http_get(url)
         res = res.content
         return res
 
     def view_data(self, identifier, fasta_range=None):
-        url = self.url + '/' + identifier
+        url = self.url + '/view/' + identifier
         if fasta_range is not None:
             url += "&range=%s-%s" % (fasta_range[0], fasta_range[1])
         self.on_web(url)
 
+    def data_warehouse(self):
+        #http://www.ebi.ac.uk/ena/data/warehouse/search?query="geo_circ(-0.587,-90.5713,170)"&result=sequence_release&display=text&download=gzip
+        pass
 
-
-
+    def get_taxon(self, taxon):
+        return e.get_data("Taxon:%s" % taxon, "xml").decode()
 

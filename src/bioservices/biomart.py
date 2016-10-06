@@ -38,9 +38,20 @@ to all the BioModel service.
 .. note:: SOAP and REST are available. We use REST for the wrapping.
 """
 from bioservices import REST, BioServicesError
+from functools import wraps
 
 __all__ = ["BioMart"]
 
+
+def require_host(f):
+    @wraps(f)
+    def wrapper(*args, **kargs):
+        if args[0].host is None:
+            print("You must set the host (e.g. f.host='www.ensembl.org' ")
+            return
+        return f(*args, **kargs)
+    return wrapper
+    
 
 class BioMart(REST):
     r"""Interface to the `BioMart <http://www.biomart.org>`_ service
@@ -160,7 +171,7 @@ class BioMart(REST):
                     </Query>"""
 
 
-    def __init__(self, verbose=False, host=None, cache=False):
+    def __init__(self, host=None, verbose=False, cache=False):
         """.. rubric:: Constructor
 
 
@@ -174,26 +185,49 @@ class BioMart(REST):
         (e.g., www.ensembl.org) that will speed up significantly the
         initialisation time. To do so, use the **host** parameter.
 
-        :param str host: a valid host (e.g. "www.ensembl.org")
+        :param str host: a valid host (e.g. "www.ensembl.org", gramene.org)
+
+        List of databases are available in this webpage http://www.biomart.org/community.html
+
+
 
 
         """
-        if host is None:
-            host = "www.biomart.org"
-        url = "http://%s/biomart/martservice" % host
-
+        url = "undefined"
         super(BioMart, self).__init__("BioMart", url=url, verbose=verbose,
             cache=cache)
+
+
         self._names = None
         self._databases = None
         self._display_names = None
         self._valid_attributes = None
         self._hosts = None
-
-        #self._init()   # can be commented if we do not want to 
-                       # check the validity of attributes
+        
+        if host is None:
+            host = "www.biomart.org"
+            url = "http://%s/biomart/martservice" % host
+            self._host = None
+        else:
+            self.host = host
 
         self._biomartQuery = BioMartQuery()
+
+    def _get_host(self):
+        return self._host
+    def _set_host(self, host):
+        import easydev
+        try:
+            if easydev.isurl_reachable(host):
+                self._host = host
+                url = "http://%s/biomart/martservice" % host
+                self.url = url
+                self._init()
+            else:
+                print("host %s is not reachable " % host)
+        except:
+            print("Could not reach the host %s" % host)
+    host = property(_get_host, _set_host)
 
     def _init(self):
         temp = self.debugLevel
@@ -202,6 +236,7 @@ class BioMart(REST):
         _ = self.valid_attributes
         self.debugLevel = temp
 
+    @require_host
     def registry(self):
         """to retrieve registry information
 
@@ -220,6 +255,7 @@ class BioMart(REST):
         ret = [x.attrib for x in ret.getchildren()]
         return ret
 
+    @require_host
     def datasets(self, mart, raw=False):
         """to retrieve datasets available for a mart:
 
@@ -245,6 +281,7 @@ class BioMart(REST):
 
         return ret
 
+    @require_host
     def attributes(self, dataset):
         """to retrieve attributes available for a dataset:
 
@@ -263,6 +300,7 @@ class BioMart(REST):
             results[key] = line.split("\t")[1:]
         return results
 
+    @require_host
     def filters(self, dataset):
         r"""to retrieve filters available for a dataset:
 
@@ -290,6 +328,7 @@ class BioMart(REST):
             results[key] = line.split("\t")[1:]
         return results
 
+    @require_host
     def configuration(self, dataset):
         """to retrieve configuration available for a dataset:
 
@@ -300,6 +339,7 @@ class BioMart(REST):
         ret = self.easyXML(ret)
         return ret
 
+    @require_host
     def version(self, mart):
         """Returns version of a **mart**
 
@@ -310,9 +350,11 @@ class BioMart(REST):
         ret = self.easyXML(ret)
         return ret.root.strip()
 
+    @require_host
     def new_query(self):
         self._biomartQuery.reset()
 
+    @require_host
     def query(self, xmlq):
         """Send a query to biomart
 
@@ -340,22 +382,27 @@ class BioMart(REST):
                 data={'query':xmlq.strip()}, headers={})
         return ret
 
+    @require_host
     def add_attribute_to_xml(self, name, dataset=None):
         attr = self.create_attribute(name, dataset)
         self._biomartQuery.add_attribute(attr)
 
+    @require_host
     def add_filter_to_xml(self, name, value, dataset=None):
         filt = self.create_filter(name, value, dataset)
         self._biomartQuery.add_filter(filt)
 
+    @require_host
     def add_dataset_to_xml(self, dataset):
         self.attributes(dataset)
         #    raise BioServicesError("invalid dataset names provided. Check names attribute")
         self._biomartQuery.add_dataset(dataset)
 
+    @require_host
     def get_xml(self):
         return self._biomartQuery.get_xml()
 
+    @require_host
     def create_filter(self, name, value, dataset=None):
         if dataset:
             valid_filters = self.filters(dataset).keys()
@@ -365,6 +412,7 @@ class BioMart(REST):
         _filter = """        <Filter name = "%s" value = "%s"/>""" % (name, value)
         return _filter
 
+    @require_host
     def create_attribute(self, name, dataset=None):
         #s.attributes(dataset)
         # valid dataset
@@ -375,6 +423,7 @@ class BioMart(REST):
         attrib = """        <Attribute name = "%s" />""" % name
         return attrib
 
+    @require_host
     def _get_names(self):
         if self._names is None:
             ret = self.registry()
@@ -383,6 +432,7 @@ class BioMart(REST):
         return self._names
     names = property(_get_names, doc="list of valid datasets")
 
+    @require_host
     def _get_displayNames(self):
         if self._display_names is None:
             ret = self.registry()
@@ -391,6 +441,7 @@ class BioMart(REST):
         return self._display_names
     displayNames = property(_get_displayNames, doc="list of valid datasets")
 
+    @require_host
     def _get_databases(self):
         if self._databases is None:
             ret = self.registry()
@@ -399,6 +450,7 @@ class BioMart(REST):
         return self._databases
     databases = property(_get_databases, doc="list of valid datasets")
 
+    @require_host
     def _get_hosts(self):
         if self._hosts is None:
             ret = self.registry()
@@ -407,7 +459,7 @@ class BioMart(REST):
         return self._hosts
     hosts = property(_get_hosts, doc="list of valid hosts")
 
-
+    @require_host
     def _get_valid_attributes(self,):
         res = {}
         if self._valid_attributes is None:
@@ -437,6 +489,7 @@ class BioMart(REST):
         return self._valid_attributes
     valid_attributes = property(_get_valid_attributes, doc="list of valid datasets")
 
+    @require_host
     def lookfor(self, pattern, verbose=True):
         for a,x,y,z in zip(self.hosts, self.databases, self.names, self.displayNames):
             found = False

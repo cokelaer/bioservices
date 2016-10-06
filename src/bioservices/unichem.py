@@ -327,7 +327,7 @@ class UniChem(REST):
         res = self._process(src_compound_id, "json", request)
         # the output is a list but looks like there is only 1 item
         # TODO check that there is indeed only 1 output.
-        if len(res) == 1:
+        if res and len(res) == 1:
             return res[0]
         return res
 
@@ -347,7 +347,7 @@ class UniChem(REST):
         src_id = self._get_source_id(src_id)
         request = "structure_all/%s" + "/%s" % src_id
         res = self._process(src_compound_id, "json", request)
-        if len(res) == 1:
+        if res and len(res) == 1:
             return res[0]
         return res
 

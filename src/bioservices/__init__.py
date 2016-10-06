@@ -12,6 +12,7 @@ see online documentation for details on pypi or github.
 from __future__ import print_function
 from __future__ import division
 
+
 import pkg_resources
 __version__ = "$Id$$, $Rev$"
 try:
@@ -47,6 +48,12 @@ from .settings import *
 from . import services
 from .services import *
 
+from . import biodbnet
+from .biodbnet import *
+
+from . import biocarta
+from .biocarta import *
+
 from . import biomodels
 from .biomodels import *
 
@@ -54,7 +61,7 @@ from . import chebi
 from .chebi import *
 
 from . import ena
-from ena import ENA
+from .ena import ENA
 
 from . import ensembl
 from .ensembl import *
@@ -80,6 +87,9 @@ from .xmltools import *
 from . import wikipathway
 from .wikipathway import *
 
+from . import omnipath
+from .omnipath import *
+
 from . import pdb
 from .pdb import *
 
@@ -92,16 +102,14 @@ from .uniprot import *
 from . import unichem
 from .unichem import *
 
-from . import wsdbfetch
-from .wsdbfetch import *
-
+from . import rnaseq_ebi
+from .rnaseq_ebi import RNASEQ_EBI
 
 from . import reactome
 from .reactome import *
 
 from . import quickgo
 from .quickgo import *
-
 
 from . import chembl
 from .chembl import *
@@ -140,8 +148,11 @@ from .pathwaycommons import *
 from . import muscle
 from .muscle import *
 
-from . import biodbnet
-from .biodbnet import *
+
+
+from . import wsdbfetch
+from .wsdbfetch import *
+
 # sub packages inside bioservices.
 
 #import mapping

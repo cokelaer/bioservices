@@ -1256,25 +1256,28 @@ class KEGGParser(Logging):
                 data = [x.split(":",1) for x in output[key].split("\n")]
                 data = dict([(x[0].strip(), float(x[1].strip())) for x in data])
                 output[key] = data
-            # strip only expecting a single line (string)
+            # strip only: expecting a single line (string)
             elif key in ['POSITION', 'DESCRIPTION', 'ENTRY', 'ORGANISM', 
                     'CLASS', 'FORMULA', 'KEYWORDS', 'CATEGORY', 'ANNOTATION',
                     'DATA_SOURCE', 'MASS', 'COMPOSITION', 'DEFINITION', 
-                    'KO_PATHWAY', 'EQUATION', 'TYPE', 'RCLASS']:
+                    'KO_PATHWAY', 'EQUATION', 'TYPE', 'RCLASS', 'SYSNAME', "HISTORY"]:
                 # get rid of \n
 
                 if "\n" in value:
                     # happens in description path:hsa04915
-                    print("warning for debugging in %s" % key)
+                    self.logging.warning("warning for debugging in %s" % key)
                     value = value.replace("\n", " ")
                 # nothing to do here except strip
                 output[key] = value.strip()
-            # list : set of lines
+            # list : set iof lines. Could be split by ; character but we use the
+            # \n instead to be sure
             # COMMENT is sometimes on several lines
-            elif key in ['NAME', 'REMARK', 'ACTIVITY', 'COMMENT', 'ORIGINAL_DB']:
+            elif key in ['NAME', 'REMARK', 'ACTIVITY', 'COMMENT', 'ORIGINAL_DB',
+                "SUBSTRATE", "PRODUCT"]:
                 output[key] = [x.strip() for x in value.split("\n")]
             # list: long string splitted into items and therefore converted to a list
-            elif key in ['ENZYME', 'REACTION',  'RPAIR', 'RELATEDPAIR']:
+            elif key in ['ENZYME', 'REACTION',  'RPAIR', 'RELATEDPAIR',
+                  "ALL_REAC"]:
                 # RPAIR/rn:R00005 should be a dict if "_" found
                 # REACTION/md:hsa_M00554 should be a dict if '->' found
                 if '->' in value or "_" in value:
@@ -1327,6 +1330,10 @@ class KEGGParser(Logging):
                 newvalue = [self._interpret_taxonomy(this)
                     for this in self._tolist(value)]
                 output[key] = newvalue
+            elif key == "SEQUENCE":
+                newvalue = [self._interpret_sequence(this)
+                    for this in self._tolist(value)]
+                output[key] = newvalue
 
             # dictionary, interpreted as follows
             # on each line, there is an identifier followed by : character
@@ -1371,8 +1378,8 @@ class KEGGParser(Logging):
                 # get rid of that number and then send a list
                 output[key] = self._interpret_enumeration(output[key])
             # not interpreted
-            elif key in ['BRACKET', 'COMPONENT', 'SOURCE', 'BRITE', 
-                    'CARCINOGEN', 'MARKER', 'PRODUCT']: # do not interpret to keep structure
+            elif key in ['BRACKET', 'COMPONENT', 'SOURCE', 'BRITE', "TARGET",
+                    'CARCINOGEN', 'MARKER']: # do not interpret to keep structure
                 pass
             else:
                 print("""\nWarning. Found keyword %s, which has not special
@@ -1416,6 +1423,36 @@ class KEGGParser(Logging):
                 res['TITLE'] = this.strip().split(None,1)[1]
         return res
 
+    def _interpret_sequence(self, data):
+        res = {}
+        gene = False
+        count = 0
+        for this in data.split("\n"):
+            if this.strip().startswith("GENE"):
+                res['GENE'] = this.strip().split(None,1)[1]
+                gene = True
+            elif this.strip().startswith('ORGANISM'):
+                res['ORGANISM'] = this.strip().split(None,1)[1]
+                gene = False
+            elif this.strip().startswith('TYPE'):
+                res['TYPE'] = this.strip().split(None, 1)[1]
+                gene = False
+            elif gene is True:
+                res['GENE'] += this.strip()
+            else:
+                assert gene is False
+                res['SEQUENCE'] = this.strip()
+        return res
+    """
+    [u'    0 Mtk  1 Mtd  2 Mad  3 Man  4 Mte  5 Mtk  6 Mtd  7 Man',
+ u'  GENE      0-2 mycAI [UP:Q83WF0]; 3 mycAII [UP:Q83WE9]; 4-5 mycAIII',
+ u'            [UP:Q83WE8]; 6 mycAIV [UP:Q83WE7]; 7 mycAV [UP:Q83WE6]',
+ u'  ORGANISM  Micromonospora griseorubida',
+ u'  TYPE      PK']
+    """
+
+            
+
     def _interpret_taxonomy(self, data):
         res = {}
         for this in data.split("\n"):
@@ -1428,14 +1465,19 @@ class KEGGParser(Logging):
     def _interpret_references(self, data):
         res = {}
         for this in data.split("\n"):
-            if this.strip().startswith("REFERENCE"):
-                res['REFERENCE'] = this.strip().split(None,1)[1]
-            elif this.strip().startswith("JOURNAL"):
-                res['JOURNAL'] = this.strip().split(None,1)[1]
-            elif this.strip().startswith("AUTHORS"):
-                res['AUTHORS'] = this.strip().split(None,1)[1]
-            elif this.strip().startswith("TITLE"):
-                res['TITLE'] = this.strip().split(None,1)[1]
+            fields = this.strip().split(None, 1)
+            if len(fields) <= 1: continue
+            if fields[0] in ("REFERENCE", "AUTHORS", "TITLE", "JOURNAL"):
+                res[fields[0]] = fields[1]
+
+            #if this.strip().startswith("REFERENCE"):
+            #    res['REFERENCE'] = this.strip().split(None,1)[1]
+            #elif this.strip().startswith("JOURNAL"):
+            #    res['JOURNAL'] = this.strip().split(None,1)[1]
+            #elif this.strip().startswith("AUTHORS"):
+            #    res['AUTHORS'] = this.strip().split(None,1)[1]
+            #elif this.strip().startswith("TITLE"):
+            #    res['TITLE'] = this.strip().split(None,1)[1]
         return res
 
     def _interpret_plasmid(self, data):

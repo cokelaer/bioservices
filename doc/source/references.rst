@@ -99,6 +99,14 @@ Clinvitae
     :undoc-members:
     :synopsis:
 
+
+ENA
+==========
+
+.. automodule:: bioservices.ena
+    :members:
+    :undoc-members:
+
 EUtils
 ==========
 
@@ -176,6 +184,14 @@ NCBIblast
     :undoc-members:
     :synopsis:
 
+OmniPath Commons
+=========================
+
+.. automodule:: bioservices.omnipath
+    :members:
+    :undoc-members:
+    :synopsis:
+
 Pathway Commons
 =========================
 
@@ -240,6 +256,16 @@ Readseq
     :members:
     :undoc-members:
     :synopsis:
+
+RNASEQ Analysis
+======================
+
+.. automodule:: bioservices.rnaseq_ebi
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
 
 
 UniChem
