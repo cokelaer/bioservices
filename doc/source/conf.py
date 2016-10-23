@@ -12,6 +12,7 @@
 # serve to show the default.
 
 import sys, os
+import sphinx
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -54,19 +55,20 @@ project = pkg_name
 
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
+
+    ('sphinx.ext.imgmath'  # only available for sphinx >= 1.4
+                  if sphinx.version_info[:2] >= (1, 4)
+                  else 'sphinx.ext.pngmath'),
     'sphinx.ext.coverage',
-    'sphinx.ext.graphviz',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
-    'sphinx.ext.coverage',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-    'easydev.copybutton',
+    "numpydoc.numpydoc",
     'matplotlib.sphinxext.plot_directive',
-    'matplotlib.sphinxext.only_directives',
-    'sphinx.ext.pngmath',
+    'sphinx.ext.autosummary',
+    #'sphinx_gallery.gen_gallery'
     ]
 # note that the numpy directives is buggy. Example: class and init are not recognised as two entities for the autoclass_content=both here below
 

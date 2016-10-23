@@ -248,6 +248,8 @@ class UniProt(REST):
                                       verbose=verbose, cache=cache)
         self.TIMEOUT = 100
 
+        self._database = "uniprot"
+
     def _download_flat_files(self):
         """could be used to get all data in flat files (about compressed 500Mb )"""
         url = "ftp://ftp.ebi.ac.uk/pub/databases/uniprot/knowledgebase/uniprot_sprot.dat.gz"
@@ -328,7 +330,7 @@ class UniProt(REST):
     def searchUniProtId(self, uniprot_id, frmt="xml"):
         print("DEPRECATED SINCE VERSION 1.3.1. use retrieve instead")
 
-    def retrieve(self, uniprot_id, frmt="xml"):
+    def retrieve(self, uniprot_id, frmt="xml", database="uniprot"):
         """Search for a uniprot ID in UniProtKB database
 
         :param str uniprot: a valid UniProtKB ID or a list of identifiers.
@@ -350,7 +352,7 @@ class UniProt(REST):
 
         queries = self.devtools.to_list(uniprot_id)
 
-        url = ["uniprot/" + query + '.' + frmt for query in queries]
+        url = [database+"/" + query + '.' + frmt for query in queries]
         res = self.http_get(url, frmt="txt")
         if frmt == "xml":
             res = [self.easyXML(x) for x in res]
@@ -396,7 +398,8 @@ class UniProt(REST):
         return f.sequence
 
     def search(self, query, frmt="tab", columns=None,
-               include=False, sort="score", compress=False, limit=None, offset=None, maxTrials=10):
+               include=False, sort="score", compress=False, limit=None, 
+                offset=None, maxTrials=10, database="uniprot"):
         """Provide some interface to the uniprot search interface.
 
         :param str query: query must be a valid uniprot query.
@@ -497,7 +500,7 @@ class UniProt(REST):
         params['query'] = query.replace("+", " ")
         # res = s.request("/uniprot/?query=zap70+AND+organism:9606&format=xml", params)
         # print(params)
-        res = self.http_get("uniprot/", frmt="txt", params=params)
+        res = self.http_get(database + "/", frmt="txt", params=params)
         return res
 
     def quick_search(self, query, include=False, sort="score", limit=None):
