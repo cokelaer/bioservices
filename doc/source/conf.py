@@ -14,17 +14,18 @@
 import sys, os
 import sphinx
 
+sys.path.insert(0, os.path.abspath('sphinxext'))
+
+import sphinx_gallery
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 pkg_name = "bioservices"
 
-try:
-    exec("import %s" % pkg_name)
-except Exception, e:
-    print "Install %s or set your PYTHONPATH properly" % pkg_name
-    raise Exception
+# This is for ReadTheDoc
+import matplotlib
+matplotlib.use('Agg')
 
 try:
     import easydev
@@ -42,6 +43,8 @@ title = "BioServices"
 copyright = author + ", 2012"
 project = pkg_name
 
+import easydev
+from easydev import get_path_sphinx_themes
 
 
 
@@ -139,20 +142,56 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 modindex_common_prefix = ["bioservices."]
 
-
-
+# -- sphinx gallery ------------------------------------------------------------
+plot_gallery = True
 sphinx_gallery_conf = {
-    # path to your examples scripts
-    'examples_dirs' : 'examples',
-    # path where to save gallery generated examples
-    'gallery_dirs'  : 'doc/source/auto_examples'
-    }
+    "doc_module": "bioservices",
+#    "examples_dirs": "examples",
+#    "gallery_dirs": "auto_examples",
+}
+
+# Get rid of spurious warnings due to some interaction between
+# autosummary and numpydoc. See
+# https://github.com/phn/pytpm/issues/3#issuecomment-12133978 for more
+# details
+numpydoc_show_class_members = False
+
+
+# solution from nilearn
+def touch_example_backreferences(app, what, name, obj, options, lines):
+    # generate empty examples files, so that we don't get
+    # inclusion errors if there are no examples for a class / module
+    examples_path = os.path.join(app.srcdir, "modules", "generated",
+                                 "%s.examples" % name)
+    if not os.path.exists(examples_path):
+        # touch file
+        open(examples_path, 'w').close()
+
+
+
+# Add the 'copybutton' javascript, to hide/show the prompt in code
+# examples
+def setup(app):
+    app.add_javascript('copybutton.js')
+    app.connect('autodoc-process-docstring', touch_example_backreferences)
+
+
+
+
 
 # -- Options for HTML output ---------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
 html_theme = 'standard'
+on_rtd = os.environ.get("READTHEDOCS", None) == True
+if not on_rtd:
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+else:
+    html_theme = "default"
+
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -185,7 +224,6 @@ html_theme_path = [get_path_sphinx_themes()]
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 
-# the copybutton.js must be copied there: 
 html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
