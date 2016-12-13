@@ -53,7 +53,7 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 # on rtd, pandas is 1.3.1 cannot use something better for now (march 2016)
 if on_rtd is True:  # only import and set the theme if we're building docs
-    install_requires = ["sphinx-gallery", grequests", "requests", 
+    install_requires = ["sphinx-gallery", "grequests", "requests", 
         "requests_cache", "easydev>=0.9.7", "beautifulsoup4", "xmltodict",
         "suds-jurko", "appdirs", 'wrapt'],
 else:
