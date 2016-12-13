@@ -6,6 +6,11 @@ Whats' new, what has changed
 Revision 1.4
 ---------------
 
+* 1.4.15:
+    * BUG: 
+        * ensembl.org in biomart was not reachable anymore. This is fixed
+          by using requests to check URL existence. 
+
 * 1.4.14:
     * CHANGES:
         * update http to https in EUtils

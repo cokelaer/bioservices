@@ -29,7 +29,7 @@ Services
 ArrayExpress
 ===================
 
-.. automodule:: bioservices.arrayexpress
+.. .. automodule:: bioservices.arrayexpress
     :members:
     :undoc-members:
     :synopsis:

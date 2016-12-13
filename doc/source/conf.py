@@ -54,21 +54,20 @@ project = pkg_name
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 
 extensions = [
-    'sphinx.ext.autodoc',
-
     ('sphinx.ext.imgmath'  # only available for sphinx >= 1.4
-                  if sphinx.version_info[:2] >= (1, 4)
-                  else 'sphinx.ext.pngmath'),
+         if sphinx.version_info[:2] >= (1, 4)
+         else 'sphinx.ext.pngmath'),
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary', 
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-    "numpydoc.numpydoc",
+    'easydev.copybutton',
     'matplotlib.sphinxext.plot_directive',
-    'sphinx.ext.autosummary',
-    #'sphinx_gallery.gen_gallery'
+    'sphinx_gallery.gen_gallery'
     ]
 # note that the numpy directives is buggy. Example: class and init are not recognised as two entities for the autoclass_content=both here below
 
@@ -140,6 +139,14 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 modindex_common_prefix = ["bioservices."]
 
+
+
+sphinx_gallery_conf = {
+    # path to your examples scripts
+    'examples_dirs' : 'examples',
+    # path where to save gallery generated examples
+    'gallery_dirs'  : 'doc/source/auto_examples'
+    }
 
 # -- Options for HTML output ---------------------------------------------------
 
