@@ -10,6 +10,8 @@ Revision 1.4
     * BUG: 
         * ensembl.org in biomart was not reachable anymore. This is fixed
           by using requests to check URL existence. 
+        * in ensembl module tolist -> to_list
+        * Fix ensembl tests
 
 * 1.4.14:
     * CHANGES:
