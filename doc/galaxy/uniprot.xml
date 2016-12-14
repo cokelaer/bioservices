@@ -1,0 +1,16 @@
+<tool id="bioservices_uniprot" name="Get FASTA" version="1.1.0">
+  <description>from UniProt via Bioservices</description>
+  <requirements>
+    <requirement type="package">bioservices</requirement>
+  </requirements>
+  <command interpreter="python">uniprot.py $uniprot_id $output</command>
+  <inputs>
+    <param name="uniprot_id" type="text" label="UniProt ID" size="40" help="Provide a valid UniProt Entry (e.g. P43403) "/>
+  </inputs>
+  <outputs>
+    <data format="fasta" name="output" />
+  </outputs>
+  <help>
+Fetch a FASTA file using UniProt via BioServices. Simply provide a valid Uniprot Entry (e.g., P43403)
+  </help>
+</tool>
