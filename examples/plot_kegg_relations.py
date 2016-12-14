@@ -15,14 +15,13 @@ s = KEGG()
 s.organism = "hsa"
 
 # retrieve more than 260 pathways so it takes time
-#results = [s.parse_kgml_pathway(x) for x in s.pathwayIds]
-#relations = [x['relations'] for x in results]
+max_pathways = 10
+results = [s.parse_kgml_pathway(x) for x in s.pathwayIds[0:max_pathways]]
+relations = [x['relations'] for x in results]
 
 # plot
-
-data = randn(10000)
-hist(data, 20)
+hist([len(this) for this in relations], 20)
 xlabel('number of relations')
-ylabel('\#')
+ylabel('#')
 title("number of relations per pathways")
 grid(True)
