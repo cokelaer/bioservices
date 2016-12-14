@@ -3,9 +3,10 @@ name: gdsctools_env
 channels:
 - bioconda
 
+
 dependencies:
 - requests
-- gevents
+- grequests
 - numpy
 - pandas
 - matplotlib
