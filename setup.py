@@ -51,9 +51,11 @@ with open('HISTORY.rst') as f:
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
+# sphinx-gallery and numpydoc are used for the doc only.
+# Could have a if on_rtd
 install_requires = ["sphinx-gallery", "grequests", "requests", 
         "requests_cache", "easydev>=0.9.7", "beautifulsoup4", "xmltodict",
-        "suds-jurko", "appdirs", 'wrapt'],
+        "suds-jurko", "appdirs", 'wrapt', 'numpydoc'],
 
 
 
