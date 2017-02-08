@@ -7,7 +7,7 @@ import glob
 
 _MAJOR               = 1
 _MINOR               = 4
-_MICRO               = 15
+_MICRO               = 16
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -53,9 +53,9 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 # sphinx-gallery and numpydoc are used for the doc only.
 # Could have a if on_rtd
-install_requires = ["sphinx-gallery", "grequests", "requests", 
+install_requires = ["grequests", "requests",
         "requests_cache", "easydev>=0.9.7", "beautifulsoup4", "xmltodict",
-        "suds-jurko", "appdirs", 'wrapt', 'numpydoc'],
+        "suds-jurko", "appdirs", 'wrapt'],
 
 
 
@@ -71,7 +71,7 @@ setup(
     description = metainfo['description'],
     license          = metainfo['license'],
     platforms        = metainfo['platforms'],
-    url              = metainfo['url'],      
+    url              = metainfo['url'],
     download_url     = metainfo['download_url'],
     classifiers      = metainfo['classifiers'],
 
