@@ -6,6 +6,8 @@ Whats' new, what has changed
 Revision 1.4
 ---------------
 
+* 1.4.16: simplify setup
+
 * 1.4.15:
     * BUG: 
         * ensembl.org in biomart was not reachable anymore. This is fixed
