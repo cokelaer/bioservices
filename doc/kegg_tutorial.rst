@@ -24,7 +24,7 @@ queried with the :meth:`bioservices.kegg.KEGG.list` method::
 
     k.list("organism")
 
-The output contains Id of the organism and some oter information. To retrieve
+The output contains Id of the organism and some other information. To retrieve
 the Ids, you will need to process the output. However, we provide an alias::
 
     print(k.organismIds)
@@ -34,7 +34,7 @@ therefore it takes time. For instance, the command above takes a couple of
 seconds. However, some are buffered so next time you call it, it will be much faster.
 
 Another useful alias is the **pathwayIds** to retrieve all pathway Ids. However,
-you must first specify the organism you are intereted in. From the command above
+you must first specify the organism you are interested in. From the command above
 we know that **hsa** (human) is valid organism Id, so let us set it and then get
 the list of pathways::
 
@@ -62,9 +62,9 @@ an entry for the gene called ZAP70 in the human organism, type::
     >>> s.find("hsa", "zap70")
     'hsa:7535\tZAP70, SRK, STCD, STD, TZK, ZAP-70; zeta-chain (TCR) associated protein kinase 70kDa (EC:2.7.10.2); K07360 tyrosine-protein kinase ZAP-70 [EC:2.7.10.2]\n'
 
-It is quite powerful and more examples will be showm. However, it has some limitations.
+It is quite powerful and more examples will be shown. However, it has some limitations.
 For example, what about searching for the organism Ids that correspond to any
-Drosophila ? It does not look like it is possible. BioServices provides a method to search 
+Drosophila? It does not look like it is possible. BioServices provides a method to search 
 for an organism Id using :meth:`~bioservices.kegg.KEGG.lookfor_organism` given
 the name (or part of it)::
 
@@ -156,8 +156,8 @@ NAME, GENE, DESCRIPTION and so on. This is quite limited. In BioServices, we pro
     ...
 
 This is fine if we just want the name of the genes but what about their
-relations ? Actually, there is an option with the get metho where you can
-specify the output format. In particular you can erquest the pathway to be
+relations? Actually, there is an option with the get method where you can
+specify the output format. In particular you can request the pathway to be
 returned as a kgml file::
 
     res = s.get("hsa04660", "kgml")
@@ -261,7 +261,7 @@ You can then extract more information such as the type of relations::
     >>> genes = k.get_genes_by_pathway(pid)
     >>> len(genes)
     93
-    If you do not know the name of a pathwya but know some species in it (given
+    If you do not know the name of a pathway but know some species in it (given
     their name, not kegg id), then you can use the following command::
      >>> k.lookfor_specy("ZAP70")
     'hsa:7535'
