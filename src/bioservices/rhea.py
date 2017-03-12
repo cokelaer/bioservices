@@ -44,6 +44,7 @@
 
 """
 from __future__ import print_function
+from collections import defaultdict
 
 from bioservices.services import REST
 
@@ -130,7 +131,6 @@ class Rhea(REST):
         response = self.easyXML(response)
         return response
 
-
     def entry(self, id, frmt):
         """Retrieve a concrete reaction for the given id in a given format
 
@@ -159,6 +159,32 @@ class Rhea(REST):
         return response
 
 
+    def get_metabolites(self, rxn_id):
+        """Given a Rhea (http://www.rhea-db.org/) reaction id,
+        returns its participant metabolites as a dict: {metabolite: stoichiometry},
 
+        e.g. '2 H + 1 O2 = 1 H2O' would be represented ad {'H': -2, 'O2': -1, 'H2O': 1}.
 
+        :param rxn_id: Rhea reaction id
+        :return: dict of participant metabolites.
+        """
+        response = self.entry(rxn_id, frmt="cmlreact")
+
+        reactants = [xx.attrs['title'] for xx in response.findAll("reactant")]
+        products = [xx.attrs['title'] for xx in response.findAll("product")]
+        return {"reactants": reactants, "products": products}
+
+        """ms = defaultdict(lambda: 0)
+        if response.content:
+            # parse XML that comes as a resonse
+            tree = ElementTree.fromstring(response.content)
+
+            ms.update({m.attrib['title']: -float(m.attrib['count'])
+                   for m in
+                tree.iter('{http://www.xml-cml.org/schema/cml2/react}reactant')})
+            ms.update({m.attrib['title']: float(m.attrib['count'])
+                       for m in
+            tree.iter('{http://www.xml-cml.org/schema/cml2/react}product')})
+        return ms
+        """
 
