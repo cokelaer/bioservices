@@ -79,7 +79,7 @@ class Rhea(REST):
     See :meth:`search` :meth:`entry` methods for more information about format.
 
     """
-    _url = "http://www.ebi.ac.uk/rhea/rest"
+    _url = "http://www.rhea-db.org"
     def __init__(self, version="1.0",  verbose=True, cache=False):
         """.. rubric:: Rhea constructor
 
@@ -95,6 +95,7 @@ class Rhea(REST):
             verbose=verbose, cache=cache)
         self.version = version
         self.format_entry = ["cmlreact", "biopax2", "rxn"]
+        self.url += "/rest"
 
     def search(self, query, frmt=None):
         """Search for reactions
