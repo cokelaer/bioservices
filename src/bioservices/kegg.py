@@ -1269,11 +1269,11 @@ class KEGGParser(Logging):
                     value = value.replace("\n", " ")
                 # nothing to do here except strip
                 output[key] = value.strip()
-            # list : set iof lines. Could be split by ; character but we use the
+            # list : set of lines. Could be split by ; character but we use the
             # \n instead to be sure
             # COMMENT is sometimes on several lines
             elif key in ['NAME', 'REMARK', 'ACTIVITY', 'COMMENT', 'ORIGINAL_DB',
-                "SUBSTRATE", "PRODUCT"]:
+                "SUBSTRATE", "PRODUCT", "ENV_FACTOR", "PATHOGEN"]:
                 output[key] = [x.strip() for x in value.split("\n")]
             # list: long string splitted into items and therefore converted to a list
             elif key in ['ENZYME', 'REACTION',  'RPAIR', 'RELATEDPAIR',
@@ -1296,7 +1296,7 @@ class KEGGParser(Logging):
             # transform to dictionary
             elif key in ['DRUG', 'ORTHOLOGY', 'GENE', 'COMPOUND', 'RMODULE',
                     'DISEASE', 'PATHWAY_MAP',
-                    'STR_MAP', 'PATHWAY', 'MODULE', 'GENES']:
+                    'STR_MAP', 'OTHER_MAP', 'PATHWAY', 'MODULE', 'GENES']:
                 kp = {}
                 for line in value.split("\n"):
                     try: # empty orthology in rc:RC00004
