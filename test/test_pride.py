@@ -30,11 +30,11 @@ def test_pride_file():
     # p = PRIDE()
     files = p.get_file_list("PRD000001")
     count = p.get_file_count("PRD000001")
-    assert len(files) == count
+    assert len(set([x['assayAccession'] for x in files])) == count
 
     files = p.get_file_list_assay(1643)
     count = p.get_file_count_assay(1643)
-    assert len(files) == count
+    assert len(set([x['assayAccession'] for x in files])) == count
 
 
 def test_pride_protein():

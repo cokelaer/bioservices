@@ -3,8 +3,12 @@ Whats' new, what has changed
 
 
 
+
+
 Revision 1.4
 ---------------
+* 1.4.17: rhea URL changed and add get_metabolites function. Fix pride test and
+   add missing license file
 
 * 1.4.16: simplify setup
 
