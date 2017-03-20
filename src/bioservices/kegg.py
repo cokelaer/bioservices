@@ -1240,7 +1240,9 @@ class KEGGParser(Logging):
             if k in ['CHROMOSOME', 'TAXONOMY']:
                 continue
             try:
-                output[k] = output[k].strip().replace(k,'',1) # remove the name that
+                output[k] = output[k].strip().replace(k, '', 1).strip()     # remove the name that
+                if not output[k]:
+                    output.pop(k)
             except: # skip the lists
                 pass
 
