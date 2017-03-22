@@ -7,7 +7,7 @@ import glob
 
 _MAJOR               = 1
 _MINOR               = 4
-_MICRO               = 17
+_MICRO               = 18
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
