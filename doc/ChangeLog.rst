@@ -7,6 +7,10 @@ Whats' new, what has changed
 
 Revision 1.4
 ---------------
+* 1.4.18:
+    * BUG:
+        * kegg: fix #75 and #77 (missing  keywords in KEGG)
+
 * 1.4.17: rhea URL changed and add get_metabolites function. Fix pride test and
    add missing license file
 
