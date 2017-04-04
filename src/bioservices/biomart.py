@@ -226,7 +226,11 @@ class BioMart(REST):
         return self._host
     def _set_host(self, host):
         import requests
-        url = "http://%s/biomart/martservice" % host
+        #include exception because phytozome is currently the only biomart using https
+        secure = ''
+        if host == "phytozome.jgi.doe.gov":
+            secure = 's'
+        url = "http%s://%s/biomart/martservice" % (secure, host)
         request = requests.head(url)
         if request.status_code in [200]:
             self._host = host
