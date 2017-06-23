@@ -1426,10 +1426,24 @@ class KEGGParser(Logging):
         return res
 
     def _interpret_sequence(self, data):
-        res = {}
-        gene = False
-        count = 0
+        fields = ["GENE", "ORGANISM", "TYPE"]
+        current_field = "SEQUENCE"
+        res = dict({current_field: u""})
+
+
         for this in data.split("\n"):
+            for f in fields:
+                if this.strip().startswith(f):
+                    fields.remove(f)
+                    current_field = f
+                    this = this.strip().split(None, 1)[1]
+                    res[current_field] = ''
+                    break
+            res[current_field] += this.strip() + u' '
+        if res['SEQUENCE'] == u'': res.pop('SEQUENCE') 
+        return res
+        # changed v1.4.18 issue #79
+        """for this in data.split("\n"):
             if this.strip().startswith("GENE"):
                 res['GENE'] = this.strip().split(None,1)[1]
                 gene = True
@@ -1445,6 +1459,7 @@ class KEGGParser(Logging):
                 assert gene is False
                 res['SEQUENCE'] = this.strip()
         return res
+        """
     """
     [u'    0 Mtk  1 Mtd  2 Mad  3 Man  4 Mte  5 Mtk  6 Mtd  7 Man',
  u'  GENE      0-2 mycAI [UP:Q83WF0]; 3 mycAII [UP:Q83WE9]; 4-5 mycAIII',
