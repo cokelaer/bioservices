@@ -1,0 +1,17 @@
+name: gdsctools_env
+
+channels:
+- bioconda
+
+
+dependencies:
+- requests
+- grequests
+- numpy
+- pandas
+- matplotlib
+- scipy
+- pip:
+  - matplotlib
+  - easydev>=0.9.21
+  - bioservices

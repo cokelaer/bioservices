@@ -1,0 +1,11 @@
+easydev
+colormap
+matplotlib
+pandas
+grequests
+requests
+requests_cache
+beautifulsoup4
+xmltodict
+suds-jurko
+wrapt

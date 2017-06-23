@@ -5,7 +5,6 @@ from nose.plugins.attrib import attr
 p = PRIDE()
 
 
-@attr("fixme")
 def test_pride_project():
     # p = PRIDE()
     res = p.get_project("PRD000001")
@@ -16,7 +15,6 @@ def test_pride_project():
     assert counter > 1000
 
 
-@attr("fixme")
 def test_pride_assay():
     # p = PRIDE()
     res = p.get_assays(1643)
@@ -28,19 +26,17 @@ def test_pride_assay():
     assert count == len(assays)
 
 
-@attr("fixme")
 def test_pride_file():
     # p = PRIDE()
     files = p.get_file_list("PRD000001")
     count = p.get_file_count("PRD000001")
-    assert len(files) == count
+    assert len(set([x['assayAccession'] for x in files])) == count
 
     files = p.get_file_list_assay(1643)
     count = p.get_file_count_assay(1643)
-    assert len(files) == count
+    assert len(set([x['assayAccession'] for x in files])) == count
 
 
-@attr("fixme")
 def test_pride_protein():
     files = p.get_protein_list("PRD000001")
     count = p.get_protein_count("PRD000001")

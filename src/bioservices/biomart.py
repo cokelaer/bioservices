@@ -6,7 +6,7 @@
 #  Copyright (c) 2013-2014 - EBI-EMBL
 #
 #  File author(s):
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -51,7 +51,7 @@ def require_host(f):
             return
         return f(*args, **kargs)
     return wrapper
-    
+
 
 class BioMart(REST):
     r"""Interface to the `BioMart <http://www.biomart.org>`_ service
@@ -175,21 +175,31 @@ class BioMart(REST):
         """.. rubric:: Constructor
 
 
-        By default, the URL used for the biomart service is::
+        URL required to use biomart change quite often. Experience has
+        shown that BioMart class in Bioservices may fail. This is not a
+        bioservices issue but due to API changes on server side.
 
-            http://www.biomart.org/biomart/martservice
+        For that reason the host is not filled anymore and one must set it
+        manually.
 
-        It may be busy or take lots of time to initialise since it 
-        encompasses lots of different MARTS. Usually, one knows which 
-        MART to look at, in which case you may want to use a specific host
-        (e.g., www.ensembl.org) that will speed up significantly the
-        initialisation time. To do so, use the **host** parameter.
+        Let us take the example of the ensembl biomart. The host is
+
+            www.ensembl.org
+
+        Note that there is no prefix *http* and that the actual URL looked for
+        internally is http://www.ensembl.org/biomart/martview
+
+        (It used to be martservice in 2012-2016)
+
+        Another reason to not set any default host is that servers may be busy or
+        take lots of time to initialise (if many MARTS are available). Usually,
+        one knows which MART to look at, in which case you may want to use a
+        specific host (e.g., www.ensembl.org) that will speed up significantly the
+        initialisation time.
 
         :param str host: a valid host (e.g. "www.ensembl.org", gramene.org)
 
         List of databases are available in this webpage http://www.biomart.org/community.html
-
-
 
 
         """
@@ -197,13 +207,12 @@ class BioMart(REST):
         super(BioMart, self).__init__("BioMart", url=url, verbose=verbose,
             cache=cache)
 
-
         self._names = None
         self._databases = None
         self._display_names = None
         self._valid_attributes = None
         self._hosts = None
-        
+
         if host is None:
             host = "www.biomart.org"
             url = "http://%s/biomart/martservice" % host
@@ -216,17 +225,15 @@ class BioMart(REST):
     def _get_host(self):
         return self._host
     def _set_host(self, host):
-        import easydev
-        try:
-            if easydev.isurl_reachable(host):
-                self._host = host
-                url = "http://%s/biomart/martservice" % host
-                self.url = url
-                self._init()
-            else:
-                print("host %s is not reachable " % host)
-        except:
-            print("Could not reach the host %s" % host)
+        import requests
+        url = "http://%s/biomart/martservice" % host
+        request = requests.head(url)
+        if request.status_code in [200]:
+            self._host = host
+            self.url = url
+            self._init()
+        else:
+            print("host %s is not reachable " % host)
     host = property(_get_host, _set_host)
 
     def _init(self):
@@ -259,8 +266,8 @@ class BioMart(REST):
     def datasets(self, mart, raw=False):
         """to retrieve datasets available for a mart:
 
-        :param str mart: e.g. ensembl. see :attr:`names` for a list of valid 
-            MART names the mart is the database. see lookfor method or 
+        :param str mart: e.g. ensembl. see :attr:`names` for a list of valid
+            MART names the mart is the database. see lookfor method or
             databases attributes
 
         >>> s = BioMart(verbose=False)
@@ -374,11 +381,11 @@ class BioMart(REST):
                     <Attribute name="exon_chrom_end"/>
                     </Dataset>
                     </Query>
-    
+
         .. warning:: the input XML must be valid. THere is no validation made
             in thiss method.
         """
-        ret = self.http_post(None, frmt=None, 
+        ret = self.http_post(None, frmt=None,
                 data={'query':xmlq.strip()}, headers={})
         return ret
 
@@ -469,7 +476,7 @@ class BioMart(REST):
             saveme = self.settings.params['general.async_threshold']
             # TODO: not python3 compatible for now. Waiting for gevent package
             # to be available.
-            self.settings.params['general.async_threshold'][0] = 10000 # 
+            self.settings.params['general.async_threshold'][0] = 10000 #
 
             queries = ["?type=datasets&mart=%s" % name for name in
                     self.names]

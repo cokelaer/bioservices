@@ -7,7 +7,7 @@ import glob
 
 _MAJOR               = 1
 _MINOR               = 4
-_MICRO               = 14
+_MICRO               = 18
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -42,11 +42,21 @@ metainfo = {
     }
 
 
-
 with open('README.rst') as f:
     readme = f.read()
 with open('HISTORY.rst') as f:
     history = f.read()
+
+
+
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+
+# sphinx-gallery and numpydoc are used for the doc only.
+# Could have a if on_rtd
+install_requires = ["grequests", "requests",
+        "requests_cache", "easydev>=0.9.7", "beautifulsoup4", "xmltodict",
+        "suds-jurko", "appdirs", 'wrapt'],
+
 
 
 setup(
@@ -61,7 +71,7 @@ setup(
     description = metainfo['description'],
     license          = metainfo['license'],
     platforms        = metainfo['platforms'],
-    url              = metainfo['url'],      
+    url              = metainfo['url'],
     download_url     = metainfo['download_url'],
     classifiers      = metainfo['classifiers'],
 
@@ -71,9 +81,7 @@ setup(
     #package_dir  = package_dir,
 
     # If user of python2.6 ordereddict must be installed manually
-    install_requires = ["grequests", "requests", "requests_cache", 
-        "easydev>=0.9.7", "beautifulsoup4", "xmltodict",
-         "suds-jurko", "appdirs", 'wrapt'],
+    install_requires = install_requires,
     )
 
 

@@ -3,8 +3,25 @@ Whats' new, what has changed
 
 
 
+
+
 Revision 1.4
 ---------------
+* 1.4.18:
+    * BUG:
+        * kegg: fix #75 and #77 (missing  keywords in KEGG)
+
+* 1.4.17: rhea URL changed and add get_metabolites function. Fix pride test and
+   add missing license file
+
+* 1.4.16: simplify setup
+
+* 1.4.15:
+    * BUG: 
+        * ensembl.org in biomart was not reachable anymore. This is fixed
+          by using requests to check URL existence. 
+        * in ensembl module tolist -> to_list
+        * Fix ensembl tests
 
 * 1.4.14:
     * CHANGES:

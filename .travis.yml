@@ -25,10 +25,10 @@ before_install:
 install:
   - pip install grequests requests requests_cache
   - pip install easydev>=0.9.7 beautifulsoup4 suds-jurko appdirs
-  - pip install coveralls nose
+  - pip install coveralls nose numpydoc sphinx-gallery
 # # command to run tests, e.g. python setup.py test
-script:  
-  - python setup.py nosetests  --with-coverage --cover-package bioservices --logging-level ERROR --attr '!slow,!skip,!fixme,!skip_travis' 
+script:
+  - python setup.py nosetests  --with-coverage --cover-package bioservices --logging-level ERROR --attr '!slow,!skip,!fixme,!skip_travis'
 
 after_success:
   coveralls

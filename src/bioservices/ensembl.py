@@ -688,7 +688,7 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        symbols = self.devtools.tolist(symbols)
+        symbols = self.devtools.to_list(symbols)
         expand = int(expand)
         res = self.http_post("lookup/symbol/{0}".format(species),
                 frmt=frmt,

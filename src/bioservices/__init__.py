@@ -14,7 +14,7 @@ from __future__ import division
 
 
 import pkg_resources
-__version__ = "$Id$$, $Rev$"
+__version__ = "1.4.17"
 try:
     version = pkg_resources.require("bioservices")[0].version
     __version__ = version

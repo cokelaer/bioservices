@@ -30,7 +30,7 @@ the names as close as possible to the API. On top of the service methods, each
 class inherits from the BioService class (REST or WSDL). For instance REST
 service have the useful request method. Another nice function is the onWeb. 
 
-.. seealso:: :class:`~bioservice.services.REST`, :class:`~bioservices.services.WSDLService`
+.. seealso:: :class:`~bioservices.services.REST`, :class:`~bioservices.services.WSDLService`
 
 What about the output ?
 ------------------------

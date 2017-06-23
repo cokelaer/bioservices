@@ -106,7 +106,6 @@ class ArrayExpress(REST):
     Using the same example, you can retrieve the names of the files related to
     the experiment::
 
-
         >>> files = [x.getchildren() for x in exp.getchildren() if x.tag == "files"]
         >>> [x.get("name") for x in files[0]]
         ['E-MEXP-31.raw.1.zip',
@@ -115,7 +114,6 @@ class ArrayExpress(REST):
          'E-MEXP-31.sdrf.txt']
 
     Nnew in version 1.3.7 you can use the method :meth:`getEA`
-
 
     Then, you may want to download a particular file::
 
@@ -252,9 +250,10 @@ class ArrayExpress(REST):
 
         The following parameters can sort the results:
 
-        :param str sortby: sorting by grouping (can be accession, name, assays, species, releasedata,
-            fgem, raw, atlas)
-        :param str sortorder: sorting by orderering. Can be either ascending or descending (default)
+        :param str sortby: sorting by grouping (can be accession, name, assays,
+            species, releasedata, fgem, raw, atlas)
+        :param str sortorder: sorting by orderering. Can be either ascending or
+            descending (default)
 
         .. doctest::
             :options: +SKIP
@@ -263,7 +262,8 @@ class ArrayExpress(REST):
             >>> s = ArrayExpress()
             >>> res = s.queryFiles(keywords="cancer+breast", wholewords=True)
             >>> res = s.queryExperiments(array="A-AFFY-33", species="Homo Sapiens")
-            >>> res = s.queryExperiments(array="A-AFFY-33", species="Homo Sapiens", sortorder="releasedate")
+            >>> res = s.queryExperiments(array="A-AFFY-33", species="Homo Sapiens",
+            ...                          sortorder="releasedate")
             >>> res = s.queryExperiments(array="A-AFFY-33", species="Homo+Sapiens",
             ...     expdesign="dose response", sortby="releasedate", sortorder="ascending")
             >>> dates = [x.findall("releasedate")[0].text for x in res.getchildren()]

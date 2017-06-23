@@ -48,8 +48,10 @@ except:
         """return a list of list"""
         print("pandas library is not installed. ")
         print("TSV results will not be interpreted  with Pandas.")
-        data = data.split('\n')
-        data = [this.split('\t') for this in data]
+        try:
+            data = data.split('\n')
+            data = [this.split('\t') for this in data]
+        except:pass
         return data
 
 __all__ = ["RNASEQ_EBI"]

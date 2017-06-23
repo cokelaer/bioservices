@@ -29,7 +29,7 @@ Services
 ArrayExpress
 ===================
 
-.. automodule:: bioservices.arrayexpress
+.. .. automodule:: bioservices.arrayexpress
     :members:
     :undoc-members:
     :synopsis:
@@ -313,6 +313,7 @@ The goal of this sub-package is to provide convenient tools, which are not web s
 
 Peptides
 ============
+
 .. automodule:: bioservices.apps.peptides
     :members:
     :undoc-members:
@@ -320,6 +321,7 @@ Peptides
 
 FASTA
 =======
+
 .. automodule:: bioservices.apps.fasta
     :members:
     :undoc-members:
