@@ -187,35 +187,35 @@ class UniProt(REST):
     #                   'sequence-modified', 'proteome']
     _valid_columns = [
         # Names & Taxonomy
-        'id', 'entry name', 'genes', 'genes(PREFERRED)', 'genes(ALTERNATIVE)', 
-        'genes(OLN)', 'genes(ORF)', 'organism', 'organism-id', 'protein names', 
+        'id', 'entry name', 'genes', 'genes(PREFERRED)', 'genes(ALTERNATIVE)',
+        'genes(OLN)', 'genes(ORF)', 'organism', 'organism-id', 'protein names',
         'proteome', 'lineage(ALL)', 'lineage-id', 'virus hosts',
         # Sequences
-        'fragement', 'sequence', 'length', 'mass', 'encodedon', 
-        'comment(ALTERNATIVE PRODUCTS)', 'comment(ERRONEOUS GENE MODEL PREDICTION)', 
-        'comment(ERRONEOUS INITIATION)', 'comment(ERRONEOUS TERMINATION)', 
-        'comment(ERRONEOUS TRANSLATION)', 'comment(FRAMESHIFT)', 
+        'fragement', 'sequence', 'length', 'mass', 'encodedon',
+        'comment(ALTERNATIVE PRODUCTS)', 'comment(ERRONEOUS GENE MODEL PREDICTION)',
+        'comment(ERRONEOUS INITIATION)', 'comment(ERRONEOUS TERMINATION)',
+        'comment(ERRONEOUS TRANSLATION)', 'comment(FRAMESHIFT)',
         'comment(MASS SPECTROMETRY)', 'comment(POLYMORPHISM)',
-        'comment(RNA EDITING)', 'comment(SEQUENCE CAUTION)', 
-        'feature(ALTERNATIVE SEQUENCE)', 'feature(NATURAL VARIANT)', 
-        'feature(NON ADJACENT RESIDUES)', 
-        'feature(NON STANDARD RESIDUE)', 'feature(NON TERMINAL RESIDUE)', 
-        'feature(SEQUENCE CONFLICT)', 'feature(SEQUENCE UNCERTAINTY)',  
+        'comment(RNA EDITING)', 'comment(SEQUENCE CAUTION)',
+        'feature(ALTERNATIVE SEQUENCE)', 'feature(NATURAL VARIANT)',
+        'feature(NON ADJACENT RESIDUES)',
+        'feature(NON STANDARD RESIDUE)', 'feature(NON TERMINAL RESIDUE)',
+        'feature(SEQUENCE CONFLICT)', 'feature(SEQUENCE UNCERTAINTY)',
         'version(sequence)',
         # Family and Domains
-        'domains', 'domain', 'comment(DOMAIN)', 'comment(SIMILARITY)', 
-        'feature(COILED COIL)', 'feature(COMPOSITIONAL BIAS)', 
+        'domains', 'domain', 'comment(DOMAIN)', 'comment(SIMILARITY)',
+        'feature(COILED COIL)', 'feature(COMPOSITIONAL BIAS)',
         'feature(DOMAIN EXTENT)', 'feature(MOTIF)', 'feature(REGION)',
         'feature(REPEAT)', 'feature(ZINC FINGER)',
         # Function
-        'ec', 'comment(ABSORPTION)', 'comment(CATALYTIC ACTIVITY)', 
-        'comment(COFACTOR)', 'comment(ENZYME REGULATION)', 'comment(FUNCTION)', 
+        'ec', 'comment(ABSORPTION)', 'comment(CATALYTIC ACTIVITY)',
+        'comment(COFACTOR)', 'comment(ENZYME REGULATION)', 'comment(FUNCTION)',
         'comment(KINETICS)', 'comment(PATHWAY)', 'comment(REDOX POTENTIAL)',
-        'comment(TEMPERATURE DEPENDENCE)', 'comment(PH DEPENDENCE)', 
+        'comment(TEMPERATURE DEPENDENCE)', 'comment(PH DEPENDENCE)',
         'feature(ACTIVE SITE)', 'feature(BINDING SITE)', 'feature(DNA BINDING)',
         'feature(METAL BINDING)', 'feature(NP BIND)', 'feature(SITE)',
         # Gene Ontologys
-        'go', 'go(biological process)', 'go(molecular function)', 
+        'go', 'go(biological process)', 'go(molecular function)',
         'go(cellular component)', 'go-id',
         # InterPro
         'interpro',
@@ -228,16 +228,44 @@ class UniProt(REST):
         # Structure
         '3d', 'feature(BETA STRAND)', 'feature(HELIX)', 'feature(TURN)',
         # Subcellular location
-        'comment(SUBCELLULAR LOCATION)', 'feature(INTRAMEMBRANE)', 
+        'comment(SUBCELLULAR LOCATION)', 'feature(INTRAMEMBRANE)',
         'feature(TOPOLOGICAL DOMAIN)',
         'feature(TRANSMEMBRANE)',
         # Miscellaneous
-        'annotation score', 'score', 'features', 'comment(CAUTION)', 
+        'annotation score', 'score', 'features', 'comment(CAUTION)',
         'comment(TISSUE SPECIFICITY)',
-        'comment(GENERAL)', 'keywords', 'context', 'existence', 'tools', 
-        'reviewed', 'feature', 'families', 'subcellular locations', 'taxonomy', 
-        'version', 'clusters', 'comments', 'database', 'keyword-id', 'pathway', 
-        'score']
+        'comment(GENERAL)', 'keywords', 'context', 'existence', 'tools',
+        'reviewed', 'feature', 'families', 'subcellular locations', 'taxonomy',
+        'version', 'clusters', 'comments', 'database', 'keyword-id', 'pathway',
+        'score',
+        # Pathology & Biotech
+        'comment(ALLERGEN)', 'comment(BIOTECHNOLOGY)', 'comment(DISRUPTION PHENOTYPE)',
+        'comment(DISEASE)', 'comment(PHARMACEUTICAL)', 'comment(TOXIC DOSE)',
+        # PTM / Processsing
+        'comment(PTM)', 'feature(CHAIN)', 'feature(CROSS LINK)', 'feature(DISULFIDE BOND)',
+        'feature(GLYCOSYLATION)', 'feature(INITIATOR METHIONINE)', 'feature(LIPIDATION)',
+        'feature(MODIFIED RESIDUE)', 'feature(PEPTIDE)', 'feature(PROPEPTIDE)',
+        'feature(SIGNAL)', 'feature(TRANSIT)',
+        # Taxonomic lineage
+        'lineage(all)', 'lineage(SUPERKINGDOM)', 'lineage(KINGDOM)', 'lineage(SUBKINGDOM)',
+        'lineage(SUPERPHYLUM)', 'lineage(PHYLUM)', 'lineage(SUBPHYLUM)', 'lineage(SUPERCLASS)',
+        'lineage(CLASS)', 'lineage(SUBCLASS)', 'lineage(INFRACLASS)', 'lineage(SUPERORDER)',
+        'lineage(ORDER)', 'lineage(SUBORDER)', 'lineage(INFRAORDER)', 'lineage(PARVORDER)',
+        'lineage(SUPERFAMILY)', 'lineage(FAMILY)', 'lineage(SUBFAMILY)', 'lineage(TRIBE)',
+        'lineage(SUBTRIBE)', 'lineage(GENUS)', 'lineage(SUBGENUS)', 'lineage(SPECIES GROUP)',
+        'lineage(SPECIES SUBGROUP)', 'lineage(SPECIES)', 'lineage(SUBSPECIES)', 'lineage(VARIETAS)',
+        'lineage(FORMA)',
+        # Taxonomic identifier
+        'lineage-id(all)', 'lineage-id(SUPERKINGDOM)', 'lineage-id(KINGDOM)', 'lineage-id(SUBKINGDOM)',
+        'lineage-id(SUPERPHYLUM)', 'lineage-id(PHYLUM)', 'lineage-id(SUBPHYLUM)', 'lineage-id(SUPERCLASS)',
+        'lineage-id(CLASS)', 'lineage-id(SUBCLASS)', 'lineage-id(INFRACLASS)', 'lineage-id(SUPERORDER)',
+        'lineage-id(ORDER)', 'lineage-id(SUBORDER)', 'lineage-id(INFRAORDER)', 'lineage-id(PARVORDER)',
+        'lineage-id(SUPERFAMILY)', 'lineage-id(FAMILY)', 'lineage-id(SUBFAMILY)', 'lineage-id(TRIBE)',
+        'lineage-id(SUBTRIBE)', 'lineage-id(GENUS)', 'lineage-id(SUBGENUS)', 'lineage-id(SPECIES GROUP)',
+        'lineage-id(SPECIES SUBGROUP)', 'lineage-id(SPECIES)', 'lineage-id(SUBSPECIES)', 'lineage-id(VARIETAS)',
+        'lineage-id(FORMA)',
+        # Cross-references
+        'database(db_abbrev)', 'database(EMBL)']
 
     def __init__(self, verbose=False, cache=False):
         """**Constructor**
@@ -352,7 +380,7 @@ class UniProt(REST):
 
         queries = self.devtools.to_list(uniprot_id)
 
-        url = [database+"/" + query + '.' + frmt for query in queries]
+        url = [database + "/" + query + '.' + frmt for query in queries]
         res = self.http_get(url, frmt="txt")
         if frmt == "xml":
             res = [self.easyXML(x) for x in res]
@@ -398,8 +426,8 @@ class UniProt(REST):
         return f.sequence
 
     def search(self, query, frmt="tab", columns=None,
-               include=False, sort="score", compress=False, limit=None, 
-                offset=None, maxTrials=10, database="uniprot"):
+               include=False, sort="score", compress=False, limit=None,
+               offset=None, maxTrials=10, database="uniprot"):
         """Provide some interface to the uniprot search interface.
 
         :param str query: query must be a valid uniprot query.
