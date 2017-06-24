@@ -1430,17 +1430,20 @@ class KEGGParser(Logging):
         current_field = "SEQUENCE"
         res = dict({current_field: u""})
 
-
         for this in data.split("\n"):
+            this = this.strip()
             for f in fields:
-                if this.strip().startswith(f):
+                if this.startswith(f):
                     fields.remove(f)
                     current_field = f
-                    this = this.strip().split(None, 1)[1]
+                    this = this.split(None, 1)[1]
                     res[current_field] = ''
                     break
-            res[current_field] += this.strip() + u' '
-        if res['SEQUENCE'] == u'': res.pop('SEQUENCE') 
+            res[current_field] += this + u' '
+        if res['SEQUENCE'] == u'': 
+            res.pop('SEQUENCE')
+        for k in res.keys():
+            res[k] = res[k].strip()
         return res
         # changed v1.4.18 issue #79
         """for this in data.split("\n"):
