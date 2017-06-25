@@ -45,6 +45,8 @@
 import types
 import io
 import sys
+from __future__ import print_function
+
 from bioservices.services import REST
 
 __all__ = ["UniProt"]
