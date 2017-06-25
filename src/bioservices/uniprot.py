@@ -42,10 +42,10 @@
 .. http://www.uniprot.org/docs/pkinfam
 
 """
+from __future__ import print_function
 import types
 import io
 import sys
-from __future__ import print_function
 
 from bioservices.services import REST
 
