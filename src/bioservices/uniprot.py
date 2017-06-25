@@ -48,7 +48,10 @@ import io
 import sys
 
 from bioservices.services import REST
-
+try:
+    import pandas as pd
+except:
+    pass
 __all__ = ["UniProt"]
 
 # TODO:: falt files to get list of identifiers
