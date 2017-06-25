@@ -36,6 +36,8 @@
         -- from Reactome web site
 
 """
+from __future__ import print_function
+
 import sys
 import webbrowser
 import copy
