@@ -39,10 +39,6 @@ import types
 import io
 
 from bioservices.services import REST
-try:
-    import pandas as pd
-except:
-    print("pandas library is not installed. Not all functionalities will be  available")
 
 __all__ = ["EVA"]
 

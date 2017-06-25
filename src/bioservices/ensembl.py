@@ -1335,10 +1335,12 @@ class Ensembl(REST):
 
 
 class EnsemblFTP(object):
+    """Draft to be completed. 
+    """
     def __init__(self):
        pass
 
-    def download(self, db="fungi", release="release-31"):
+    def download(self, db="fungi", release="current"):
 
         import ftplib
         f = ftplib.FTP('ftp.ensemblgenomes.org')

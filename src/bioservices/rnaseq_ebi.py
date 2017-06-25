@@ -109,7 +109,7 @@ class RNASEQ_EBI(REST):
         .. csv-table:: Returned fields
             :header: "name", "description"
             :widths: 30,70
-        
+
             ASSEMBLY_USED ,      Genome reference assembly name
             BIOREP_ID,           ENA Run ID or a unique label for tech. replicates in RUN_IDS
             ENA_LAST_UPDATED ,   Date ENA record for was last updated
@@ -153,13 +153,13 @@ class RNASEQ_EBI(REST):
         """
         assert frmt in ["tsv", "json"]
         assert mapping_quality >0 and mapping_quality <100
-        results = self.http_get("%s/%s/getRun/%s" % 
+        results = self.http_get("%s/%s/getRun/%s" %
             (frmt, mapping_quality, run_id), frmt=frmt)
         if frmt == 'tsv':
             results = tsv_parser(results)
 
         return results
-        
+
 
     def get_run_by_study(self, study, frmt="json", mapping_quality=70):
         """Access to the RUNS for a given study
@@ -171,7 +171,7 @@ class RNASEQ_EBI(REST):
 
 
         :return: See :meth:`get_run_by_organism`
-        
+
 
         Example::
 
@@ -211,7 +211,7 @@ class RNASEQ_EBI(REST):
             results = tsv_parser(results)
 
         return results
-        
+
 
     def get_studies_by_organism(self, organism, frmt='json'):
         """
@@ -307,7 +307,7 @@ class RNASEQ_EBI(REST):
         .. csv-table:: Returned fields
             :header: "name", "description"
             :widths: 30,70
-        
+
             FO_URL,     URL of EFO term matching VALUE
             RUN_ID,     ENA Run ID
             STUDY_ID,   ENA Study ID
@@ -329,13 +329,13 @@ class RNASEQ_EBI(REST):
         if frmt == 'tsv':
             results = tsv_parser(results)
         return results
-    
+
     def get_sample_attribute_per_study(self, study_id, frmt='json'):
         """Return attributes of a given RUN ID
 
         :param: a run ID
         :param frmt: tsv or json
-        :return: list of entries with the fields as described in    
+        :return: list of entries with the fields as described in
             :meth:`get_sample_attribute_per_run`
 
 
@@ -352,13 +352,13 @@ class RNASEQ_EBI(REST):
         if frmt == 'tsv':
             results = tsv_parser(results)
         return results
-    
+
     def get_sample_attribute_coverage_per_study(self, study_id, frmt='json'):
         """Return attributes of a given RUN ID
 
         :param: a run ID
         :param frmt: tsv or json
-        :return: list of entries with the fields as described in    
+        :return: list of entries with the fields as described in
             :meth:`get_sample_attribute_per_run`
 
 
@@ -375,5 +375,5 @@ class RNASEQ_EBI(REST):
         if frmt == 'tsv':
             results = tsv_parser(results)
         return results
-    
+
 

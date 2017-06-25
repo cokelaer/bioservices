@@ -46,7 +46,7 @@ __all__ = ["EUtils", "EUtilsParser"]
 class EUtils(REST):
     """Interface to `NCBI Entrez Utilities <http://www.ncbi.nlm.nih.gov/entrez>`_ service
 
-    .. note:: Technical note: the WSDL interface was dropped in july 2015 
+    .. note:: Technical note: the WSDL interface was dropped in july 2015
         so we now use the REST service.
 
     .. warning:: Read the `guidelines
@@ -74,8 +74,8 @@ class EUtils(REST):
     Most of the methods take a database name as input. You can obtain the
     valid list by checking the :attr:`databases` attribute.
 
-    A few functions takes Identifier(s) as input. It could be a list of 
-    strings, list of numbers, or a string where identifiers are separated 
+    A few functions takes Identifier(s) as input. It could be a list of
+    strings, list of numbers, or a string where identifiers are separated
     either by comma or spaces.
 
     A few functions take an argument called **term**. You can use the **AND**
@@ -95,7 +95,7 @@ class EUtils(REST):
 
     For information about retmode and retype, please see:
 
-    
+
     http://www.ncbi.nlm.nih.gov/books/NBK25499/table/chapter4.T._valid_values_of__retmode_and/?report=objectonly
 
 
@@ -110,18 +110,18 @@ class EUtils(REST):
 
         warning = """
 
-        NCBI recommends that users post no more than three URL requests per 
+        NCBI recommends that users post no more than three URL requests per
         second. Failure to comply with this policy may result in an IP address
-        being blocked from accessing NCBI. If NCBI blocks an IP address, 
-        service will not be restored unless the developers of the software 
-        accessing the E-utilities register values of the tool and email 
-        parameters with NCBI. The value of email will be used only to contact 
+        being blocked from accessing NCBI. If NCBI blocks an IP address,
+        service will not be restored unless the developers of the software
+        accessing the E-utilities register values of the tool and email
+        parameters with NCBI. The value of email will be used only to contact
         developers if NCBI observes requests that violate our policies, and we
-        will attempt such contact prior to blocking access.  For more details 
+        will attempt such contact prior to blocking access.  For more details
         see http://www.ncbi.nlm.nih.gov/books/NBK25497/#chapter2.chapter2_table1
-        BioServices does not check if you send more than 3 requests per 
-        seconds. This is considered to be the user responsability. Within 
-        BioServices, we fill the parameter **tool** and **email**, however, 
+        BioServices does not check if you send more than 3 requests per
+        seconds. This is considered to be the user responsability. Within
+        BioServices, we fill the parameter **tool** and **email**, however,
         to fill the latter you should provide your email either globablly
         when instanciating EUtils, or locally when calling a method.
 
@@ -129,7 +129,7 @@ class EUtils(REST):
 
             e = EUtils(email="name@adress")
 
-        or in you bioservices configuration file 
+        or in you bioservices configuration file
         (.config/bioservices/bioservices.cfg) under linux with a user section::
 
             [user]
@@ -271,7 +271,7 @@ class EUtils(REST):
         return ret
 
     def snp_summary(self, id):
-        """Alias to Efetch for the SNP database 
+        """Alias to Efetch for the SNP database
 
 
         :Return: a json data structure.
@@ -288,7 +288,7 @@ class EUtils(REST):
     def EFetch(self, db, id, retmode="text", **kargs):
         """Access to the EFetch E-Utilities
 
-        :param str db: database from which to retrieve UIDs. 
+        :param str db: database from which to retrieve UIDs.
         :param str id: list of identifiers.
         :param retmode: default to text (could be xml but not recommended).
         :param rettype: could be fasta, summary, ...
@@ -325,7 +325,7 @@ class EUtils(REST):
             >>> e.EFetch("protein", [352, 234], retmode="text", rettype="fasta")
 
 
-        **retmode** should be xml or text depending on the database. 
+        **retmode** should be xml or text depending on the database.
         For instance, xml for pubmed::
 
             >>> e.EFetch("pubmed", "20210808", retmode="xml")
@@ -344,7 +344,7 @@ class EUtils(REST):
             e.EFetch(db="nuccore",id="AP013055", rettype="seqid", retmode="text")
 
         .. versionchanged:: 1.5.0
-            instead of "xml", retmode can now be set to dict, in which case an 
+            instead of "xml", retmode can now be set to dict, in which case an
             XML is retrieved and converted to a dictionary if possible.
 
         """
@@ -396,7 +396,7 @@ class EUtils(REST):
             'Filter'
 
         You can use the *retmode* parameter to 'xml' as well. In that
-        case, you will need a XML parser. 
+        case, you will need a XML parser.
 
         ::
 
@@ -405,7 +405,7 @@ class EUtils(REST):
             >>> ret.root.DbInfo.FieldList.getchildren()[2].FullName
             'Filter'
 
-        .. note:: Note that the name in the XML or json outputs 
+        .. note:: Note that the name in the XML or json outputs
             differ (some have lower cases, some have upper cases). This
             is inherent to the output of EUtils.
 
@@ -468,7 +468,7 @@ class EUtils(REST):
 
         ::
 
-            >>> proteins = e.ESearch("protein", "bacteriorhodopsin", 
+            >>> proteins = e.ESearch("protein", "bacteriorhodopsin",
                     retmax=20)
             >>> ret = e.ESummary("protein", 449301857)
             >>> ret['result']['449301857']['extra']
@@ -497,11 +497,11 @@ class EUtils(REST):
     def EGQuery(self, term, **kargs):
         """Provides the number of records retrieved in all Entrez databases by a text query.
 
-        :param str term: Entrez text query. 
-            Spaces may be replaced by '+' signs. For very long queries 
-            (more than  several hundred characters long), consider using 
+        :param str term: Entrez text query.
+            Spaces may be replaced by '+' signs. For very long queries
+            (more than  several hundred characters long), consider using
             an HTTP POST call. See the
-            PubMed or Entrez help for information about search field 
+            PubMed or Entrez help for information about search field
             descriptions and tags.
             Search fields and tags are database specific.
         :return: returns a XML data structure parsed with :class:`EUtilsParser`
@@ -534,7 +534,7 @@ class EUtils(REST):
     def ESearch(self, db, term, retmode='json', **kargs):
         """Responds to a query in a given database
 
-        The response can be used later in ESummary, EFetch or ELink, 
+        The response can be used later in ESummary, EFetch or ELink,
         along with the term translations of the query.
 
         :param db: a valid database
@@ -564,7 +564,7 @@ class EUtils(REST):
             >>> e = EFetch("pubmed")
             >>> e.Efetch(identifiers)
 
-        .. note:: valid parameters can be found by calling 
+        .. note:: valid parameters can be found by calling
             :meth:`_get_esearch_params`
         """
         self._check_db(db)
@@ -652,23 +652,23 @@ class EUtils(REST):
         """The Entrez links utility
 
         Responds to a list of UIDs in a given database with either a list of
-        related UIDs (and relevancy scores) in the same database or a list 
-        of linked UIDs in another Entrez database; 
+        related UIDs (and relevancy scores) in the same database or a list
+        of linked UIDs in another Entrez database;
 
-        :param str db: valid database from which to retrieve UIDs. 
-        :param str dbfrom: Database containing the input UIDs. The 
-            value must be a valid database name (default = pubmed). 
+        :param str db: valid database from which to retrieve UIDs.
+        :param str dbfrom: Database containing the input UIDs. The
+            value must be a valid database name (default = pubmed).
             This is the origin database of
-            the link operation. If db and dbfrom are set to the same database 
-            value, then  ELink will return computational neighbors within 
-            that database. Computational neighbors have linknames that begin 
-            with dbname_dbname (examples: protein_protein, 
+            the link operation. If db and dbfrom are set to the same database
+            value, then  ELink will return computational neighbors within
+            that database. Computational neighbors have linknames that begin
+            with dbname_dbname (examples: protein_protein,
             pcassay_pcassay_activityneighbor).
         :param str id: UID list. Either a single UID or a comma-delimited list
             Limited  to 200 Ids
         :param str cmd: ELink command mode. The command mode specified which
-            function ELink will perform. Some optional parameters only 
-            function for certain values of cmd (see 
+            function ELink will perform. Some optional parameters only
+            function for certain values of cmd (see
             http://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.ELink).
             Examples are neighbor, prlinks.
 
@@ -778,7 +778,7 @@ class EUtilsParser(AttrDict):
     """
     def __init__(self, xml):
         super(EUtilsParser, self).__init__()
-        
+
         try:
             name = xml.root.tag
             self[name] = EUtilsParser(xml.root)

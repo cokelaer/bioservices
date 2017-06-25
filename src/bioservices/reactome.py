@@ -36,9 +36,11 @@
         -- from Reactome web site
 
 """
-from bioservices.services import WSDLService, REST
+import sys
 import webbrowser
 import copy
+
+from bioservices.services import WSDLService, REST
 
 __all__ = ['Reactome', 'ReactomeAnalysis']
 # for reactome, content-type could be
@@ -258,7 +260,7 @@ class Reactome(REST):
 
     def query_by_id(self, classname, identifier):
         """Get Reactome Database for a specific object.
-        
+
 
         :param str classname: e.g. Pathway
         :param int identifier: database identifier or stable identifier if available
@@ -364,14 +366,14 @@ class Reactome(REST):
 
         .. note:: draft version
         """
-        res = self.http_get('http://www.reactome.org/content/detail/%s' % reaction) 
+        res = self.http_get('http://www.reactome.org/content/detail/%s' % reaction)
         res = res.content
 
         try:
             reactants = [x for x in res.split("\n") if '<title>' in x]
             reactants = reactants[0].split("|")[1].strip().strip('</title>')
         except  Exception as err:
-            print('Could not interpret title')
+            print('Could not interpret title', file=sys.stderr)
             return res
 
         if reactants.count(':') == 1:
@@ -445,7 +447,7 @@ class ReactomeAnalysis(REST):
 
 
     _url = "http://www.reactome.org:80/AnalysisService"
-    
+
     #"identifiers/projection?pageSize=8000&page=1&sortBy=ENTITIES_PVALUE&order=ASC&resource=TOTAL",
 
     def __init__(self, verbose=True, cache=False):
@@ -465,9 +467,9 @@ class ReactomeAnalysis(REST):
 
         genes = self.devtools.list2string(genes)
         genes = genes.replace(" ","")
-        print(genes)
+        #print(genes)
         res = self.http_post(url, frmt="json", data=genes,
-                headers={"Content-Type": "text/plain;charset=UTF-8", 
+                headers={"Content-Type": "text/plain;charset=UTF-8",
                     "Accept": "application/json"})
         return res
 

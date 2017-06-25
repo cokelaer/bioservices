@@ -157,6 +157,7 @@ import copy
 
 __all__ = ["KEGG",  "KEGGParser"]
 
+
 class KEGG(REST):
     """Interface to the `KEGG <http://www.genome.jp/kegg/pathway.html>`_ service
 
@@ -920,7 +921,7 @@ class KEGG(REST):
         if 'PATHWAY' in dic.keys():
             return dic['PATHWAY']
         else:
-            print("No pathway found ?")
+            self.logging.info("No pathway found ?")
 
     def parse_kgml_pathway(self, pathwayId, res=None):
         """Parse the pathway in KGML format and returns a dictionary (relations and entries)
@@ -1036,8 +1037,8 @@ class KEGG(REST):
                         name1 = self.conv("uniprot", name1)[name1]
                         name2 = self.conv("uniprot", name2)[name2]
                     except Exception:
-                        print(name1)
-                        print(name2)
+                        self.logging.info(name1)
+                        self.logging.info(name2)
                         raise Exception
                 #print(name1, 1, name2)
                 sif.append([name1, 1, name2])
@@ -1384,7 +1385,7 @@ class KEGGParser(Logging):
                     'CARCINOGEN', 'MARKER']: # do not interpret to keep structure
                 pass
             else:
-                print("""\nWarning. Found keyword %s, which has not special
+                self.logging.warning("""Found keyword %s, which has not special
     parsing for now. please report this issue with the KEGG 
     identifier (%s) into github.com/bioservices. Thanks T.C.""" % (key,output['ENTRY']))
 
@@ -1543,11 +1544,11 @@ class KEGGTools(KEGG):
     def __init__(self, verbose=False, organism="hsa"):
         self.kegg = KEGG()
         self.parser = KEGGParser()
-        print("initialisation")
+        self.kegg.logging.info("Initialisation. Please wait")
         self.load_genes(organism)
 
     def load_genes(self, organism):
-        res = self.parser.list(organism)
+        res = self.kegg.list(organism)
         self.genes =  [x.split("\t")[0] for x in res.strip().split("\n")]
         return self.genes
 

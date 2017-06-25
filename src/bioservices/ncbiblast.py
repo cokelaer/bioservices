@@ -253,7 +253,7 @@ http://www.ebi.ac.uk/Tools/sss/ncbiblast/help/index-nucleotide.html
         # here because what is returned by parametersDetails is not exactly what
         # is expected.
         for k, v in kargs.items():
-            print(k, v)
+            #print(k, v)
             checkParam(v,self.parametersDetails(k))
             params[k] = v
 

@@ -44,12 +44,8 @@
 """
 import types
 import io
+import sys
 from bioservices.services import REST
-
-try:
-    import pandas as pd
-except:
-    print("pandas library is not installed. Not all functionalities will be  available")
 
 __all__ = ["UniProt"]
 
@@ -356,7 +352,7 @@ class UniProt(REST):
         return result_dict
 
     def searchUniProtId(self, uniprot_id, frmt="xml"):
-        print("DEPRECATED SINCE VERSION 1.3.1. use retrieve instead")
+        self.logging.warning("DEPRECATED SINCE VERSION 1.3.1. use retrieve instead")
 
     def retrieve(self, uniprot_id, frmt="xml", database="uniprot"):
         """Search for a uniprot ID in UniProtKB database
@@ -527,7 +523,6 @@ class UniProt(REST):
         # + are interpreted and have a meaning.
         params['query'] = query.replace("+", " ")
         # res = s.request("/uniprot/?query=zap70+AND+organism:9606&format=xml", params)
-        # print(params)
         res = self.http_get(database + "/", frmt="txt", params=params)
         return res
 
@@ -576,7 +571,7 @@ class UniProt(REST):
         try:
             import pandas as pd
         except:
-            print("uniref method requires Pandas")
+            print("uniref method requires Pandas", file=sys.stderr)
             return
         res = self.http_get("uniref/", params={"query": query, 'format': 'tab'}, frmt="txt")
         try:
