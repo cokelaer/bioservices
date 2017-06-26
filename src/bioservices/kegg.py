@@ -1082,7 +1082,7 @@ class KEGG(REST):
             res = self.keggParser.parse(entry)
             return res
         except:
-            self.logging.warning('Could not parse correctly the entry.')
+            self.logging.warning('Could not parse the entry correctly.')
             return entry
 
 
@@ -1234,18 +1234,16 @@ class KEGGParser(Logging):
                     output[name].append(entry[:])
                 else:
                     output[name] = [entry[:]]
-
         # remove name that are now the keys of the dictionary anyway
         # if the values is not a list
-        for k,v in output.items():
+        for k, v in output.items():
             if k in ['CHROMOSOME', 'TAXONOMY']:
                 continue
             try:
-                output[k] = output[k].strip().replace(k, '', 1).strip()     # remove the name that
-                if not output[k]:
-                    output.pop(k)
+                output[k] = output[k].strip().replace(k, '', 1).strip()
             except: # skip the lists
                 pass
+        
 
         # Now, let us do the real stuff.
         # This is tricky since format is not consistent with the names e,g
@@ -1268,7 +1266,6 @@ class KEGGParser(Logging):
 
                 if "\n" in value:
                     # happens in description path:hsa04915
-                    self.logging.warning("warning for debugging in %s" % key)
                     value = value.replace("\n", " ")
                 # nothing to do here except strip
                 output[key] = value.strip()
@@ -1360,11 +1357,15 @@ class KEGGParser(Logging):
                 new = {}
                 import re
                 value = re.sub("\n {12,12+1}", "\n", value)
-                for line in value.split("\n"):
-                    thiskey, content = line.strip().split(":", 1)
-                    new[thiskey] = content.strip()
-                    #                       self.logging.warning("Could not fully interpret %s " % key )
-                output[key] = new
+                # Sometimes (e.g. INTERACTION in D00136) values are empty
+                # see issue #85
+                if len(value):
+                    for line in value.split("\n"):
+                        thiskey, content = line.strip().split(":", 1)
+                        new[thiskey] = content.strip()
+                    output[key] = new
+                else:
+                    output[key] = value
             # floats
             elif key in ['EXACT_MASS', 'MOL_WEIGHT']:
                 output[key] = float(value)
@@ -1388,6 +1389,7 @@ class KEGGParser(Logging):
                 self.logging.warning("""Found keyword %s, which has not special
     parsing for now. please report this issue with the KEGG 
     identifier (%s) into github.com/bioservices. Thanks T.C.""" % (key,output['ENTRY']))
+
 
         return output
 
