@@ -1414,7 +1414,8 @@ class KEGGParser(Logging):
     def _interpret_entry(self, data):
         res = {}
 
-        return res
+        return res  # FIXME: `res` is always an empty dictionary
+        # FIXME: unreachable piece of code:
         for this in data.split("\n"):
             if this.strip().startswith("ENTRY"):
                 pass
@@ -1441,7 +1442,7 @@ class KEGGParser(Logging):
                     res[current_field] = ''
                     break
             res[current_field] += this + u' '
-        if res['SEQUENCE'] == u'': 
+        if res['SEQUENCE'] == u'':
             res.pop('SEQUENCE')
         for k in res.keys():
             res[k] = res[k].strip()

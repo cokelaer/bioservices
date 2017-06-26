@@ -1,8 +1,6 @@
-from bioservices import KEGG, KEGGParser
 from nose.plugins.attrib import attr
 
-
-
+from bioservices import KEGG
 
 
 # This is a simple test class that do not test everything on purpose.
@@ -12,7 +10,6 @@ from nose.plugins.attrib import attr
 
 @attr('skip_travis')
 class TestKEGG(object):
-
     @classmethod
     def setup_class(klass):
         klass.ws = KEGG()
@@ -25,10 +22,10 @@ class TestKEGG(object):
         assert self.ws.isOrganism('dummy') == False
 
     def test_database_IDs(self):
-        self.ws.pathwayIds
+        self.ws.pathwayIdsDs
 
     def test_conv(self):
-        self.ws.conv("ncbi-gi","hsa:10458+ece:Z5100")
+        self.ws.conv("ncbi-gi", "hsa:10458+ece:Z5100")
 
     @attr('slow')
     def test_info(self):
@@ -36,7 +33,7 @@ class TestKEGG(object):
         self.ws.dbinfo("brite")
 
     def test_list(self):
-        self.ws.list("pathway", "hsa")      # returns the list of human pathways
+        self.ws.list("pathway", "hsa")  # returns the list of human pathways
 
     def test_find(self):
         self.ws.find("compound", "300-310", "mol_weight")
@@ -68,12 +65,8 @@ class TestKEGG(object):
         res = self.ws.parse_kgml_pathway("hsa04660")
 
 
-
-
-
 @attr('skip_travis')
 class TestKEGGALL(object):
-
     @classmethod
     def setup_class(klass):
         klass.ws = KEGG()
@@ -89,7 +82,6 @@ class TestKEGGALL(object):
         assert self.ws.drugIds[0].startswith("dr")
         assert self.ws.koIds[0].startswith("ko")
         assert self.ws.briteIds[0].startswith("br")
-
 
     @attr('slow')
     def test_lookfor(self):
@@ -118,13 +110,13 @@ class TestKEGGALL(object):
 
     @attr('slow')
     def test_list(self):
-        self.ws.list("pathway")             # returns the list of reference pathways
-        self.ws.list("organism")            # returns the list of KEGG organisms with taxonomic classification
-        self.ws.list("hsa")                 # returns the entire list of human genes
-        self.ws.list("T01001")              # same as above
-        self.ws.list("hsa:10458+ece:Z5100") # returns the list of a human gene and an E.coli O157 gene
-        self.ws.list("cpd:C01290+gl:G00092")# returns the list of a compound entry and a glycan entry
-        self.ws.list("C01290+G00092")       # same as above
+        self.ws.list("pathway")  # returns the list of reference pathways
+        self.ws.list("organism")  # returns the list of KEGG organisms with taxonomic classification
+        self.ws.list("hsa")  # returns the entire list of human genes
+        self.ws.list("T01001")  # same as above
+        self.ws.list("hsa:10458+ece:Z5100")  # returns the list of a human gene and an E.coli O157 gene
+        self.ws.list("cpd:C01290+gl:G00092")  # returns the list of a compound entry and a glycan entry
+        self.ws.list("C01290+G00092")  # same as above
 
         # invalid queries:
         try:
@@ -141,12 +133,12 @@ class TestKEGGALL(object):
 
     @attr('slow')
     def test_find(self):
-        self.ws.find("genes", "shiga+toxin")             # for keywords "shiga" and "toxin"
-        self.ws.find("genes", "shiga toxin")            # for keywords "shigatoxin"
-        self.ws.find("compound", "C7H10O5", "formula")   # for chemicalformula "C7H10O5"
-        self.ws.find("compound", "O5C7","formula")       # for chemicalformula containing "O5" and "C7"
-        self.ws.find("compound", "174.05","exact_mass")  # for 174.045 =<exact mass < 174.055
-        self.ws.find("compound", "300-310","mol_weight") # for 300 =<molecular weight =< 310
+        self.ws.find("genes", "shiga+toxin")  # for keywords "shiga" and "toxin"
+        self.ws.find("genes", "shiga toxin")  # for keywords "shigatoxin"
+        self.ws.find("compound", "C7H10O5", "formula")  # for chemicalformula "C7H10O5"
+        self.ws.find("compound", "O5C7", "formula")  # for chemicalformula containing "O5" and "C7"
+        self.ws.find("compound", "174.05", "exact_mass")  # for 174.045 =<exact mass < 174.055
+        self.ws.find("compound", "300-310", "mol_weight")  # for 300 =<molecular weight =< 310
 
     @attr('slow')
     def test_get(self):
@@ -162,7 +154,7 @@ class TestKEGGALL(object):
 
     @attr('slow')
     def test_conv(self):
-        self.ws.conv("ncbi-gi","hsa:10458+ece:Z5100")
+        self.ws.conv("ncbi-gi", "hsa:10458+ece:Z5100")
 
         try:
             self.ws.conv("unipro", "hsa")
@@ -189,13 +181,12 @@ class TestKEGGALL(object):
             assert True
 
         # asc contains 1500. Try to get even samller to spped up tests.
-        #self.conv("asc", "uniprot")
-        self.ws.conv("hsa","up:Q9BV86+")
+        # self.conv("asc", "uniprot")
+        self.ws.conv("hsa", "up:Q9BV86+")
 
     @attr('slow')
     def test_show_module(self):
         self.ws.show_module("md:hsa_M00402")
-
 
     @attr('slow')
     def test_show_pathway(self):
@@ -224,41 +215,33 @@ def test_KEGGParser():
     d = s.parse(s.get("rn:R00001"))
     d = s.parse(s.get("rp:RP00001"))
 
-
     d = s.parse(s.get('C15682'))
     assert d['SEQUENCE'][0]['TYPE'] == 'PK'
-    assert d['SEQUENCE'][0]['GENE'] =="0-2 mycAI [UP:Q83WF0]; 3 mycAII [UP:Q83WE9]; 4-5 mycAIII [UP:Q83WE8]; 6 mycAIV [UP:Q83WE7]; 7 mycAV [UP:Q83WE6]"
+    assert d['SEQUENCE'][0][
+               'GENE'] == "0-2 mycAI [UP:Q83WF0]; 3 mycAII [UP:Q83WE9]; 4-5 mycAIII [UP:Q83WE8]; 6 mycAIV [UP:Q83WE7]; 7 mycAV [UP:Q83WE6]"
     assert d['SEQUENCE'][0]['ORGANISM'] == "Micromonospora griseorubida"
 
-
-    #issue #79
+    # issue #79
 
     d = s.parse(s.get("C00395"))
     assert d["SEQUENCE"][0]["GENE"] == '[1] 0-2 pcbAB [UP:P19787] [2] 0-2 pcbAB [UP:P27742]'
-    assert d["SEQUENCE"][0]["ORGANISM"] == '[1] Penicillium chrysogenum [2] Emericella nidulans (Aspergillus nidulans [GN:ani] )'
+    assert d["SEQUENCE"][0][
+               "ORGANISM"] == '[1] Penicillium chrysogenum [2] Emericella nidulans (Aspergillus nidulans [GN:ani] )'
     assert d['SEQUENCE'][0]['SEQUENCE'] == '0 Aad  1 Cys  2 Val'
     assert d['SEQUENCE'][0]['TYPE'] == "NRP"
 
+    # issue #85
 
+    bad_ids = ['D00136', 'D05177', 'D10223',
+               'H00434', 'H01656', 'H01663',
+               'T40092', 'T40093', 'T40094', 'T40098', 'T40100', 'T40103', 'T40107', 'T40123', 'T40129', 'T40136',
+               'T40139', 'T40145', 'T40147', 'T40148', 'T40149', 'T40161', 'T40162', 'T40180', 'T40182', 'T40183',
+               'T40195', 'T40196', 'T40197', 'T40208', 'T40209', 'T40210', 'T40213', 'T40215', 'T40219', 'T40224',
+               'T40226', 'T40233', 'T40236', 'T40238', 'T40242', 'T40248', 'T40249', 'T40255', 'T40256', 'T40258',
+               'T40284', 'T40285', 'T40286', 'T40287', 'T40288', 'T40289', 'T40295', 'T40303', 'T40307', 'T40314',
+               'T40318', 'T40326',
+               'K20201']
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    for entry_id in bad_ids:
+        entry = s.get(entry_id)
+        assert not s.parse(entry) is entry
