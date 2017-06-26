@@ -2,16 +2,20 @@ Whats' new, what has changed
 ================================
 
 
+Reviosion 1.5
+-----------------
 
 
-
-Revision 1.4
----------------
-* 1.4.18:
     * BUG:
         * kegg: fix #75 and #77 (missing  keywords in KEGG)
         * kegg: fix #79 (mis-interpreted cases reported by kirienko with examples.
         * kegg: fix #85 (some entries are not interpreted)    
+    * CHANGES:
+        * biodbnet: conversion from WSDL to REST. Note methods' arguments
+          changes: inputValues to input_values, dbPath to db_path. Uses pandas
+
+Revision 1.4
+---------------
 
 * 1.4.17: rhea URL changed and add get_metabolites function. Fix pride test and
    add missing license file
