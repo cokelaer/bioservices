@@ -31,8 +31,9 @@
 
 
 """
-from bioservices.services import REST
+import sys
 
+from bioservices.services import REST
 
 __all__ = ["PubChem"]
 
@@ -48,7 +49,8 @@ class PubChem(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        print("PubChem is not finalised yet. This is currently only a draft version")
+        print("PubChem is not finalised yet. This is currently only a draft version", 
+            file=sys.stderr)
         super(PubChem, self).__init__(name="PubChem", url=PubChem._url,
                 verbose=verbose, cache=cache)
 

@@ -11,7 +11,7 @@ see online documentation for details on pypi or github.
 #from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import division
-
+import sys
 
 import pkg_resources
 __version__ = "1.4.17"
@@ -26,21 +26,19 @@ try:
     # However, some functions and python notebooks included in bioservices do
     import pandas as pd
 except:
-    print("BioServices %s warning: pandas is not installed on your system." % version)
-    print("Some features requires this library and future version of BioServices may use it.")
-
+    msg = "BioServices %s warning: pandas is not installed on your system."
+    print(msg % version, file=sys.stderr)
+    print("Some features requires this library and future version of " +
+        "BioServices may use it.", file=sys.stderr)
 
 # Initialise the config directory if not already done
 from easydev import CustomConfig
 configuration = CustomConfig("bioservices", verbose=False)
 bspath = configuration.user_config_dir
 
-
-
 # Add bioservices.uniprot to sys.modules to prevent cycles in our imports
 #import bioservices.uniprot
 #bioservices.uniprot  # Stop flake8 error
-
 
 from . import settings
 from .settings import *
@@ -144,11 +142,8 @@ from .eutils import *
 from . import pathwaycommons
 from .pathwaycommons import *
 
-
 from . import muscle
 from .muscle import *
-
-
 
 from . import wsdbfetch
 from .wsdbfetch import *
@@ -158,7 +153,6 @@ from .wsdbfetch import *
 #import mapping
 from . import apps
 #import dev
-
 
 from . import clinvitae
 from .clinvitae import Clinvitae

@@ -227,7 +227,38 @@ def test_KEGGParser():
 
     d = s.parse(s.get('C15682'))
     assert d['SEQUENCE'][0]['TYPE'] == 'PK'
-    assert d['SEQUENCE'][0]['GENE'] =="0-2 mycAI [UP:Q83WF0]; 3 mycAII [UP:Q83WE9]; 4-5 mycAIII[UP:Q83WE8]; 6 mycAIV [UP:Q83WE7]; 7 mycAV [UP:Q83WE6]"
+    assert d['SEQUENCE'][0]['GENE'] =="0-2 mycAI [UP:Q83WF0]; 3 mycAII [UP:Q83WE9]; 4-5 mycAIII [UP:Q83WE8]; 6 mycAIV [UP:Q83WE7]; 7 mycAV [UP:Q83WE6]"
     assert d['SEQUENCE'][0]['ORGANISM'] == "Micromonospora griseorubida"
+
+
+    #issue #79
+
+    d = s.parse(s.get("C00395"))
+    assert d["SEQUENCE"][0]["GENE"] == '[1] 0-2 pcbAB [UP:P19787] [2] 0-2 pcbAB [UP:P27742]'
+    assert d["SEQUENCE"][0]["ORGANISM"] == '[1] Penicillium chrysogenum [2] Emericella nidulans (Aspergillus nidulans [GN:ani] )'
+    assert d['SEQUENCE'][0]['SEQUENCE'] == '0 Aad  1 Cys  2 Val'
+    assert d['SEQUENCE'][0]['TYPE'] == "NRP"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

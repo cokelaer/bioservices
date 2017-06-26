@@ -6,7 +6,7 @@
 #  Copyright (c) 2013-2014 - EBI-EMBL
 #
 #  File author(s):
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -628,9 +628,9 @@ records.
         Ids = []
         for i in range(start, end+1):
             ChEBI = "CHEBI:" +  str(i)
-            if i%100 == 0 and i>0:
+            if i%10 == 0 and i>0:
                 if verbose is True:
-                    print("%f %% done" % ((i-start)*100./float(end-start)))
+                    self.logging.info("%f %% done" % ((i-start)*100./float(end-start)))
             res = self.getModelsIdByChEBI(ChEBI)
             if res:
                 Ids.append(ChEBI)
@@ -659,9 +659,9 @@ records.
             raise ValueError("start must be positive and lower than end value")
         Ids = []
         for i in range(start, end+1):
-            if i%100 == 0 and i>0:
+            if i%10 == 0 and i>0:
                 if verbose is True:
-                    print("%f %% done" % ((i-start)*100./float(end-start)))
+                    self.logging.info("%f %% done" % ((i-start)*100./float(end-start)))
             res = self.serv.getSimpleModelsByReactomeIds(['REACT_%s'%i])
             if 'REACT' in res:
                 Ids.append('REACT_%s' % i)
@@ -697,8 +697,8 @@ records.
         self.logging.info("Retrieving the uniprot ID from %s to %s" %(start,end))
         Ids = []
         for i in range(start, end):
-            if i%100 == 0 and i>0:
-                print("%f  done" % ((i-start)*100./float(end-start)))
+            if i%10 == 0 and i>0:
+                self.logging.info("%f  done" % ((i-start)*100./float(end-start)))
             res = self.serv.getSimpleModelsByUniprotIds(['P%s'%i])
             if 'P%s' % i in res:
                 Ids.append('P%s' % i)

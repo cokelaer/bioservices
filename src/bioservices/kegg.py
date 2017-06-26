@@ -157,6 +157,7 @@ import copy
 
 __all__ = ["KEGG",  "KEGGParser"]
 
+
 class KEGG(REST):
     """Interface to the `KEGG <http://www.genome.jp/kegg/pathway.html>`_ service
 
@@ -920,7 +921,7 @@ class KEGG(REST):
         if 'PATHWAY' in dic.keys():
             return dic['PATHWAY']
         else:
-            print("No pathway found ?")
+            self.logging.info("No pathway found ?")
 
     def parse_kgml_pathway(self, pathwayId, res=None):
         """Parse the pathway in KGML format and returns a dictionary (relations and entries)
@@ -1036,8 +1037,8 @@ class KEGG(REST):
                         name1 = self.conv("uniprot", name1)[name1]
                         name2 = self.conv("uniprot", name2)[name2]
                     except Exception:
-                        print(name1)
-                        print(name2)
+                        self.logging.info(name1)
+                        self.logging.info(name2)
                         raise Exception
                 #print(name1, 1, name2)
                 sif.append([name1, 1, name2])
@@ -1384,7 +1385,7 @@ class KEGGParser(Logging):
                     'CARCINOGEN', 'MARKER']: # do not interpret to keep structure
                 pass
             else:
-                print("""\nWarning. Found keyword %s, which has not special
+                self.logging.warning("""Found keyword %s, which has not special
     parsing for now. please report this issue with the KEGG 
     identifier (%s) into github.com/bioservices. Thanks T.C.""" % (key,output['ENTRY']))
 
@@ -1427,20 +1428,43 @@ class KEGGParser(Logging):
         return res
 
     def _interpret_sequence(self, data):
-        fields = ['GENE', 'ORGANISM', 'TYPE']
-        current_field = 'SEQUENCE'
-        res = dict({current_field: u''})
+        fields = ["GENE", "ORGANISM", "TYPE"]
+        current_field = "SEQUENCE"
+        res = dict({current_field: u""})
+
         for this in data.split("\n"):
+            this = this.strip()
             for f in fields:
-                if this.strip().startswith(f):
+                if this.startswith(f):
                     fields.remove(f)
                     current_field = f
-                    this = this.strip().split(None, 1)[1]
+                    this = this.split(None, 1)[1]
                     res[current_field] = ''
                     break
-            res[current_field] += this.strip() + u' '
-        if res['SEQUENCE'] == u'': res.pop('SEQUENCE')
+            res[current_field] += this + u' '
+        if res['SEQUENCE'] == u'':
+            res.pop('SEQUENCE')
+        for k in res.keys():
+            res[k] = res[k].strip()
         return res
+        # changed v1.4.18 issue #79
+        """for this in data.split("\n"):
+            if this.strip().startswith("GENE"):
+                res['GENE'] = this.strip().split(None,1)[1]
+                gene = True
+            elif this.strip().startswith('ORGANISM'):
+                res['ORGANISM'] = this.strip().split(None,1)[1]
+                gene = False
+            elif this.strip().startswith('TYPE'):
+                res['TYPE'] = this.strip().split(None, 1)[1]
+                gene = False
+            elif gene is True:
+                res['GENE'] += this.strip()
+            else:
+                assert gene is False
+                res['SEQUENCE'] = this.strip()
+        return res
+        """
     """
     [u'    0 Mtk  1 Mtd  2 Mad  3 Man  4 Mte  5 Mtk  6 Mtd  7 Man',
  u'  GENE      0-2 mycAI [UP:Q83WF0]; 3 mycAII [UP:Q83WE9]; 4-5 mycAIII',
@@ -1521,11 +1545,11 @@ class KEGGTools(KEGG):
     def __init__(self, verbose=False, organism="hsa"):
         self.kegg = KEGG()
         self.parser = KEGGParser()
-        print("initialisation")
+        self.kegg.logging.info("Initialisation. Please wait")
         self.load_genes(organism)
 
     def load_genes(self, organism):
-        res = self.parser.list(organism)
+        res = self.kegg.list(organism)
         self.genes =  [x.split("\t")[0] for x in res.strip().split("\n")]
         return self.genes
 
