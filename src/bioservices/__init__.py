@@ -14,6 +14,10 @@ from __future__ import division
 import sys
 
 import pkg_resources
+
+import colorlog as logger
+from easydev import CustomConfig
+
 __version__ = "1.4.17"
 try:
     version = pkg_resources.require("bioservices")[0].version
@@ -21,18 +25,14 @@ try:
 except:
     version = __version__
 
-try:
-    # This is not striclty speaking required to run and use bioservices
-    # However, some functions and python notebooks included in bioservices do
-    import pandas as pd
-except:
-    msg = "BioServices %s warning: pandas is not installed on your system."
-    print(msg % version, file=sys.stderr)
-    print("Some features requires this library and future version of " +
-        "BioServices may use it.", file=sys.stderr)
+
+def bioservices_debug_level(level="WARNING"):
+    """A deubg level setter at top level of the library"""
+    assert level in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    logging_level = getattr(logger.logging.logging, level)
+    logger.getLogger().setLevel(logging_level)
 
 # Initialise the config directory if not already done
-from easydev import CustomConfig
 configuration = CustomConfig("bioservices", verbose=False)
 bspath = configuration.user_config_dir
 
