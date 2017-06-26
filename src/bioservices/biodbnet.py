@@ -42,14 +42,19 @@
 
 """
 import io
-from bioservices.services import WSDLService
+from bioservices.services import REST
+
+try:
+    import pandas as pd
+except:
+    pass
 
 __all__ = ["BioDBNet"]
 
 
-class BioDBNet(WSDLService):
-    """Interface to the `BioDBNet <http://biodbnet.abcc.ncifcrf.gov/>`_ service
 
+class BioDBNet(REST):
+    """Interface to the `BioDBNet <http://biodbnet.abcc.ncifcrf.gov/>`_ service
 
     ::
 
@@ -64,135 +69,262 @@ class BioDBNet(WSDLService):
     databases.
 
     """
-    _url = 'http://biodbnet.abcc.ncifcrf.gov/webServices/bioDBnet.wsdl'
+    _url = 'https://biodbnet-abcc.ncifcrf.gov/webServices/rest.php/biodbnetRestApi.json'
     def __init__(self, verbose=True, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose:
 
         """
-        super(BioDBNet, self).__init__(name="BioDBNet", 
+        super(BioDBNet, self).__init__(name="BioDBNet",
                 url=BioDBNet._url, verbose=verbose, cache=cache)
+        self._valid_inputs = self.getInputs() 
 
-    def _interpret_input_db(self, inputValues):
-        if isinstance(inputValues, list):
-            inputValues = ",".join(inputValues)
-            return inputValues
-        elif isinstance(inputValues, str):
-            return inputValues
-        else:
-            raise NotImplementedError
+    def _list_to_string(self, values):
+        if isinstance(values, list):
+            values = ",".join(values)
+        return values
 
     def _interpret_output_db(self, input_db, output_db):
-        if isinstance(output_db, list):
-            outputs = ",".join(output_db)
-        else:
-            outputs = output_db
+        # in biodbnet, the database can be provided as
+        # in the output of getInputs() that is with capitals and spaces
+        # or with no spaces and no big caps.
+        # Here, like in _check_db(), with convert everything to small caps and
+        # remove spaces so as to compare the input/output databases with the
+        # list of databases returned by getInputs
+        outputs = self._list_to_string(output_db)
         inputResult = self.getInputs()
         #getOutputsForInput method
         outputResult = self.getOutputsForInput(input_db)
+        outputResult = [this.lower().replace(" ", "") for this in outputResult]
         for output in outputs.split(","):
-            if output not in outputResult:
-                print(output + " not found")
-                print(outputResult)
-                raise Exception
+            if output.lower().replace(" ", "") not in outputResult:
+                raise ValueError(output + " not found")
         return outputs
 
-    def db2db(self, input_db, output_db, inputValues, taxon=9606):
+    def _check_db(self, value):
+        def convert(value):
+            return value.lower().replace(" ", "")
+        if convert(value) not in [convert(this) for this in self._valid_inputs]:
+            raise ValueError("Invalid value {} not a known database".format(value))
+
+    def db2db(self, input_db, output_db, input_values, taxon=9606):
         """Retrieves models associated to the provided Taxonomy text.
 
-        :param str text: free (Taxonomy based) text
-        :return:  list of model identifiers
+        :param input_db: input database.
+        :param output_db: list of databases to map to.
+        :param input_values: list of identifiers to map to the output databases
+        :return:  dataframe where index correspond to the input database
+            identifiers. The columns contains the identifiers for each output
+            database (see example here below).
 
         ::
 
             >>> from bioservices import BioDBNet
             >>> input_db = 'Ensembl Gene ID'
             >>> output_db = ['Gene Symbol']
-            >>> input_values = ['ENSG00000121410, ENSG00000171428']
-            >>> print(s.db2db(input_db, output_db, input_values, 9606)
-            Ensembl Gene ID Gene Symbol
-            ENSG00000121410 A1BG
-            ENSG00000171428 NAT1
+            >>> input_values = ['ENSG00000121410', 'ENSG00000171428']
+            >>> df = s.db2db(input_db, output_db, input_values, 9606)
+                            Gene Symbol
+            Ensembl Gene ID
+            ENSG00000121410        A1BG
+            ENSG00000171428        NAT1
 
         """
-        inputValues = self._interpret_input_db(inputValues)
+        self._check_db(input_db)
+        # This also check that the outputs exist and are compatible with the
+        # input.
         outputs = self._interpret_output_db(input_db, output_db)
 
-        # dbPath = 'Ensembl Gene ID->Gene ID->Homolog - Mouse Gene ID->Ensembl Gene ID'
-        # getDirectOutputsForInput method
-        # directOutputResult = self.getDirectOutputsForInput(input_db)
+        url = self.url + "?method=db2db"
+        url += "&input={}".format(input_db)
+        url += "&outputs={}".format(outputs)
+        url += "&inputValues={}".format(self._list_to_string(input_values))
+        url += "&taxonId={}".format(taxon)
+        url += "&format={}".format("row")
+        request = self.http_get(url)
+        try: # TODO can be removed in v2
+            df = pd.DataFrame(request)
+            df.set_index("InputValue", inplace=True)
+            df.index.name = input_db
+            return df
+        except Exception as err:
+            self.logging.error(err)
+            return request
 
-        params = self.suds.factory.create("db2dbParams")
-        params.taxonId = str(taxon)
-        params.inputValues = inputValues
-        params.input = input_db
-        params.outputs = output_db
+    def dbFind(self, output_db, input_values, taxon="9606"):
+        """dbFind method
 
-        res = self.serv.db2db(params)
-        return res
+        dbFind can be used when you do not know the actual type of your identifiers or
+        when you have a mixture of different types of identifiers. The tool finds the
+        identifier type and converts them into the selected output if the identifiers
+        are within the network. 
 
-    def dbFind(self, input_db, inputValues, taxon="9606"):
-        inputValues = self._interpret_input_db(inputValues)
+        :param str output_db: valid database name
+        :param list input_values: list of identifiers to look for
+        :return: a dataframe with index set to the input values.
 
-        params = self.suds.factory.create('dbFindParams')
-        params.output = input_db
-        params.taxonId = str(taxon) # do we need the cast ?
-        params.inputValues = inputValues
-        return self.serv.dbFind(params)
-
-
-    def dbOrtho(self, input_db, output_db, inputValues, input_taxon, output_taxon):
-        inputValues = self._interpret_input_db(inputValues)
-        outputs = self._interpret_output_db(input_db, output_db)
-
-        params = self.suds.factory.create("dbOrtho")
-        params.input = input_db
-        params.output = output_db
-        params.inputTaxon = str(input_taxon)
-        params.outputTaxon = str(output_taxon)
-        return self.serv.dbOrtho(params)
-
-    def dbReport(self, input_db, inputValues, taxon=9606, output="raw"):
-        """Returns report
-
-        :param output: returns dataframe if set to dataframe
 
         ::
 
-            s.dbReport("Ensembl Gene ID", ['ENSG00000121410', 'ENSG00000171428'])
-
+            >>> b.dbFind("Gene ID", ["ZMYM6_HUMAN", "NP_710159", "ENSP00000305919"])
+                            Gene ID                Input Type
+            InputValue
+            ZMYM6_HUMAN        9204        UniProt Entry Name
+            NP_710159        203100  RefSeq Protein Accession
+            ENSP00000305919  203100        Ensembl Protein ID
 
         """
-        inputValues = self._interpret_input_db(inputValues)
+        self._check_db(output_db)
 
-        params = self.suds.factory.create('dbReportParams')
-        params.input = input_db
-        params.taxonId = str(taxon) # do we need the cast ?
-        params.inputValues = inputValues
+        url = self.url + "?method=dbfind"
+        url += "&output={}".format(output_db)
+        url += "&inputValues={}".format(self._list_to_string(input_values))
+        url += "&taxonId={}".format(taxon)
+        url += "&format={}".format("row")
+        request = self.http_get(url)
+        try:
+            return pd.DataFrame(request).set_index("InputValue")
+        except:
+            return request
 
-        res = self.serv.dbReport(params)
-        if output == "dataframe":
-            try:
-                import pandas as pd
-            except:
-                print("Pandas library is not installed. dataframe are not  available")
-            df = pd.readcsv(io.StringIO(res.strip()), sep="\t")
+    def dbOrtho(self, input_db, output_db, input_values, input_taxon, output_taxon):
+        """Convert identifiers from one species to identifiers of a different species
+
+        :param input_db: input database
+        :param output_db: output database
+        :param input_values: list of identifiers to retrieve
+        :param input_taxon: input taxon
+        :param output_taxon: output taxon
+        :return:  dataframe where index correspond to the input database
+            identifiers. The columns contains the identifiers for each output
+            database (see example here below)
+
+        ::
+
+            >>> df = b.dbOrtho("Gene Symbol", "Gene ID", ["MYC", "MTOR", "A1BG"],
+            ...                    input_taxon=9606, output_taxon=10090)
+                 Gene ID InputValue
+            0   17869        MYC
+            1   56717       MTOR
+            2  117586       A1BG
+
+        """
+        self._check_db(input_db)
+        self._check_db(output_db)
+        url = self.url + "?method=dbortho"
+        url += "&input={}".format(input_db)
+        url += "&output={}".format(output_db)
+        url += "&inputValues={}".format(self._list_to_string(input_values))
+        url += "&inputTaxon={}".format(input_taxon)
+        url += "&outputTaxon={}".format(output_taxon)
+        url += "&format={}".format("row")
+        request = self.http_get(url)
+
+        try:
+            df = pd.DataFrame(request).set_index("InputValue")
+            df.index.name = input_db
             return df
-        else:
-            return res
+        except:
+            return request
 
-    def dbWalk(self, dbPath, inputValues, taxon=9606):
-        dbPath = 'Ensembl Gene ID->Gene ID->Homolog - Mouse Gene ID->Ensembl Gene ID'
+    def dbReport(self, input_db, input_values, taxon=9606):
+        """Same as :meth:`db2db` but returns results for all possible outputs.
+
+        :param input_db: input database
+        :param input_values: list of identifiers to retrieve
+        :return:  dataframe where index correspond to the input database
+            identifiers. The columns contains the identifiers for each output
+            database (see example here below)
+
+        ::
+
+            df = s.dbReport("Ensembl Gene ID", ['ENSG00000121410', 'ENSG00000171428'])
+
+        """
+        self._check_db(input_db)
+        # This also check that the outputs exist and are compatible with the
+        # input.
+        url = self.url + "?method=dbreport"
+        url += "&input={}".format(input_db)
+        url += "&inputValues={}".format(self._list_to_string(input_values))
+        url += "&taxonId={}".format(taxon)
+        url += "&format={}".format("row")
+        request = self.http_get(url)
+        try: # TODO can be removed in v2
+            df = pd.DataFrame(request)
+            df.set_index("InputValue", inplace=True)
+            df.index.name = input_db
+            return df
+        except Exception as err:
+            self.logging.error(err)
+            return request
         inputValues = self._interpret_input_db(inputValues)
-        params = self.suds.factory.create("dbWalkParams")
-        params.dbPath = dbPath
-        params.inputValues = inputValues
-        params.taxonId = str(taxon)
-        return self.serv.dbWalk(params)
+
+        # df = pd.readcsv(io.StringIO(res.strip()), sep="\t")
+
+    def dbWalk(self, db_path, input_values, taxon=9606):
+        """Walk through biological database network
+
+        dbWalk is a form of database to database conversion where the user has complete
+        control on the path to follow while doing the conversion. When a input/node is
+        added to the path the input selection gets updated with all the nodes that it
+        can access directly.
+
+        :param db_path: path to follow in the databases 
+        :param input_values: list of identifiers 
+        :return: a dataframe with columns corresponding to the path nodes
+
+        A typical example is to get the Ensembl mouse homologs for  
+        Ensembl Gene ID's from human. This conversion is not possible 
+        through :meth:`db2db` as Homologene does not have
+        Ensembl ID's and the input and output nodes to acheive this would both be
+        'Ensembl Gene ID'. It can however be run by using dbWalk as follows.
+        Add Ensembl Gene ID to the path, then add Gene Id, Homolog - Mouse Gene ID
+        and Ensebml Gene ID to complete the path.
+
+        ::
+
+            db_path = "Ensembl Gene ID->Gene ID->Homolog - Mouse Gene ID->Ensembl Gene ID"
+            s.dbWalk(db_path, ["ENSG00000175899"])
+
+        .. todo:: check validity of the path
+
+        """
+        url = self.url + "?method=dbwalk"
+        url += "&inputValues={}".format(self._list_to_string(input_values))
+        url += "&dbPath={}".format(db_path)
+        url += "&taxonId={}".format(taxon)
+        url += "&format={}".format("row")
+        request = self.http_get(url)
+        try:
+            return pd.DataFrame(request)
+        except:
+            return request
 
     def getDirectOutputsForInput(self, input_db):
-        return self.serv.getDirectOutputsForInput(input_db).split(",")
+        """Gets all the direct output nodes for a given input node
+
+        Gets all the direct output nodes for a given input node
+        Outputs reachable by single edge connection in the bioDBnet graph.
+
+        ::
+
+            b.getDirectOutputsForInput("genesymbol")
+            b.getDirectOutputsForInput("Gene Symbol")
+            b.getDirectOutputsForInput("pdbid")
+            b.getDirectOutputsForInput("PDB ID")
+        """
+        self._check_db(input_db)
+
+        url = self.url
+        url += "?method=getdirectoutputsforinput"
+        url += "&input={}&directOutput=1".format(input_db)
+        request = self.http_get(url)
+        try:
+            return request['output']
+        except:
+            return request
 
     def getInputs(self):
         """Return list of possible input database
@@ -201,7 +333,11 @@ class BioDBNet(WSDLService):
 
             s.getInputs()
         """
-        return self.serv.getInputs().split(",")
+        request = self.http_get(self.url + "?method=getinputs")
+        try:
+            return request['input']
+        except:
+            return request
 
     def getOutputsForInput(self, input_db):
         """Return list of possible output database for a given input database
@@ -211,9 +347,11 @@ class BioDBNet(WSDLService):
             s.getOutputsForInput("UniProt Accession")
 
         """
-        if input_db not in self.getInputs():
-            raise ValueError("Invalid input database provided")
-        return self.serv.getOutputsForInput(input_db).split(",")
-
-
-
+        self._check_db(input_db)
+        url = self.url + "?method=getoutputsforinput"
+        url += "&input={}".format(input_db)
+        request = self.http_get(url)
+        try:
+            return request['output']
+        except:
+            return request
