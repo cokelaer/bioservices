@@ -1,6 +1,13 @@
 Whats' new, what has changed
 ================================
 
+Revision 2.0
+----------------
+
+* NEWS
+  - Portage wikipathway WSDL to REST + output XML output interpreted as pandas
+    Dataframes
+
 
 
 
@@ -11,7 +18,6 @@ Revision 1.4
     * BUG:
         * kegg: fix #75 and #77 (missing  keywords in KEGG)
         * kegg: fix #79 (mis-interpreted cases reported by kirienko with examples.
-    
 
 * 1.4.17: rhea URL changed and add get_metabolites function. Fix pride test and
    add missing license file
