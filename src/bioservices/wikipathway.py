@@ -375,7 +375,7 @@ class WikiPathways(REST):
         #d = {"name":usrname, "pass":password}
         #return self.serv.login(**d)
 
-    def getPathwayAs(self, pathwayId, filetype='owl', revision=0):
+    def getPathwayAs(self, pathwayId, filetype='png', revision=0):
         """Download a pathway in the specified file format.
 
         :param str pathwayId: the pathway identifier.
@@ -396,7 +396,7 @@ class WikiPathways(REST):
         res = self.http_get(url)
 
         res = self.easyXML(res.content).findAll("ns1:data")
-        assert len(res) == 1, "Found more than one entry"
+        assert len(res) == 1, "Found more than one entry {}".format(len(res))
         res = res[0].getText()
 
         return res
