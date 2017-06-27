@@ -2,7 +2,7 @@ Whats' new, what has changed
 ================================
 
 
-Reviosion 1.5
+Revision 1.5
 -----------------
 
 
@@ -13,6 +13,7 @@ Reviosion 1.5
     * CHANGES:
         * biodbnet: conversion from WSDL to REST. Note methods' arguments
           changes: inputValues to input_values, dbPath to db_path. Uses pandas
+        * wikipathways: conversion from WSDL to REST
 
 Revision 1.4
 ---------------
