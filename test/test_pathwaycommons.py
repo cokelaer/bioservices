@@ -1,7 +1,6 @@
 from bioservices import pathwaycommons
 
 
-
 def test_search_queries():
     pc2 = pathwaycommons.PathwayCommons(verbose=False)
     pc2.search("Q06609")
@@ -23,6 +22,7 @@ def test_idmapping():
     pc2.idmapping("BRCA2")
     pc2.idmapping(["TP53", "BRCA2"])
 
+
 def test_top_pathways():
     pc2 = pathwaycommons.PathwayCommons(verbose=False)
     res = pc2.top_pathways()
@@ -34,11 +34,8 @@ def test_graph():
             kind="neighborhood", frmt="EXTENDED_BINARY_SIF")
 
     #res = pc2.graph(source="P20908", kind="neighborhood")
-
-
     #res = pc2.graph(source="COL5A1", kind="neighborhood")
     #res = pc2.graph(kind="neighborhood", source="COL5A1")
-
 
 def test_traverse():
      pc2 = pathwaycommons.PathwayCommons(verbose=False)
@@ -56,5 +53,4 @@ def test_traverse():
      #       path="Named/name")
 
 
-test_traverse()
 

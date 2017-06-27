@@ -1,39 +1,40 @@
 from bioservices import NCBIblast
-from nose.plugins.attrib import attr
+import pytest
 
-class test_nciblast(NCBIblast):
-    def __init__(self):
-        super(test_nciblast, self).__init__(verbose=False)
 
-    def test_param(self):
-        self.getParameters()
-        assert(len(self.parameters)>0)
-        assert(len(self.parameters)>0)
+@pytest.fixture
+def ncbi():
+    return NCBIblast()
 
-    
-    def test_paramdetails(self):
-        names = self.parametersDetails("matrix") 
-        try:
-            names = self.parametersDetails("matrixddddd") 
-            assert False
-        except:
-            assert True
 
-    @attr('slow')
-    def test_run(self):
+def test_param(ncbi):
+    ncbi.getParameters()
+    assert(len(ncbi.parameters)>0)
+    assert(len(ncbi.parameters)>0)
 
-        try:
-            self.jobid = self.run(program="blastp", sequence=self._sequence_example,
-                stype="protein", database="uniprotkb")
-            assert False # missing email argument
-        except:
-            assert True
-        self.jobid = self.run(program="blastp", sequence=self._sequence_example,
-            stype="protein", database="uniprotkb", email="cokelaer@ebi.ac.uk",
-            matrix="BLOSUM45")
-        res = self.getResult(self.jobid, "out")
 
-        res = self.getResultTypes(self.jobid)
+def test_paramdetails(ncbi):
+    names = ncbi.parametersDetails("matrix") 
+    try:
+        names = ncbi.parametersDetails("matrixddddd") 
+        assert False
+    except:
+        assert True
 
-    def test_attributse(self):
-        self.databases
+def test_run(ncbi):
+
+    try:
+        ncbi.jobid = ncbi.run(program="blastp", sequence=ncbi._sequence_example,
+            stype="protein", database="uniprotkb")
+        assert False # missing email argument
+    except:
+        assert True
+    ncbi.jobid = ncbi.run(program="blastp", sequence=ncbi._sequence_example,
+        stype="protein", database="uniprotkb", email="cokelaer@ebi.ac.uk",
+        matrix="BLOSUM45")
+    res = ncbi.getResult(ncbi.jobid, "out")
+
+    res = ncbi.getResultTypes(ncbi.jobid)
+
+def test_attributse(ncbi):
+    ncbi.databases

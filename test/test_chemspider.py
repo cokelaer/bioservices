@@ -1,11 +1,9 @@
 from bioservices import chemspider
 
-from nose.plugins.attrib import attr
 
 
 # works only if you have a token
-@attr('skip_travis')
-def test_chemspider():
+def _test_chemspider():
     s = chemspider.ChemSpider()
     assert s.find("Pyridine") == [1020]
     s.GetExtendedCompoundInfo(1020)

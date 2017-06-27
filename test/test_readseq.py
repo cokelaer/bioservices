@@ -1,12 +1,11 @@
 from bioservices import readseq
-from nose.plugins.attrib import attr
+import pytest
 
 
 
 fasta = """MDAPRQVVNFGPGPAKLPHSVLLEIQKELLDYKGVGISVLEMSHRSSDFAKIINNTENLVRELLAVPDNYKVIFLQGGGCGQFSAVPLNLIGLKAGRCADYVVTGAWSAKAAEEAKKFGTINIVHPKLGSYTKIPDPSTWNLNPDASYVYYCANETVHGVEFDFIPDVKGAVLVCDMSSNFLSKPVDVSKFGVIFAGAQKNVGSAGVTVVIVRDDLLGFALRECPSVLEYKVQAGNSSLYNTPPCFSIYVMGLVLEWIKNNGGAAAMEKLSSIKSQTIYEIIDNSQGFYVCPVEPQNRSKMNIPFRIGNAKGDDALEKRFLDKALELNMLSLKGHRSVGGIRASLYNAVTIEDVQKLAAFMKKFLEMHQL"""
 
 
-@attr('fixme') # does not work on travis
 def test_readseq():
 
     # 8 is 
@@ -28,6 +27,13 @@ def test_readseq():
 
 
     # now let us do the inverse
-    jobid = s.run("cokelaer@ebi.co.uk", "test", sequence=genbank, inputformat=2, 
+    jobid = s.run("cokelaer@test.co.uk", "test", sequence=genbank, inputformat=2, 
             outputformat=8)
-    #FIXME do not know yet how to check
+    count = 0
+    while s.get_status(s._jobid) != "FINISHED" and count<20:
+        count += 1
+        time.sleep(1)
+        print(count)
+    newfasta = s.get_result(s._jobid)
+
+    assert "DVQKLAAFMKKFLEMHQL" in newfasta

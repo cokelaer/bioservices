@@ -1,47 +1,47 @@
-from bioservices import picr
-from nose.plugins.attrib import attr
+from bioservices.picr import PICR
+import pytest
 
-# timeout on travis...
-@attr('skip_travis')
-class TestPICR(object):
 
-    @classmethod
-    def setup_class(klass):
-        klass.e = picr.PICR(verbose=False)
+@pytest.fixture
+def picr():
+    return PICR(verbose=True)
 
-    def test_getUPIForSequence(self):
-        res = self.e.getUPIForSequence(self.e._sequence_example,
-                ["IPI", "ENSEMBL", "SWISSPROT"])
-        res = self.e.getUPIForSequence(self.e._sequence_example, "SWISSPROT",
-                taxid="9606")
-        res = self.e.getUPIForSequence(self.e._sequence_example, "SWISSPROT",
-                onlyactive=False, includeattributes=False)
 
-    def test_databases(self):
-        assert len(self.e.databases) > 0
 
-    @attr('slow')
-    def test_MappedDB(self):
-        self.e.getMappedDatabaseNames()
 
-    @attr('slow')
-    def test_checkDB(self):
-        self.e._checkDBname("IPI")
-        try:
-            self.e._checkDBname("dummy")
-            assert False
-        except:
-            assert True
+def test_getUPIForSequence(picr):
+    res = picr.getUPIForSequence(picr._sequence_example,
+            ["IPI", "ENSEMBL", "SWISSPROT"])
+    res = picr.getUPIForSequence(picr._sequence_example, "SWISSPROT",
+            taxid="9606")
+    res = picr.getUPIForSequence(picr._sequence_example, "SWISSPROT",
+            onlyactive=False, includeattributes=False)
 
-    @attr('slow')
-    def test_getUPIForAccession(self):
-        self.e.getUPIForAccession(self.e._accession_example, ["SWISSPROT"])
-        self.e.getUPIForAccession(self.e._accession_example, "SWISSPROT", taxid="9606")
-        res = self.e.getUPIForAccession(self.e._accession_example, "SWISSPROT", onlyactive=False, includeattributes=False)
+def test_databases(picr):
+    assert len(picr.databases) > 0
 
-    # this one is failing from time to time even the exemple on the web site.
-    @attr('fixme')
-    def test_getUPIForBLAST(self):
-        self.e.getUPIForBLAST(self.e._blastfrag_example, "SWISSPROT", taxid="9606")
-        self.e.getUPIForBLAST(self.e._blastfrag_example, ["SWISSPROT"], taxid="9606", includeattributes=False)
-        self.e.getUPIForBLAST(self.e._blastfrag_example, ["SWISSPROT"], taxid="9606", program="blastp",matrix="BLOSUM62")
+def test_MappedDB(picr):
+    picr.getMappedDatabaseNames()
+
+def test_checkDB(picr):
+    picr._checkDBname("IPI")
+    try:
+        picr._checkDBname("dummy")
+        assert False
+    except:
+        assert True
+
+def test_getUPIForAccession(picr):
+    picr.getUPIForAccession(picr._accession_example, ["SWISSPROT"])
+    picr.getUPIForAccession(picr._accession_example, "SWISSPROT", taxid="9606")
+    res = picr.getUPIForAccession(picr._accession_example, "SWISSPROT", onlyactive=False, includeattributes=False)
+
+# Those ones do not work
+def _test_getUPIForBLAST(picr):
+    picr.getUPIForBLAST(picr._blastfrag_example, "SWISSPROT", taxid="9606")
+
+def _test_getUPIForBLAST2(picr):
+    picr.getUPIForBLAST(picr._blastfrag_example, ["SWISSPROT"], taxid="9606", includeattributes=False)
+
+def _test_getUPIForBLAST3(picr):
+    picr.getUPIForBLAST(picr._blastfrag_example, ["SWISSPROT"], taxid="9606", program="blastp",matrix="BLOSUM62")

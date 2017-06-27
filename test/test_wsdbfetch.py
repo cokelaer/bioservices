@@ -1,58 +1,52 @@
 from bioservices.wsdbfetch import WSDbfetch
-from nose.plugins.attrib import attr
+import pytest
+
+@pytest.fixture
+def dbfetch():
+    return WSDbfetch(verbose=False)
 
 
-@attr('skip_travis')
-class test_WSDbfetch(object):
-    @classmethod
-    def setup_class(klass):
-        klass.s = WSDbfetch(verbose=False)
+def test_getSupportedDBs(dbfetch):
+    res = dbfetch.getSupportedDBs()
+    res = dbfetch.getSupportedDBs()
+    assert len(res) >10
 
-    def test_getSupportedDBs(self):
-        res = self.s.getSupportedDBs()
-        res = self.s.getSupportedDBs()
-        assert len(res) >10
+def test_getSupportedFormats(dbfetch):
+    res = dbfetch.getSupportedFormats()
+    res = dbfetch.getSupportedFormats()
+    assert len(res) >10
 
-    @attr('slow')
-    def test_getSupportedFormats(self):
-        res = self.s.getSupportedFormats()
-        res = self.s.getSupportedFormats()
-        assert len(res) >10
+def test_getSupportedStyles(dbfetch):
+    res = dbfetch.getSupportedStyles()
+    res = dbfetch.getSupportedStyles()
+    assert len(res) >10
 
-    @attr('slow')
-    def test_getSupportedStyles(self):
-        res = self.s.getSupportedStyles()
-        res = self.s.getSupportedStyles()
-        assert len(res) >10
+def test_fetchBatch(dbfetch):
+    dbfetch.fetchBatch("uniprot" ,"wap_mouse", "xml") 
 
-    @attr('fixme')
-    def test_fetchBatch(self):
-        self.s.fetchBatch("uniprot" ,"wap_mouse", "xml") 
+def test_fetchData(dbfetch):
+    dbfetch.fetchData('uniprot:zap70_human')
 
-    def test_fetchData(self):
-        self.s.fetchData('uniprot:zap70_human')
+def test_getDatabaseInfo(dbfetch):
+    res = dbfetch.getDatabaseInfo("uniprotkb")
+    assert res.displayName == 'UniProtKB'
 
-    def test_getDatabaseInfo(self):
-        res = self.s.getDatabaseInfo("uniprotkb")
-        assert res.displayName == 'UniProtKB'
+def test_getDatabaseInfoList(dbfetch):
+    assert len(dbfetch.getDatabaseInfoList())>10
 
-    def test_getDatabaseInfoList(self):
-        assert len(self.s.getDatabaseInfoList())>10
+def test_getDatavaseInfoList(dbfetch):
+    dbfetch.getDatabaseInfoList()
 
-    def test_getDatavaseInfoList(self):
-        self.s.getDatabaseInfoList()
+def test_getDbFormats(dbfetch):
+    dbfetch.getDbFormats("uniprotkb")
 
-    def test_getDbFormats(self):
-        self.s.getDbFormats("uniprotkb")
+def test_getFormat(dbfetch):
+    assert len(dbfetch.getFormatStyles("uniprotkb", "fasta")) >= 3
+    #['default', 'raw', 'html']
 
-    def test_getFormat(self):
-        assert len(self.s.getFormatStyles("uniprotkb", "fasta")) >= 3
-        #['default', 'raw', 'html']
-
-    def test_wrong_db(self):
-        try:
-            self.s.getDbFormats("uniprot")
-            assert False
-        except:
-            assert True
-        
+def test_wrong_db(dbfetch):
+    try:
+        dbfetch.getDbFormats("uniprot")
+        assert False
+    except:
+        assert True

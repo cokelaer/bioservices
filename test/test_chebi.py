@@ -2,8 +2,6 @@ from bioservices import ChEBI
 
 
 
-
-
 def test_chebi():
     ch = ChEBI()
     ch.getCompleteEntity("CHEBI:10102")

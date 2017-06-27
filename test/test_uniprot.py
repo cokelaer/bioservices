@@ -1,56 +1,51 @@
 from bioservices.uniprot import UniProt
-from nose.plugins.attrib import attr
+import pytest
+
+@pytest.fixture
+def uniprot():
+    u = UniProt(verbose=False, cache=False)
+    u.debugLevel = "ERROR"
+    return u
 
 
-class test_UniProt(UniProt):
-    def __init__(self):
-        super(test_UniProt, self).__init__(verbose=False, cache=False)
-        self.debugLevel = "ERROR"
+def test_mapping(uniprot):
+    res = uniprot.mapping(fr="ACC+ID", to="KEGG_ID", query='P43403')
+    assert res['P43403'] == ['hsa:7535']
+    try:
+        res = uniprot.mapping(fr="AC", to="KEID", query='P434')
+        assert False
+    except:
+        assert True
 
-    def test_mapping(self):
-        res = self.mapping(fr="ACC+ID", to="KEGG_ID", query='P43403')
-        assert res['P43403'] == ['hsa:7535']
-        try:
-            res = self.mapping(fr="AC", to="KEID", query='P434')
-            assert False
-        except:
-            assert True
 
-    @attr('slow')
-    def test_retrieve(self):
-        self.retrieve("P09958", frmt="rdf")
-        self.retrieve("P09958", frmt="xml")
-        self.retrieve("P09958", frmt="txt")
-        self.retrieve("P09958", frmt="fasta")
-        self.retrieve("P09958", frmt="gff")
+def test_retrieve(uniprot):
+    uniprot.retrieve("P09958", frmt="rdf")
+    uniprot.retrieve("P09958", frmt="xml")
+    uniprot.retrieve("P09958", frmt="txt")
+    uniprot.retrieve("P09958", frmt="fasta")
+    uniprot.retrieve("P09958", frmt="gff")
+    try:
+        uniprot.retrieve("P09958", frmt="dummy")
+        assert False
+    except:
+        assert True
 
-        try:
-            self.retrieve("P09958", frmt="dummy")
-            assert False
-        except:
-            assert True
+def test_search(uniprot):
+    uniprot.search('zap70+AND+organism:9606', frmt='list')
+    uniprot.search("zap70+and+taxonomy:9606", frmt="tab", limit=3,
+                columns="entry name,length,id, genes, genes(PREFERRED), interpro, interactor")
+    uniprot.search("zap70+and+taxonomy:9606", frmt="tab", limit=3,
+                columns="entry name, go(biological process), comment(FUNCTION), comment(DOMAIN), lineage(all)")
+    uniprot.search("ZAP70_HUMAN", frmt="tab", columns="sequence", limit=1)
+    uniprot.quick_search("ZAP70")
 
-    @attr('slow')
-    def test_search(self):
-        self.search('zap70+AND+organism:9606', frmt='list')
-        self.search("zap70+and+taxonomy:9606", frmt="tab", limit=3,
-                    columns="entry name,length,id, genes, genes(PREFERRED), interpro, interactor")
-        self.search("zap70+and+taxonomy:9606", frmt="tab", limit=3,
-                    columns="entry name, go(biological process), comment(FUNCTION), comment(DOMAIN), lineage(all)")
+def test_uniref(uniprot):
+    df = uniprot.uniref("member:Q03063")
+    df.Size
 
-        self.search("ZAP70_HUMAN", frmt="tab", columns="sequence", limit=1)
+def test_get_df(uniprot):
+    df = uniprot.get_df(["P43403"])
 
-        self.quick_search("ZAP70")
-
-    @attr('skip')
-    def test_uniref(self):
-        df = self.uniref("member:Q03063")
-        df.Size
-
-    @attr('skip')
-    def test_get_df(self):
-        df = self.get_df(["P43403"])
-
-    def test_fasta(self):
-        "Q9Y617" in self.get_fasta(["Q9Y617-1"])
-        "Q9Y617" not in self.get_fasta_sequence(["Q9Y617-1"])
+def test_fasta(uniprot):
+    "Q9Y617" in uniprot.get_fasta(["Q9Y617-1"])
+    "Q9Y617" not in uniprot.get_fasta_sequence(["Q9Y617-1"])

@@ -26,9 +26,10 @@ install:
   - pip install grequests requests requests_cache
   - pip install easydev>=0.9.7 beautifulsoup4 suds-jurko appdirs
   - pip install coveralls nose numpydoc sphinx-gallery
+  - pip install pytest pytest-cov pytest-qt pytest-xdist pytest-mock pytest-timeout
 # # command to run tests, e.g. python setup.py test
 script:
-  - python setup.py nosetests  --with-coverage --cover-package bioservices --logging-level ERROR --attr '!slow,!skip,!fixme,!skip_travis'
+  - pytest -v --durations=60 test/ --cov=bioservices --cov-report term --timeout 300 -n 4 
 
 after_success:
   coveralls

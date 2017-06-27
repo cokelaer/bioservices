@@ -1,5 +1,4 @@
 from bioservices.rhea import Rhea
-from nose.plugins.attrib import attr
 
 
 def test_rhea():

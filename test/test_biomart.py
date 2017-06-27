@@ -1,49 +1,43 @@
 from bioservices import BioMart
-from nose.plugins.attrib import attr
+import pytest
 
 
-class test_biomart(object):
-    @classmethod
-    def setup_class(klass):
-        # ideally we should not provide a host to be more generic 
-        # but this takes lots of time or is simply down.
-        klass.s = BioMart(host='www.ensembl.org', verbose=False)
-        klass.mart_test = 'ENSEMBL_MART_ENSEMBL'
+@pytest.fixture
+def biomart():
+    biomart = BioMart(host='www.ensembl.org', verbose=False)
+    biomart.mart_test = 'ENSEMBL_MART_ENSEMBL'
+    return biomart
 
-    def test_general(self):
-        # test another host
-        s = BioMart(host="www.ensembl.org")
 
-    def test_version(self):
-        self.s.version(self.mart_test)
+def test_version(biomart):
+    biomart.version(biomart.mart_test)
 
-    def test_datasets(self):
-        # there are about 70 dataset but let us check that at least the list is
-        # not empty
-        assert len(self.s.datasets(self.mart_test)) > 2
+def test_datasets(biomart):
+    # there are about 70 dataset but let us check that at least the list is
+    # not empty
+    assert len(biomart.datasets(biomart.mart_test)) > 2
 
-        assert "mmusculus_gene_ensembl" in self.s.datasets(self.mart_test)
+    assert "mmusculus_gene_ensembl" in biomart.datasets(biomart.mart_test)
 
-    def test_attributes(self):
-        assert 'oanatinus_gene_ensembl' in \
-            self.s.valid_attributes[self.mart_test]
+def test_attributes(biomart):
+    assert 'oanatinus_gene_ensembl' in \
+        biomart.valid_attributes[biomart.mart_test]
 
-    def test_filteres(self):
-        self.s.filters("oanatinus_gene_ensembl")
+def test_filteres(biomart):
+    biomart.filters("oanatinus_gene_ensembl")
 
-    def test_config(self):
-        self.s.configuration("oanatinus_gene_ensembl")
+def test_config(biomart):
+    biomart.configuration("oanatinus_gene_ensembl")
 
-    #fails on travais sometines
-    @attr("fixme")
-    def test_query(self):
-        res = self.s.query(self.s._xml_example)
-        assert "ENSMUS" in res
+#fails on travais sometines
+def test_query(biomart):
+    res = biomart.query(biomart._xml_example)
+    assert "ENSMUS" in res
 
-    def test_xml(self):
-        # build own xml using the proper functions
-        self.s.add_dataset_to_xml("mmusculus_gene_ensembl")
-        self.s.get_xml()
+def test_xml(biomart):
+    # build own xml using the proper functions
+    biomart.add_dataset_to_xml("mmusculus_gene_ensembl")
+    biomart.get_xml()
 
 def test_biomart_constructor():
     s = BioMart()
