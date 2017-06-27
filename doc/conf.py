@@ -148,6 +148,7 @@ modindex_common_prefix = ["bioservices."]
 plot_gallery = True
 sphinx_gallery_conf = {
     "doc_module": "bioservices",
+    "backreferences_dir": "gallery",
     #"examples_dirs": "examples",
     #"gallery_dirs": "auto_examples",
 }
@@ -163,7 +164,6 @@ numpydoc_show_class_members = False
 def touch_example_backreferences(app, what, name, obj, options, lines):
     # generate empty examples files, so that we don't get
     # inclusion errors if there are no examples for a class / module
-    print(app.srcdir)
     examples_path = os.path.join(app.srcdir, "modules", "generated",
                                  "%s.examples" % name)
     if not os.path.exists(examples_path):
@@ -260,8 +260,8 @@ html_use_index = True
 html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
-#html_copy_source = False
+html_show_sourcelink = True
+html_copy_source = True
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 #html_show_sphinx = True
@@ -284,10 +284,7 @@ htmlhelp_basename = 'doc'
 # -- Options for LaTeX output --------------------------------------------------
 
 # NOT in original quickstart
-#pngmath_use_preview = True
-
-# The paper size ('letter' or 'a4').
-latex_paper_size = 'a4'
+pngmath_use_preview = True
 
 # The font size ('10pt', '11pt' or '12pt').
 latex_font_size = '10pt'
@@ -301,6 +298,7 @@ latex_documents = [
 
 latex_elements = { 'inputenc': '\\usepackage[utf8]{inputenc}' }
 
+latex_elements['latex_paper_size'] = "a4"
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
 #latex_logo = None
@@ -316,7 +314,9 @@ latex_use_parts = False
 #latex_show_urls = False
 
 # Additional stuff for the LaTeX preamble.
-latex_preamble =r"""
+
+latex_elements['latex_preamble'] =r"""
+
 \definecolor{VerbatimColor}{rgb}{.9,1,0.9}
 \definecolor{VerbatimBorderColor}{rgb}{0,0,0}
 

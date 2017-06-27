@@ -1442,7 +1442,7 @@ class KEGGParser(Logging):
                     res[current_field] = ''
                     break
             res[current_field] += this + u' '
-        if res['SEQUENCE'] == u'': 
+        if res['SEQUENCE'] == u'':
             res.pop('SEQUENCE')
         for k in res.keys():
             res[k] = res[k].strip()

@@ -100,38 +100,9 @@ User guide
     tutorials.rst
     applications.rst
     developers.rst
-
-Examples 
-####################
-
-.. toctree::
-    :maxdepth: 2
-    :numbered:
-
     auto_examples/index
     notebooks.rst
-
-
-
-References
-##################
-
-
-.. toctree::
-    :maxdepth: 2
-    :numbered:
-
     references
-
-
-
-Others
-#################################
-
-.. toctree::
-    :maxdepth: 2
-    :numbered:
-
     external_references.rst
     faqs
     ChangeLog.rst

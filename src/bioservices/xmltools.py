@@ -6,7 +6,7 @@
 #  Copyright (c) 2013-2014 - EMBL-EBI
 #
 #  File author(s):
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at

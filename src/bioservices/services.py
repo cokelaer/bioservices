@@ -594,7 +594,6 @@ class REST(RESTbase):
             requests_cache.install_cache(self.CACHE_NAME)
 
     def delete_cache(self):
-        import os
         cache_file = self.CACHE_NAME + '.sqlite'
         if os.path.exists(cache_file):
             msg = "You are about to delete this bioservices cache: %s. Proceed? (y/[n]) "
