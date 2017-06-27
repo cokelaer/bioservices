@@ -1416,7 +1416,6 @@ class KEGGParser(Logging):
     def _interpret_entry(self, data):
         res = {}
 
-        return res
         for this in data.split("\n"):
             if this.strip().startswith("ENTRY"):
                 pass
