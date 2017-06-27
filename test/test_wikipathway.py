@@ -1,8 +1,6 @@
 from bioservices.wikipathway import  WikiPathways
 from nose.plugins.attrib import attr
 
-@attr('skip')
-@attr('skip_travis')
 class test_wiki(object):
     @classmethod
     def setup_class(klass):
@@ -19,11 +17,10 @@ class test_wiki(object):
         except ValueError:
             assert True
 
-    @attr('slow')
+    @attr('skip')
     def test_showPathwayInBrowser(self):
         self.s.showPathwayInBrowser("WP2320")
 
-    @attr('slow')
     def test_listPathways(self):
         l = self.s.listPathways()
         assert len(l) > 40
@@ -32,53 +29,39 @@ class test_wiki(object):
 
     def test_getPathway(self):
         self.s.getPathway("WP2320")
-    @attr('slow')
+
     def test_getPathwayInfo(self):
         self.s.getPathwayInfo("WP2320")
 
-    @attr('slow')
     def test_getPathwayAs(self):
-        res = self.s.getPathwayAs("WP4", filetype="txt")
+        res = self.s.getPathwayAs("WP4", filetype="png")
 
     @attr('slow')
     def test_findPathwaysByText(self):
         res = self.s.findPathwaysByText(query="p53")
-        res = self.s.findPathwaysByText(query="p53",species='Homo sapiens')
-        len([x.score for x in res]) == len(res)
+        res = self.s.findPathwaysByText(query="p53", species='Homo sapiens')
         assert len(self.s.findPathwaysByText(query="p53 OR mapk",species='Homo sapiens'))>0
 
-    @attr('slow')
     def test_getOntologyTersmByPathway(self):
         res = self.s.getOntologyTermsByPathway("WP4")
-        res[0].ontology
 
-    @attr('slow')
-    def test_getOntologyTermsByOntology(self):
-        self.s.getOntologyTermsByOntology("Disease")
-
-    @attr('slow')
-    def test_getCurationTags(self):
+    def _test_getCurationTags(self):
         self.s.getCurationTags("WP4")
 
-    @attr('slow')
-    def test_getcurationTagByNames(self):
+    def _test_getcurationTagByNames(self):
         self.s.getCurationTagsByName("Curation:Tutorial")
 
-    @attr('slow')
     def test_findInteractions(self):
-        self.s.findInteractions("P53")
-        self.s.findInteractions("P53", interactionOnly=False)
-        self.s.findInteractions("P53", raw=True)
+        assert len(self.s.findInteractions("P53").species) > 10
 
-    @attr('slow')
     def test_getRecentChanges(self):
         self.s.getRecentChanges(20120101000000)
 
     # does not seem to work
-    @attr('slow')
     def test_findPathwayByXref(self):
-        self.s.findPathwaysByXref('P45985')
-
+        df = self.s.findPathwaysByXref('P45985')
+        assert len(df)
+        assert df['x.id'].unique() == ['P45985']
 
     @attr('slow')
     def test_findPathwaysByLitterature(self):
@@ -100,7 +83,6 @@ class test_wiki(object):
             assert False
         except NotImplementedError:
             assert True
-
 
     def test_updatePathwa(self):
         try:
