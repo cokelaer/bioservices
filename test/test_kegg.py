@@ -118,13 +118,13 @@ class TestKEGGALL(object):
 
     @attr('slow')
     def test_list(self):
-        self.ws.list("pathway")             # returns the list of reference pathways
-        self.ws.list("organism")            # returns the list of KEGG organisms with taxonomic classification
-        self.ws.list("hsa")                 # returns the entire list of human genes
-        self.ws.list("T01001")              # same as above
+        self.ws.list("pathway") # returns the list of reference pathways
+        self.ws.list("organism") # returns the list of KEGG organisms with taxonomic classification
+        self.ws.list("hsa") # returns the entire list of human genes
+        self.ws.list("T01001") # same as above
         self.ws.list("hsa:10458+ece:Z5100") # returns the list of a human gene and an E.coli O157 gene
-        self.ws.list("cpd:C01290+gl:G00092")# returns the list of a compound entry and a glycan entry
-        self.ws.list("C01290+G00092")       # same as above
+        self.ws.list("cpd:C01290+gl:G00092") # returns the list of a compound entry and a glycan entry
+        self.ws.list("C01290+G00092") # same as above
 
         # invalid queries:
         try:
@@ -141,11 +141,11 @@ class TestKEGGALL(object):
 
     @attr('slow')
     def test_find(self):
-        self.ws.find("genes", "shiga+toxin")             # for keywords "shiga" and "toxin"
-        self.ws.find("genes", "shiga toxin")            # for keywords "shigatoxin"
-        self.ws.find("compound", "C7H10O5", "formula")   # for chemicalformula "C7H10O5"
-        self.ws.find("compound", "O5C7","formula")       # for chemicalformula containing "O5" and "C7"
-        self.ws.find("compound", "174.05","exact_mass")  # for 174.045 =<exact mass < 174.055
+        self.ws.find("genes", "shiga+toxin") # for keywords "shiga" and "toxin"
+        self.ws.find("genes", "shiga toxin") # for keywords "shigatoxin"
+        self.ws.find("compound", "C7H10O5", "formula") # for chemicalformula "C7H10O5"
+        self.ws.find("compound", "O5C7","formula") # for chemicalformula containing "O5" and "C7"
+        self.ws.find("compound", "174.05","exact_mass") # for 174.045 =<exact mass < 174.055
         self.ws.find("compound", "300-310","mol_weight") # for 300 =<molecular weight =< 310
 
     @attr('slow')
