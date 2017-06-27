@@ -60,6 +60,13 @@ class Readseq(WSDLService):
         >>> s = Readseq()
 
 
+    This services is retired from EBI (2015) and one should use seqret service
+    but the service works so let us keep it (not maintained though)
+
+    http://www.ebi.ac.uk/Tools/webservices/services/sfc/readseq_soap?rev=1425032285
+
+
+
     """
     _url = "http://www.ebi.ac.uk/Tools/services/soap/readseq?wsdl"
     def __init__(self, verbose=True):
@@ -103,6 +110,49 @@ class Readseq(WSDLService):
         :param str title: job title.
         :param params: parameters for the tool as returned by :meth:`get_parameter_details`.
         :return: string containing the job identifier (jobId).
+
+
+
+        Format Name     Value
+        Auto-detected   0
+        EMBL    4
+        GenBank     2
+        Fasta(Pearson)  8
+        Clustal/ALN     22
+        ACEDB   25
+        BLAST   20
+        DNAStrider  6
+        FlatFeat/FFF    23
+        GCG     5
+        GFF     24
+        IG/Stanford     1
+        MSF     15
+        NBRF    3
+        PAUP/NEXUS  17
+        Phylip(Phylip4)     12
+        Phylip3.2   11
+        PIR/CODATA  14
+        Plain/Raw   13
+        SCF     21
+        XML     19
+
+        As output, you also have 
+
+        Pretty 18
+
+        ::
+
+            s = readseq.Readseq()
+            jobid = s.run("cokelaer@test.co.uk", "test", sequence=fasta, inputformat=8, 
+                outputformat=2)
+            genbank = s.get_result(s._jobid)
+
+
+
+
+
+
+
         """
         for k in kargs.keys():
             self.devtools.check_param_in_list(k, self.parameters)
@@ -162,7 +212,11 @@ class Readseq(WSDLService):
         type_ = self.get_result_types(jobid).type[0].identifier
         res = self.serv.getResult(jobid, type_)
 
-        res = res.decode("base64")
+        try:
+            import base64
+            res = base64.b64decode(res).decode()
+        except:
+            pass
         return res
 
 """
