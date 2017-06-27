@@ -2,7 +2,9 @@ name: gdsctools_env
 
 channels:
 - bioconda
-
+- defaults
+- r
+- conda-forge
 
 dependencies:
 - requests
