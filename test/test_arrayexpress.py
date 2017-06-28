@@ -1,5 +1,4 @@
 from bioservices import ArrayExpress
-from nose.plugins.attrib import attr
 import pytest
 
 
@@ -48,9 +47,10 @@ def test_format(array):
 def test_retrieveExperiment(array):
     array.retrieveExperiment("E-MEXP-31")
 
-@attr('slow')
-def test_extra(array):
+def test_extra1(array):
     # works. just takes 15 seconds so let us skip it.
     res = array.queryFiles(keywords="cancer+breast", wholewords=True)
+def test_extra2(array):
     res = array.queryFiles(keywords="cancer+breast", wholewords=True, gxa="true")
+def test_extra3(array):
     res = array.queryFiles(keywords="cancer+breast", wholewords=True, directsub="false")
