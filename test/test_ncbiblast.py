@@ -1,5 +1,9 @@
 from bioservices import NCBIblast
 import pytest
+import os
+
+skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+    reason="too slow for travis")
 
 
 @pytest.fixture
@@ -21,6 +25,7 @@ def test_paramdetails(ncbi):
     except:
         assert True
 
+@skiptravis
 def test_run(ncbi):
 
     try:
