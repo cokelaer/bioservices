@@ -10,6 +10,7 @@ dependencies:
 - requests
 - grequests
 - sphinx
+- sphinx-gallery
 - numpy
 - pandas
 - matplotlib
