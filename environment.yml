@@ -14,7 +14,7 @@ dependencies:
 - matplotlib
 - scipy
 - pip:
-  - sphinx-gallery
+  - sphinx_gallery
   - matplotlib
   - easydev>=0.9.21
   - bioservices
