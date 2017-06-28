@@ -1,6 +1,7 @@
 from bioservices.muscle import MUSCLE
 from bioservices import uniprot
 import pytest
+import os
 
 skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
      reason="too long On travis ")

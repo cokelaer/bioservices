@@ -6,7 +6,6 @@ def ensembl():
     return Ensembl(verbose=False)
 
 
-
 def test_get_archive(ensembl):
     res = ensembl.get_archive("ENSG00000157764")
     assert 'id' in res.keys()
