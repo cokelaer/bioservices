@@ -10,9 +10,11 @@ def test_get_archive(ensembl):
     res = ensembl.get_archive("ENSG00000157764")
     assert 'id' in res.keys()
 
+
 def test_post_archive(ensembl):
     res = ensembl.post_archive(["ENSG00000157764"])
     assert "ENSG00000157764" in [x['id'] for x in res]
+
 
 def test_genetree_by_id(ensembl):
     res = ensembl.get_genetree_by_id("ENSGT00390000003602",
@@ -29,16 +31,19 @@ def test_genetree_by_id(ensembl):
     ensembl.get_genetree_by_id('ENSGT00390000003602', frmt='phyloxml',
                               sequence='none')
 
+
 def test_get_genetree_by_member_id(ensembl):
     res = ensembl.get_genetree_by_member_id('ENSG00000157764',
                                            frmt='json', nh_format='phylip')
     assert len(res) > 1000
+
 
 def test_get_genetree_by_member_symbol(ensembl):
     res = ensembl.get_genetree_by_member_symbol('human', 'BRCA2',
                                                nh_format='simple')
     # was working until dec 2014 then results changed. so not stable
     # assert res[0:200] == """((((((((ENSPFOP00000001575:0.046083,ENSXMAP00000006983:0.065551):0.43822,ENSONIP00000006940:0.359035):0.019582,((ENSTRUP00000015030:0.077336,ENSTNIP00000002435:0.099898):0.208834,ENSGACP00000015199:0."""
+
 
 def test_get_alignment_by_region(ensembl):
     region = '2:106040000-106040050'
@@ -48,6 +53,7 @@ def test_get_alignment_by_region(ensembl):
 
     assert 'gallus_gallus' in res[0]['tree']
 
+
 def test_get_homology_by_id(ensembl):
     res = ensembl.get_homology_by_id('ENSG00000157764')
     assert res.keys()
@@ -55,6 +61,7 @@ def test_get_homology_by_id(ensembl):
     res = ensembl.get_homology_by_id('ENSG00000157764', format='condensed',
                                     type='orthologues', target_taxon='10090')
     assert 'homologies' in res['data'][0].keys()
+
 
 def test_references(ensembl):
     res = ensembl.get_xrefs_by_id('ENST00000288602', external_db='PDB',
@@ -67,6 +74,7 @@ def test_references(ensembl):
     res = ensembl.get_xrefs_by_symbol('BRCA2', 'homo_sapiens',
                                      external_db='HGNC')
     assert 'id' in res[0]
+
 
 def test_info(ensembl):
     assert len(ensembl.get_info_analysis('human')) > 0
@@ -93,6 +101,7 @@ def test_info(ensembl):
     res = ensembl.get_info_species()
     assert 'ovis_aries' in [x['name'] for x in res['species'] if 'ovis' in x['name']]
 
+
 def test_lookup(ensembl):
     res = ensembl.get_lookup_by_id('ENSG00000157764', expand=True)
 
@@ -108,6 +117,7 @@ def test_lookup(ensembl):
     res = ensembl.post_lookup_by_symbol('human', ["BRCA2", "BRAF"], expand=True)
     assert len(res['BRCA2']['Transcript'])
 
+
 def test_mapping(ensembl):
     res = ensembl.get_map_assembly_one_to_two('GRCh37', 'GRCh38',
                                              region='X:1000000..1000100:1')
@@ -118,6 +128,7 @@ def test_mapping(ensembl):
     res = ensembl.get_map_cds_to_region('ENST00000288602', '1..1000')
 
     res = ensembl.get_map_cdna_to_region('ENST00000288602', '100..300')
+
 
 def test_ontologies(ensembl):
     res = ensembl.get_ontology_ancestors_by_id('GO:0005667')
@@ -135,6 +146,7 @@ def test_ontologies(ensembl):
     assert res[0]['children']
     res = ensembl.get_ontology_by_name('transcription factor')
     assert res
+
 
 def test_taxonomy(ensembl):
     res = ensembl.get_taxonomy_by_name('homo')
@@ -166,10 +178,10 @@ def _test_regulation(ensembl):
     res = ensembl.get_regulatory_by_id('ENSR00001348195', 'human')
     assert 'ID' in res[0].keys()
 
+
 def test_sequences(ensembl):
     sequence = ensembl.get_sequence_by_id('ENSG00000157764', frmt='text')
-    assert sequence[
-           0:120] == """CGCCTCCCTTCCCCCTCCCCGCCCGACAGCGGCCGCTCGGGCCCCGGCTCTCGGTTATAAGATGGCGGCGCTGAGCGGTGGCGGTGGTGGCGGCGCGGAGCCGGGCCAGGCTCTGTTCAA"""
+    assert sequence.startswith("CGCCTCCCTTCCCCCTCCCCGCCCGACAGCGGCCGCTCGGGCCCCG")
 
     sequence = ensembl.get_sequence_by_id('ENSG00000157764', frmt='fasta')
     assert sequence.startswith(">ENSG00000157764 chromosome:")
@@ -200,6 +212,7 @@ def test_sequences(ensembl):
 
     res = ensembl.get_sequence_by_id('ENSP00000288602', frmt='json')
     assert res['seq'].startswith("MAAL")
+
 
 def test_variation(ensembl):
     res = ensembl.get_variation_by_id('rs56116432', 'human')
