@@ -182,7 +182,7 @@ Revision 1.3
     * pdb: add a method
     * hgnc: add new class related to HGNC
 
-  * NEWS 
+  * NEWS
     * services.py: add a method to ease conversion of dict to json. add
       attribute to limit number of requests per seconds but not yet used.
     * taxonomy module: add new method in Taxon to look for a taxon identifier given a name

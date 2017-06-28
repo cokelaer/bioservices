@@ -60,7 +60,6 @@ publicationIdOrText     publication identifier (PMID or DOI) or text
 
 
 """
-
 import copy
 import webbrowser
 from functools import wraps
@@ -443,13 +442,13 @@ class BioModels(WSDLService):
         return self.serv.getModelsIdByPerson(personName)
 
     def getSimpleModelsByReactomeIds(self, reacID, raw=False):
-        """Retrieves all the models which are annotated with the given Reactome
-records.
+        """Retrieves all models annotated with the given Reactome records.
 
         :param: list of reactome identifiers (e.g., REACT_1590)
         :param bool raw: return raw data if True
 
-        :return:  models annotated with the provided Reactome identifiers, as a TreeMap (which uses Reactome identifiers as keys)
+        :return:  models annotated with the provided Reactome identifiers, as 
+            a TreeMap (which uses Reactome identifiers as keys)
 
 
         .. seealso:: How to retrieve REACTOME IDs in :meth:`extra_getReactomeIds`
@@ -527,7 +526,8 @@ records.
         """Retrieves the identifiers of all models related to one (or more) publication(s).
 
 
-        :param str pubId: publication identifier PMID or DOI or text which occurs in the publications.
+        :param str pubId: publication identifier PMID or DOI or text which 
+            occurs in the publications.
 
         ::
 
