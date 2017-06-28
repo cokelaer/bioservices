@@ -26,7 +26,7 @@ install:
   - pip install grequests requests requests_cache
   - pip install easydev>=0.9.7 beautifulsoup4 suds-jurko appdirs
   - pip install coveralls nose numpydoc sphinx-gallery
-  - pip install pytest pytest-cov pytest-qt pytest-xdist pytest-mock pytest-timeout
+  - pip install pytest pytest-cov pytest-xdist pytest-mock pytest-timeout
 # # command to run tests, e.g. python setup.py test
 script:
   - pytest -v --durations=60 test/ --cov=bioservices --cov-report term --timeout 300 -n 4 
