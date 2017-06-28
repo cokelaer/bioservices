@@ -13,6 +13,7 @@ dependencies:
 - pandas
 - matplotlib
 - scipy
+- sphinx_gallery
 - pip:
   - sphinx_gallery
   - matplotlib
