@@ -5,15 +5,20 @@ Whats' new, what has changed
 Revision 1.5
 -----------------
 
+Support for Python 3.6 on Travis.
 
     * BUG:
         * kegg: fix #75 and #77 (missing  keywords in KEGG)
         * kegg: fix #79 (mis-interpreted cases reported by kirienko with examples.
-        * kegg: fix #85 (some entries are not interpreted)    
+        * kegg: fix #85 (some entries are not interpreted)
     * CHANGES:
         * biodbnet: conversion from WSDL to REST. Note methods' arguments
           changes: inputValues to input_values, dbPath to db_path. Uses pandas
-        * wikipathways: conversion from WSDL to REST
+        * wikipathways: conversion from WSDL to REST. All wikipathways service 
+          uses Pandas and returns dataframes.
+
+
+For developers: use pytest instead of nosetests.
 
 Revision 1.4
 ---------------
