@@ -267,7 +267,10 @@ class WikiPathways(REST):
 
         pathways = self._get_list(data, "ns1:pathways", 
             ['id', 'url', 'name', 'species', 'revision'])
-        pathways = pd.DataFrame(pathways).set_index("id")
+        try:
+            pathways = pd.DataFrame(pathways).set_index("id")   
+        except:
+            pass
         return pathways
 
     def getPathway(self, pathwayId, revision=0):
@@ -576,7 +579,10 @@ class WikiPathways(REST):
 
         results = self._get_list(data, "ns1:result",
             ["score", 'id', 'url', 'name', 'species', 'revision'])
-        results = pd.DataFrame(results).set_index("id")
+        try:
+            results = pd.DataFrame(results).set_index("id")
+        except:
+            pass
         return  results
 
     def getOntologyTermsByPathway(self, pathwayId):
