@@ -11,14 +11,14 @@ dependencies:
 - requests
 - grequests
 - numpy
+- matplotlib
 - pandas
 - matplotlib
 - scipy
-- sphinx
+- easydev>=0.9.34
 - numpydoc
+- pip
 - suds-jurko
 - pip:
   - sphinx-gallery
-  - matplotlib
-  - easydev>=0.9.21
   - bioservices
