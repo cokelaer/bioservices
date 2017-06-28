@@ -9,6 +9,7 @@ channels:
 dependencies:
 - requests
 - grequests
+- sphinx
 - numpy
 - pandas
 - matplotlib
