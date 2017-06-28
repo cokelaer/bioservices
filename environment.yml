@@ -16,6 +16,7 @@ dependencies:
 - matplotlib
 - scipy
 - easydev>=0.9.34
+- sphinx
 - numpydoc
 - pip
 - suds-jurko
