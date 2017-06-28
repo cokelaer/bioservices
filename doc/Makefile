@@ -129,5 +129,3 @@ doctest:
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
-publish:
-	scp -r build/html/* cokelaer@ebi1-001.ebi.ac.uk:/homes/cokelaer/public_html/cnolab/wrapper

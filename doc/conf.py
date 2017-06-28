@@ -27,12 +27,6 @@ pkg_name = "bioservices"
 import matplotlib
 matplotlib.use('Agg')
 
-try:
-    import easydev
-    from easydev import get_path_sphinx_themes
-except Exception, e:
-    print "Install easydev or set your PYTHONPATH properly"
-    raise Exception
 
 
 import pkg_resources
@@ -40,12 +34,11 @@ version = pkg_resources.require(pkg_name)[0].version
 release = version
 author = "Thomas Cokelaer, Lea M. Harder, Jordi Serra-Musach, \nDennis Pultz"
 title = "BioServices"
-copyright = author + ", 2012"
+copyright = author + ", 2012-2017"
 project = pkg_name
 
 import easydev
 from easydev import get_path_sphinx_themes
-
 
 
 # -- General configuration -----------------------------------------------------
@@ -58,21 +51,21 @@ from easydev import get_path_sphinx_themes
 
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
-    'sphinx.ext.coverage',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode',
-    "numpydoc.numpydoc",
-    'easydev.copybutton',
-    'matplotlib.sphinxext.plot_directive',
-    'matplotlib.sphinxext.only_directives',
+
     ('sphinx.ext.imgmath'  # only available for sphinx >= 1.4
                   if sphinx.version_info[:2] >= (1, 4)
                   else 'sphinx.ext.pngmath'),
-    'sphinx_gallery.gen_gallery'
+    'sphinx.ext.coverage',
+    'sphinx.ext.doctest',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.todo',
+    'sphinx.ext.ifconfig',
+    'sphinx.ext.viewcode',
+    "numpydoc.numpydoc",
+    'matplotlib.sphinxext.plot_directive',
+    'sphinx.ext.autosummary',
+    'sphinx_gallery.gen_gallery',
+    "sequana.sphinxext.snakemakerule"
     ]
 # note that the numpy directives is buggy. Example: class and init are not recognised as two entities for the autoclass_content=both here below
 
@@ -195,13 +188,11 @@ if not on_rtd:
 else:
     html_theme = "default"
 
-
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 # the user theme contains the otpions 'homepage', which is populated here
 #html_theme_options = {'homepage': init_sphinx.url}
-
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = [get_path_sphinx_themes()]
 
