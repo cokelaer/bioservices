@@ -9,13 +9,12 @@ channels:
 dependencies:
 - requests
 - grequests
-- sphinx
-- sphinx-gallery
 - numpy
 - pandas
 - matplotlib
 - scipy
 - pip:
+  - sphinx-gallery
   - matplotlib
   - easydev>=0.9.21
   - bioservices
