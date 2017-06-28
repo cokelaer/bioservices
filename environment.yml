@@ -16,7 +16,7 @@ dependencies:
 - scipy
 - sphinx
 - numpydoc
-- suds
+- suds-jurko
 - pip:
   - sphinx-gallery
   - matplotlib
