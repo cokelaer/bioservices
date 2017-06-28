@@ -7,12 +7,15 @@ channels:
 - conda-forge
 
 dependencies:
+- python=3.5.0
 - requests
 - grequests
 - numpy
 - pandas
 - matplotlib
 - scipy
+- sphinx
+- numpydoc
 - pip:
   - sphinx-gallery
   - matplotlib
