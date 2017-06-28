@@ -13,9 +13,8 @@ dependencies:
 - pandas
 - matplotlib
 - scipy
-- sphinx_gallery
 - pip:
-  - sphinx_gallery
+  - sphinx-gallery
   - matplotlib
   - easydev>=0.9.21
   - bioservices
