@@ -30,9 +30,11 @@ In the example below, we use geneprof to
 #. plot histogram of the log values found above.
 
 
-.. plot::
+.. .. plot::
     :include-source:
     :width: 80%
+
+::
 
     >>> from bioservices import GeneProf
     >>> g = GeneProf(verbose=True)
