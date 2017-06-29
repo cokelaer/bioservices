@@ -34,6 +34,9 @@ In the example below, we use geneprof to
     :include-source:
     :width: 80%
 
+.. note:: broken example on June 2017. Service should be fix soon. Issue
+   reported to the author.
+
 ::
 
     >>> from bioservices import GeneProf

@@ -2,17 +2,40 @@
 
 
 #################################################################################
-BIOSERVICES: a Python package to access biological web services programmatically
+BIOSERVICES: access to biological web services programmatically
 #################################################################################
 
-.. topic:: BioServices
+
+.. topic:: BioServices |version| (|today|)
 
     .. image:: bioservices.png
         :width: 50%
 
     :Citations: If you use BioServices, please cite *Cokelaer et al, Bioinformatics (2013)*. 
-    See `bioinformatics link <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ 
-    for details.
+        See `bioinformatics link <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ 
+        for details.
+
+
+
+.. raw:: html
+
+    <div style="width:80%"><p>    <a href="https://pypi.python.org/pypi/bioservices"> <img src="https://badge.fury.io/py/bioservices.svg"></a>
+    <a href="https://travis-ci.org/cokelaer/bioservices"> <img src="https://travis-ci.org/cokelaer/bioservices.svg?branch=master"></a>
+    <a href="https://coveralls.io/github/cokelaer/bioservices?branch=master"> <img src="https://coveralls.io/repos/github/cokelaer/bioservices/badge.svg?branch=master"></a>
+
+    <a href="http://bioservices.readthedocs.org/en/master/?badge=master"> <img src="http://readthedocs.org/projects/cokelaer/bioservices/badge/?version=master"></a>
+    <a href="http://landscape.io/github/cokelaer/bioservices/master/"> <img src="http://landscape.io/github/cokelaer/bioservices/master/landscape.png"></a>
+    </p>
+    </div>
+
+
+
+
+
+
+:Python version: Python 2.6, 2.7, 3.4, 3.5, 3.6
+:Source: See  `http://github.com/cokelaer/bioservices <https://github.com/cokelaer/bioservices/>`_.
+:Issues: Please fill a report on `github <https://github.com/cokelaer/bioservices/issues>`_
 
 
 .. note:: Contributions to implement new wrappers are more than welcome. 

@@ -140,6 +140,7 @@ modindex_common_prefix = ["bioservices."]
 plot_gallery = True
 sphinx_gallery_conf = {
     "doc_module": "bioservices",
+    'backreferences_dir': False
     #"examples_dirs": "examples",
     #"gallery_dirs": "auto_examples",
 }

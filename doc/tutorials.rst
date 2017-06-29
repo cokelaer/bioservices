@@ -14,8 +14,6 @@ of information about a specific protein. New Contributino to this section are
 welcomed.
 
 .. toctree::
-    :maxdepth: 1
-    :numbered:
 
     kegg_tutorial.rst
     biomodels.rst
