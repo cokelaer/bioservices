@@ -370,7 +370,7 @@ class EUtils(REST):
         try: ret = ret.content
         except: pass
 
-        if _retmode == "dict":
+        if _retmode == "dict" and isinstance(ret, str):
             ret = self.parse_xml(ret, "dict")
 
         return ret
