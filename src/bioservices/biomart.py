@@ -224,20 +224,20 @@ class BioMart(REST):
 
     def _get_host(self):
         return self._host
-    def _set_host(self, host):
+    
+    def _set_host(self, host, https=False):
         import requests
-        #include exception because phytozome is currently the only biomart using https
         secure = ''
-        if host == "phytozome.jgi.doe.gov":
+        if https:  # host == "phytozome.jgi.doe.gov":
             secure = 's'
-        url = "http%s://%s/biomart/martservice" % (secure, host)
+        url = "http{}://{}/biomart/martservice".format(secure, host)
         request = requests.head(url)
         if request.status_code in [200]:
             self._host = host
             self.url = url
             self._init()
         else:
-            print("host %s is not reachable " % host)
+            print("host {} is not reachable ".format(host))
     host = property(_get_host, _set_host)
 
     def _init(self):
