@@ -3,9 +3,9 @@
 #
 #  This file is part of bioservices software
 #
-#  Copyright (c) 2013-2014 - EBI-EMBL
+#  Copyright (c) 2013-2017 - EBI-EMBL
 #
-#  File author(s):
+#  File author(s): Nick Weiner and others
 #
 #
 #  Distributed under the GPLv3 License.
@@ -170,7 +170,6 @@ class BioMart(REST):
                     </Dataset>
                     </Query>"""
 
-
     def __init__(self, host=None, verbose=False, cache=False):
         """.. rubric:: Constructor
 
@@ -219,22 +218,32 @@ class BioMart(REST):
             self._host = None
         else:
             self.host = host
-
         self._biomartQuery = BioMartQuery()
+
+    # THis function needs keywords (eg. version=..., virtualScheme=..,
+    # formatter="FASTA"
+    def custom_query(self, **args):
+        self._biomartQuery = BioMartQuery(**args)
 
     def _get_host(self):
         return self._host
     def _set_host(self, host):
         import requests
-        url = "http://%s/biomart/martservice" % host
+        secure = ''
+        if host == "phytozome.jgi.doe.gov":
+            secure = 's'
+        url = "http{}://{}/biomart/martservice".format(secure, host)
         request = requests.head(url)
         if request.status_code in [200]:
             self._host = host
             self.url = url
             self._init()
         else:
-            print("host %s is not reachable " % host)
+            print("host {} is not reachable ".format(host))
     host = property(_get_host, _set_host)
+
+    def _set_format(self, format):
+        self.format = format
 
     def _init(self):
         temp = self.debugLevel
@@ -415,8 +424,11 @@ class BioMart(REST):
             valid_filters = self.filters(dataset).keys()
             if name not in valid_filters:
                 raise BioServicesError("Invalid filter name. ")
-
-        _filter = """        <Filter name = "%s" value = "%s"/>""" % (name, value)
+        _filter = ''
+        if '=' in value:
+            _filter = """        <Filter name = "%s" %s/>""" % (name, value)
+        else:
+            _filter = """        <Filter name = "%s" value = "%s"/>""" % (name, value)
         return _filter
 
     @require_host
@@ -515,12 +527,13 @@ class BioMart(REST):
 
 
 class BioMartQuery(object):
-    def __init__(self, version="1.0", virtualScheme="default"):
-
+    def __init__(self, version="1.0", virtualScheme="default",
+                 formatter="TSV"):
+            # previously virtualScheme="zome_mart", formatter="FASTA"
         params = {
             "version": version,
             "virtualSchemaName": virtualScheme,
-            "formatter": "TSV",
+            "formatter": formatter,
             "header":0,
             "uniqueRows":0,
             "configVersion":"0.6"
@@ -562,5 +575,4 @@ datasetConfigVersion = "%(configVersion)s" >\n""" % params
             xml += line + "\n"
         xml += self.footer
         return xml
-
 
