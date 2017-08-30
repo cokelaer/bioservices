@@ -76,9 +76,9 @@ class QuickGO(REST):
     """
     _goid_example = "GO:0003824"
     _valid_col = ['proteinDB', 'proteinID', 'proteinSymbol', 'qualifier',
-            'goID', 'goName', 'aspect', 'evidence', 'ref', 'with', 'proteinTaxon',
-            'date', 'from', 'splice', 'proteinName', 'proteinSynonym', 'proteinType',
-            'proteinTaxonName', 'originalTermID', 'originalGOName']
+                  'goID', 'goName', 'aspect', 'evidence', 'ref', 'with', 'proteinTaxon',
+                  'date', 'from', 'splice', 'proteinName', 'proteinSynonym', 'proteinType',
+                  'proteinTaxonName', 'originalTermID', 'originalGOName']
 
     def __init__(self, verbose=False, cache=False):
         """.. rubric:: Constructor
@@ -86,8 +86,8 @@ class QuickGO(REST):
         :param bool verbose: print informative messages.
 
         """
-        super(QuickGO, self).__init__(url="http://www.ebi.ac.uk/QuickGO",
-            name="quickGO", verbose=verbose, cache=cache)
+        super(QuickGO, self).__init__(url="http://www.ebi.ac.uk/QuickGO-Old",
+                                      name="quickGO", verbose=verbose, cache=cache)
 
     def Term(self, goid, frmt="oboxml"):
         """Obtain Term information
@@ -110,18 +110,18 @@ class QuickGO(REST):
 
         """
         self.devtools.check_param_in_list(frmt, ["mini", "obo", "oboxml"])
-        if goid.startswith("GO:")is False:
+        if goid.startswith("GO:") is False:
             raise ValueError("GO id must start with 'GO:'")
 
-        params = {'id':goid, 'format': frmt}
+        params = {'id': goid, 'format': frmt}
         res = self.http_get("GTerm", frmt="xml", params=params)
 
         return res
 
     def Annotation(self, goid=None, protein=None, frmt="gaf", limit=10000,
-            gz=False, col=None, db=None, aspect=None, relType=None, termUse=None,
-            evidence=None, source=None, ref=None,  tax=None, qualifier=None, q=None, 
-            _with=None):
+                   gz=False, col=None, db=None, aspect=None, relType=None, termUse=None,
+                   evidence=None, source=None, ref=None, tax=None, qualifier=None, q=None,
+                   _with=None):
         """Calling the Annotation service
 
         Mutual exclusive parameters are goid, protein
@@ -207,7 +207,7 @@ class QuickGO(REST):
         elif tax is not None:
             url += "tax=" + tax
 
-        #need to check that there are mutualy exclusive
+        # need to check that there are mutualy exclusive
         if goid is None and protein is None and tax is None:
             raise ValueError("you must provide at least one of the following parameter: goid, protein")
 
@@ -228,9 +228,9 @@ class QuickGO(REST):
             raise NotImplementedError
 
         if evidence:
-            if isinstance(evidence,list):
+            if isinstance(evidence, list):
                 evidence = ",".join([x.strip() for x in evidence])
-            elif isinstance(evidence,str):
+            elif isinstance(evidence, str):
                 pass
             else:
                 raise ValueError("""
@@ -261,7 +261,7 @@ or a string (e.g., 'PUBMED:*') """)
             params['ref'] = ref
 
         if qualifier:
-            #NOT, colocalizes_with, contributes_to
+            # NOT, colocalizes_with, contributes_to
             if isinstance(qualifier, list):
                 qualifier = ",".join([x.strip() for x in qualifier])
             elif isinstance(qualifier, str):
@@ -285,7 +285,8 @@ or a string (e.g., 'PUBMED:*') """)
         if frmt not in ["tsv", "dict"]:
             # col is provided but format is not appropriate
             if col is not None:
-                raise ValueError("You provided the 'col' parameter but the format is not correct. You should use the frmt='tsv' or frmt='dict' ")
+                raise ValueError(
+                    "You provided the 'col' parameter but the format is not correct. You should use the frmt='tsv' or frmt='dict' ")
 
         # gz parameter. do not expect values so need to be added afterwards.
         if gz is True:
@@ -306,7 +307,7 @@ or a string (e.g., 'PUBMED:*') """)
 
         """
         kargs["frmt"] = "tsv"
-        cols = ",".join (self._valid_col)
+        cols = ",".join(self._valid_col)
         kargs['col'] = cols
 
         data = self.Annotation(goid=goid, **kargs)
@@ -323,7 +324,8 @@ or a string (e.g., 'PUBMED:*') """)
             import pandas as pd
             return pd.DataFrame(res)
         except:
-            self.logging.warning("Cannot return a DataFrame. Returns the list. If you want the dataframe, install pandas library")
+            self.logging.warning(
+                "Cannot return a DataFrame. Returns the list. If you want the dataframe, install pandas library")
             return res
 
     def Annotation_from_protein(self, protein, **kargs):
@@ -337,7 +339,7 @@ or a string (e.g., 'PUBMED:*') """)
 
         """
         kargs["frmt"] = "tsv"
-        cols = ",".join (self._valid_col)
+        cols = ",".join(self._valid_col)
         kargs['col'] = cols
 
         data = self.Annotation(protein=protein, **kargs)
@@ -356,7 +358,6 @@ or a string (e.g., 'PUBMED:*') """)
         except:
             self.logging.warning("Cannot return a DAtaFrame. Returns the list")
             return res
-
 
 
 class GeneOntology():
@@ -379,10 +380,9 @@ class GeneOntology():
 
 
     """
+
     def __init__(self):
         self._quickgo = QuickGO(verbose=False)
 
     def getGOTerm(self, goid):
         return self._quickgo.Term(goid, frmt="obo")
-
-

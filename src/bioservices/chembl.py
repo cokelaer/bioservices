@@ -77,11 +77,11 @@ class ChEMBL(REST):
     _target_approved_drugs_example = "CHEMBL1824"
     _target_refseq_example = 'NP_015325'
     _assays_example = "CHEMBL1217643"
-    _inspect_example = ('CHEMBL1','compound')
+    _inspect_example = ('CHEMBL1', 'compound')
 
     def __init__(self, verbose=False, cache=False):
         super(ChEMBL, self).__init__(url=ChEMBL._url,
-            name="ChEMBL", verbose=verbose, cache=cache)
+                                     name="ChEMBL", verbose=verbose, cache=cache)
 
     def _process(self, query, frmt, request):
         self.devtools.check_param_in_list(frmt, ["json", "xml"])
@@ -108,7 +108,7 @@ class ChEMBL(REST):
         """
         res = self.http_get("status", frmt="json")
         try:
-            #FIXME: wierd behaviour that is different on different systems...
+            # FIXME: wierd behaviour that is different on different systems...
             return res['status']
         except:
             return res
@@ -280,11 +280,11 @@ class ChEMBL(REST):
             >>> resjson = s.get_compounds_similar_to_SMILES(s._smiles_similar_example)
         """
         self.devtools.check_range(similarity, 70, 100)
-        res = self._process(query, frmt, "compounds/similarity/%s/"+str(similarity))
+        res = self._process(query, frmt, "compounds/similarity/%s/" + str(similarity))
         return self._postprocess(res, 'compounds')
 
     def get_image_of_compounds_by_chemblId(self, query, dimensions=500,
-            save=True, view=True, engine="rdkit"):
+                                           save=True, view=True, engine="rdkit"):
         """Get the image of a given compound in PNG png format.
 
         :param str query: a valid compound ChEMBLId or a list/tuple of valid compound ChEMBLIds.
@@ -309,16 +309,16 @@ class ChEMBL(REST):
         .. todo:: ignorecoords option
         """
         # NOTE: not async requests here.
-        self.devtools.check_range(dimensions, 1,500)
+        self.devtools.check_range(dimensions, 1, 500)
         self.devtools.check_param_in_list(engine, ['rdkit'])
         queries = self.devtools.to_list(query)
 
-        res = {'filenames':[], 'images':[], 'chemblids':[]}
+        res = {'filenames': [], 'images': [], 'chemblids': []}
         for query in queries:
             req = "compounds/%s/image" % query
-            #url=self.url+'compounds/%s/image' % query
+            # url=self.url+'compounds/%s/image' % query
             if dimensions is not None:
-                req += '?engine=%s&dimensions=%s'%(engine, dimensions)
+                req += '?engine=%s&dimensions=%s' % (engine, dimensions)
             target_data = self.http_get(req, frmt=None)
 
             file_out = os.getcwd()
@@ -407,7 +407,7 @@ class ChEMBL(REST):
             >>> resjson = s.get_target_by_uniprotId(s._target_uniprotId_example)
         """
         res = self._process(query, frmt, "targets/uniprot/%s")
-        if frmt == 'json':
+        if frmt == 'json' and not isinstance(res, int):
             res = res['target']
         return res
 
@@ -565,38 +565,37 @@ class ChEMBL(REST):
             >>> s.inspect(s._assays_example,'assay')
 
         """
-        url = "https://www.ebi.ac.uk/chembldb/%s/inspect/%s"%(item_type, query)
+        url = "https://www.ebi.ac.uk/chembldb/%s/inspect/%s" % (item_type, query)
         webbrowser.open(url)
 
     def version(self):
         """Return version of the API on the server"""
         res = self.http_get("status", frmt="json")
         try:
-            #FIXME: wierd behaviour that is different on different systems...
+            # FIXME: wierd behaviour that is different on different systems...
             return res['version']
         except:
             return res
 
 
 class BenchmarkChembl(ChEMBL):
-
     def __init__(self):
         super(BenchmarkChembl, self).__init__(cache=True)
 
     def benchmark(self, N=1000):
-        #self.name = "compounds"
+        # self.name = "compounds"
         import time
         t1 = time.time()
-        res = self.get_compounds_by_chemblId(['CHEMBL%s' % i for i in range(1,N)])
+        res = self.get_compounds_by_chemblId(['CHEMBL%s' % i for i in range(1, N)])
         t2 = time.time()
-        res1 = t2-t1
-        print(t2-t1)
+        res1 = t2 - t1
+        print(t2 - t1)
 
         t1 = time.time()
-        res = [self.get_compounds_by_chemblId('CHEMBL%s' % i) for i in range(1,N)]
+        res = [self.get_compounds_by_chemblId('CHEMBL%s' % i) for i in range(1, N)]
         t2 = time.time()
-        res2   = t2-t1
-        print(t2-t1)
+        res2 = t2 - t1
+        print(t2 - t1)
 
         return res, res1, res2
 
@@ -607,25 +606,23 @@ class BenchmarkChembl(ChEMBL):
         import time
 
         t1 = time.time()
-        res = compounds.get(['CHEMBL%s' % x for x in range(1,N)])
+        res = compounds.get(['CHEMBL%s' % x for x in range(1, N)])
         t2 = time.time()
 
-        res1 = t2-t1
-        print(t2-t1)
+        res1 = t2 - t1
+        print(t2 - t1)
 
         t1 = time.time()
-        res = [compounds.get('CHEMBL%s' % x) for x in range(1,N)]
+        res = [compounds.get('CHEMBL%s' % x) for x in range(1, N)]
         t2 = time.time()
 
-        res2 = t2-t1
-        print(t2-t1)
+        res2 = t2 - t1
+        print(t2 - t1)
         return res, res1, res2
 
-
-    def compare_benchmark(self,n=10, N=1000):
-
-        df = {'bs_sync':[], 'bs_normal':[], 'ch_sync':[], 'ch_normal':[]}
-        for i in range(0,n):
+    def compare_benchmark(self, n=10, N=1000):
+        df = {'bs_sync': [], 'bs_normal': [], 'ch_sync': [], 'ch_normal': []}
+        for i in range(0, n):
             print(i)
             res, res1, res2 = self.benchmark(N)
             df['bs_sync'].append(res1)
@@ -638,7 +635,7 @@ class BenchmarkChembl(ChEMBL):
         df = pd.DataFrame(df)
         import pylab
         pylab.clf()
-        df  = df[['bs_normal','ch_normal','bs_sync','ch_sync']]
+        df = df[['bs_normal', 'ch_normal', 'bs_sync', 'ch_sync']]
         pylab.axvline(2.5)
         df.boxplot()
         return df
