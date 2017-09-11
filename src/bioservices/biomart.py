@@ -170,7 +170,7 @@ class BioMart(REST):
                     </Dataset>
                     </Query>"""
 
-    def __init__(self, host=None, verbose=False, cache=False):
+    def __init__(self, host=None, verbose=False, cache=False, secure=False):
         """.. rubric:: Constructor
 
 
@@ -211,26 +211,26 @@ class BioMart(REST):
         self._display_names = None
         self._valid_attributes = None
         self._hosts = None
+        self._secure = secure
 
         if host is None:
             host = "www.biomart.org"
-            url = "http://%s/biomart/martservice" % host
+            url = "http://{}/biomart/martservice".format(host)
             self._host = None
         else:
             self.host = host
         self._biomartQuery = BioMartQuery()
 
-    # THis function needs keywords (eg. version=..., virtualScheme=..,
-    # formatter="FASTA"
     def custom_query(self, **args):
         self._biomartQuery = BioMartQuery(**args)
 
     def _get_host(self):
         return self._host
+
     def _set_host(self, host):
         import requests
         secure = ''
-        if host == "phytozome.jgi.doe.gov":
+        if self._secure:
             secure = 's'
         url = "http{}://{}/biomart/martservice".format(secure, host)
         request = requests.head(url)
@@ -528,15 +528,14 @@ class BioMart(REST):
 
 class BioMartQuery(object):
     def __init__(self, version="1.0", virtualScheme="default",
-                 formatter="TSV"):
-            # previously virtualScheme="zome_mart", formatter="FASTA"
+                 formatter="TSV", header=0, unique=0, configVer="0.6"):
         params = {
             "version": version,
             "virtualSchemaName": virtualScheme,
             "formatter": formatter,
-            "header":0,
-            "uniqueRows":0,
-            "configVersion":"0.6"
+            "header": header,
+            "uniqueRows": unique,
+            "configVersion": configVer
 
         }
 
@@ -575,4 +574,5 @@ datasetConfigVersion = "%(configVersion)s" >\n""" % params
             xml += line + "\n"
         xml += self.footer
         return xml
+
 
