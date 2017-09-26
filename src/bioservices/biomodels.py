@@ -66,6 +66,12 @@ from functools import wraps
 
 from bioservices.services import WSDLService
 
+try:
+    #python 3
+    from urllib.request import urlopen
+except:
+    from urllib2  import urlopen
+
 __all__ = ["BioModels"]
 
 
@@ -96,6 +102,14 @@ def checkId(fn):
             raise ValueError("""Id provided is not a valid ID. See modelsId attribute.""")
     return wrapped
 
+def checkURLs(urls):
+    """a function which returns the first url from the list which is accessible"""
+    for url in urls:
+        try:
+            urlopen(url)
+            return url
+        except:
+            pass
 
 class BioModels(WSDLService):
     """Interface to the `BioModels <http://www.ebi.ac.uk/biomodels>`_ service
@@ -116,15 +130,21 @@ class BioModels(WSDLService):
 
 
     """
-    _url = "http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices?wsdl"
-    # New (Aug 2016)
-    _url = "http://biomodels.caltech.edu/services/BioModelsWebServices?wsdl"
+
+    _url = checkURLs([
+        "http://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices?wsdl",  # Main address
+        "http://biomodels.caltech.edu/services/BioModelsWebServices?wsdl"  # Caltech mirror
+    ])
+
     def __init__(self, verbose=True):
         """.. rubric:: Constructor
 
         :param bool verbose:
 
         """
+        if BioModels._url is None:
+            raise Exception("Unable to connect to BioModels")
+
         super(BioModels, self).__init__(name="BioModels", url=BioModels._url, verbose=verbose)
 
     #: used to store all model Ids once for all
