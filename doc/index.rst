@@ -19,12 +19,26 @@ BIOSERVICES: access to biological web services programmatically
 
 .. raw:: html
 
-    <div style="width:80%"><p>    <a href="https://pypi.python.org/pypi/bioservices"> <img src="https://badge.fury.io/py/bioservices.svg"></a>
-    <a href="https://travis-ci.org/cokelaer/bioservices"> <img src="https://travis-ci.org/cokelaer/bioservices.svg?branch=master"></a>
-    <a href="https://coveralls.io/github/cokelaer/bioservices?branch=master"> <img src="https://coveralls.io/repos/github/cokelaer/bioservices/badge.svg?branch=master"></a>
+    <div style="width:80%"><p>
 
-    <a href="http://bioservices.readthedocs.org/en/master/?badge=master"> <img src="http://readthedocs.org/projects/cokelaer/bioservices/badge/?version=master"></a>
-    <a href="http://landscape.io/github/cokelaer/bioservices/master/"> <img src="http://landscape.io/github/cokelaer/bioservices/master/landscape.png"></a>
+    <a href="https://pypi.python.org/pypi/bioservices">
+    <img src="https://badge.fury.io/py/bioservices.svg"></a>
+
+    <a href="https://travis-ci.org/cokelaer/bioservices">
+    <img src="https://travis-ci.org/cokelaer/bioservices.svg?branch=master"></a>
+
+    <a href="https://coveralls.io/github/cokelaer/bioservices?branch=master">
+    <img src="https://coveralls.io/repos/github/cokelaer/bioservices/badge.svg?branch=master"></a>
+
+    <a href="http://bioservices.readthedocs.org/en/master/?badge=master">
+    <img src="http://readthedocs.org/projects/cokelaer/bioservices/badge/?version=master"></a>
+
+    <a href="http://landscape.io/github/cokelaer/bioservices/master/">
+    <img src="http://landscape.io/github/cokelaer/bioservices/master/landscape.png"></a>
+
+   <ahref="http://readthedocs.org/projects/bioservices/badge/?version=master">
+   <img src="http://bioservices.readthedocs.org/en/master/?badge=master"></a>
+
     </p>
     </div>
 

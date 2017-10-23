@@ -13,8 +13,10 @@ BioServices
 .. image:: https://landscape.io/github/cokelaer/bioservices/master/landscape.png
    :target: https://landscape.io/github/cokelaer/bioservices/master
 
-.. image:: https://badge.waffle.io/cokelaer/bioservices.png?label=ready&title=Ready 
-   :target: https://waffle.io/cokelaer/bioservices
+.. image:: http://readthedocs.org/projects/bioservices/badge/?version=master
+    :target: http://bioservices.readthedocs.org/en/master/?badge=master
+    :alt: Documentation Status
+
 
 :Python version available: BioServices is tested for Python 2.6,2.7, 3.3, 3.4, 3.5
 :Contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
