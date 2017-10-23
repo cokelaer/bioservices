@@ -55,7 +55,6 @@ class MultiFASTA(object):
     """
     def __init__(self):
         # fetch the sequence using this attribute
-        print("Will be moved to BioKit github.com/biokit")
         self._fasta_fetcher = FASTA()
 
         # an ordered dictionary to store the fasta contents
