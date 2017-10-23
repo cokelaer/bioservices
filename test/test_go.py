@@ -1,9 +1,9 @@
-from bioservices.quickgo import QuickGO
+from bioservices.quickgo_old import QuickGO_old
 import pytest
 
 @pytest.fixture
 def quickgo():
-    return QuickGO(verbose=False, cache=False)
+    return QuickGO_old(verbose=False, cache=False)
 
 
 def test_annotation_wrong_format(quickgo):
@@ -20,23 +20,6 @@ def test_annotation_format_col_compatibility(quickgo):
         assert False
     except:
         assert True
-
-# FIXME
-# very slow !
-def _test_annotation_wrong_limit(quickgo):
-    try:
-        res = quickgo.Annotation(tax='9606', frmt='tsv', limit=-1)
-        assert False
-    except:
-        assert True
-
-    try:
-        res = quickgo.Annotation(tax='9606', frmt='tsv', limit="dummy")
-        assert False
-    except TypeError:
-        assert True
-    except:
-        assert False
 
 
 def test_annotation_no_protein_and_goid(quickgo):

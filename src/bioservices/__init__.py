@@ -109,6 +109,9 @@ from .reactome import *
 from . import quickgo
 from .quickgo import *
 
+from . import quickgo_old
+from .quickgo_old import *
+
 from . import chembl
 from .chembl import *
 

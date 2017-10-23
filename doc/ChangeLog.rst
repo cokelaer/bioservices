@@ -16,6 +16,10 @@ Support for Python 3.6 on Travis.
         * wikipathways: conversion from WSDL to REST. All wikipathways service 
           uses Pandas and returns dataframes.
         * Better implementation of secure host option and more xml customization #98 
+        * move quickgo.py to quickgo_old.py 
+    * NEWS:
+        * quickgo uses the new API from EBI (see changes)
+
     * Fixes the licensing (GPLv3 everywhere)
 
 For developers: use pytest instead of nosetests.
