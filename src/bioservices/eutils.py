@@ -291,7 +291,7 @@ class EUtils(REST):
         :param str db: database from which to retrieve UIDs.
         :param str id: list of identifiers.
         :param retmode: default to text (could be xml but not recommended).
-        :param rettype: could be fasta, summary, ...
+        :param rettype: could be fasta, summary, docsum
         :return: depends on retmode parameter.
 
 
@@ -370,7 +370,7 @@ class EUtils(REST):
         try: ret = ret.content
         except: pass
 
-        if _retmode == "dict" and isinstance(ret, str):
+        if _retmode == "dict" and isinstance(ret, (bytes,str)):
             ret = self.parse_xml(ret, "dict")
 
         return ret
