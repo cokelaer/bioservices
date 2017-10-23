@@ -1,7 +1,6 @@
 Whats' new, what has changed
 ================================
 
-
 Revision 1.5
 -----------------
 
@@ -16,7 +15,8 @@ Support for Python 3.6 on Travis.
           changes: inputValues to input_values, dbPath to db_path. Uses pandas
         * wikipathways: conversion from WSDL to REST. All wikipathways service 
           uses Pandas and returns dataframes.
-
+        * Better implementation of secure host option and more xml customization #98 
+    * Fixes the licensing (GPLv3 everywhere)
 
 For developers: use pytest instead of nosetests.
 
