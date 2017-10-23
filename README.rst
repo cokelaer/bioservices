@@ -42,18 +42,7 @@ biological databases (not to re-invent new databases) and to alleviates the
 needs for expertise in Web Services for the developers/users.
 
 BioServices provides access to 25 Web Services including. For a quick start,
-look at some notebooks related to 
-
-* UniProt on `uniprot nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/UniProt.ipynb>`_
-* BioModels on `biomodels nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/BioModels.ipynb>`_
-* ChEMBL on `chembl nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org//bioservices/_downloads/ChEMBL.ipynb>`_
-* Ensembl on `Ensembl nbviewer <https://github.com/bioservices/notebooks/tree/master/ensembl>`_
-* KEGG on `KEGG nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/KEGG.ipynb>`_
-* MUSCLE on `MUSCLE  nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/MUSCLE.ipynb>`_
-* NCBIBlast on `ncbiblast nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/NCBIBlast.ipynb>`_
-* WikiPathway on `wikipathway nbviewer <http://nbviewer.ipython.org/url/pythonhosted.org/bioservices/_downloads/WikiPathway.ipynb>`_
-
-and more on `nbviewer <http://nbviewer.ipython.org/github/cokelaer/bioservices/tree/master/doc/source/notebook/>`_.
+look at some notebooks here `github cokelaer/bioservices <https://github.com/cokelaer/bioservices/tree/master/notebooks/>`_ and here `github bioservices <https://github.com/bioservices/notebooks`_.
 
 An up-to-date list of Web Services is provided within 
 the online `documentation <http://pythonhosted.org/bioservices/>`_.
