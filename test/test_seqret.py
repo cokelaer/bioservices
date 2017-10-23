@@ -1,4 +1,4 @@
-from bioservices import readseq
+from bioservices import seqret
 import pytest
 
 
@@ -8,7 +8,7 @@ fasta = """MDAPRQVVNFGPGPAKLPHSVLLEIQKELLDYKGVGISVLEMSHRSSDFAKIINNTENLVRELLAVPDN
 
 def test_readseq():
 
-    s = readseq.Readseq()
+    s = seqret.Seqret()
     jobid = s.run(**{"email":"cokelaer@test.co.uk", "title":"test", "sequence":fasta,
         "inputformat":"raw", "outputformat":"fasta", "stype":"protein"})
 
