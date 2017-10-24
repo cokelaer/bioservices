@@ -17,16 +17,16 @@
 #
 ##############################################################################
 #$Id$
-"""Interface to WSDbfetch web service
+"""Interface to DBFetch web service
 
-.. topic:: What is WSDbfetch
+.. topic:: What is DBFetch
 
     :URL: http://www.ebi.ac.uk/Tools/webservices/services/dbfetch
     :Service: http://www.ebi.ac.uk/Tools/webservices/services/dbfetch_rest
 
     .. highlights::
 
-        "WSDbfetch allows you to retrieve entries from various up-to-date biological
+        "DBFetch allows you to retrieve entries from various up-to-date biological
         databases using entry identifiers or accession numbers. This is equivalent to
         the CGI based dbfetch service. Like the CGI service a request can return a
         maximum of 200 entries."
@@ -41,7 +41,7 @@ from bioservices.services import REST
 
 
 class DBFetch(REST):
-    """Interface to `WSDbfetch <http://www.ebi.ac.uk/Tools/webservices/services/dbfetch_rest>`_ service
+    """Interface to `DBFetch <http://www.ebi.ac.uk/Tools/webservices/services/dbfetch_rest>`_ service
 
     ::
 
@@ -178,7 +178,7 @@ class DBFetch(REST):
         return res
 
     def _getSupportedDBs(self):
-        """Get a list of database names usable with WSDbfetch. 
+        """Get a list of database names usable with DBFetch. 
 
         Buffered in _supportedDB.
         """

@@ -148,8 +148,8 @@ from .pathwaycommons import *
 from . import muscle
 from .muscle import *
 
-from . import wsdbfetch
-from .wsdbfetch import *
+from . import dbfetch
+from .dbfetch import *
 
 # sub packages inside bioservices.
 
