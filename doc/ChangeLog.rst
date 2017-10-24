@@ -17,8 +17,12 @@ Support for Python 3.6 on Travis.
           uses Pandas and returns dataframes.
         * Better implementation of secure host option and more xml customization #98 
         * move quickgo.py to quickgo_old.py 
+        * move readseq to seqret (https://github.com/cokelaer/bioservices/issues/89)
+        * move wsdbfetch to dbfetch and move from WSDL to REST service
     * NEWS:
         * quickgo uses the new API from EBI (see changes)
+        * seqret uses the new API (instead of readseq)
+        * dbfetch uses new API (instead of WSDL)
 
     * Fixes the licensing (GPLv3 everywhere)
 
