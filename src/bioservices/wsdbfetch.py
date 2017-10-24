@@ -35,130 +35,130 @@
 
 
 """
-from bioservices.services import WSDLService
+from bioservices.services import REST
 
 
 
 
-class WSDbfetch(WSDLService):
+class DBFetch(REST):
     """Interface to `WSDbfetch <http://www.ebi.ac.uk/Tools/webservices/services/dbfetch_rest>`_ service
 
     ::
 
-        >>> from bioservices import WSDbfetch
-        >>> w = WSDbfetch()
+        >>> from bioservices import DBFetch
+        >>> w = DBFetch()
         >>> data = w.fetchBatch("uniprot" ,"zap70_human", "xml", "raw")
 
-    The actual URL used is http://www.ebi.ac.uk/ws/services/WSDbfetchDoclit?wsdl from
-    biocatalogue (this one having let functionalities: 
-    http://www.ebi.ac.uk/ws/services/WSDbfetch?wsdl).
+    For more information about the API, check this page: 
+    http://www.ebi.ac.uk/Tools/dbfetch/syntax.jsp
 
     """
-    _url = 'http://www.ebi.ac.uk/ws/services/WSDbfetchDoclit?wsdl'
+    _url = 'http://www.ebi.ac.uk/Tools/dbfetch'
     def __init__(self,  verbose=False):
         """.. rubric:: Constructor
 
         :param bool verbose: print informative messages
         """
-        super(WSDbfetch, self).__init__(name="WSDbfetch", url=WSDbfetch._url, 
+        super(DBFetch, self).__init__(name="DBfetch", url=DBFetch._url, 
             verbose=verbose)
         self._supportedDBs = None
         self._supportedFormats = None
         self._supportedStyles = None
 
     def _check_db(self, db):
-        if db not in self.supportedDBs:
+        if db not in self.supported_databases:
             raise Exception("%s not a supportedDB. " %db)
 
-
-    def fetchBatch(self, db, ids, format="default", style="default"):
-        """Fetch a set of entries in a defined format and style.
-
-        :param str db: the name of the database to obtain the entries from (e.g. 'uniprotkb').
-        :param list query: list of identifiers (e.g. 'wap_rat, wap_mouse').
-        :param str format: the name of the format required. 
-        :param str style: the name of the style required. 
-
-        :returns: The format of the response depends on the interface to the service used:
-
-            * WSDBFetchServerService and WSDBFetchDoclitServerService: The entries as a string.
-            * WSDBFetchServerLegacyService: An array of strings containing the entries. 
-
-
-        ::
-
-            from bioservices import WSDbfetch
-            u = WSDbfetch()
-            u.fetchBatch("uniprot" ,"wap_mouse", "xml")
-
-        """
-        res = self.serv.fetchBatch(db, ids, format, style)
-        res = self.easyXML(res)
-        return res
-
-    def fetchData(self, query, format="default", style="default"):
+    def fetch(self, query, db="ena_sequence", format="default", style="raw", 
+                pageHtml=False):
         """Fetch an entry in a defined format and style.
 
         :param str query: the entry identifier in db:id format (e.g. 'UniProtKB:WAP_RAT').
-        :param str format: the name of the format required. 
-        :param str style: the name of the style required. 
+        :param str format: the name of the format required (default to fasta).
+        :param str style: the name of the style required (raw, default, html)
 
-        :returns: The format of the response depends on the interface to the service used:
+        :returns: The format of the response depends on the format/style
+            parameter.
 
-            * WSDBFetchServerService and WSDBFetchDoclitServerService: The entries as a string.
-            * WSDBFetchServerLegacyService: An array of strings containing the entries. Generally 
-              this will contain only one item which contains the set of entries.
 
         ::
 
-            from bioservices import WSDbfetch
-            u = WSDbfetch()
-            u.fetchData('uniprot:zap70_human')
+            from bioservices import DBFetch
+            u = DBFfetch()
+            db.fetch(db="ena_sequence", format="fasta", query="L12344,L12345")
+            db.fetch(db="uniprot", format="fasta", query="P53503")
+
+
+        If db is ommited, the default is ena_sequence.
+        If formatare ommited, the default is EMBL format
+        The default style is raw data. 
 
         """
-        res = self.serv.fetchData(query, format, style)
+        self._check_db(db)
+        res = self.http_get("dbfetch", 
+                params={"db": db, "format":format, "style":style, "id":query,
+                        "pageHtml":pageHtml})
+        try:
+            res = res.content.decode()
+        except:
+            pass
         return res
 
 
-    def getDatabaseInfo(self, db):
+    def get_database_info(self, db=None):
         """Get details describing specific database (data formats, styles)
 
         :param str db: a valid database. 
         :return: The output can be introspected and contains several attributes
-            (e.g., displayName).
 
         :: 
 
-            >>> res = u.getDatabaseInfo("uniprotkb")
-            >>> res.displayName
-            'UniProtKB'
-            >>> print(res.description.encode('utf-8'))
-            u'The UniProt Knowledgebase (UniProtKB) is the central access point for extensive curated protein information, including function, classification, and cross-references. Search UniProtKB to retrieve \u201ceverything that is known\u201d about a particular sequence.'
+            >>> res = u.get_database_info('uniprotkb')
+            >>> print(res['description'])
+            'The UniProt Knowledgebase (UniProtKB) is the central access point for extensive curated protein information, including function, classification, and cross-references. Search UniProtKB to retrieve everything that is known about a particular sequence.'
 
         """
-        self._check_db(db)
-        return self.serv.getDatabaseInfo(db)
+        res = self.http_get("dbfetch/dbfetch.databases?style=json")
+        if db:
+            self._check_db(db)
+            res = res[db]
+        return res
 
-    def getDatabaseInfoList(self):
+    def get_all_database_info(self):
         """Get details of all available databases, includes formats and result styles.
 
         :Returns: A list of data structures describing the databases. See
             :meth:`getDatabaseInfo` for a description of the data structure.
         """
-        return self.serv.getDatabaseInfoList()
+        return self.get_database_info()
 
-    def getDbFormats(self, db):
+    def get_database_formats(self, db):
         """Get list of format names for a given database.
 
+        :param str db: valid database name 
 
-        :param str db:
+        ::
+
+            >>> db.get_database_formats("uniprotkb")
+            ['default',
+             'annot',
+             'entrysize',
+             'fasta',
+             'gff3',
+             'seqxml',
+             'uniprot',
+             'uniprotrdfxml',
+             'uniprotxml',
+             'dasgff',
+             'gff2']
 
         """
         self._check_db(db)
-        return self.serv.getDbFormats(db)
-    
+        res = self.http_get("dbfetch?info=formats&db={}".format(db)).content
+        res = res.decode().split()
+        return res
 
-    def getFormatStyles(self, db, format):
+    def get_database_format_styles(self, db, format):
         """Get a list of style names available for a given database and format.
 
         :param str db: database name to get available styles for (e.g. uniprotkb).
@@ -168,14 +168,16 @@ class WSDbfetch(WSDLService):
 
         ::
 
-            >>> u.getFormatStyles("uniprotkb", "fasta")
+            >>> u.get_database_format_styles("uniprotkb", "fasta")
             ['default', 'raw', 'html']
+
         """
-
         self._check_db(db)
-        return self.serv.getFormatStyles(db, format)
+        res = self.http_get("dbfetch?info=styles&format={}&db={}".format(format, db)).content
+        res = res.decode().split()
+        return res
 
-    def getSupportedDBs(self):
+    def _getSupportedDBs(self):
         """Get a list of database names usable with WSDbfetch. 
 
         Buffered in _supportedDB.
@@ -183,35 +185,11 @@ class WSDbfetch(WSDLService):
         if self._supportedDBs:
             return self._supportedDBs
         else:
-            self._supportedDBs = self.serv.getSupportedDBs()
+            res = self.http_get("dbfetch?info=dbs").content
+            self._supportedDBs = res.decode().split() + ["default"]
         return self._supportedDBs
+    supported_databases = property(_getSupportedDBs, doc="Alias to getSupportedDBs.")
 
-    supportedDBs = property(getSupportedDBs, doc="Alias to getSupportedDBs.")
-
-    def getSupportedFormats(self):
-        """Get a list of database and format names usable with WSDbfetch.
-
-        .. deprecated:: use Of getDbFormats(db), getDatabaseInfo(db) or  getDatabaseInfoList().
-
-
-
-        """
-        if self._supportedFormats is None:
-            self._supportedFormats = self.serv.getSupportedFormats()
-        return self._supportedFormats
-    supportedFormats = property(getSupportedFormats)
-
-    def getSupportedStyles(self):
-        """Get a list of database and style names usable with WSDbfetch.
-
-        .. deprecated:: use Of getFormatStyles(db, format), getDatabaseInfo(db) or         getDatabaseInfoList() is recommended.
-
-        Returns: An array of strings containing the database and style names. 
-        """
-        if self._supportedStyles is None:
-            self._supportedStyles = self.serv.getSupportedStyles()
-        return self._supportedStyles
-    supportedStyles = property(getSupportedStyles)
 
 
 
