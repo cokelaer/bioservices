@@ -20,5 +20,6 @@ def test_readseq():
         print(count)
 
     newfasta = s.get_result(s._jobid)
+    newfasta = newfasta.replace("\n", "")
 
-    assert "DVQKLAAFMKKFLEMHQL" in newfasta.replace("\n", "")
+    assert "DVQKLAAFMKKFLEMHQL" in newfasta
