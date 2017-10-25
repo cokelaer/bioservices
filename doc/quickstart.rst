@@ -178,7 +178,7 @@ or a pathway::
     >>> w = WSDbfetch()
     >>> data = w.fetchBatch("uniprot", "zap70_human", "xml", "raw")
 
-.. .. seealso:: Reference guide of :class:`bioservices.wsdbfetch.WSDbfetch` for more details
+.. .. seealso:: Reference guide of :class:`bioservices.dbfetch.DBFetch` for more details
 
 
 

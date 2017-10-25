@@ -252,7 +252,7 @@ Reactome
 Readseq
 ============
 
-.. automodule:: bioservices.readseq
+.. automodule:: bioservices.seqret
     :members:
     :undoc-members:
     :synopsis:
@@ -264,9 +264,6 @@ RNASEQ Analysis
     :members:
     :undoc-members:
     :synopsis:
-
-
-
 
 UniChem
 ===================================================================
@@ -284,10 +281,10 @@ UniProt
     :undoc-members:
     :synopsis:
 
-wsdbfetch
+DBFetch
 ===================================================================
 
-.. automodule:: bioservices.wsdbfetch
+.. automodule:: bioservices.dbfetch
     :members:
     :undoc-members:
     :synopsis:

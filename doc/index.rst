@@ -36,9 +36,6 @@ BIOSERVICES: access to biological web services programmatically
     <a href="http://landscape.io/github/cokelaer/bioservices/master/">
     <img src="http://landscape.io/github/cokelaer/bioservices/master/landscape.png"></a>
 
-   <ahref="http://readthedocs.org/projects/bioservices/badge/?version=master">
-   <img src="http://bioservices.readthedocs.org/en/master/?badge=master"></a>
-
     </p>
     </div>
 
