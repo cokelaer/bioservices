@@ -34,7 +34,7 @@
 
         -- From ENA web page Jan 2016
 
-.. addedversion:: 1.4.4
+.. versionadded:: 1.4.4
 
 """
 import os
