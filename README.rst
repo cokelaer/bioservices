@@ -7,11 +7,8 @@ BioServices
 .. image:: https://secure.travis-ci.org/cokelaer/bioservices.png
     :target: http://travis-ci.org/cokelaer/bioservices
 
-.. image:: https://coveralls.io/repos/cokelaer/bioservices/badge.png?branch=master 
-   :target: https://coveralls.io/r/cokelaer/bioservices?branch=master 
-
-.. image:: https://landscape.io/github/cokelaer/bioservices/master/landscape.png
-   :target: https://landscape.io/github/cokelaer/bioservices/master
+.. image:: https://coveralls.io/repos/cokelaer/bioservices/badge.png?branch=master
+   :target: https://coveralls.io/r/cokelaer/bioservices?branch=master
 
 .. image:: http://readthedocs.org/projects/bioservices/badge/?version=master
     :target: http://bioservices.readthedocs.org/en/master/?badge=master
@@ -42,7 +39,7 @@ biological databases (not to re-invent new databases) and to alleviates the
 needs for expertise in Web Services for the developers/users.
 
 BioServices provides access to 25 Web Services including. For a quick start,
-look at some notebooks here `github cokelaer/bioservices <https://github.com/cokelaer/bioservices/tree/master/notebooks/>`_ and here `github bioservices <https://github.com/bioservices/notebooks`_.
+look at some notebooks here `github cokelaer/bioservices <https://github.com/cokelaer/bioservices/tree/master/notebooks/>`_ and here `github bioservices <https://github.com/bioservices/notebooks>`_.
 
 An up-to-date list of Web Services is provided within 
 the online `documentation <http://pythonhosted.org/bioservices/>`_.
