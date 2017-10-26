@@ -31,7 +31,8 @@ BIOSERVICES: access to biological web services programmatically
     <img src="https://coveralls.io/repos/github/cokelaer/bioservices/badge.svg?branch=master"></a>
 
     <a href="http://bioservices.readthedocs.org/en/master/?badge=master">
-    <img src="http://readthedocs.org/projects/cokelaer/bioservices/badge/?version=master"></a>
+    <img src='https://readthedocs.org/projects/bioservices/badge/?version=master' alt='Documentation Status' />
+
 
     <a href="http://landscape.io/github/cokelaer/bioservices/master/">
     <img src="http://landscape.io/github/cokelaer/bioservices/master/landscape.png"></a>
