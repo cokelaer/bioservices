@@ -651,7 +651,7 @@ class UniProt(REST):
                 self.logging.warning("column could not be parsed. %s" % col)
         # Sequences are splitted into chunks of 10 characters. let us rmeove
         # the spaces:
-        output['Sequence'].fillna("")
+        output['Sequence'].fillna("", inplace=True)
         output.Sequence = output['Sequence'].apply(lambda x: x.replace(" ", ""))
         
         return output
