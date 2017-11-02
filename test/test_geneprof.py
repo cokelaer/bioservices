@@ -1,5 +1,11 @@
 from bioservices.geneprof import GeneProf
 import pytest
+import os
+
+pytestmark = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+          reason="On travis")
+
+
 
 @pytest.fixture
 def geneprof():
