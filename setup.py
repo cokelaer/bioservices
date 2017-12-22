@@ -54,7 +54,7 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 # sphinx-gallery and numpydoc are used for the doc only.
 # Could have a if on_rtd
 install_requires = ["grequests", "requests",
-        "requests_cache", "easydev>=0.9.7", "beautifulsoup4", "xmltodict",
+        "requests_cache", "easydev>=0.9.36", "beautifulsoup4", "xmltodict",
         "suds-jurko", "appdirs", 'wrapt', "pandas", "colorlog"],
 
 
