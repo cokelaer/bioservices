@@ -427,7 +427,7 @@ class RESTService(RESTbase):
         self.logging.debug("--Fetching url=%s" % url)
 
         if len(url)> 2000:
-            print(url)
+            self.logging.error(url)
             raise ValueError("URL length (%s) exceeds 2000. Please use a differnt URL" % len(url))
 
         try:
@@ -467,7 +467,7 @@ class RESTService(RESTbase):
         .. note:: use only by ::`ncbiblast` service so far.
         """
         requestData = urlencode(params)
-        print(requestData)
+        self.logging.debug(requestData)
         if extra is not None:
             requestData += extra
         # Concatenate the two parts.
@@ -476,16 +476,16 @@ class RESTService(RESTbase):
             # Set the HTTP User-agent.
             user_agent = self.getUserAgent()
             http_headers = {'User-Agent': user_agent}
-            print(requestUrl)
+            self.logging.debug(requestUrl)
             req = Request(requestUrl, None, http_headers)
             # Make the submission (HTTP POST).
-            print(req)
+            self.logging.debug(req)
             reqH = urlopen(req, requestData)
             jobId = reqH.read()
             reqH.close()
         except HTTPError as err:
             # Trap exception and output the document to get error message.
-            print(sys.stderr, ex.read())
+            self.logging.critical(sys.stderr, ex.read())
             raise
         return jobId
 
@@ -605,9 +605,9 @@ class REST(RESTbase):
             res = input(msg % cache_file)
             if res == "y":
                 os.remove(cache_file)
-                print("Removed cache")
+                self.logging.info("Removed cache")
             else:
-                print("Reply 'y' to delete the file")
+                self.logging.info("Reply 'y' to delete the file")
 
     def clear_cache(self):
         from requests_cache import clear
@@ -764,8 +764,8 @@ class REST(RESTbase):
                 pass
             return res
         except Exception as err:
-            print(err)
-            print("""Issue. Maybe your current timeout is {0} is not sufficient. 
+            self.logging.critical(err)
+            self.logging.critical("""Issue. Maybe your current timeout is {0} is not sufficient. 
 Consider increasing it with settings.TIMEOUT attribute""".format(self.settings.TIMEOUT))
 
     def http_post(self, query, params=None, data=None,

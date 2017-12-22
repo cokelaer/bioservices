@@ -239,7 +239,7 @@ class BioMart(REST):
             self.url = url
             self._init()
         else:
-            print("host {} is not reachable ".format(host))
+            self.logging.warning("host {} is not reachable ".format(host))
     host = property(_get_host, _set_host)
 
     def _set_format(self, format):

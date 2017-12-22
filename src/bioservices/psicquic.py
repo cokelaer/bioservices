@@ -5,8 +5,8 @@
 #
 #  Copyright (c) 2013-2014 - EMBL-EBI
 #
-#  File author(s): 
-#      
+#  File author(s):
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -44,10 +44,10 @@ About queries
 The idea behind PSICQUIC is to retrieve information related to protein
 interactions from various databases. Note that protein interactions does not
 necesseraly mean protein-protein interactions. In order to be effective, the
-query format has been standarised. 
+query format has been standarised.
 
 To do a search you can use the Molecular Interaction Query Language which is
-based on Lucene's syntax. Here are some rules 
+based on Lucene's syntax. Here are some rules
 
 * Use OR or space ' ' to search for ANY of the terms in a field
 * Use AND if you want to search for those interactions where ALL of your terms are found
@@ -56,7 +56,7 @@ based on Lucene's syntax. Here are some rules
   be interpreted by our query engine (eg. ':' in a GO term)
 * Use parenthesis for complex queries (e.g. '(XXX OR YYY) AND ZZZ')
 * Wildcards (`*`,?) can be used between letters in a term or at the end of terms to do fuzzy queries,
-   but never at the beginning of a term. 
+   but never at the beginning of a term.
 * Optionally, you can prepend a symbol in front of your term.
     *  + (plus): include this term. Equivalent to AND. e.g. +P12345
     *  - (minus): do not include this term. Equivalent to NOT. e.g. -P12345
@@ -70,13 +70,13 @@ About the MITAB output
 =========================
 
 The output returned by a query contains a list of entries. Each entry is
-formatted following the MITAB output. 
+formatted following the MITAB output.
 
 Here below are listed the name of the field returned ordered as they would
 appear in one entry. The first item is always idA whatever version of MITAB is
 used. The version 25 of MITAB contains the first 15 fields in the table below.
 Newer version may incude more fields but always include the 15 from MITAB 25 in
-the same order.  See the link from **irefindex** 
+the same order.  See the link from **irefindex**
 `about mitab <http://irefindex.uio.no/wiki/README_MITAB2.6_for_iRefIndex_8.0#What_each_line_represents>`_
 for more information.
 
@@ -90,9 +90,9 @@ alias           Aliases (A or B)                            No              alia
 identifiers     Identifiers and Aliases undistinctively     Yes             identifier:P74565
 pubauth         Publication 1st author(s)                   Yes             pubauth:scott
 pubid           Publication Identifier(s) OR                Yes             pubid:(10837477 12029088)
-taxidA          Tax ID interactor A: the tax ID or 
+taxidA          Tax ID interactor A: the tax ID or
                 the species name                            No              taxidA:mouse
-taxidB          Tax ID interactor B: the tax ID or 
+taxidB          Tax ID interactor B: the tax ID or
                 species name                                No              taxidB:9606
 species         Species. Tax ID A or Tax ID B               Yes             species:human
 type            Interaction type(s)                         Yes             type:"physical interaction"
@@ -106,9 +106,9 @@ ptypeB          Interactor type B                           Yes             ptyp
 ptype           Interactor types (A or B)                   Yes             pbiorole:"small molecule"
 pxrefA          Interactor xref A (or Identifier A)         Yes             pxrefA:"GO:0003824"
 pxrefB          Interactor xref B (or Identifier B)                         Yes pxrefB:"GO:0003824"
-pxref           Interactor xrefs (A or B or Identifier 
+pxref           Interactor xrefs (A or B or Identifier
                 A or Identifier B)                          Yes             pxref:"catalytic activity"
-xref            Interaction xrefs (or Interaction 
+xref            Interaction xrefs (or Interaction
                 identifiers)                                Yes             xref:"nuclear pore"
 annot           Interaction annotations and tags            Yes             annot:"internally curated"
 udate           Update date                                 Yes             udate:[20100101 TO 20120101]
@@ -120,12 +120,12 @@ ftype           Feature type of participant A or B          Yes             ftyp
 pmethodA        Participant identification method A         Yes             pmethodA:"western blot"
 pmethodB        Participant identification method B         Yes             pmethodB:"sequence tag identification"
 pmethod         Participant identification methods
-                 (A or B)                                   Yes             pmethod:immunostaining 
-stc             Stoichiometry (A or B). Only true or 
-                false, just to be able to filter 
+                 (A or B)                                   Yes             pmethod:immunostaining
+stc             Stoichiometry (A or B). Only true or
+                false, just to be able to filter
                 interaction having stoichiometry available  Yes             stc:true
-param           Interaction parameters. Only true or 
-                false, just to be able to filter 
+param           Interaction parameters. Only true or
+                false, just to be able to filter
                 interaction having parameters available     Yes             param:true
 =============== =========================================== =============== ======================
 
@@ -160,7 +160,7 @@ class PSICQUIC(REST):
         >>> res = s.query("intact", "zap70")
         >>> len(res) # there are 11 interactions found
         11
-        >>> for x in res[1]: 
+        >>> for x in res[1]:
         ...     print(x)
         uniprotkb:O95169
         uniprotkb:P43403
@@ -174,7 +174,7 @@ class PSICQUIC(REST):
     the *output* parameter). The meaning of the entries is described on PSICQUIC
     website: https://code.google.com/p/psicquic/wiki/MITAB25Format . In short:
 
-    
+
     #. Unique identifier for interactor A
     #. Unique identifier for interactor B.
     #. Alternative identifier for interactor A, for example the official gene
@@ -182,14 +182,14 @@ class PSICQUIC(REST):
     #. Aliases for A, separated by "|
     #. Aliases for B.
     #. Interaction detection methods, taken from the corresponding PSI-MI
-    #. First author surname(s) of the publication(s) 
-    #. Identifier of the publication 
-    #. NCBI Taxonomy identifier for interactor A. 
+    #. First author surname(s) of the publication(s)
+    #. Identifier of the publication
+    #. NCBI Taxonomy identifier for interactor A.
     #. NCBI Taxonomy identifier for interactor B.
-    #. Interaction types, 
-    #. Source databases and identifiers, 
+    #. Interaction types,
+    #. Source databases and identifiers,
     #. Interaction identifier(s) i
-    #. Confidence score. Denoted as scoreType:value. 
+    #. Confidence score. Denoted as scoreType:value.
 
 
 
@@ -230,14 +230,14 @@ class PSICQUIC(REST):
         #        "intact": None
         }
 
-    # unknown: hprd, omim, bind, bind complexid, mdl, 
+    # unknown: hprd, omim, bind, bind complexid, mdl,
 
     def __init__(self, verbose=True):
         """.. rubric:: Constructor
 
         :param bool verbose: print informative messages
 
-        .. doctest:: 
+        .. doctest::
 
             >>> from bioservices import PSICQUIC
             >>> s = PSICQUIC()
@@ -265,7 +265,7 @@ class PSICQUIC(REST):
     activeDBs = property(_get_active_db, doc="returns the active DBs only")
 
     def read_registry(self):
-        """Reads and returns the active registry 
+        """Reads and returns the active registry
 
         """
         url = 'registry/registry?action=ACTIVE&format=txt'
@@ -307,7 +307,7 @@ class PSICQUIC(REST):
         indices = sorted(range(0,N), key=lambda k: names[k])
 
         for i in range(0,N):
-            print("%s\t %s\t %s\t %s\t %s %s %s %s\n" % (names[i], actives[i], 
+            print("%s\t %s\t %s\t %s\t %s %s %s %s\n" % (names[i], actives[i],
                 counts[i], versions[i], resturls[i], soapurls[i], restexs[i], restricted[i]))
 
 
@@ -325,45 +325,45 @@ class PSICQUIC(REST):
     def _get_registry_names(self):
         res = self.registry
         return [x.findAll('name')[0].text for x in res.findAll("service")]
-    registry_names = property(_get_registry_names, 
+    registry_names = property(_get_registry_names,
             doc="returns all services available (names)")
 
     def _get_registry_restricted(self):
         res = self.registry
         return [x.findAll('restricted')[0].text for x in res.findAll("service")]
-    registry_restricted = property(_get_registry_restricted, 
+    registry_restricted = property(_get_registry_restricted,
             doc="returns restricted status of services")
 
     def _get_registry_resturl(self):
         res = self.registry
         data = [x.findAll('resturl')[0].text for x in res.findAll("service")]
         return data
-    registry_resturls = property(_get_registry_resturl, 
+    registry_resturls = property(_get_registry_resturl,
             doc="returns URL of REST services")
 
     def _get_registry_restex(self):
         res = self.registry
         data = [x.findAll('restexample')[0].text for x in res.findAll("service")]
         return data
-    registry_restexamples = property(_get_registry_restex, 
+    registry_restexamples = property(_get_registry_restex,
             doc="retuns REST example for each service")
 
     def _get_registry_soapurl(self):
         res = self.registry
         return  [x.findAll('soapurl')[0].text for x in res.findAll("service")]
-    registry_soapurls = property(_get_registry_soapurl, 
+    registry_soapurls = property(_get_registry_soapurl,
             doc="returns URL of WSDL service")
 
     def _get_registry_active(self):
         res = self.registry
         return  [x.findAll('active')[0].text for x in res.findAll("service")]
-    registry_actives = property(_get_registry_active, 
+    registry_actives = property(_get_registry_active,
             doc="returns active state of each service")
 
     def _get_registry_count(self):
         res = self.registry
         return  [x.findAll('count')[0].text for x in res.findAll("service")]
-    registry_counts = property(_get_registry_count, 
+    registry_counts = property(_get_registry_count,
             doc="returns number of entries in each service")
 
     def _get_registry_version(self):
@@ -376,13 +376,13 @@ class PSICQUIC(REST):
             if x.findAll("version"):
                 version[i] = x.findAll("version")[0].text
             else:
-                version[i] = None 
+                version[i] = None
         return  version
-    registry_versions = property(_get_registry_version, 
+    registry_versions = property(_get_registry_version,
             doc="returns version of each service")
 
     def query(self, service, query, output="tab25", version="current", firstResult=None, maxResults=None):
-        """Send a query to a specific database 
+        """Send a query to a specific database
 
         :param str service: a registered service. See :attr:`registry_names`.
         :param str query: a valid query. Can be `*` or a protein name.
@@ -399,7 +399,7 @@ class PSICQUIC(REST):
         http://www.ebi.ac.uk/Tools/webservices/psicquic/view/main.xhtml
 
 
-        Another example consist in accessing the *string* database for fetching 
+        Another example consist in accessing the *string* database for fetching
         protein-protein interaction data of a particular model organism. Here we
         restrict the query to 100 results::
 
@@ -413,7 +413,7 @@ class PSICQUIC(REST):
             than other (e.g., intact accepts "and"). species must be a valid ID number. Again, some DB are more
             permissive and may accept the name (e.g., human)
 
-        To obtain the number of interactions in intact for the human specy:: 
+        To obtain the number of interactions in intact for the human specy::
 
             >>> len(p.query("intact", "species:9606"))
 
@@ -432,7 +432,7 @@ class PSICQUIC(REST):
         try:
             index = names.index(service)
         except ValueError:
-            print("The service you gave (%s) is not registered. See self.registery_names" % service)
+            self.logging.error("The service you gave (%s) is not registered. See self.registery_names" % service)
             raise ValueError
 
         # get the base url according to the service requested
@@ -449,7 +449,6 @@ class PSICQUIC(REST):
             res = self.http_get(url, frmt="xml", params=params)
         else:
             res = self.http_get(url, frmt="txt", params=params)
-            print(res)
             res = res.strip().split("\n")
 
         if output.startswith("tab"):
@@ -508,13 +507,13 @@ class PSICQUIC(REST):
         """Returns a dictionary with database as key and results as values
 
         :param str query: a valid query
-        :return: a dictionary which key as database and value as number of entries 
+        :return: a dictionary which key as database and value as number of entries
 
         Consider only the active database.
 
         """
         # get the active names only
-        activeDBs = self.activeDBs[:] 
+        activeDBs = self.activeDBs[:]
         res = [(str(name), int(self.query(name, query, output="count")[0])) for name in activeDBs]
         return dict(res)
 
@@ -528,7 +527,7 @@ class PSICQUIC(REST):
 
 
         Each item in the input list of mitab entry
-        The output is made of 2 lists corresponding to 
+        The output is made of 2 lists corresponding to
         interactor A and B found in the mitab entries.
 
         elements in the input list takes the following forms::
@@ -536,12 +535,12 @@ class PSICQUIC(REST):
             DB1:ID1|DB2:ID2
             DB3:ID3
 
-        The | sign separates equivalent IDs from different databases. 
+        The | sign separates equivalent IDs from different databases.
 
         We want to keep only one. The first known databae is kept. If in the list of DB:ID pairs no known
         database is found, then we keep the first one whatsover.
 
-        known databases are those available in the uniprot mapping tools. 
+        known databases are those available in the uniprot mapping tools.
 
         chembl and chebi IDs are kept unchanged.
 
@@ -615,7 +614,7 @@ class PSICQUIC(REST):
 
     def postCleaningAll(self,data, keep_only="HUMAN", flatten=True, verbose=True):
         """
-    
+
         even more cleaing by ignoring score, db and interaction
         len(set([(x[0],x[1]) for x in retnew]))
         """
@@ -629,7 +628,7 @@ class PSICQUIC(REST):
             results = [x for k in results.keys() for x in results[k]]
         return results
 
-    def postCleaning(self, data, keep_only="HUMAN", remove_db=["chebi","chembl"], 
+    def postCleaning(self, data, keep_only="HUMAN", remove_db=["chebi","chembl"],
         keep_self_loop=False, verbose=True):
         """Remove entries with a None and keep only those with the keep pattern
 
@@ -638,11 +637,11 @@ class PSICQUIC(REST):
 
         data = [x for x in data if x[0] is not None and x[1] is not None]
         if verbose:print("After removing the None: ", len(data))
-    
+
         data = [x for x in data if x[0].startswith("!")is False and x[1].startswith("!")is False]
         if verbose:print("After removing the !: ", len(data))
 
-    
+
         for db in remove_db:
             data = [x for x in data if x[0].startswith(db)is False]
             data = [x for x in data if x[1].startswith(db)is False]
@@ -650,7 +649,7 @@ class PSICQUIC(REST):
 
         data = [x for x in data if keep_only in x[0] and keep_only in x[1]]
         if verbose:print("After removing entries that don't match %s : " % keep_only, len(data))
-    
+
         if keep_self_loop is False:
             data = [x for x in data if x[0]!=x[1]]
             if verbose:print("After removing self loop : ", len(data))
@@ -658,10 +657,7 @@ class PSICQUIC(REST):
         data = list(set(data))
         if verbose:print("After removing identical entries", len(data))
 
-
-
         return data
-
 
     def convertAll(self, data):
         results = {}
@@ -688,7 +684,6 @@ class PSICQUIC(REST):
             except:interaction="?"
             results.append((xp, yp, score, interaction, ref, db))
         return results
-
 
     def mappingOneDB(self, data):
         query = {}
@@ -790,7 +785,7 @@ class AppsPPI(object):
         p.summary()
 
     Let us see how many intercations where found with. THe number of databases
-    that contains at least one interactions is 
+    that contains at least one interactions is
 
         >>> p.N
         >>> p.relevant_interactions[N]
@@ -807,7 +802,7 @@ class AppsPPI(object):
     def queryAll(self, query, databases=None):
         """
 
-        :param str query: a valid query. See :class:`~bioservices.psicquic.PSICQUIC` 
+        :param str query: a valid query. See :class:`~bioservices.psicquic.PSICQUIC`
             and :mod:`bioservices.psicquic` documentation.
         :param str databases: by default, queries are sent to each active database.
             you can overwrite this behavious by providing your own list of
@@ -869,7 +864,7 @@ class AppsPPI(object):
                 summ[i] = []
 
         self.counter = counter.copy()
-        self.relevant_interactions = summ.copy() 
+        self.relevant_interactions = summ.copy()
 
 
 

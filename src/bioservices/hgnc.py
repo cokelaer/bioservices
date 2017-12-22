@@ -240,7 +240,7 @@ class HGNCDeprecated(REST):
                 res = self.easyXML(res)
             #res = bs4.BeautifulSoup(res)
         except HTTPError:
-            print("!!BioServices HTTPError caught in HGNC. Probably an invalid gene name")
+            self.logging.critical("!!BioServices HTTPError caught in HGNC. Probably an invalid gene name")
 
             res = bs4.BeautifulSoup()
         #except Exception:

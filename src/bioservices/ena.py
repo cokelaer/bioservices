@@ -6,7 +6,7 @@
 #  Copyright (c) 2013-2014 - EBI-EMBL
 #
 #  File author(s):
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -27,10 +27,10 @@
 
     .. highlights::
 
-        The European Nucleotide Archive (ENA) provides a comprehensive 
-        record of the world's nucleotide sequencing information, covering 
-        raw sequencing data, sequence assembly information and functional 
-        annotation. 
+        The European Nucleotide Archive (ENA) provides a comprehensive
+        record of the world's nucleotide sequencing information, covering
+        raw sequencing data, sequence assembly information and functional
+        annotation.
 
         -- From ENA web page Jan 2016
 
@@ -56,19 +56,19 @@ class ENA(REST):
 
 
     Retrieve read domain metadata in XML format::
-        
+
         print(e.get_data('ERA000092', 'xml'))
 
     Retrieve assemble and annotated sequences in fasta format::
 
         print(e.get_data('A00145', 'fasta'))
 
-    The range parameter can be used in combination to retrieve a subsequence 
+    The range parameter can be used in combination to retrieve a subsequence
     from sequence entry A00145 from bases 3 to 63 using ::
 
         e.get_data('A00145', 'fasta', fasta_range=[3,63])
 
-    Retrieve assembled and annotated subsequences in HTML format (same 
+    Retrieve assembled and annotated subsequences in HTML format (same
     as above but in HTML page).
 
         e.view_data('A00145')
@@ -76,32 +76,32 @@ class ENA(REST):
 
     Retrieve expanded CON records:
 
-    To retrieve expanded CON records use the expanded=true parameter. For 
+    To retrieve expanded CON records use the expanded=true parameter. For
     example, the expanded CON entry AL513382 in flat file format can be i
     obtained as follows::
 
         e.get_data('AL513382', frmt='text', expanded=True)
 
-    Expanded CON records are different from CON records in two ways. 
-    Firstly, the expanded CON records contain the full sequence in addition 
-    to the contig assembly instructions. Secondly, if a CON record contains 
-    only source or gap features the expanded CON records will also display 
+    Expanded CON records are different from CON records in two ways.
+    Firstly, the expanded CON records contain the full sequence in addition
+    to the contig assembly instructions. Secondly, if a CON record contains
+    only source or gap features the expanded CON records will also display
     all features from the segment records.
 
     Retrieve assembled and annotated sequence header in flat file format
 
-    To retrieve assembled and annotated sequence header in flat file 
+    To retrieve assembled and annotated sequence header in flat file
     format please use the header=true parameter, e.g.:
 
         e.get_data('BN000065', 'text', header=True)
 
 
-    Retrieve assembled and annotated sequence records using sequence 
+    Retrieve assembled and annotated sequence records using sequence
     versions::
 
         e.get_data('AM407889.1', 'fasta')
         e.get_data('AM407889.2', 'fasta')
-    
+
 
 
     .. todo:: Taxon viewer, image retrieval.
