@@ -12,7 +12,6 @@ dependencies:
 - grequests
 - numpy
 - matplotlib
-- pandas
 - matplotlib
 - scipy
 - easydev>=0.9.34
