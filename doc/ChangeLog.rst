@@ -1,6 +1,15 @@
 Whats' new, what has changed
 ================================
 
+Revision 1.5.1
+------------------
+
+Support for Python 2.6 in dropped.
+
+    * CHANGES:
+        * using proper logging
+
+
 Revision 1.5
 -----------------
 
