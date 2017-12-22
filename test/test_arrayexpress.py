@@ -54,3 +54,8 @@ def test_extra2(array):
     res = array.queryFiles(keywords="cancer+breast", wholewords=True, gxa="true")
 def test_extra3(array):
     res = array.queryFiles(keywords="cancer+breast", wholewords=True, directsub="false")
+
+
+def test_extra4():
+    ae = ArrayExpress(verbose=False)
+    res = ae.queryAE(keywords="pneumonia", species='homo+sapiens')

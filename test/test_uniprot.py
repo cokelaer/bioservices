@@ -4,7 +4,7 @@ import pytest
 @pytest.fixture
 def uniprot():
     u = UniProt(verbose=False, cache=False)
-    u.debugLevel = "ERROR"
+    u.logging.level = "ERROR"
     return u
 
 
