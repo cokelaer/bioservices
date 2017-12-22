@@ -1086,8 +1086,7 @@ class KEGG(REST):
             return entry
 
 
-from easydev import Logging
-class KEGGParser(Logging):
+class KEGGParser():
     """This is an extension of the :class:`KEGG` class to ease parsing of dbentries
 
     This class provides a generic method :meth:`parse` that will read the output
@@ -1128,7 +1127,8 @@ class KEGGParser(Logging):
     .. seealso:: http://www.kegg.jp/kegg/rest/dbentry.html
     """
     def __init__(self, verbose=False):
-        super(KEGGParser, self).__init__(level=verbose)
+        super(KEGGParser, self).__init__()
+        self.logging = Logging("bioservices:keggparser", verbose)
 
     def parse(self, res):
         """Parse to any outputs returned by :meth:`KEGG.get`
@@ -1186,8 +1186,8 @@ class KEGGParser(Logging):
         try:
             parser = self._parse(res)
         except Exception as err:
-            self.warning("Could not parse the entry %s correctly" % dbentry)
-            self.warning(err.message)
+            self.logging.warning("Could not parse the entry %s correctly" % dbentry)
+            self.logging.warning(err.message)
             parser = res
         return parser
 
@@ -1286,7 +1286,7 @@ class KEGGParser(Logging):
                         try:
                             k,v = line.strip().split(None,1)
                         except:
-                            self.warning("empty line in %s %s" % (key, line))
+                            self.logging.warning("empty line in %s %s" % (key, line))
                             k = line.strip()
                             v = ''
                         kp[k] = v
@@ -1302,7 +1302,7 @@ class KEGGParser(Logging):
                     try: # empty orthology in rc:RC00004
                         k,v = line.strip().split(None,1)
                     except:
-                        self.warning("empty line in %s %s" % (key, line))
+                        self.logging.warning("empty line in %s %s" % (key, line))
                         k = line.strip()
                         v = ''
                     if k.endswith(":"):
@@ -1400,7 +1400,7 @@ class KEGGParser(Logging):
         lines = data.strip().split("\n")[1:]
         lines = [line.strip() for line in lines]
         if len(lines) != N:
-            self.warning('number of lines not as expected in %s' % data)
+            self.logging.warning('number of lines not as expected in %s' % data)
 
         if N == 0:
             return []
