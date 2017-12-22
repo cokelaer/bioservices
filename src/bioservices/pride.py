@@ -55,7 +55,7 @@ class PRIDE(REST):
 
 
     """
-    _url = "http://www.ebi.ac.uk/pride/ws/archive"
+    _url = "https://www.ebi.ac.uk/pride/ws/archive"
 
     def __init__(self, verbose=False, cache=False):
         """**Constructor**

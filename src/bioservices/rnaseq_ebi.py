@@ -273,7 +273,7 @@ class RNASEQ_EBI(REST):
 
     def _get_organism(self):
         if self._organisms is None:
-            self.info("Fetching all organisms once for all")
+            self.logging.info("Fetching all organisms once for all")
             frmt = 'tsv'
             res1 = self.http_get("%s/0/getOrganisms/ensembl" % frmt, frmt)
             res1 = res1.split("\n")

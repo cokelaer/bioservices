@@ -44,7 +44,8 @@ if 'raw_input' in __builtins__: input = raw_input
 sys.path = [x for x in sys.path if 'suds-' not in x]
 
 
-from easydev import Logging, DevTools
+from easydev import Logging
+from easydev import DevTools
 
 
 __all__ = ["Service", "WSDLService", "RESTService",
@@ -59,7 +60,8 @@ class BioServicesError(Exception):
         return repr(self.value)
 
 
-class Service(Logging):
+
+class Service(object):
     """Base class for WSDL and REST classes
 
     .. seealso:: :class:`REST`, :class:`WSDLService`
@@ -111,8 +113,12 @@ class Service(Logging):
         that only WARNING, ERROR and CRITICAL messages are shown.
 
         """
-        super(Service, self).__init__(level=verbose)
+        super(Service, self).__init__()
         self.requests_per_sec = requests_per_sec
+
+
+        self.name = name
+        self.logging = Logging("bioservices:%s" % self.name, verbose)
 
         self._url = url
         try:
@@ -120,7 +126,6 @@ class Service(Logging):
                 urlopen(self.url)
         except Exception as err:
             self.logging.warning("The URL (%s) provided cannot be reached." % self.url)
-        self.name = name
         self._easyXMLConversion = True
 
         # used by HGNC where some XML contains non-utf-8 characters !!
@@ -798,7 +803,7 @@ Consider increasing it with settings.TIMEOUT attribute""".format(self.settings.T
             try:
                 return res.decode()
             except:
-                self.debug("BioServices:: Could not decode the response")
+                self.logging.debug("BioServices:: Could not decode the response")
                 return res
         except Exception as err:
             print(err)

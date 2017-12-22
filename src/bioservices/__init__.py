@@ -15,7 +15,6 @@ import sys
 
 import pkg_resources
 
-import colorlog as logger
 from easydev import CustomConfig
 
 __version__ = "1.4.17"
@@ -25,12 +24,6 @@ try:
 except:
     version = __version__
 
-
-def bioservices_debug_level(level="WARNING"):
-    """A deubg level setter at top level of the library"""
-    assert level in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-    logging_level = getattr(logger.logging.logging, level)
-    logger.getLogger().setLevel(logging_level)
 
 # Initialise the config directory if not already done
 configuration = CustomConfig("bioservices", verbose=False)

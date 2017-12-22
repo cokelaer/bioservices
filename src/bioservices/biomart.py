@@ -246,11 +246,11 @@ class BioMart(REST):
         self.format = format
 
     def _init(self):
-        temp = self.debugLevel
-        self.debugLevel = "ERROR"
+        temp = self.logging.level
+        self.logging.level = "ERROR"
         _ = self.lookfor("uniprot", verbose=False)
         _ = self.valid_attributes
-        self.debugLevel = temp
+        self.logging.level = temp
 
     @require_host
     def registry(self):

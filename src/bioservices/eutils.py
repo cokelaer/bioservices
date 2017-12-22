@@ -190,7 +190,7 @@ class EUtils(REST):
             else:
                 # unknown so let use it but raise a warning
                 params[k] = v
-                self.warning("%s does not seem to be a known parameter. " % k+
+                self.logging.warning("%s does not seem to be a known parameter. " % k+
                         "Use it anyway but may be ignored")
         return params
 

@@ -41,17 +41,19 @@
 """
 from bioservices import WSDLService
 
+
 __all__ = ["Miriam"]
 
 
 class Miriam(WSDLService):
-    """Interface to the `MIRIAM <http://www.ebi.ac.uk/miriam/main/>`_ service
+    """Interface to the `MIRIAM
+<http://www.ebi.ac.uk/miriamws/main/MiriamWebService>`_ service
 
     ::
 
         >>> from bioservices import Miriam
         >>> m = Miriam()
-        >>> m.getMiriamURI("http://www.ebi.ac.uk/chebi/#CHEBI:17891")
+        >>> m.getMiriamURI("https://www.ebi.ac.uk/chebi/#CHEBI:17891")
         'urn:miriam:chebi:CHEBI%3A17891'
 
 
@@ -64,7 +66,7 @@ class Miriam(WSDLService):
         :param str url: redefine the wsdl URL
 
         """
-        url = "http://www.ebi.ac.uk/miriamws/main/MiriamWebServices?wsdl"
+        url = "https://www.ebi.ac.uk/miriamws/main/MiriamWebServices?wsdl"
         super(Miriam, self).__init__(name="Miriam", url=url, verbose=verbose)
 
     def _boolean_convertor(self, boolean):
