@@ -13,9 +13,9 @@ def biomart():
 def test_version(biomart):
     biomart.version(biomart.mart_test)
 
-@pytest.mark.flaky(reruns=5)
+@pytest.mark.flaky(reruns=8, reruns_delay=2)
 def test_datasets(biomart):
-    # there are about 70 dataset but let us check that at least the list is
+    # there are about 70 datasets but let us check that at least the list is
     # not emptyt
     assert len(biomart.datasets(biomart.mart_test)) > 2
 
@@ -36,7 +36,7 @@ def test_config(biomart):
     biomart.configuration("oanatinus_gene_ensembl")
 
 #fails on travais sometines
-@pytest.mark.flaky(reruns=5)
+@pytest.mark.flaky(reruns=8, reruns_delay=2)
 def test_query(biomart):
     res = biomart.query(biomart._xml_example)
     assert "ENSMUS" in res
