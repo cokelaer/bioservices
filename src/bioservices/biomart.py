@@ -211,12 +211,12 @@ class BioMart(REST):
         self._display_names = None
         self._valid_attributes = None
         self._hosts = None
+        self._host = None
         self._secure = secure
 
         if host is None:
             host = "www.biomart.org"
             url = "http://{}/biomart/martservice".format(host)
-            self._host = None
         else:
             self.host = host
         self._biomartQuery = BioMartQuery()
