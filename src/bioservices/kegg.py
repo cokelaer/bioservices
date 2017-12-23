@@ -154,6 +154,7 @@ from bioservices.services import REST, BioServicesError
 import webbrowser
 import copy
 
+from easydev.logging_tools import Logging
 
 __all__ = ["KEGG",  "KEGGParser"]
 
@@ -1086,7 +1087,7 @@ class KEGG(REST):
             return entry
 
 
-class KEGGParser():
+class KEGGParser(object):
     """This is an extension of the :class:`KEGG` class to ease parsing of dbentries
 
     This class provides a generic method :meth:`parse` that will read the output
