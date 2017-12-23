@@ -33,19 +33,12 @@ BIOSERVICES: access to biological web services programmatically
     <a href="http://bioservices.readthedocs.org/en/master/?badge=master">
     <img src='https://readthedocs.org/projects/bioservices/badge/?version=master' alt='Documentation Status' />
 
-
-    <a href="http://landscape.io/github/cokelaer/bioservices/master/">
-    <img src="http://landscape.io/github/cokelaer/bioservices/master/landscape.png"></a>
-
     </p>
     </div>
 
 
 
-
-
-
-:Python version: Python 2.6, 2.7, 3.4, 3.5, 3.6
+:Python version: Python 2.7, 3.4, 3.5, 3.6
 :Source: See  `http://github.com/cokelaer/bioservices <https://github.com/cokelaer/bioservices/>`_.
 :Issues: Please fill a report on `github <https://github.com/cokelaer/bioservices/issues>`_
 
@@ -90,10 +83,12 @@ Here are only some of Web Services that are available in **BioServices**:
     bioservices.arrayexpress.ArrayExpress
     bioservices.biomodels.BioModels
     bioservices.chembl.ChEMBL
+    bioservices.chebi.ChEBI
     bioservices.kegg.KEGG
     bioservices.muscle.MUSCLE
     bioservices.pdb.PDB
     bioservices.uniprot.UniProt
+    bioservices.unichem.UniChem
     bioservices.ncbiblast.NCBIblast
     bioservices.wikipathway.Wikipathway
 
