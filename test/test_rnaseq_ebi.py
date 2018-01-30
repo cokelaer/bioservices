@@ -8,23 +8,23 @@ def rnaseq():
     return r
 
 
-def _test1(rnaseq):
+def test1(rnaseq):
     rnaseq.get_run_by_organism("homo_sapiens", "tsv")
     rnaseq.get_run_by_organism("homo_sapiens", "json")
     rnaseq.get_run_by_organism("homo_sapiens",condition="central nervous system")
 
 
-def _test2(rnaseq):
+def test2(rnaseq):
     rnaseq.get_run_by_study("SRP033494", mapping_quality=90, frmt='tsv')
 
 
-def _test3(rnaseq):
+def test3(rnaseq):
     res = rnaseq.get_study("SRP033494", "tsv")
     res = rnaseq.get_study("SRP033494", frmt="json")
     assert res[0]['STUDY_ID'] == "SRP033494"
 
 
-def _test4(rnaseq):
+def test4(rnaseq):
     try:
         import pandas
         res = rnaseq.get_studies_by_organism("arabidopsis_thaliana", frmt='tsv')
@@ -34,7 +34,7 @@ def _test4(rnaseq):
         studies = [x[0] for x in res[1:]]
 
 
-def _test5(rnaseq):
+def test5(rnaseq):
     rnaseq.get_sample_attribute_per_run("SRR805786")
     rnaseq.get_sample_attribute_per_run("SRR805786", frmt='tsv')
 
@@ -45,6 +45,6 @@ def _test5(rnaseq):
     rnaseq.get_sample_attribute_per_study("SRP020492", frmt='tsv')
 
 
-def _test_get_run(rnaseq):
+def test_get_run(rnaseq):
     res = rnaseq.get_run("SRR1042759")
     assert res[0]['RUN_IDS'] == "SRR1042759"
