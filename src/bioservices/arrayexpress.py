@@ -47,7 +47,7 @@ class ArrayExpress(REST):
     **QuickStart** Given an experiment name (e.g., E-MEXP-31), type::
 
         s = ArrayExpress()
-        s.getEA('E-MEXP-31')
+        s.getAE('E-MEXP-31')
 
     You can also quickyl retrieve experiments matching some search queries as
     follows::
