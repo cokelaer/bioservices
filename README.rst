@@ -15,7 +15,7 @@ BioServices
     :alt: Documentation Status
 
 
-:Python version available: BioServices is tested for Python 2.6,2.7, 3.3, 3.4, 3.5
+:Python version available: BioServices is tested for Python 2.7, 3.3, 3.4, 3.5
 :Contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
 :Issues: Please use https://github.com/cokelaer/bioservices/issues
 :How to cite: Cokelaer et al. *BioServices: a common Python package to access biological Web Services programmatically*
@@ -67,6 +67,19 @@ Release History
 ------------------
 This is a summary of the changelog. Complete change can be found in the 
 `main documentation <http://pythonhosted.org//bioservices/ChangeLog.html>`_.
+
+1.5.X
+---------
+
+* Support for Python 3.6 on Travis.
+* No more support for PYthon 2.6
+* biodbnet and wikipathways services now uses the REST protocol (instead of
+WSDL).
+* move readseq to seqret and uses new EBI API
+* move wsdbfetch to dbfetch (and switch to  REST protocol)
+* quickgo uses the new API from EBI
+* For developers: use pytest instead of nosetests.
+
 
 
 
