@@ -351,7 +351,7 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
 
 
         :param str jobid: a job identifier returned by :meth:`run`.
-        :pariam str  resultType: type of result to retrieve. See :meth:`getResultTypes`.
+        :param str  resultType: type of result to retrieve. See :meth:`getResultTypes`.
 
    The output from the tool itself.
     Use the 'format' parameter to retireve the output in different formats,
