@@ -358,13 +358,14 @@ class EUtils(REST):
         sid = self._check_ids(id)
 
         params = self._get_efetch_params(**kargs)
+
         if 'strand' in params.keys() and params['strand'] != None:
             self.devtools.check_param_in_list(params['strand'], [1, 2])
         if 'complexity' in params.keys() and params['complexity'] != None:
             self.devtools.check_param_in_list(params['complexity'],
                     [0, 1, 2, 3, 4])
 
-        query = "efetch.fcgi?db=%s&id=%s" % (db, sid)
+        query = "efetch.fcgi?db=%s&id=%s&retmode=%s" % (db, sid, retmode)
 
         ret = self.http_get(query, params=params)
         try: ret = ret.content
