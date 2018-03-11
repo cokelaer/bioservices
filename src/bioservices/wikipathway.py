@@ -32,7 +32,7 @@
         -- From WikiPathway web site. Dec 2012
 
 """
-from bioservices.services import WSDLService, RESTService, REST
+from bioservices.services import RESTService, REST
 import copy, webbrowser,  base64
 
 import pandas as pd
@@ -98,8 +98,9 @@ class WikiPathways(REST):
         request = self.http_get(self.url + '/listOrganisms')
         content = request.content
         data = self.easyXML(content)
-        ww = data.findAll("ns1:organisms")
+
         res = [this.getText() for this in data.findAll("ns1:organisms")]
+
         return res
 
     def _set_organism(self, organism):
