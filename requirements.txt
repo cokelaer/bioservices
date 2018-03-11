@@ -1,7 +1,7 @@
 easydev>=0.9.36
 colormap
 matplotlib
-pandas
+pandas>=0.21.1
 grequests
 requests
 requests_cache
@@ -9,3 +9,4 @@ beautifulsoup4
 xmltodict
 suds-jurko
 wrapt
+lxml
