@@ -2,8 +2,8 @@ from bioservices import BioModels
 import pytest
 import os
 
-pytestmark = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
-     reason="On travis")
+#pytestmark = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+#     reason="On travis")
 
 
 modelId = 'BIOMD0000000256'
