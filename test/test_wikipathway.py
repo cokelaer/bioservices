@@ -23,9 +23,11 @@ def test_organism(wikipath):
     except ValueError:
         assert True
 
+    assert len(wikipath.organisms) > 2 # check it is not empty
+
 @skiptravis
 def test_showPathwayInBrowser(wikipath):
-    wikipath.showPathwayInBrowser("WP2320")
+    wikipath.showPathwayInBrowser("WP232")
 
 @skiptravis
 def test_listPathways(wikipath):
@@ -40,11 +42,11 @@ def test_listPathways(wikipath):
 
 @skiptravis
 def test_getPathway(wikipath):
-    wikipath.getPathway("WP2320")
+    wikipath.getPathway("WP232")
 
 @skiptravis
 def test_getPathwayInfo(wikipath):
-    wikipath.getPathwayInfo("WP2320")
+    wikipath.getPathwayInfo("WP232")
 
 @skiptravis
 def test_getPathwayAs(wikipath):
@@ -91,15 +93,21 @@ def test_findPathwayByXref(wikipath):
     except:
         pass
 
+
 @skiptravis
 def test_findPathwaysByLitterature(wikipath):
     wikipath.findPathwaysByLiterature(18651794)
 
+
 @skiptravis
 def test_savePathwayAs(wikipath):
-    wikipath.savePathwayAs("WP4", "test.pdf", display=False)
+    # Note that not all WP have the PDF format available.
+    # WP4 has not (march 2018)
+    wikipath.savePathwayAs("WP232", "test.pdf", display=False)
     try:os.remove("test.pdf")
     except:pass
+
+
 @skiptravis
 def test_getPathwaysByParentOntologyTerm(wikipath):
     wikipath.getPathwaysByParentOntologyTerm("DOID:344")
