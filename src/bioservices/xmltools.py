@@ -95,7 +95,7 @@ class easyXML(object):
 
     def _get_soup(self):
         if self._soup is None:
-            self._soup = bs4.BeautifulSoup(self.data, "html.parser")
+            self._soup = bs4.BeautifulSoup(self.data, "lxml")
         return self._soup
     soup = property(_get_soup, doc="Returns the beautiful soup instance")
 
