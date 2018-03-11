@@ -103,7 +103,7 @@ class EUtils(REST):
     """
     def __init__(self, verbose=False, email="unknown", cache=False,
                 xmlparser="EUtilsParser"):
-        url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
+        url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
         super(EUtils, self).__init__(name="EUtils", verbose=verbose, url=url,
             cache=cache)
 
