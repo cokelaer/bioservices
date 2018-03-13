@@ -27,7 +27,7 @@ before_install:
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
   - pip install grequests requests requests_cache
-  - pip install easydev>=0.9.34 beautifulsoup4 suds-jurko appdirs
+  - pip install easydev>=0.9.36 beautifulsoup4 suds-jurko appdirs
   - pip install coveralls coverage numpydoc sphinx-gallery
   - pip install pytest pytest-cov pytest-xdist pytest-mock pytest-timeout pytest-rerunfailures
   - pip install .
