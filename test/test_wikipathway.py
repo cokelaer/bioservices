@@ -2,8 +2,8 @@ from bioservices.wikipathway import  WikiPathways
 import pytest
 import os
 
-skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
-    reason="On travis")
+#skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+#    reason="On travis")
 
 # The skip are those that fail on travis (june 2017) related to pandas
 @skiptravis
