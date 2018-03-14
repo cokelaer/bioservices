@@ -2,16 +2,16 @@ from bioservices.wikipathway import  WikiPathways
 import pytest
 import os
 
-#skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
-#    reason="On travis")
+skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+    reason="On travis")
 
 # The skip are those that fail on travis (june 2017) related to pandas
-@skiptravis
+#@skiptravis
 @pytest.fixture
 def wikipath():
     return WikiPathways(verbose=False)
 
-@skiptravis
+#@skiptravis
 def test_organism(wikipath):
     assert "Homo sapiens" in wikipath.organisms
     wikipath.organism = 'Homo sapiens'
