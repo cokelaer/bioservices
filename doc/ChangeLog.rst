@@ -1,10 +1,21 @@
 Whats' new, what has changed
 ================================
 
+
+Revision 1.5.2
+----------------
+
+* Fix retmode in EUtils.Efetch fonction. Was not taken into account but set to
+  text by default but this seemed to have changed recently so this bug emerged
+  while it was silent before.
+* Issue in EUtils URL (trailing /) fixed in this PR https://github.com/cokelaer/bioservices/pull/116
+* Major update of Reactome class. The old one is named ReactomeOld and the new
+  one uses the new Reactome API
+
 Revision 1.5.1
 ------------------
 
-Support for Python 2.6 in dropped.
+Support for Python 2.6  dropped.
 
     * CHANGES:
         * using proper logging
