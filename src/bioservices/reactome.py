@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -*- python -*-
 #
 #  This file is part of bioservices software
@@ -15,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
+# $Id$
 """Interface to the Reactome webs services
 
 .. topic:: What is Reactome?
@@ -44,7 +45,9 @@ import copy
 
 from bioservices.services import WSDLService, REST
 
-__all__ = ['Reactome', 'ReactomeAnalysis']
+__all__ = ['Reactome', 'ReactomeOld', 'ReactomeAnalysis']
+
+
 # for reactome, content-type could be
 #  "Content-Type", "multipart/form-data; boundary=" +    boundary);
 
@@ -61,9 +64,10 @@ class Reactome(REST):
     """
 
     _url = "https://reactome.org/ContentService"
+
     def __init__(self, verbose=True, cache=False):
-        super(Reactome, self).__init__("Reactome",url=Reactome._url,
-            verbose="ERROR", cache=False)
+        super(Reactome, self).__init__("Reactome", url=Reactome._url,
+                                       verbose="ERROR", cache=False)
         self.debugLevel = verbose
 
     @property
@@ -95,12 +99,12 @@ class Reactome(REST):
 
         return: dictionary with DOID contained in the values()
         """
-        res =  self.http_get("data/diseases/doid").content
+        res = self.http_get("data/diseases/doid").content
         res = dict([x.split() for x in res.decode().split("\n")])
         return res
 
     def exporter_diagram(self, identifier, ext="png", quality=5,
-        diagramProfile="Modern", analysisProfile="Standard", filename=None):
+                         diagramProfile="Modern", analysisProfile="Standard", filename=None):
         """Export a given pathway diagram to raster file
 
         This method accepts identifiers for Event class instances.
@@ -131,16 +135,16 @@ class Reactome(REST):
         """
         assert ext in ['png', 'jpg', 'jpeg', 'svg', "gif"]
         assert quality in range(11)
-        assert diagramProfile in ["Modern","Standard"]
+        assert diagramProfile in ["Modern", "Standard"]
         assert analysisProfile in ["Standard", "Strosobar", "Copper Plus"]
 
         params = {
-                    "diagramProfile": diagramProfile,
-                    "analysisProfile": analysisProfile,
-                    "quality": quality}
+            "diagramProfile": diagramProfile,
+            "analysisProfile": analysisProfile,
+            "quality": quality}
 
         res = self.http_get("exporter/diagram/{}.{}".format(
-                identifier, ext), params=params)
+            identifier, ext), params=params)
         if filename:
             with open(filename, "wb") as fout:
                 import binascii
@@ -167,7 +171,7 @@ class Reactome(REST):
         """
         params = {"excludeStructuresSpecifies": excludeStructuresSpecifies}
         res = self.http_get("data/complex/{}/subunits".format(identifier),
-            params=params)
+                            params=params)
         return res
 
     def data_complexes(self, resources, identifier):
@@ -188,7 +192,7 @@ class Reactome(REST):
 
         """
         res = self.http_get("data/complexes/{}/{}".format(
-                    resources, identifier))
+            resources, identifier))
         return res
 
     def data_entity_componentOf(self, identifier):
@@ -205,7 +209,7 @@ class Reactome(REST):
 
         """
         res = self.http_get("data/entity/{}/componentOf".format(
-                    identifier))
+            identifier))
         return res
 
     def data_entity_otherForms(self, identifier):
@@ -223,7 +227,7 @@ class Reactome(REST):
 
         """
         res = self.http_get("data/entity/{}/otherForms".format(
-                    identifier))
+            identifier))
         return res
 
     def data_event_ancestors(self, identifier):
@@ -282,9 +286,8 @@ class Reactome(REST):
 
         """
         res = self.http_get("exporter/sbml/{}.xml".format(identifier),
-                    frmt="xml")
+                            frmt="xml")
         return res
-
 
     def data_pathway_containedEvents(self, identifier):
         """All the events contained in the given event
@@ -325,7 +328,7 @@ class Reactome(REST):
         res = self.http_get("data/pathway/{}/containedEvents/{}".format(
             identifier, attribute))
         return res.content
- 
+
     def data_pathways_low_diagram_entity(self, identifier):
         """A list of lower level pathways with diagram containing 
         a given entity or event
@@ -404,7 +407,6 @@ class Reactome(REST):
         res = self.http_get("data/pathways/top/{}".format(species))
         return res
 
-
     def references(self, identifier):
         """All referenceEntities for a given identifier
 
@@ -429,7 +431,6 @@ class Reactome(REST):
         res = self.http_get("search/facet")
         return res
 
-
     def search_facet_query(self, query):
         """A list of facets corresponding to a specific query
 
@@ -438,7 +439,6 @@ class Reactome(REST):
         """
         res = self.http_get("search/facet_query?query={}".format(query))
         return res
-
 
     def search_query(self, query):
         """Queries Solr against the Reactome knowledgebase
@@ -503,8 +503,8 @@ class ReactomeOld(REST):
     _url = "http://reactomews.oicr.on.ca:8080/ReactomeRESTfulAPI/RESTfulWS"
 
     def __init__(self, verbose=True, cache=False):
-        super(Reactome, self).__init__("Reactome(URL)",url=Reactome._url,
-            verbose="ERROR", cache=False)
+        super(ReactomeOld, self).__init__("Reactome(URL)", url=ReactomeOld._url,
+                                          verbose="ERROR", cache=False)
         self.debugLevel = verbose
         self.test = 2
 
@@ -513,9 +513,9 @@ class ReactomeOld(REST):
 
     def _download_list_pathways(self):
         if self._list_pathways is None:
-            res =  self.session.get("http://www.reactome.org/download/current/ReactomePathways.txt")
+            res = self.session.get("http://www.reactome.org/download/current/ReactomePathways.txt")
             if res.status_code == 200:
-                res = res.text # content does not work in python 3.3
+                res = res.text  # content does not work in python 3.3
                 res = res.strip()
                 self._list_pathways = [x.split("\t") for x in res.split("\n")]
             else:
@@ -556,7 +556,7 @@ class ReactomeOld(REST):
             >>> res = s.biopax_exporter(109581)
         """
         res = self.http_get("biopaxExporter/Level{0}/{1}".format(level, identifier),
-                frmt=None)
+                            frmt=None)
         return res
 
     def front_page_items(self, species):
@@ -579,7 +579,7 @@ class ReactomeOld(REST):
         """
         species = species.replace("+", " ")
         res = self.http_get("frontPageItems/{0}".format(species),
-                frmt="json")
+                            frmt="json")
         return res
 
     def highlight_pathway_diagram(self, identifier, genes, frmt="PNG"):
@@ -606,9 +606,8 @@ class ReactomeOld(REST):
         genes = self.devtools.list2string(genes)
 
         res = self.http_post(url.format(identifier, frmt), frmt="txt",
-                data=genes)
+                             data=genes)
         return res
-
 
     def list_by_query(self, classname, **kargs):
         """Get list of objecs from Reactome database
@@ -629,7 +628,7 @@ class ReactomeOld(REST):
         # NOTE: without the content-type this request fails with error 415
         # fixed by
         res = self.http_post(url, frmt='json', data=kargs,
-                headers={'Content-Type': "application/json;odata=verbose"})
+                             headers={'Content-Type': "application/json;odata=verbose"})
         return res
 
     def pathway_diagram(self, identifier, frmt="PNG"):
@@ -699,7 +698,7 @@ class ReactomeOld(REST):
 
         """
         res = self.http_get("pathwayComplexes/{0}".format(identifier),
-                frmt="json")
+                            frmt="json")
         return res
 
     def query_by_id(self, classname, identifier):
@@ -740,7 +739,7 @@ class ReactomeOld(REST):
         identifiers = self.devtools.list2string(identifiers)
         url = "queryByIds/{0}".format(classname)
         res = self.http_post(url, frmt="json", data=identifiers)
-        #headers={'Content-Type': "application/json"})
+        # headers={'Content-Type': "application/json"})
         return res
 
     def query_hit_pathways(self, query):
@@ -772,7 +771,7 @@ class ReactomeOld(REST):
         """
         identifiers = self.devtools.list2string(identifiers, space=False)
         url = "pathwayForEntities"
-        res = self.http_post(url, frmt='json', data={'ID':identifiers})
+        res = self.http_post(url, frmt='json', data={'ID': identifiers})
         return res
 
     def species_list(self):
@@ -799,7 +798,6 @@ class ReactomeOld(REST):
         res = self.http_get(url, frmt='xml')
         return res
 
-
     def get_all_reactions(self):
         """Return list of reactions from the Pathway"""
         res = self.get_list_pathways()
@@ -823,8 +821,8 @@ class ReactomeOld(REST):
         if reactants.count(':') == 1:
             reactants = reactants.split(":")
         else:
-            #self.logging.warning('Warning: did not find unique sign : for %s' % reaction)
-            #reactants = reactants.split(":", 1)
+            # self.logging.warning('Warning: did not find unique sign : for %s' % reaction)
+            # reactants = reactants.split(":", 1)
             pass
 
         return reactants
@@ -888,18 +886,15 @@ class ReactomePathway(object):
 
 
 class ReactomeAnalysis(REST):
-
-
     _url = "http://www.reactome.org:80/AnalysisService"
 
-    #"identifiers/projection?pageSize=8000&page=1&sortBy=ENTITIES_PVALUE&order=ASC&resource=TOTAL",
+    # "identifiers/projection?pageSize=8000&page=1&sortBy=ENTITIES_PVALUE&order=ASC&resource=TOTAL",
 
     def __init__(self, verbose=True, cache=False):
-        super(ReactomeAnalysis, self).__init__("Reactome(URL)",url=ReactomeAnalysis._url,
-            verbose=verbose, cache=False)
-        self.logging.warning("Class in development. Some methods are already  working but those required POST do not. Coming soon ")
-
-
+        super(ReactomeAnalysis, self).__init__("Reactome(URL)", url=ReactomeAnalysis._url,
+                                               verbose=verbose, cache=False)
+        self.logging.warning(
+            "Class in development. Some methods are already  working but those required POST do not. Coming soon ")
 
     def identifiers(self, genes):
         """
@@ -910,14 +905,9 @@ class ReactomeAnalysis(REST):
         url = "identifiers/projection?pageSize=8000&page=1&sortBy=ENTITIES_PVALUE&order=ASC&resource=TOTAL"
 
         genes = self.devtools.list2string(genes)
-        genes = genes.replace(" ","")
-        #print(genes)
+        genes = genes.replace(" ", "")
+        # print(genes)
         res = self.http_post(url, frmt="json", data=genes,
-                headers={"Content-Type": "text/plain;charset=UTF-8",
-                    "Accept": "application/json"})
+                             headers={"Content-Type": "text/plain;charset=UTF-8",
+                                      "Accept": "application/json"})
         return res
-
-
-
-
-
