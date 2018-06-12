@@ -42,7 +42,7 @@ BioServices provides access to 25 Web Services including. For a quick start,
 look at some notebooks here `github cokelaer/bioservices <https://github.com/cokelaer/bioservices/tree/master/notebooks/>`_ and here `github bioservices <https://github.com/bioservices/notebooks>`_.
 
 An up-to-date list of Web Services is provided within 
-the online `documentation <http://pythonhosted.org/bioservices/>`_.
+the online `documentation <http://http://bioconvert.readthedocs.io/>`_.
 
 Here is a small example using the UniProt Web Service to search for the zap70 specy in human
 organism::
@@ -58,7 +58,7 @@ organism::
     RHOH_HUMAN   191     Q15669  RHOH ARHH TTF
 
 More examples and tutorials are available in the exhaustive 
-`On-line documentation <http://pythonhosted.org//bioservices>`_
+`On-line documentation <http://http://bioconvert.readthedocs.io/>`_
 
 
 
@@ -66,18 +66,18 @@ More examples and tutorials are available in the exhaustive
 Release History
 ------------------
 This is a summary of the changelog. Complete change can be found in the 
-`main documentation <http://pythonhosted.org//bioservices/ChangeLog.html>`_.
+`main documentation <http://http://bioconvert.readthedocs.io/en/master/ChangeLog.html>`_.
 
 1.5.X
 ---------
 
 * Support for Python 3.6 on Travis.
-* No more support for PYthon 2.6
-* biodbnet and wikipathways services now uses the REST protocol (instead of
-WSDL).
+* No more support for Python 2.6
+* biodbnet and wikipathways services now uses the REST protocol (instead of WSDL).
 * move readseq to seqret and uses new EBI API
 * move wsdbfetch to dbfetch (and switch to  REST protocol)
 * quickgo uses the new API from EBI
+* New Reactome API
 * For developers: use pytest instead of nosetests.
 
 
