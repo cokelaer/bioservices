@@ -1,9 +1,8 @@
 from bioservices.quickgo_old import QuickGO_old
 import pytest
-import requests
 
-on_success = pytest.mark.skipif(requests.get(QuickGO_old().url).status_code == 404,
-                                reason="Got 404 status from QuickGO_old")
+on_success = pytest.mark.skipif(isinstance(QuickGO_old().Term('GO:0003824', frmt="obo"), int) is True,
+                                reason="Got instance of int from QuickGO_old")
 
 
 @pytest.fixture
