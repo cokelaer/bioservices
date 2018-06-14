@@ -572,6 +572,11 @@ class UniProt(REST):
             >>> df = u.uniref("member:Q03063")  # of just A03063
             >>> df.Size
 
+        Another example from https://github.com/cokelaer/bioservices/issues/121
+        is the combination of uniprot and uniref filters::
+
+            u.uniref("uniprot:(ec:1.1.1.282 taxonomy:bacteria reviewed:yes) AND identity:0.5")
+
         """
         try:
             import pandas as pd
