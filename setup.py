@@ -6,14 +6,14 @@ import glob
 
 
 _MAJOR               = 1
-_MINOR               = 5
-_MICRO               = 2
+_MINOR               = 6
+_MICRO               = 0
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
 metainfo = {
     'authors': {
-        'Cokelaer':('Thomas Cokelaer','cokelaer@ebi.ac.uk'),
+        'Cokelaer':('Thomas Cokelaer','thomas.cokelaer@pasteur.fr'),
         },
     'version': version,
     'license' : 'GPLv3',
@@ -34,6 +34,9 @@ metainfo = {
           'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
           'Operating System :: OS Independent',
           'Programming Language :: Python :: 2.7',
+          'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
           'Topic :: Software Development :: Libraries :: Python Modules',
           'Topic :: Scientific/Engineering :: Bio-Informatics',
           'Topic :: Scientific/Engineering :: Information Analysis',
