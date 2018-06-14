@@ -229,7 +229,7 @@ class UniProt(REST):
         # Structure
         '3d', 'feature(BETA STRAND)', 'feature(HELIX)', 'feature(TURN)',
         # Subcellular location
-        'comment(SUBCELLULAR LOCATION)', 'feature(INTRAMEMBRANE)',
+        'feature(SUBCELLULAR LOCATION)', 'feature(INTRAMEMBRANE)',
         'feature(TOPOLOGICAL DOMAIN)',
         'feature(TRANSMEMBRANE)',
         # Miscellaneous
