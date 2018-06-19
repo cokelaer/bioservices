@@ -246,7 +246,6 @@ class ConfigReadOnly(object):
         self.params = copy.deepcopy(self._default_params)
 
 
-
 class BioServicesConfig(ConfigReadOnly):
     def __init__(self):
         super(BioServicesConfig, self).__init__(name="bioservices",

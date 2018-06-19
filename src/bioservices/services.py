@@ -60,7 +60,6 @@ class BioServicesError(Exception):
         return repr(self.value)
 
 
-
 class Service(object):
     """Base class for WSDL and REST classes
 
@@ -116,7 +115,6 @@ class Service(object):
         super(Service, self).__init__()
         self.requests_per_sec = requests_per_sec
 
-
         self.name = name
         self.logging = Logging("bioservices:%s" % self.name, verbose)
 
@@ -135,7 +133,7 @@ class Service(object):
 
         self.devtools = DevTools()
         self.settings = BioServicesConfig()
-    
+
     def _get_caching(self):
         return self.settings.params['cache.on'][0]
     def _set_caching(self, caching):
@@ -716,15 +714,16 @@ class REST(RESTbase):
         * query is either a string or a list of strings.
         * if list is larger than ASYNC_THRESHOLD, use asynchronous call.
 
-
         """
         if isinstance(query, list) and len(query) > self.settings.ASYNC_THRESHOLD:
             self.logging.debug("Running async call for a list")
             return self.get_async(query, frmt, params=params, **kargs)
+
         if isinstance(query, list) and len(query) <= self.settings.ASYNC_THRESHOLD:
             self.logging.debug("Running sync call for a list")
             return [self.get_one(key, frmt, params=params, **kargs) for key in query]
             #return self.get_sync(query, frmt)
+
         # OTHERWISE
         self.logging.debug("Running http_get (single call mode)")
         #return self.get_one(**{'frmt': frmt, 'query': query, 'params':params})
@@ -842,7 +841,7 @@ Consider increasing it with settings.TIMEOUT attribute""".format(self.settings.T
         print(self.last_response.reason)
         print(self.last_response.status_code)
 
-    def http_delete(self, query, params=None, 
+    def http_delete(self, query, params=None,
                     frmt='xml', headers=None,  **kargs):
         kargs.update({'query': query})
         kargs.update({'params': params})

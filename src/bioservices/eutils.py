@@ -41,8 +41,6 @@ __all__ = ["EUtils", "EUtilsParser"]
 # http://www.dalkescientific.com/writings/diary/archive/2005/09/30/using_eutils.html
 
 
-
-
 class EUtils(REST):
     """Interface to `NCBI Entrez Utilities <http://www.ncbi.nlm.nih.gov/entrez>`_ service
 
@@ -91,13 +89,9 @@ class EUtils(REST):
         Correct: term=#2+AND+"gene in genomic"[properties]
         Correct: term=%232+AND+%22gene+in+genomic%22[properties]
 
-
-
     For information about retmode and retype, please see:
 
-
     http://www.ncbi.nlm.nih.gov/books/NBK25499/table/chapter4.T._valid_values_of__retmode_and/?report=objectonly
-
 
 
     """
@@ -106,7 +100,6 @@ class EUtils(REST):
         url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
         super(EUtils, self).__init__(name="EUtils", verbose=verbose, url=url,
             cache=cache)
-
 
         warning = """
 

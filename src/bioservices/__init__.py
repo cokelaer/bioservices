@@ -17,7 +17,7 @@ import pkg_resources
 
 from easydev import CustomConfig
 
-__version__ = "1.4.17"
+__version__ = "1.6.0"
 try:
     version = pkg_resources.require("bioservices")[0].version
     __version__ = version
@@ -102,8 +102,6 @@ from .reactome import *
 from . import quickgo
 from .quickgo import *
 
-from . import quickgo_old
-from .quickgo_old import *
 
 from . import chembl
 from .chembl import *
