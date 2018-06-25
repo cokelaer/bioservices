@@ -51,7 +51,6 @@ from easydev import get_path_sphinx_themes
 
 extensions = [
     'sphinx.ext.autodoc',
-
     ('sphinx.ext.imgmath'  # only available for sphinx >= 1.4
                   if sphinx.version_info[:2] >= (1, 4)
                   else 'sphinx.ext.pngmath'),
@@ -94,7 +93,7 @@ copyright = copyright
 # built documents.
 #
 # The short X.Y version.
-version = version
+version = 'Current version: ' + str(version)
 # The full version, including alpha/beta/rc tags.
 release = release
 
@@ -114,6 +113,7 @@ release = release
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
+exclude_trees = ['build']
 exclude_patterns = []
 
 # The reST default role (used for this markup: `text`) to use for all documents.
@@ -137,11 +137,20 @@ pygments_style = 'sphinx'
 modindex_common_prefix = ["bioservices."]
 
 # -- sphinx gallery ------------------------------------------------------------
+
+# By default, examples are not built locally. You can set plot_gallery to True
+# to force their creation. Note that it requires singularity or dot to be
+# installed. Fixes https://github.com/biokit/bioconvert/issues/153
+if not on_rtd:
+    plot_gallery = False
+else:
+    plot_gallery = True
+
 plot_gallery = True
+
 sphinx_gallery_conf = {
     "doc_module": "bioservices",
-# fails on RTD (june 2017)
-#    'backreferences_dir': False
+    'backreferences_dir': os.path.join("modules", "generated"),
     #"examples_dirs": "examples",
     #"gallery_dirs": "auto_examples",
 }
@@ -161,8 +170,8 @@ def touch_example_backreferences(app, what, name, obj, options, lines):
                                  "%s.examples" % name)
     if not os.path.exists(examples_path):
         # touch file
+        os.makedirs(os.path.dirname(examples_path), exist_ok=True)
         open(examples_path, 'w').close()
-
 
 
 # Add the 'copybutton' javascript, to hide/show the prompt in code
@@ -170,10 +179,6 @@ def touch_example_backreferences(app, what, name, obj, options, lines):
 def setup(app):
     app.add_javascript('copybutton.js')
     app.connect('autodoc-process-docstring', touch_example_backreferences)
-
-
-
-
 
 # -- Options for HTML output ---------------------------------------------------
 
@@ -218,6 +223,7 @@ html_theme_path = [get_path_sphinx_themes()]
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 
+# the copybutton.js must be copied there:
 html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
@@ -255,7 +261,7 @@ html_show_sourcelink = True
 html_copy_source = True
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-#html_show_sphinx = True
+html_show_sphinx = True
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
 #html_show_copyright = True
@@ -288,8 +294,7 @@ latex_documents = [
 ]
 
 latex_elements = { 'inputenc': '\\usepackage[utf8]{inputenc}' }
-
-latex_elements['latex_paper_size'] = "a4"
+latex_elements["latex_paper_size"] = "a4"
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
 #latex_logo = None
@@ -312,7 +317,7 @@ latex_elements['latex_preamble'] =r"""
 \definecolor{VerbatimBorderColor}{rgb}{0,0,0}
 
    \setlength{\fboxrule}{2pt}
- 
+
  \renewcommand{\Verbatim}[1][1]{%
    % list starts new par, but we don't want it to be set apart vertically
    \bgroup\parskip=0pt%
