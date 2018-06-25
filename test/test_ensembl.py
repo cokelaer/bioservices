@@ -203,11 +203,12 @@ def test_sequences(ensembl):
 
     seq = ensembl.get_sequence_by_id('ENSE00001154485', expand_5prime=10,
                                     frmt='fasta', type='genomic')
-    assert seq == u'>ENSE00001154485 chromosome:GRCh38:7:140924566:140924774:-1\nCCCAGCTCTCCGCCTCCCTTCCCCCTCCCCGCCCGACAGCGGCCGCTCGGGCCCCGGCTC\nTCGGTTATAAGATGGCGGCGCTGAGCGGTGGCGGTGGTGGCGGCGCGGAGCCGGGCCAGG\nCTCTGTTCAACGGGGACATGGAGCCCGAGGCCGGCGCCGGCGCCGGCGCCGCGGCCTCTT\nCGGCTGCGGACCCTGCCATTCCGGAGGAG\n'
+    assert seq == ">ENSE00001154485 chromosome:GRCh38:7:140924566:140924752:-1\nCCCTCCCCGCCCGACAGCGGCCGCTCGGGCCCCGGCTCTCGGTTATAAGATGGCGGCGCT\nGAGCGGTGGCGGTGGTGGCGGCGCGGAGCCGGGCCAGGCTCTGTTCAACGGGGACATGGA\nGCCCGAGGCCGGCGCCGGCGCCGGCGCCGCGGCCTCTTCGGCTGCGGACCCTGCCATTCC\nGGAGGAG\n"
+
 
     res = ensembl.get_sequence_by_id('ENSG00000157764', frmt='seqxml',
                                     type='protein', multiple_sequences=1)
-    assert 'XSTT' in res
+    assert 'MAAL' in res
 
     res = ensembl.get_sequence_by_id('GENSCAN00000000001', frmt='json',
                                     object_type='predictiontranscript', db_type='core',
