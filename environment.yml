@@ -22,4 +22,5 @@ dependencies:
 - pip:
   - sphinx-gallery
   - bioservices
-  - docutils<0.13.1 # https://github.com/sphinx-doc/sphinx/issues/3212
+  # docutils failed june 2018 maybe time to remove it from here
+  #- docutils<0.13.1 # https://github.com/sphinx-doc/sphinx/issues/3212
