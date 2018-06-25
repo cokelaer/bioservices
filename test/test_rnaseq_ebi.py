@@ -1,4 +1,5 @@
 from bioservices import RNASEQ_EBI
+import os
 import pytest
 
 
