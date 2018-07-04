@@ -44,7 +44,7 @@ import copy
 
 from bioservices.services import WSDLService, REST
 
-__all__ = ['Reactome', 'ReactomeAnalysis']
+__all__ = ['Reactome', 'ReactomeOld', 'ReactomeAnalysis']
 # for reactome, content-type could be
 #  "Content-Type", "multipart/form-data; boundary=" +    boundary);
 
@@ -503,7 +503,7 @@ class ReactomeOld(REST):
     _url = "http://reactomews.oicr.on.ca:8080/ReactomeRESTfulAPI/RESTfulWS"
 
     def __init__(self, verbose=True, cache=False):
-        super(Reactome, self).__init__("Reactome(URL)",url=Reactome._url,
+        super(ReactomeOld, self).__init__("Reactome(URL)",url=ReactomeOld._url,
             verbose="ERROR", cache=False)
         self.debugLevel = verbose
         self.test = 2
