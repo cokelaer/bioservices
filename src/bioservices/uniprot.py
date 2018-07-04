@@ -177,7 +177,7 @@ class UniProt(REST):
 
     """
     _mapping = mapping.copy()
-    _url = "http://www.uniprot.org"
+    _url = "https://www.uniprot.org"
     # _valid_columns = ['citation', 'clusters', 'comments', 'database',
     #                   'domains', 'domain', 'ec', 'id', 'entry name', 'existence',
     #                   'families', 'feature', 'features', 'genes', 'go', 'go-id', 'interpro',
