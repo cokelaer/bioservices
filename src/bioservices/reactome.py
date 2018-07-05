@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -*- python -*-
 #
 #  This file is part of bioservices software
