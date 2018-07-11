@@ -4,7 +4,7 @@ import pytest
 
 class test_Service(Service):
     def __init__(self):
-        super(test_Service, self).__init__("test", "http://www.uniprot.org", verbose=False)
+        super(test_Service, self).__init__("test", "https://www.uniprot.org", verbose=False)
         self.url
         self.easyXMLConversion
 
@@ -22,7 +22,7 @@ def test_service():
 class test_WSDLService(WSDLService):
     def __init__(self):
         super(test_WSDLService, self).__init__("test",
-            "http://biomodels.caltech.edu/services/BioModelsWebServices?wsdl", 
+            "https://www.ebi.ac.uk/biomodels-main/services/BioModelsWebServices?wsdl",
             verbose=False)
 
     def test_methods(self):
@@ -36,7 +36,7 @@ def test_wsdl():
 class test_RESTService(RESTService):
     def __init__(self):
         super(test_RESTService, self).__init__("test",
-            "http://www.uniprot.org", 
+            "https://www.uniprot.org",
             verbose=False)
 
     def test_request(self):
