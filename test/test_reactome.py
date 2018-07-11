@@ -1,4 +1,4 @@
-from bioservices import Reactome
+from bioservices import Reactome, ReactomeOld
 import pytest
 from easydev import TempFile
 
@@ -136,6 +136,18 @@ def test_data_species_main(reactome):
     res = reactome.data_species_main()
     assert len(res)
 
+@pytest.fixture
+def reactomeold():
+    return ReactomeOld(verbose=True)
+
+
+def test_species(reactomeold):
+    assert len(reactomeold.get_species()) > 10
+
+
+def test_query_by_ids(reactomeold):
+    res = reactomeold.query_by_ids("Pathway", 'TP53')
+    assert len(res) >= 1
 
 """
 
