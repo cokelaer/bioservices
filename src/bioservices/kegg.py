@@ -919,7 +919,7 @@ class KEGG(REST):
         """
         res = self.get(":".join([organism, gene]))
         dic = self.parse(res)
-        if 'PATHWAY' in dic.keys():
+        if not isinstance(dic, int) and 'PATHWAY' in dic.keys():
             return dic['PATHWAY']
         else:
             self.logging.info("No pathway found ?")

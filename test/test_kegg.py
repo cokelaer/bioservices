@@ -58,6 +58,10 @@ def test_org_conv(kegg):
 def test_parse_kgml_pathway(kegg):
     res = kegg.parse_kgml_pathway("hsa04660")
 
+def test_get_pathway_by_gene(kegg):
+    res = kegg.get_pathway_by_gene("7535", "hsa")
+    assert isinstance(res, dict) is True
+    assert 'hsa04064' in res.keys()
 
 def test_ids(kegg):
     assert kegg.enzymeIds[0].startswith("ec")
