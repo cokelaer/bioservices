@@ -23,11 +23,6 @@ def test_chebi_mass():
     mass1 = ch.getCompleteEntity("CHEBI:27732").mass
     assert float(mass1) == 194.19076
 
-    res = ch.getLiteEntity("194.19076", "MASS", 5, 2)
-    assert  res[0]["chebiId"] == "CHEBI:27732"
-
-    # should return nothing
-    res = ch.getLiteEntity("194.19076", "SMILES", 5, 2)
 
 def test_polymer():
     ch = ChEBI()
