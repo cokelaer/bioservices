@@ -1294,10 +1294,24 @@ class KEGGParser(object):
                     output[key] = kp.copy()
                 else:
                     output[key] = [x.strip() for x in value.split()]
-            # transform to dictionary
-            elif key in ['DRUG', 'ORTHOLOGY', 'GENE', 'COMPOUND', 'RMODULE',
-                    'DISEASE', 'PATHWAY_MAP',
-                    'STR_MAP', 'OTHER_MAP', 'PATHWAY', 'MODULE', 'GENES']:
+            # transform to dictionary by splitting line and then split on ";"
+            elif key in "GENE":
+                kp = {}
+                for i,line in enumerate(value.split("\n")):
+                    try: 
+                        k,v = line.strip().split(";",1)
+                    except:
+                        self.logging.warning("could not interpet line in %s %s" % (key, line))
+                        k = i
+                        v = line
+                    if k.endswith(":"):
+                        k = k.strip().rstrip(":")
+                    kp[k] = v
+                output[key] = kp.copy()
+
+            elif key in ['DRUG', 'ORTHOLOGY', 'COMPOUND', 'RMODULE',
+                    'DISEASE', 'PATHWAY_MAP', 'STR_MAP', 'OTHER_MAP',
+                    'PATHWAY', 'MODULE', 'GENES']:
                 kp = {}
                 for line in value.split("\n"):
                     try: # empty orthology in rc:RC00004
