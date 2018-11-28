@@ -919,7 +919,7 @@ class KEGG(REST):
         """
         res = self.get(":".join([organism, gene]))
         dic = self.parse(res)
-        if 'PATHWAY' in dic.keys():
+        if not isinstance(dic, int) and 'PATHWAY' in dic.keys():
             return dic['PATHWAY']
         else:
             self.logging.info("No pathway found ?")
@@ -1244,7 +1244,7 @@ class KEGGParser(object):
                 output[k] = output[k].strip().replace(k, '', 1).strip()
             except: # skip the lists
                 pass
-        
+
 
         # Now, let us do the real stuff.
         # This is tricky since format is not consistent with the names e,g
@@ -1259,9 +1259,9 @@ class KEGGParser(object):
                 data = dict([(x[0].strip(), float(x[1].strip())) for x in data])
                 output[key] = data
             # strip only: expecting a single line (string)
-            elif key in ['POSITION', 'DESCRIPTION', 'ENTRY', 'ORGANISM', 
+            elif key in ['POSITION', 'DESCRIPTION', 'ENTRY', 'ORGANISM',
                     'CLASS', 'FORMULA', 'KEYWORDS', 'CATEGORY', 'ANNOTATION',
-                    'DATA_SOURCE', 'MASS', 'COMPOSITION', 'DEFINITION', 
+                    'DATA_SOURCE', 'MASS', 'COMPOSITION', 'DEFINITION',
                     'KO_PATHWAY', 'EQUATION', 'TYPE', 'RCLASS', 'SYSNAME', "HISTORY"]:
                 # get rid of \n
 
@@ -1474,7 +1474,7 @@ class KEGGParser(object):
  u'  TYPE      PK']
     """
 
-            
+
 
     def _interpret_taxonomy(self, data):
         res = {}

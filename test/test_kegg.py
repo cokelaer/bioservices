@@ -15,6 +15,11 @@ def kegg():
 # minutes so during development this one should be used instead.
 # class TestKEGGAll should serve as a complement to this class
 
+def test_get_pathway_by_gene(kegg):
+    res = kegg.get_pathway_by_gene("7535", "hsa")
+    assert isinstance(res, dict) is True
+    assert 'hsa04064' in res.keys()
+
 def test_isOrganism(kegg):
     assert kegg.isOrganism('T01440') == True
     assert kegg.isOrganism('hsa') == True

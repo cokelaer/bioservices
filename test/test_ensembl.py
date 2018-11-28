@@ -182,7 +182,7 @@ def _test_regulation(ensembl):
 def test_sequences(ensembl):
     sequence = ensembl.get_sequence_by_id('ENSG00000157764', frmt='text')
     #assert sequence.startswith("CGCCTCCCTTCCCCCTCCCCGCCCGACAGCGGCCGCTCGGGCCCCG")
-    # changed June 2018. double checked on web site 
+    # changed June 2018. double checked on web site
     # http://www.ensembl.org/Homo_sapiens/Gene/Sequence?g=ENSG00000157764;r=7:140719327-140924928
     assert sequence.startswith("TTCCCCCAATCCCCTCAGGCTCGGCTGCGCCCGGGGCCGCGGGCCGGTACCTGAGGTGGC")
 
@@ -202,10 +202,8 @@ def test_sequences(ensembl):
                                              frmt='json', coord_system='seqlevel')
 
     seq = ensembl.get_sequence_by_id('ENSE00001154485', expand_5prime=10,
-                                    frmt='fasta', type='genomic')
-    assert seq == ">ENSE00001154485 chromosome:GRCh38:7:140924566:140924752:-1\nCCCTCCCCGCCCGACAGCGGCCGCTCGGGCCCCGGCTCTCGGTTATAAGATGGCGGCGCT\nGAGCGGTGGCGGTGGTGGCGGCGCGGAGCCGGGCCAGGCTCTGTTCAACGGGGACATGGA\nGCCCGAGGCCGGCGCCGGCGCCGGCGCCGCGGCCTCTTCGGCTGCGGACCCTGCCATTCC\nGGAGGAG\n"
-
-
+                                     frmt='fasta', type='genomic')
+    assert seq == u'>ENSE00001154485 chromosome:GRCh38:7:140924566:140924752:-1\nCCCTCCCCGCCCGACAGCGGCCGCTCGGGCCCCGGCTCTCGGTTATAAGATGGCGGCGCT\nGAGCGGTGGCGGTGGTGGCGGCGCGGAGCCGGGCCAGGCTCTGTTCAACGGGGACATGGA\nGCCCGAGGCCGGCGCCGGCGCCGGCGCCGCGGCCTCTTCGGCTGCGGACCCTGCCATTCC\nGGAGGAG\n'
     res = ensembl.get_sequence_by_id('ENSG00000157764', frmt='seqxml',
                                     type='protein', multiple_sequences=1)
     assert 'MAAL' in res
