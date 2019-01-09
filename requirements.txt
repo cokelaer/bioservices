@@ -10,3 +10,4 @@ xmltodict
 suds-jurko
 wrapt
 lxml
+colorlog
