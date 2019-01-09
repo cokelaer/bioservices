@@ -4,6 +4,31 @@ FAQS
 
 .. _troubleshootings:
 
+General Errors
+================
+
+The most common errors come from 
+
+#. The web service that you are trying to access is down (temporarily or not) 
+#. The web service API has changed
+#. A request inside bioservices is incorrect
+#. A timeout occured.
+
+For the first problem, we cannot do anything except wait for the service to be
+up again.
+
+For the second, you are trying to update bioservices to reflect those changes.
+
+For the two other issues, which are really bioservices problems, we recommend to
+rerun your code setting the logging level to debug and send the code and errors
+you see.
+
+To set the debug level on on a web service::
+
+    u = UniProt(verbose=True)
+    u.logging.level = 'DEBUG'
+
+
 Installation issues
 =======================
 

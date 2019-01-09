@@ -7,6 +7,9 @@ Revision 1.6.0
 * CHANGES: 
   * removed the quickgo_old module and its tests
   * Fix typo for a "valid colum," in uniprot module
+  * uses colorlog to have more robust and consistent logging.
+  * rewrote entirely the ChEMBL wrapper due to
+    new ChEMBL API.
 
 Revision 1.5.2
 ----------------
