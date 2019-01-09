@@ -40,6 +40,8 @@
 
 """
 from bioservices import WSDLService
+from bioservices import logger
+logger.name = __name__
 
 
 __all__ = ["Miriam"]

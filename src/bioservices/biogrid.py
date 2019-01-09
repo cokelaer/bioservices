@@ -40,6 +40,9 @@ from __future__ import print_function
 
 from bioservices import PSICQUIC
 import re
+from bioservices import logger
+logger.name = __name__
+
 
 __all__ = ["BioGRID"]
 

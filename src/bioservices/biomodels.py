@@ -63,6 +63,8 @@ publicationIdOrText     publication identifier (PMID or DOI) or text
 import copy
 import webbrowser
 from functools import wraps
+from bioservices import logger
+logger.name = __name__
 
 from bioservices.services import WSDLService
 

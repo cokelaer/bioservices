@@ -33,7 +33,10 @@
 
 """
 from services import REST
-__all__ = ["Pfam"]
+from bioservices import logger
+logger.name = __name__
+ 
+ __all__ = ["Pfam"]
 
 
 class Pfam(REST):

@@ -43,6 +43,8 @@
 """
 import io
 from bioservices.services import REST
+from bioservices import logger
+logger.name = __name__
 
 try:
     import pandas as pd

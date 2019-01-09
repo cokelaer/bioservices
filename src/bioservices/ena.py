@@ -40,6 +40,9 @@
 import os
 from bioservices.services import REST
 import webbrowser
+from bioservices import logger
+logger.name = __name__
+
 
 __all__ = ["ENA"]
 

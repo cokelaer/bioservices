@@ -39,6 +39,9 @@
 from bioservices import REST
 from bioservices.xmltools import bs4
 import easydev
+from bioservices import logger
+logger.name = __name__
+
 
 try:
     from urllib.error import HTTPError
