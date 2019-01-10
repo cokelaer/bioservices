@@ -4,9 +4,16 @@ Whats' new, what has changed
 Revision 1.6.0
 -----------------
 
-* CHANGES: 
-  * removed the quickgo_old module and its tests
-  * Fix typo for a "valid colum," in uniprot module
+* CHANGES:
+    * removed the quickgo_old module and its tests
+    * Fix typo for a "valid colum," in uniprot module
+    * Changed biomodels WSDL endpoint (thanks to https://github.com/thobalose. )
+* BUGS:
+    * Fix https://github.com/cokelaer/bioservices/issues/137 to handle KEGG GENE
+      field properly in KEGGParse
+    * Fix https://github.com/cokelaer/bioservices/issues/125 thanks to 
+      https://github.com/thobalose. 
+
 
 Revision 1.5.2
 ----------------
