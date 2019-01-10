@@ -23,6 +23,9 @@
 # from public sources, operated and made freely available by INVITAE." - CLINVITAE website
 
 from bioservices.services import REST
+from bioservices import logger
+logger.name = __name__
+
 
 __all__ = ["Clinvitae"]
 

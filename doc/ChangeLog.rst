@@ -5,15 +5,16 @@ Revision 1.6.0
 -----------------
 
 * CHANGES:
+    * rewrote entirely the ChEMBL wrapper due to new ChEMBL API.
     * removed the quickgo_old module and its tests
     * Fix typo for a "valid colum," in uniprot module
     * Changed biomodels WSDL endpoint (thanks to https://github.com/thobalose. )
+    * uses colorlog to have more robust and consistent logging.
 * BUGS:
     * Fix https://github.com/cokelaer/bioservices/issues/137 to handle KEGG GENE
       field properly in KEGGParse
     * Fix https://github.com/cokelaer/bioservices/issues/125 thanks to 
       https://github.com/thobalose. 
-
 
 Revision 1.5.2
 ----------------

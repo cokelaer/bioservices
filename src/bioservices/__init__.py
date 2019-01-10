@@ -24,6 +24,9 @@ try:
 except:
     version = __version__
 
+import colorlog
+logger = colorlog.getLogger("bioservices")
+
 
 # Initialise the config directory if not already done
 configuration = CustomConfig("bioservices", verbose=False)

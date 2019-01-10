@@ -32,6 +32,8 @@
 """
 from bioservices import REST
 from easydev import to_list 
+from bioservices import logger
+logger.name = __name__
 
 
 

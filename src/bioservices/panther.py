@@ -44,6 +44,10 @@
 """
 from services import REST
 from xmltools import readXML
+from bioservices import logger
+logger.name = __name__
+
+
 __all__ = ["Panther"]
 
 

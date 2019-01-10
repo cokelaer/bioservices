@@ -41,6 +41,9 @@ from __future__ import print_function
 import sys
 import time
 from bioservices.services import REST
+from bioservices import logger
+logger.name = __name__
+
 
 __all__ = ["MUSCLE"]
 

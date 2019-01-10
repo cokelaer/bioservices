@@ -153,6 +153,9 @@ except:
 from bioservices.services import REST, BioServicesError
 import webbrowser
 import copy
+from bioservices import logger
+logger.name = __name__
+
 
 from easydev.logging_tools import Logging
 

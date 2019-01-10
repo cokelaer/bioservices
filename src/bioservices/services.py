@@ -72,6 +72,7 @@ class Service(object):
         201: 'Created',
         400: 'Bad Request. There is a problem with your input',
         404: 'Not found. The resource you requests does not exist',
+        405: 'Method not allowed',
         406: "Not Acceptable. Usually headers issue",
         410:  'Gone. The resource you requested was removed.',
         415: "Unsupported Media Type",
@@ -424,7 +425,7 @@ class RESTService(RESTbase):
         self.logging.debug("REST.bioservices.%s request begins" % self.name)
         self.logging.debug("--Fetching url=%s" % url)
 
-        if len(url)> 2000:
+        if len(url) > 2000:
             self.logging.error(url)
             raise ValueError("URL length (%s) exceeds 2000. Please use a differnt URL" % len(url))
 

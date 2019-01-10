@@ -47,6 +47,9 @@ from __future__ import print_function
 from collections import defaultdict
 
 from bioservices.services import REST
+from bioservices import logger
+logger.name = __name__
+
 
 __all__ = ["Rhea"]
 

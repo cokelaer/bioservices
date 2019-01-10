@@ -9,7 +9,7 @@ def biodbnet():
 
 def test_db2db(biodbnet):
     df = biodbnet.db2db("UniProt Accession", "Gene ID", "P43403")
-    assert df.ix['P43403'].values[0] == "7535"
+    assert df.loc['P43403'].values[0] == "7535"
 
 def test_dbfind(biodbnet):        
     df = biodbnet.dbFind("Gene ID", ["ZMYM6_HUMAN", "NP_710159", "ENSP00000305919"])

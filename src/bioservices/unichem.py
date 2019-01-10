@@ -37,6 +37,8 @@
 
 """
 from bioservices import REST
+from bioservices import logger
+logger.name = __name__
 
 
 class UniChem(REST):

@@ -34,6 +34,9 @@
 import json
 from bioservices import REST
 from bioservices import __version__
+from bioservices import logger
+logger.name = __name__
+
 
 __all__ = ["EUtils", "EUtilsParser"]
 
