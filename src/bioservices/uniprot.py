@@ -478,8 +478,19 @@ class UniProt(REST):
             ...    columns="entry name,length,id, genes")
             Entry name  Length  Entry   Gene names
 
-        .. warning:: this function request seems a bit unstable (UniProt web issue ?)
-            so we repeat the request if it fails
+
+        Finally, note that when search for a query, you may have several hits::
+
+            >>> u.search("P12345)
+
+        including the ID P12345 but also related entries. If you need only the
+        entry that perfectly match the query, use::
+
+            >>> u.search("id:P12345")
+
+        This was provided from a user issue that was solved here:
+        https://github.com/cokelaer/bioservices/issues/122
+
 
         .. warning:: some columns although valid may not return anything, not even in
             the header: 'score', 'taxonomy', 'tools'. this is a uniprot feature,
