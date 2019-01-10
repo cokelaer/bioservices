@@ -19,6 +19,9 @@ def test_service():
     this.test_easyXML()
     #this.test_pubmed()
 
+#version 1.6.0  the example service does not work anymore and WSDL services are
+# closing down so let us remove this test
+"""
 class test_WSDLService(WSDLService):
     def __init__(self):
         super(test_WSDLService, self).__init__("test",
@@ -31,7 +34,7 @@ class test_WSDLService(WSDLService):
 def test_wsdl():
     this = test_WSDLService()
     this.test_methods()
-
+"""
 
 class test_RESTService(RESTService):
     def __init__(self):
