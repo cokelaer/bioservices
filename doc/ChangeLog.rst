@@ -11,6 +11,8 @@ Revision 1.6.0
     * Changed biomodels WSDL endpoint (thanks to https://github.com/thobalose. )
     * uses colorlog to have more robust and consistent logging.
 * BUGS:
+    * Fix wikipathway XML issues by outputing dictionaries now. This fixes 
+      https://github.com/cokelaer/bioservices/issues/131
     * Fix https://github.com/cokelaer/bioservices/issues/137 to handle KEGG GENE
       field properly in KEGGParse
     * Fix https://github.com/cokelaer/bioservices/issues/125 thanks to 
