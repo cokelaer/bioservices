@@ -2,6 +2,9 @@ from bioservices.chembl import ChEMBL
 import pytest
 import os
 
+skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+     reason="On travis")
+
 
 SMILE = "CC(=O)Oc1ccccc1C(=O)O"
 INCHIKEY = "BSYNRYMUTXBXSQ-UHFFFAOYSA-N"
@@ -10,6 +13,7 @@ INCHIKEY = "BSYNRYMUTXBXSQ-UHFFFAOYSA-N"
 @pytest.fixture
 def chembl():
     c = ChEMBL(verbose=False, cache=False)
+    c.TIMEOUT = 60
     c.default_extension = "xml"
     try:
         c.default_extension = "xmlf"
@@ -92,6 +96,7 @@ def test_ATC(chembl):
 
 # SEARCHES ------------------
 
+@skiptravis
 def test_search_protein_class(chembl):
     res1715 = chembl.get_protein_class(1715)
     # no good example. This returns noting but at least calls the method
@@ -224,5 +229,6 @@ def test_limit(chembl):
     res = chembl.get_mechanism(limit=60000, offset=offset)
     assert len(res) == chembl.page_meta['total_count'] - offset
 
+@skiptravis
 def test_compounds2accession(chembl):
     res = chembl.compounds2accession('CHEMBL2')
