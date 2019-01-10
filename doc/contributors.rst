@@ -15,4 +15,7 @@ implemented modules now available in BioServices:
 And thank you also to the contributions from users who have sent communication
 via emails or via the `ticket system <https://github.com/cokelaer/bioservices/issues>`_.
 
+Special thanks to Thoba Lose (https://github.com/thobalose) and
+https://github.com/jsmusach for various pull requests.
+
 Note that originally code (and earlier tickets) were hosted  `elsewhere <https://www.assembla.com/spaces/bioservices/tickets>`_.
