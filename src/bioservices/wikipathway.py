@@ -32,7 +32,7 @@
         -- From WikiPathway web site. Dec 2012
 
 """
-from bioservices.services import RESTService, REST
+from bioservices.services import REST
 import copy, webbrowser,  base64
 
 import pandas as pd
@@ -63,7 +63,6 @@ class WikiPathways(REST):
 
     Methods not implemented at all:
 
-      * getXrefList: Neither WSDL or REST seemed to work
       * u'getCurationTagHistory': No API found in Wikipathway web page
       * u'getRelations': No API found in Wikipathway web page
     """
@@ -329,8 +328,7 @@ class WikiPathways(REST):
             or number of the form YYYYMMDDHHMMSS.
         :return: The revision history.
 
-        .. warning:: Does not seem to work with WSDL. Replaced by a REST version but
-            unstable: Does not return the results systematically.
+        .. warning:: seems unstable does not return the results systematically.
 
         ::
 

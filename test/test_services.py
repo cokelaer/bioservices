@@ -1,4 +1,4 @@
-from bioservices.services import Service, WSDLService, RESTService, REST
+from bioservices.services import Service, WSDLService,  REST
 import pytest
 
 
@@ -36,9 +36,9 @@ def test_wsdl():
     this.test_methods()
 """
 
-class test_RESTService(RESTService):
+class test_REST(REST):
     def __init__(self):
-        super(test_RESTService, self).__init__("test",
+        super(test_REST, self).__init__("test",
             "http://www.uniprot.org", 
             verbose=False)
 
@@ -51,5 +51,5 @@ class test_RESTService(RESTService):
 
 
 def test_rest():
-    this = test_RESTService()
+    this = test_REST()
     this.test_request()

@@ -456,7 +456,6 @@ class PSICQUIC(REST):
 
         return res
 
-
     def _convert_tab2dict(self, data):
         """
 
@@ -467,7 +466,6 @@ class PSICQUIC(REST):
             results.append(line.split("\t"))
 
         return results
-
 
     def queryAll(self, query, databases=None, output="tab25", version="current", firstResult=None, maxResults=None):
         """Same as query but runs on all active database
@@ -500,8 +498,6 @@ class PSICQUIC(REST):
         for name in databases:
             self.logging.info("Found %s in %s" % (len(results[name]), name))
         return results
-
-
 
     def getInteractionCounter(self, query):
         """Returns a dictionary with database as key and results as values
@@ -546,8 +542,6 @@ class PSICQUIC(REST):
 
 
         """
-
-
         self.logging.info("converting data into known names")
         idsA = [x[0].replace("\"","") for x in data]
         idsB = [x[1].replace("\"", "") for x in data]
@@ -866,8 +860,6 @@ class AppsPPI(object):
         self.counter = counter.copy()
         self.relevant_interactions = summ.copy()
 
-
-
     def get_reference(self, idA, idB):
         key = idA+"++"+idB
         uniq = len(self.counter[key])
@@ -877,7 +869,6 @@ class AppsPPI(object):
                 (idA, idB, N, uniq, self.counter[key]))
         for r in ret:
             print(r[5], " reference", r[4])
-
 
     def show_pie(self):
         """a simple example to demonstrate how to visualise number of
@@ -892,7 +883,6 @@ class AppsPPI(object):
         labels = range(1, self.N + 1)
         print(labels)
         counting = [len(self.relevant_interactions[i]) for i in labels]
-
 
         clf()
         #pie(counting, labels=[str(int(x)) for x in labels], shadow=True)
