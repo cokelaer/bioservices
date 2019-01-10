@@ -60,8 +60,9 @@ from .ena import ENA
 from . import ensembl
 from .ensembl import *
 
-from . import geneprof
-from .geneprof import *
+# moved to attic in bioservices v1.6
+#from . import geneprof
+#from .geneprof import *
 
 from . import kegg
 from .kegg import *

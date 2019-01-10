@@ -322,11 +322,12 @@ class ChEMBL(REST):
                                       'molecule_chembl_id=CHEMBL25', 
                                       'target_chembl_id=CHEMBL612545'])
 
-
     Get all approved drugs::
 
         c.get_approved_drugs(max_phase=4)
 
+    Get approved drugs for lung cancer
+    
 
     The ChEMBL API significantly changed in 2018 and the nez version of
     bioservices (1.6.0) had to change the API as well, which has been 
