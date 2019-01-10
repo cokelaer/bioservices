@@ -73,7 +73,6 @@ class WikiPathways(REST):
         :param bool verbose:
 
         """
-
         super(WikiPathways, self).__init__(name="WikiPathways", 
                 url=WikiPathways._url, verbose=verbose, cache=cache)
         self._organism = 'Homo sapiens' # This function is redundant (see class service)
@@ -82,25 +81,9 @@ class WikiPathways(REST):
         #: Get a list of all available organisms.
         self.organisms = self.listOrganisms()
 
-    def _get_list(self, data, outer_tag, inner_tags):
-        results = []
-        for this in data:
-            item = {}
-            for tag in inner_tags:
-                text = this.find("ns2:%s" % tag).getText()
-                item[tag] = text
-            results.append(item)
-        results = pd.DataFrame(results)
-        return results
-
     def listOrganisms(self):
-        request = self.http_get(self.url + '/listOrganisms')
-        content = request.content
-        data = self.easyXML(content)
-
-        res = [this.getText() for this in data.findAll("ns1:organisms")]
-
-        return res
+        res = self.http_get(self.url + '/listOrganisms?format=json')
+        return res['organisms']
 
     def _set_organism(self, organism):
         if organism in self.organisms:
@@ -115,34 +98,20 @@ class WikiPathways(REST):
     def findPathwaysByLiterature(self, query):
         """Find pathways by their literature references.
 
-        :param str query: The query, can be a pubmed id, author name or title keyword.
-        :return:  Array of WSSearchResult descr=The search results. {{{descr}}}
+        :param str query: The query, can be a pubmed id, author name 
+            or title keyword.
+        :return:  dictionary with Pathway as keys
 
         ::
 
-            s.findPathwaysByLiterature(18651794)
+            res = s.findPathwaysByLiterature(18651794)
 
         """
-        url = self.url + "findPathwaysByLiterature"
-        url += "?query={}".format(query)
-        request = self.http_get(url)
-        data = self.easyXML(request.content)
+        params = {'format': 'json', 'query': query}
+        res = self.http_get(self.url + "findPathwaysByLiterature",
+                params=params)
 
-        interactions = []
-        for interaction in data.findAll("ns1:result"):
-            # Get the single tags
-            result = {}
-            for key in ["score", "name", "species", "revision", "species", "id"]:
-                value = interaction.find("ns2:{}".format(key)).getText()
-                result[key] = value
-            # Get the fields
-            for field in interaction.findAll("ns2:fields"):
-                key = field.find("ns2:name").getText()
-                value = field.find("ns2:values").getText()
-                result[key] = value
-            interactions.append(result)
-        df = pd.DataFrame(interactions)
-        return df
+        return res['results']
 
     def findPathwaysByXref(self, ids, codes=None):
         """Find pathways by searching on the external references of DataNodes.
@@ -155,7 +124,7 @@ class WikiPathways(REST):
             See http://developers.pathvisio.org/wiki/DatabasesMapps#Supporteddatabasesystems
             for details. Examples are "L" for entrez gene, "En" for ensembl. See
             also the note here below for multiple identifiers/codes.
-        :return:  a dataframe
+        :return:  a dictionary
 
         ::
 
@@ -191,55 +160,26 @@ class WikiPathways(REST):
         if codes:
             for code in codes:
                 url += "&codes={}".format(code)
-        request = self.http_get(url).content
-        data = self.easyXML(request)
+        res = self.http_get(url + "&format=json")
 
-        results = []
-        items = data.findAll('ns1:result')
-        for item in items:
-            result = {}
-            result['score'] = item.find('ns2:score').getText()
-            for field in item.findAll('ns2:fields'):
-                k = field.find("ns2:name").getText()
-                v = field.find("ns2:values").getText()
-                result[k] = v
-            results.append(result)
-        results = pd.DataFrame(results)
+        #results = pd.DataFrame(results)
 
-        return results
+        return res
 
     def findInteractions(self, query):
         """Find interactions defined in WikiPathways pathways.
 
 
         :param str query:  The name of an entity to find interactions for (e.g. 'P53')
-        :returns: a dataframe
+        :returns: list of dictionaries
 
         ::
 
-            df = w.findInteractions("P53")
-            df[["left", "right", "species"]]
+            res = w.findInteractions("P53")
 
         """
-        url = self.url + 'findInteractions?query={}'.format(query)
-        request = self.http_get(url)
-        data = self.easyXML(request.content)
-        interactions = []
-
-        for interaction in data.findAll("ns1:result"):
-            # Get the single tags
-            result = {}
-            for key in ["score", "name", "species", "revision", "id"]:
-                value = interaction.find("ns2:{}".format(key)).getText()
-                result[key] = value
-            # Get the fields
-            for field in interaction.findAll("ns2:fields"):
-                key = field.find("ns2:name").getText()
-                value = field.find("ns2:values").getText()
-                result[key] = value
-            interactions.append(result)
-        df = pd.DataFrame(interactions)
-        return df
+        url = self.url + 'findInteractions?query={}&format=json'.format(query)
+        res = self.http_get(url)['result']
 
     def listPathways(self, organism=None):
         """Get a list of all available pathways.
@@ -258,18 +198,12 @@ class WikiPathways(REST):
         """
         if organism:
             self.devtools.check_param_in_list(organism, self.organisms)
-            request = self.http_get("/listPathways?%s" % organism)
+            request = self.http_get("/listPathways?%s&format=json" % organism)
         else:
-            request = self.http_get("/listPathways")
-        data = self.easyXML(request.content)
-        data = data.findAll("ns1:pathways")
+            request = self.http_get("/listPathways?format=json")
+        pathways = request['pathways']
 
-        pathways = self._get_list(data, "ns1:pathways", 
-            ['id', 'url', 'name', 'species', 'revision'])
-        try:
-            pathways = pd.DataFrame(pathways).set_index("id")   
-        except:
-            pass
+        pathways = pd.DataFrame(pathways).set_index("id")
         return pathways
 
     def getPathway(self, pathwayId, revision=0):
@@ -285,10 +219,10 @@ class WikiPathways(REST):
             s.getPathway("WP2320")
         """
         url = "/getPathway?pwId=%s" % pathwayId
-        url += "&revision=%s" % revision
+        url += "&revision=%s&format=json" % revision
         request = self.http_get(url)
-        data = self.easyXML(request.content)
-        data = data.findAll("ns1:pathway")
+
+
         pathway = {}
         for this in data:
             for tag in [ 'url', 'name', 'species', 'revision', "gpml"]:
@@ -334,10 +268,11 @@ class WikiPathways(REST):
 
             s.getPathwayHistory("WP4", 20110101000000)
 
-        .. todo:: interpret XML
         """
-        res = self.http_get(self.url + "/getPathwayHistory?pwId=%s&timestamp=%s" % (pathwayId, str(date)))
-        return self.easyXML(res.content)
+
+        query = self.url + "/getPathwayHistory?pwId=%s&timestamp=%s" % (pathwayId, str(date))
+        query += "&format=json"
+        return self.http_get(query)
 
     def getRecentChanges(self, timestamp):
         """Get the recently changed pathways.
@@ -352,8 +287,9 @@ class WikiPathways(REST):
 
         .. todo:: interpret XML
         """
-        request = self.http_get(self.url+"/getRecentChanges?timestamp=%s" % timestamp)
-        return self.easyXML(request.content)
+        res = self.http_get(self.url + 
+                "/getRecentChanges?timestamp=%s&format=json" % timestamp)
+        return res
 
     def login(self, usrname, password):
         """Start a logged in session using an existing WikiPathways account.
@@ -393,14 +329,9 @@ class WikiPathways(REST):
 
         url = self.url + "/getPathwayAs?fileType=%s" % filetype
         url += "&pwId=%s " % pathwayId
-        url += "&revision=%s" %  revision
+        url += "&revision=%s&format=json" %  revision
         res = self.http_get(url)
-
-        res = self.easyXML(res.content).findAll("ns1:data")
-        assert len(res) == 1, "Found more than one entry {}".format(len(res))
-        res = res[0].getText()
-
-        return res
+        return res['data']
 
     def savePathwayAs(self, pathwayId, filename, revision=0, display=True):
         """Save a pathway.
@@ -453,7 +384,6 @@ class WikiPathways(REST):
 
         :returns: Boolean. True if the pathway was updated successfully.
         """
-        #self.authInfo
         raise NotImplementedError
         #return self.serv.updatePathway(pwId = pathwayId,
         #description = describeChanges, gpml = gpmlCode, revision = revisionNumb, auth = authInfo)
@@ -536,10 +466,9 @@ class WikiPathways(REST):
         url = self.url + "getColoredPathway?pwId={}".format(pathwayId)
         if revision:
             url += "&revision={}".format(revision)
-
+        url += "&format=json"
         request = self.http_get(url)
-        data = self.easyXML(request.content)
-        data = data.findAll("ns1:data")[0].getText()
+        data = request['data']
         return base64.b64decode(data)
 
     def findPathwaysByText(self, query, species=None):
@@ -571,17 +500,15 @@ class WikiPathways(REST):
         url = self.url + "/findPathwaysByText?query=%s" % query
         if species:
             url += "&species=%s" % species
+        url += "&format=json"
         request = self.http_get(url)
-        data = self.easyXML(request.content)
-        data = data.findAll("ns1:result")
+        data = request['result']
 
-        results = self._get_list(data, "ns1:result",
-            ["score", 'id', 'url', 'name', 'species', 'revision'])
         try:
-            results = pd.DataFrame(results).set_index("id")
+            data = pd.DataFrame(data).set_index("id")
         except:
             pass
-        return  results
+        return data
 
     def getOntologyTermsByPathway(self, pathwayId):
         """Get a list of ontology terms for a given pathway.
@@ -595,10 +522,10 @@ class WikiPathways(REST):
             s.getOntologyTermsByPathway("WP4")
         """
         url = self.url + "getOntologyTermsByPathway?pwId={}".format(pathwayId)
+        url += "&format=json"
         request = self.http_get(url)
-        res = self.easyXML(request.content)
-        results = self._get_list(res.findAll("ns1:terms"), "ns1:terms",
-            ['name', 'id', 'ontology'])
+        results = request['terms']
+
         return results
 
     def getPathwaysByOntologyTerm(self, terms):
@@ -615,11 +542,9 @@ class WikiPathways(REST):
 
         """
         url = self.url + "getPathwaysByOntologyTerm?term={}".format(terms)
+        url += "&format=json"
         request = self.http_get(url)
-        res = self.easyXML(request.content)
-        results = self._get_list(res.findAll("ns1:pathways"), "ns1:pathways",
-            ['name', "url", 'id', 'species', "revision"])
-        return results
+        return request['pathways']
 
     def getPathwaysByParentOntologyTerm(self, term):
         """Get a list of pathways tagged with any ontology term that is the child of the given Ontology term.
@@ -629,11 +554,9 @@ class WikiPathways(REST):
 
         """
         url = self.url + "getPathwaysByParentOntologyTerm?term={}".format(term)
+        url += "&format=json"
         request = self.http_get(url)
-        res = self.easyXML(request.content)
-        results = self._get_list(res.findAll("ns1:pathways"), "ns1:pathways",
-            ['name', "url", 'id', 'species', "revision"])
-        return results
+        return request['pathways']
 
     def showPathwayInBrowser(self, pathwayId):
         """Show a given Pathway into your favorite browser.
