@@ -118,7 +118,10 @@ EUtils
 GeneProf
 ============
 
-.. automodule:: bioservices.geneprof
+Currently removed from the main API from version 1.6.0 onwards. You can still get
+the code in earlier version or in the github repository in the attic/ directory
+
+.. .. automodule:: bioservices.geneprof
     :members:
     :undoc-members:
     :synopsis:
