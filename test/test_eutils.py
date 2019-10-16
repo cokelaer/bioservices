@@ -62,7 +62,7 @@ def test_einfo(eutils):
     assert dbinfo.FieldList.Field[0].Name == 'ALL'
 
     # use JSON
-    ret = eutils.EInfo("taxonomy")
+    ret = eutils.EInfo("taxonomy")[0]
     ret['count']
 
     alldbs = eutils.EInfo()
@@ -72,7 +72,7 @@ def test_einfo(eutils):
 
 
 def test_einfo_pubmed(eutils):
-    ret = eutils.EInfo('pubmed')
+    ret = eutils.EInfo('pubmed')[0]
     assert ret['dbname'] == 'pubmed'
     assert ret['menuname'] == 'PubMed'
     assert ret['description'] == 'PubMed bibliographic record'

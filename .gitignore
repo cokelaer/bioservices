@@ -48,6 +48,7 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *,cover
+.pytest_cache/
 
 # Translations
 *.mo
@@ -64,3 +65,5 @@ target/
 
 # JetBrains
 .idea
+# vscode
+.vscode/

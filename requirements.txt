@@ -1,6 +1,6 @@
 easydev>=0.9.36
 colormap
-matplotlib
+matplotlib==3.0.3
 pandas>=0.21.1
 grequests
 requests
