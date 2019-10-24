@@ -58,7 +58,7 @@ organism::
     RHOH_HUMAN   191     Q15669  RHOH ARHH TTF
 
 More examples and tutorials are available in the exhaustive 
-`On-line documentation <http://http://bioconvert.readthedocs.io/>`_
+`On-line documentation <http://bioconvert.readthedocs.io/>`_
 
 
 
@@ -66,7 +66,7 @@ More examples and tutorials are available in the exhaustive
 Release History
 ------------------
 This is a summary of the changelog. Complete change can be found in the 
-`main documentation <http://http://bioconvert.readthedocs.io/en/master/ChangeLog.html>`_.
+`main documentation <http://bioconvert.readthedocs.io/en/master/ChangeLog.html>`_.
 
 1.5.X
 ---------
