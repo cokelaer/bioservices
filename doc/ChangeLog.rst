@@ -7,7 +7,8 @@ Revision 1.8.0 roadmap
 - make all services methods hidden or inside a single attributes to make the
 methods of a services more visible
 - finalise pubchem, pfam and eva modules
-
+- Where ever devtools is used to check input params, we should make sure the
+error message is informative. This may need to change easydev itself;
 
 Revision 1.7.0
 --------------
@@ -26,10 +27,14 @@ Revision 1.7.0
       Not on EBI website anymore
     * remove TCGA, which waws only a draft version with one method. 
 
-* FIXES
+* BUGS and FIXES
     * wikipathway: fixed getPathway, savePathway, getPathwayByLiterature and
       coloredPathway methods. Some are failing due to some wikipathway 
       temporary failures.
+    * Fixed https://github.com/cokelaer/bioservices/issues/148 to have a more
+      informative error message (array express)
+    * Fixed KeggParser for the GENE entries to have the correct ID name. 
+      https://github.com/cokelaer/bioservices/issues/151
 
 
 Revision 1.6.0
