@@ -66,11 +66,11 @@ class ChEMBL(REST):
         >>> res = c.get_molecule(limit=1000)
 
     The returned objet is a list of 1000 records, each of them being a
-    dictionary. The **molecule** resource is actually a very large one 
+    dictionary. The **molecule** resource is actually a very large one
     and one may want to skip some entries. This is possible using the **offset**
     parameter as follows::
 
-        # Retrieve 1000 molecules skipping the first 50 
+        # Retrieve 1000 molecules skipping the first 50
         res = c.get_molecule(limit=1000, offset=50)
 
     If you want to know all resources available and the number of entries in
@@ -216,10 +216,10 @@ class ChEMBL(REST):
         >>> res = c.get_molecule('CHEMBL25')
 
     Several molecules at the same time can also be retrieved using lists::
-        
+
         >>> res = c.get_molecule(['CHEMBL25', 'CHEMBL2'])
 
-        
+
 
     Search target by gene name::
 
@@ -231,8 +231,8 @@ class ChEMBL(REST):
 
         >>> res = c.get_target(filters='target_synonym__icontains=GABRB2')
 
-    .. note:: Not sure what is the difference between icontains vs contains. 
-        It looks like icontains is more permissive (you get more entries 
+    .. note:: Not sure what is the difference between icontains vs contains.
+        It looks like icontains is more permissive (you get more entries
         with icontains).
 
     Having a list of molecules ChEMBL IDs in a list, get uniprot accession
@@ -245,7 +245,7 @@ class ChEMBL(REST):
 
         # we jump from compounds to targets through activities
         # Here this is a one to many mapping so we initialise a default
-        # dictionary. 
+        # dictionary.
         compound2target = defaultdict(set)
 
         filter = "molecule_chembl_id__in={}"
@@ -273,10 +273,10 @@ class ChEMBL(REST):
             accessions = set()
             for target in targs:
                 index = target_names.index(target)
-                accessions = accessions.union([comp['accession'] 
+                accessions = accessions.union([comp['accession']
                     for comp in targets[index]['target_components']])
             compounds2targets[compound] = accessions
- 
+
     In version 1.6.0 of bioservices, you can simply use::
 
         res = c.compounds2targets(IDs)
@@ -312,14 +312,14 @@ class ChEMBL(REST):
 
     Obtain he pChEMBL value for compound::
 
-        res = c.get_activity(filters=['pchembl_value__isnull=False', 
+        res = c.get_activity(filters=['pchembl_value__isnull=False',
                                       'molecule_chembl_id=CHEMBL25'])
 
 
     Obtain he pChEMBL value for compound and target::
 
-        res = c.get_activity(filters=['pchembl_value__isnull=False', 
-                                      'molecule_chembl_id=CHEMBL25', 
+        res = c.get_activity(filters=['pchembl_value__isnull=False',
+                                      'molecule_chembl_id=CHEMBL25',
                                       'target_chembl_id=CHEMBL612545'])
 
     Get all approved drugs::
@@ -327,10 +327,10 @@ class ChEMBL(REST):
         c.get_approved_drugs(max_phase=4)
 
     Get approved drugs for lung cancer
-    
+
 
     The ChEMBL API significantly changed in 2018 and the nez version of
-    bioservices (1.6.0) had to change the API as well, which has been 
+    bioservices (1.6.0) had to change the API as well, which has been
     simplified.
 
     Here below are some correspondances between the previous and the new API.
@@ -368,9 +368,9 @@ class ChEMBL(REST):
         max_data = params['limit']
         offset = params['offset']
 
-        # I noticed that 
+        # I noticed that
         # if offset + limit > total_count, then limit is set to 1000 - offset
-        # Not sure whether it is a but or intended behaviour but this caused
+        # Not sure whether it is a bug or intended behaviour but this caused
         # some issues during the debugging.
 
         # So http_get("mechanism?format=json&limit=10000&offset=10")
@@ -379,7 +379,7 @@ class ChEMBL(REST):
         # if a resources is small (e.g. tissue has 655 < 1000 entries) there is
         # no such issues.
 
-        # So, the best is to constraint limit to 1000 
+        # So, the best is to constraint limit to 1000
         params['limit'] = 1000  # for the first call
 
         # The limit used in all other calls
@@ -487,7 +487,7 @@ class ChEMBL(REST):
             self._check_request(res)
             # Note that there is no page_meta key in the returned object but a
             # single key that is the plural for of the resource except if some
-            # entries are not found. In such case, a 
+            # entries are not found. In such case, a
             if 'not_found' in res.keys():
                 self.logging.warning('Some entries were not found: {}'.format(res['not_found']))
                 self.not_found = res['not_found']
@@ -854,12 +854,10 @@ class ChEMBL(REST):
     def get_target_component(self, query=None, limit=20, offset=0, filters=None):
         """Target sequence information (A Target may have 1 or more sequences)
 
-
         ::
 
             res = c.get_target_component(1)
             res['sequence']
-
 
         """
         params = {"limit":limit, "offset":offset, 'filters':filters}
@@ -930,7 +928,7 @@ class ChEMBL(REST):
             >>> from pylab import imread, imshow
             >>> from bioservices import *
             >>> s = ChEMBL(verbose=False)
-            >>> res = s.get_image_of_compounds_by_chemblId(s._image_chemblId_example)
+            >>> res = s.get_image(s._image_chemblId_example)
             >>> imshow(imread(res['filenames'][0]))
 
         .. todo:: ignorecoords option
@@ -1064,9 +1062,15 @@ class ChEMBL(REST):
 
         filter = "molecule_chembl_id__in={}"
         from easydev import Progress
+
+        if isinstance(compounds, list):
+            pass
+        else:
+            compounds = list(compounds)
+
         pb = Progress(len(compounds))
         for i in range(0, len(compounds)):
-            # FIXME could get activities by bunch using 
+            # FIXME could get activities by bunch using
             # ",".join(compounds[i:i+10) for example
             activities = self.get_activity(filters=filter.format(compounds[i]))
             # get target ChEMBL IDs from activities
@@ -1081,7 +1085,6 @@ class ChEMBL(REST):
         # let us download all of them ! This took about 4 minutes on this test but
         # if you use the cache, next time it will be much much quicker. This is
         # not down at the activities level because there are too many entries
-
         targets = self.get_target(limit=-1)
 
         # identifies all target chembl id to easily retrieve the entry later on
@@ -1092,8 +1095,8 @@ class ChEMBL(REST):
             accessions = set()
             for target in targs:
                 index = target_names.index(target)
-                accessions = accessions.union([comp['accession'] 
+                accessions = accessions.union([comp['accession']
                     for comp in targets[index]['target_components']])
             compound2target[compound] = accessions
- 
+
         return compound2target

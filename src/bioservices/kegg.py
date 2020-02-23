@@ -60,7 +60,8 @@ pages.
   Here are some examples of entry Ids:
 
     * **genes_id**: A KEGG organism and a gene name (e.g. 'eco:b0001').
-    * **enzyme_id**: 'ec' and an enzyme code. (e.g. 'ec:1.1.1.1'). See :attr:`~bioservices.kegg.KEGG.enzymeIds`.
+    * **enzyme_id**: 'ec' and an enzyme code. (e.g. 'ec:1.1.1.1'). 
+      See :attr:`~bioservices.kegg.KEGG.enzymeIds`.
     * **compound_id**: 'cpd' and a compound number (e.g. 'cpd:C00158').
       Some compounds also have 'glycan_id' and
       both IDs are accepted and converted internally.
@@ -77,7 +78,8 @@ pages.
     * **pathway_id**: 'path' and a pathway number. Pathway numbers prefixed
       by 'map' specify the reference pathway and pathways prefixed by
       a KEGG organism specify pathways specific to the organism (e.g.
-      'path:map00020', 'path:eco00020'). See :attr:`~bioservices.kegg.KEGG.pathwayIds` attribute.
+      'path:map00020', 'path:eco00020'). 
+      See :attr:`~bioservices.kegg.KEGG.pathwayIds` attribute.
     * **motif_id**: a motif database names ('ps' for prosite, 'bl' for blocks,
       'pr' for prints, 'pd' for prodom, and 'pf' for pfam) and a motif entry
       name. (e.g. 'pf:DnaJ' means a Pfam  database entry 'DnaJ').
@@ -129,7 +131,11 @@ Each database entry is identified by::
 
     db:entry
 
-where "db" is the database name or its abbreviation shown above and  "entry" is the entry name or the accession number that is uniquely assigned within the database. In reality "db" may be omitted, for the entry name called the KEGG object identifier (kid) is unique across KEGG.::
+where "db" is the database name or its abbreviation shown above and  
+"entry" is the entry name or the accession number that is uniquely 
+assigned within the database. In reality "db" may be omitted, for 
+the entry name called the KEGG object identifier (kid) is unique 
+across KEGG.::
 
     kid = database-dependent prefix + five-digit number
 
@@ -138,9 +144,9 @@ more specifically written as::
 
     org:gene
 
-where "org" is the three- or four-letter KEGG organism code or the T number genome
-identifier and "gene" is the gene identifier, usually locus_tag or ncbi GeneID, or the primary
-gene name.
+where "org" is the three- or four-letter KEGG organism code or 
+the T number genome identifier and "gene" is the gene identifier, 
+usually locus_tag or ncbi GeneID, or the primary gene name.
 
 
 """
@@ -1191,7 +1197,7 @@ class KEGGParser(object):
             parser = self._parse(res)
         except Exception as err:
             self.logging.warning("Could not parse the entry %s correctly" % dbentry)
-            self.logging.warning(err.message)
+            self.logging.warning(err)
             parser = res
         return parser
 
@@ -1300,15 +1306,13 @@ class KEGGParser(object):
             # transform to dictionary by splitting line and then split on ";"
             elif key in "GENE":
                 kp = {}
-                for i,line in enumerate(value.split("\n")):
-                    try: 
-                        k,v = line.strip().split(";",1)
+                for i, line in enumerate(value.split("\n")):
+                    try:
+                        k, v = line.strip().split(None, 1)
                     except:
-                        self.logging.warning("could not interpet line in %s %s" % (key, line))
-                        k = i
-                        v = line
-                    if k.endswith(":"):
-                        k = k.strip().rstrip(":")
+                        self.logging.warning("empty line in %s %s" % (key, line))
+                        k = line.strip()
+                        v = ''
                     kp[k] = v
                 output[key] = kp.copy()
 

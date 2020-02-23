@@ -57,6 +57,9 @@ from .chebi import *
 from . import ena
 from .ena import ENA
 
+from . import eva
+from .eva import *
+
 from . import ensembl
 from .ensembl import *
 
@@ -72,6 +75,12 @@ from .hgnc import *
 
 from . import intact
 from .intact import *
+
+from . import pubchem
+from .pubchem import *
+
+from . import pfam
+from .pfam import *
 
 from . import rhea
 from .rhea import *
@@ -110,8 +119,8 @@ from .quickgo import *
 from . import chembl
 from .chembl import *
 
-from . import picr
-from .picr import *
+#from . import picr
+#from .picr import *
 
 from . import psicquic
 from .psicquic import *
@@ -145,6 +154,7 @@ from .muscle import *
 
 from . import dbfetch
 from .dbfetch import *
+
 
 # sub packages inside bioservices.
 

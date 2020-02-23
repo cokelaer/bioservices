@@ -48,15 +48,11 @@ from bioservices.services import WSDLService, REST
 __all__ = ['Reactome', 'ReactomeOld', 'ReactomeAnalysis']
 
 
-# for reactome, content-type could be
-#  "Content-Type", "multipart/form-data; boundary=" +    boundary);
-
 
 class Reactome(REST):
     """
 
 
-    pathway_diagram -> exporter_diagram
 
     .. todo:: interactors, orthology, particiapnts, person,
         query, refernces, schema

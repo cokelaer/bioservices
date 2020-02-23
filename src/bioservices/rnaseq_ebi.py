@@ -76,11 +76,14 @@ class RNASEQ_EBI(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(RNASEQ_EBI, self).__init__(name="UniProt",
-                url="http://www.ebi.ac.uk/fg/rnaseq/api",
-                verbose=verbose, cache=cache)
-        self._organisms = None
+        print("This service is deprecated")
 
+        #super(RNASEQ_EBI, self).__init__(name="UniProt",
+        #        url="http://www.ebi.ac.uk/fg/rnaseq/api",
+        #        verbose=verbose, cache=cache)
+        #self._organisms = None
+
+'''
     def get_run_by_organism(self, organism, frmt="json", mapping_quality=70,
         condition=None):
         """
@@ -376,4 +379,4 @@ class RNASEQ_EBI(REST):
             results = tsv_parser(results)
         return results
 
-
+'''

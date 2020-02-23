@@ -6,7 +6,7 @@
 #
 #  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -74,13 +74,16 @@ class PICR(REST):
         :param bool verbose: prints informative messages (default is False)
 
         """
-        super(PICR, self).__init__(name="PICR", url=PICR._url, verbose=verbose, 
-                cache=cache)
-        self._databases = None
+        print("This service is not available anymore on EBI website")
+
+        #super(PICR, self).__init__(name="PICR", url=PICR._url, verbose=verbose,
+        #        cache=cache)
+        #self._databases = None
 
         # the blast call needs time
-        self.settings.params['general.timeout'][0] = 100
+        #self.settings.params['general.timeout'][0] = 100
 
+'''
     def getMappedDatabaseNames(self):
         """Returns names of the databases
 
@@ -98,7 +101,7 @@ class PICR(REST):
             res = self.getMappedDatabaseNames()
             self._databases = [a.text for a in res.getchildren()]
         return self._databases
-    databases = property(_get_databases, 
+    databases = property(_get_databases,
         doc="Get a human-readable list of databases (obtained from XML returned by :meth:`getMappedDatabaseNames`)")
 
     def getUPIForSequence(self, sequence, database, taxid=None,
@@ -144,7 +147,7 @@ class PICR(REST):
                 self._checkDBname(d)
             # requests.get accepts multidict values, so nothing fancy to do here !
             params['database'] = database[:]
-                
+
         #if taxid!=None or onlyactiveis False or includeattributesis False:
         #    raise NotImplementedError
         if taxid:
@@ -196,7 +199,7 @@ class PICR(REST):
         """
 
         url =  "getUPIForAccession"
-        
+
         params = {}
         params['accession'] = accession
 
@@ -306,3 +309,4 @@ Parameters:
         blastdb - set the database against which to query the protein fragments. [optional, defaults to uniprotkb]
 
 """
+'''

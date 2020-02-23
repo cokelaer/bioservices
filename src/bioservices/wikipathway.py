@@ -73,7 +73,7 @@ class WikiPathways(REST):
         :param bool verbose:
 
         """
-        super(WikiPathways, self).__init__(name="WikiPathways", 
+        super(WikiPathways, self).__init__(name="WikiPathways",
                 url=WikiPathways._url, verbose=verbose, cache=cache)
         self._organism = 'Homo sapiens' # This function is redundant (see class service)
         self.logging.info("Fetching organisms...")
@@ -98,7 +98,7 @@ class WikiPathways(REST):
     def findPathwaysByLiterature(self, query):
         """Find pathways by their literature references.
 
-        :param str query: The query, can be a pubmed id, author name 
+        :param str query: The query, can be a pubmed id, author name
             or title keyword.
         :return:  dictionary with Pathway as keys
 
@@ -111,14 +111,14 @@ class WikiPathways(REST):
         res = self.http_get(self.url + "findPathwaysByLiterature",
                 params=params)
 
-        return res['results']
+        return res['result']
 
     def findPathwaysByXref(self, ids, codes=None):
         """Find pathways by searching on the external references of DataNodes.
 
         :param str string ids: One or mode DataNode identifier(s) (e.g. 'P45985').
             Datanodes can be (gene/protein/metabolite identifiers). For one
-            node, you can use a string (or number) or list of one identifier. 
+            node, you can use a string (or number) or list of one identifier.
             you can also provide a list of identifiers.
         :param str codes: You can restrict the search to a specific database.
             See http://developers.pathvisio.org/wiki/DatabasesMapps#Supporteddatabasesystems
@@ -134,10 +134,10 @@ class WikiPathways(REST):
             >>> s.findPathwaysByXref(ids=["P45985", "ENSG00000130164"], codes=["L", "En"])
 
 
-        Note that in the last example, we specify multiple ids and codes 
-        parameters to query for multiple xrefs at once. In that case, the 
-        number of ids and codes parameters should match. Moreover, they will 
-        be paired to form xrefs, so P45985 is searched for in the "L" 
+        Note that in the last example, we specify multiple ids and codes
+        parameters to query for multiple xrefs at once. In that case, the
+        number of ids and codes parameters should match. Moreover, they will
+        be paired to form xrefs, so P45985 is searched for in the "L"
         database while "ENSG00000130164" is searched for in the En" database
         only.
         """
@@ -154,7 +154,7 @@ class WikiPathways(REST):
                     url += "&ids={}".format(this)
         else:
             raise ValueError("ids must be a list, or a string or a number")
- 
+
         if codes and isinstance(codes, (str, int)):
             codes = [codes]
         if codes:
@@ -184,8 +184,8 @@ class WikiPathways(REST):
     def listPathways(self, organism=None):
         """Get a list of all available pathways.
 
-        :param str organism: If provided, the data is filtered to keep only 
-            the organism  provided, which must be a valid name (check out 
+        :param str organism: If provided, the data is filtered to keep only
+            the organism  provided, which must be a valid name (check out
             :attr:`organism` attribute)
         :return: dataframe. Index are the pathways identifiers (e.g. WP1)
 
@@ -212,23 +212,18 @@ class WikiPathways(REST):
         :param str pathwayId: the pathway identifier.
         :param int revision: the revision number of the pathway (use '0'
             for most recent version).
-        :Returns: The pathway.
+        :Returns: The pathway as a dictionary. The pathway is stored in gpml
+            format.
 
         ::
 
             s.getPathway("WP2320")
         """
-        url = "/getPathway?pwId=%s" % pathwayId
+        url = "getPathway?pwId=%s" % pathwayId
         url += "&revision=%s&format=json" % revision
         request = self.http_get(url)
 
-
-        pathway = {}
-        for this in data:
-            for tag in [ 'url', 'name', 'species', 'revision', "gpml"]:
-                text = this.find("ns2:%s" % tag).getText()
-                pathway[tag] = text
-        return pathway
+        return request['pathway']
 
     def getPathwayInfo(self, pathwayId):
         """Get some general info about the pathway.
@@ -287,7 +282,7 @@ class WikiPathways(REST):
 
         .. todo:: interpret XML
         """
-        res = self.http_get(self.url + 
+        res = self.http_get(self.url +
                 "/getRecentChanges?timestamp=%s&format=json" % timestamp)
         return res
 
@@ -324,7 +319,7 @@ class WikiPathways(REST):
 
         .. note:: use :meth:`savePathwayAs` to save into a file.
         """
-        self.devtools.check_param_in_list(filetype, ['gpml', 'png', 'svg', 
+        self.devtools.check_param_in_list(filetype, ['gpml', 'png', 'svg',
             'pdf', 'txt', 'pwf', 'owl'])
 
         url = self.url + "/getPathwayAs?fileType=%s" % filetype
@@ -337,14 +332,16 @@ class WikiPathways(REST):
         """Save a pathway.
 
         :param str pathwayId: the pathway identifier.
-        :param str filename: the name of the file. If a filename extension 
+        :param str filename: the name of the file. If a filename extension
             is not provided the pathway will be saved as a pdf (default).
-        :param int revisionNumb: the revision number of the pathway (use 
+        :param int revisionNumb: the revision number of the pathway (use
             '0 for most recent version).
-        :param bool display: if True the pathway will be displayed in your 
+        :param bool display: if True the pathway will be displayed in your
             browser.
 
         .. note:: Method from bioservices. Not a WikiPathways function
+        .. versionchanged:: 1.7 return PNG by default instead of PDF. PDF
+            not working as of 20 Feb 2020 even on wikipathway website.
         """
         if filename.find('.') == -1:
             filename = "%s.%s" %(filename,'pdf')
@@ -352,6 +349,7 @@ class WikiPathways(REST):
 
         res = self.getPathwayAs(pathwayId, filetype=filetype,
             revision=revision)
+
         with open(filename,'wb') as f:
             import binascii
             try:
@@ -452,10 +450,10 @@ class WikiPathways(REST):
 
     def getColoredPathway(self, pathwayId, filetype="svg", revision=0,
             color=None, graphId=None):
-        """Get a colored image version of the pathway. 
+        """Get a colored image version of the pathway.
 
         :param str pwId: The pathway identifier.
-        :param int revision: The revision number of the pathway (use '0' for most recent version). 
+        :param int revision: The revision number of the pathway (use '0' for most recent version).
         :param str fileType:  The image type (One of 'svg', 'pdf' or 'png'). Not
             yet implemented. svg is returned for now.
         :returns: Binary form of the image.
@@ -468,8 +466,11 @@ class WikiPathways(REST):
             url += "&revision={}".format(revision)
         url += "&format=json"
         request = self.http_get(url)
-        data = request['data']
-        return base64.b64decode(data)
+        try:
+            data = request['data']  
+            return base64.b64decode(data)
+        except:
+            return request
 
     def findPathwaysByText(self, query, species=None):
         """Find pathways using a textual search on the description and text labels of the pathway objects.

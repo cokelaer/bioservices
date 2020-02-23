@@ -6,7 +6,7 @@
 #
 #  File author(s): 
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -32,7 +32,7 @@
 
 
 """
-from services import REST
+from bioservices.services import REST
 from bioservices import logger
 logger.name = __name__
  
@@ -51,7 +51,7 @@ class Pfam(REST):
         >>> p = Pfam()
 
     """
-    _url = "http://pfam.sanger.ac.uk/"
+    _url = "http://pfam.xfam.org/"
     def __init__(self, verbose=True):
         """**Constructor**
 
@@ -69,6 +69,16 @@ class Pfam(REST):
         """
         url = self._url + "/protein/" + Id
         self.on_web(url)
+
+
+    def get_protein(self, ID):
+        res = self.http_get("protein", params={"id": ID, "output": "xml"})
+        return res.content
+
+
+
+
+
 
 
 

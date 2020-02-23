@@ -6,7 +6,7 @@
 #
 #  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -32,7 +32,8 @@
         over 28 million structures, properties and associated information. By
         integrating and linking compounds from more than 400 data sources, ChemSpider
         enables researchers to discover the most comprehensive view of freely
-        available chemical data from a single online search. It is owned by the Royal Society of Chemistry.
+        available chemical data from a single online search. It is owned by 
+        the Royal Society of Chemistry.
 
         -- ChemSpider home page, March 2013
 """
@@ -60,7 +61,6 @@ class ChemSpider(REST):
         >>> results['averagemass']
         79.0999
 
-
     """
     def __init__(self, verbose=False, token=None, cache=False):
         url = 'http://www.chemspider.com/'
@@ -74,7 +74,6 @@ class ChemSpider(REST):
                 raise Exception(err)
         self._token = None
         self.token = token
-
 
         self._databases = None
 
