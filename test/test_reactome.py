@@ -147,16 +147,11 @@ def test_data_species_main(reactome):
     assert len(res)
 
 
-@pytest.fixture
-def reactomeold():
-    return ReactomeOld(verbose=True)
 
-
-def test_species(reactomeold):
-    assert len(reactomeold.get_species()) > 10
-
-
-def test_query_by_ids(reactomeold):
-    res = reactomeold.query_by_ids("Pathway", 'TP53')
+# obsolet
+def __test_species():
+    r = ReactomeOld(verbose=True)
+    assert len(r.get_species()) > 10
+    res = r.query_by_ids("Pathway", 'TP53')
     assert len(res) >= 1
 

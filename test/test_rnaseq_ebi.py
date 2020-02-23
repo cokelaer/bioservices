@@ -2,7 +2,8 @@ from bioservices import RNASEQ_EBI
 import os
 import pytest
 
-
+# This services is deprecated
+'''
 skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
      reason="in maintenance")
 
@@ -61,3 +62,4 @@ def test5(rnaseq):
 def test_get_run(rnaseq):
     res = rnaseq.get_run("SRR1042759")
     assert res[0]['RUN_IDS'] == "SRR1042759"
+'''

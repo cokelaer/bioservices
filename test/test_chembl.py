@@ -178,19 +178,23 @@ def test_similarity(chembl):
 def test_get_approved_drugs(chembl):
     res = chembl.get_approved_drugs(maxdrugs=20)
 
+
 def test_image(chembl):
     res = chembl.get_image("CHEMBL25", view=False)
     os.remove("CHEMBL25.png")
     res = chembl.get_image("CHEMBL25", view=False, format='svg')
     os.remove("CHEMBL25.svg")
 
+
 def test_get_status(chembl):
     res = chembl.get_status()
     assert 'activities' in res
 
+
 def test_get_status_resources(chembl):
     res = chembl.get_status_resources()
     assert 'activity' in res
+
 
 def test_int_str_request(chembl):
      assert chembl.get_mechanism(13) == chembl.get_mechanism('13')
@@ -220,15 +224,17 @@ def test_ordering(chembl):
         assert True
 
 
-def test_limit(chembl):
+# very slow and probably useless now. 
+# the test was written to check an unclear behaviou
+def __test_limit(chembl):
     # Check that the limi
     # See notes in _get_data in ChEMBL.
     # if limit > 1000 and offset >0 ChEMBL REST API reset the limit to 1000-10,
     # which is not expected. 
     offset = 10
-    res = chembl.get_mechanism(limit=60000, offset=offset)
+    res = chembl.get_mechanism(limit=6000, offset=offset)
     assert len(res) == chembl.page_meta['total_count'] - offset
 
-@skiptravis
-def test_compounds2accession(chembl):
-    res = chembl.compounds2accession('CHEMBL2')
+# very very slow 
+def __test_compounds2accession(chembl):
+    res = chembl.compounds2accession('CHEMBL4')

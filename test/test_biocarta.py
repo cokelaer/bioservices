@@ -1,9 +1,7 @@
 import pytest
 from bioservices import BioCarta
 
-@skiptravis
-# @pytest.mark.skip(reason="The NCI CBIIT instance of the CGAP and Mitelman data is no longer supported.")
-def test_biocarta():
+def _test_biocarta():
 
     b = BioCarta()
     res = b.get_pathway_protein_names('h_RELAPathway')

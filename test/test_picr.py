@@ -1,7 +1,10 @@
 from bioservices.picr import PICR
 import pytest
 
+# As of Feb 2020, we cannot find picr service on EBI website anymore.
+# Most probably deprecated
 
+"""
 @pytest.fixture
 def picr():
     return PICR(verbose=True)
@@ -45,3 +48,5 @@ def _test_getUPIForBLAST2(picr):
 
 def _test_getUPIForBLAST3(picr):
     picr.getUPIForBLAST(picr._blastfrag_example, ["SWISSPROT"], taxid="9606", program="blastp",matrix="BLOSUM62")
+
+"""

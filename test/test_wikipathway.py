@@ -1,6 +1,7 @@
 from bioservices.wikipathway import  WikiPathways
 import pytest
 import os
+from easydev import TempFile
 
 skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
     reason="On travis")
@@ -103,9 +104,8 @@ def test_findPathwaysByLitterature(wikipath):
 def test_savePathwayAs(wikipath):
     # Note that not all WP have the PDF format available.
     # WP4 has not (march 2018)
-    wikipath.savePathwayAs("WP232", "test.pdf", display=False)
-    try:os.remove("test.pdf")
-    except:pass
+    with TempFile(suffix=".png") as fout:
+        wikipath.savePathwayAs("WP232", fout.name, display=False)
 
 
 @skiptravis
@@ -152,13 +152,12 @@ def test_remoceCurationTag(wikipath):
     except NotImplementedError:
         assert True
 
-@skiptravis
-def test_getPathwayHistory(wikipath):
+# FIXME SLOW
+def _test_getPathwayHistory(wikipath):
     _ = wikipath.getPathwayHistory("WP455", "20100101000000")
 
-@skiptravis
 def test_coloredPathway(wikipath):
-    _ = wikipath.getColoredPathway("WP4",revision=0)
+    wikipath.getColoredPathway("WP4",revision=0)
 
 
 

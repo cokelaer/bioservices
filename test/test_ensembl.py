@@ -45,7 +45,9 @@ def test_get_genetree_by_member_symbol(ensembl):
     # assert res[0:200] == """((((((((ENSPFOP00000001575:0.046083,ENSXMAP00000006983:0.065551):0.43822,ENSONIP00000006940:0.359035):0.019582,((ENSTRUP00000015030:0.077336,ENSTNIP00000002435:0.099898):0.208834,ENSGACP00000015199:0."""
 
 
-def test_get_alignment_by_region(ensembl):
+# FIXME
+# feb 2020. does not work even on ensemble website
+def __test_get_alignment_by_region(ensembl):
     region = '2:106040000-106040050'
     species = 'taeniopygia_guttata'
     res = ensembl.get_alignment_by_region(region, species,

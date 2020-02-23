@@ -172,7 +172,7 @@ def test_conv(kegg):
 
 
 def test_show_module(kegg):
-    kegg.show_module("md:hsa_M00402")
+    kegg.show_module("md:hsa_M00001")
 
 
 def test_show_pathway(kegg):
