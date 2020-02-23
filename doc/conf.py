@@ -292,7 +292,7 @@ latex_documents = [
 ]
 
 latex_elements = { 'inputenc': '\\usepackage[utf8]{inputenc}' }
-latex_elements["latex_paper_size"] = "a4"
+#latex_elements["latex_paper_size"] = "a4"
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
 #latex_logo = None

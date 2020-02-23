@@ -195,6 +195,15 @@ OmniPath Commons
     :undoc-members:
     :synopsis:
 
+Panther
+=========================
+
+.. automodule:: bioservices.panther
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
 Pathway Commons
 =========================
 
@@ -211,13 +220,6 @@ PDB module
     :undoc-members:
     :synopsis:
 
-PICR module
-=====================================
-
-.. automodule:: bioservices.picr
-    :members:
-    :undoc-members:
-    :synopsis:
 
 PRIDE module
 =====================================
@@ -260,16 +262,9 @@ Readseq
     :undoc-members:
     :synopsis:
 
-RNASEQ Analysis
-======================
-
-.. automodule:: bioservices.rnaseq_ebi
-    :members:
-    :undoc-members:
-    :synopsis:
 
 UniChem
-===================================================================
+=========
 
 .. automodule:: bioservices.unichem
     :members:
@@ -277,7 +272,7 @@ UniChem
     :synopsis:
 
 UniProt
-===================================================================
+================
 
 .. automodule:: bioservices.uniprot
     :members:
@@ -285,7 +280,7 @@ UniProt
     :synopsis:
 
 DBFetch
-===================================================================
+===============
 
 .. automodule:: bioservices.dbfetch
     :members:
@@ -293,7 +288,7 @@ DBFetch
     :synopsis:
 
 Wikipathway
-===================================================================
+====================
 
 .. automodule:: bioservices.wikipathway
     :members:

@@ -1,6 +1,37 @@
 Whats' new, what has changed
 ================================
 
+Revision 1.8.0 roadmap
+----------------------
+
+- make all services methods hidden or inside a single attributes to make the
+methods of a services more visible
+- finalise pubchem, pfam and eva modules
+
+
+Revision 1.7.0
+--------------
+
+* Pull request
+    * from @thobalose (https://github.com/cokelaer/bioservices/pull/149) to
+      update tests, travis recipes, pinned matplotlib to 3.0.3
+
+* NEWS:
+    * panther module (pantherdb.org)
+    * add a test for the pubchem, pfam and eva modules, which are still 
+      in draft version though
+
+* CHANGES
+    * PICR module is fully commented. The service is most probably deprecated.
+      Not on EBI website anymore
+    * remove TCGA, which waws only a draft version with one method. 
+
+* FIXES
+    * wikipathway: fixed getPathway, savePathway, getPathwayByLiterature and
+      coloredPathway methods. Some are failing due to some wikipathway 
+      temporary failures.
+
+
 Revision 1.6.0
 -----------------
 

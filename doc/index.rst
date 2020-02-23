@@ -11,9 +11,10 @@ BIOSERVICES: access to biological web services programmatically
     .. image:: bioservices.png
         :width: 50%
 
-    :Citations: If you use BioServices, please cite *Cokelaer et al, Bioinformatics (2013)*. 
-        See `bioinformatics link <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ 
-        for details.
+
+:Citations: If you use BioServices, please cite *Cokelaer et al, Bioinformatics (2013)*. 
+    See `bioinformatics link <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ 
+    for details.
 
 
 
