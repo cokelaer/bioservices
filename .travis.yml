@@ -25,7 +25,8 @@ before_install:
 install:
   - pip install grequests requests requests_cache
   - pip install easydev>=0.9.36 beautifulsoup4 suds-jurko appdirs colorlog
-  - pip install coveralls coverage numpydoc 
+  - pip install coveralls coverage 
+  # numpydoc --> install sphinx, not required. Was failing in feb 2020
   #sphinx-gallery
   - pip install pytest pytest-cov pytest-xdist pytest-mock pytest-timeout pytest-rerunfailures
   - pip install .
