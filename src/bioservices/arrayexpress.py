@@ -163,7 +163,6 @@ class ArrayExpress(REST):
         assert mode in ["experiments", "files"]
         url = "{0}/{1}/{2}".format(self.format, self.version, mode)
 
-
         defaults = {
             "accession":None, #ex: E-MEXP-31
             "keywords":None,
@@ -179,12 +178,15 @@ class ArrayExpress(REST):
             "array":None,       # ex: A-AFFY-33
             "expandfo": "on",
             "directsub": "true",
-            "sortby": ["accession", "name", "assays", "species", "releasedate", "fgem", "raw", "atlas"],
+            "sortby": ["accession", "name", "assays", "species",
+                       "releasedate", "fgem", "raw", "atlas"],
             "sortorder": ["ascending", "descending"],
         }
 
         for k in kargs.keys():
-            self.devtools.check_param_in_list(k, list(defaults.keys()))
+            if k not in defaults.keys():
+                raise ValueError("Incorrect value provided ({}). Correct values are {}".format(
+                    k, sorted(defaults.keys())))
 
         #if len(kargs.keys()):
         #    url += "?"
@@ -381,8 +383,8 @@ class ArrayExpress(REST):
         self.format = 'json'
         try:
             sets = self.queryExperiments(**kargs)
-        except:
-            pass
+        except Exception as err:
+            raise Exception(err)
         self.format = frmt
         return [x['accession'] for x in sets['experiments']['experiment']]
 
