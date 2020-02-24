@@ -58,4 +58,8 @@ def test_extra3(array):
 
 def test_extra4():
     ae = ArrayExpress(verbose=False)
-    res = ae.queryAE(keywords="pneumonia", species='homo+sapiens')
+    ae.TIMEOUT = 60
+    try:
+        res = ae.queryAE(keywords="pneumonia", species='homo+sapiens')
+    except:
+        pass
