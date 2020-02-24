@@ -32,6 +32,8 @@
 
 """
 import sys
+# for the print function compatibility
+from __future__ import print_function
 
 from bioservices.services import REST
 
