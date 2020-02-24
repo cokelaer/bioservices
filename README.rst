@@ -15,7 +15,7 @@ BioServices
     :alt: Documentation Status
 
 
-:Python version available: BioServices is tested for Python 2.7, 3.3, 3.4, 3.5
+:Python_version_available: BioServices is tested for Python 2.7, 3.6, 3.7
 :Contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
 :Issues: Please use https://github.com/cokelaer/bioservices/issues
 :How to cite: Cokelaer et al. *BioServices: a common Python package to access biological Web Services programmatically*
@@ -67,6 +67,35 @@ Release History
 ------------------
 This is a summary of the changelog. Complete change can be found in the 
 `main documentation <http://bioconvert.readthedocs.io/en/master/ChangeLog.html>`_.
+
+
+
+Revision 1.7.0
+--------------
+
+* General fixes and update from @thobalose (https://github.com/cokelaer/bioservices/pull/149) to
+  updating matplotlib to 3.0.3
+* added  panther module (pantherdb.org)
+* added tests for pubchem, pfam and eva modules, which are still in draft version though
+* deprecated PICR and TCGA modules (the latter was not really available anyway)
+* Fixed wikipathway, kegg, reactome tests and code (issues 148 and 151)
+
+
+1.6.X
+-----
+
+* rewrote entirely the ChEMBL wrapper due to new ChEMBL API.
+* removed the quickgo_old module and its tests
+* Fix typo for a "valid colum," in uniprot module
+* Changed biomodels WSDL endpoint (thanks to https://github.com/thobalose. )
+* uses colorlog to have more robust and consistent logging.
+* Fixed wikipathway XML issues by outputing dictionaries now. This fixes 
+      https://github.com/cokelaer/bioservices/issues/131
+* Fix https://github.com/cokelaer/bioservices/issues/137 to handle KEGG GENE
+  field properly in KEGGParse
+* Fix https://github.com/cokelaer/bioservices/issues/125 thanks to 
+      https://github.com/thobalose. 
+
 
 1.5.X
 ---------
