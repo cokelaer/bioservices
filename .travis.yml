@@ -23,12 +23,16 @@ before_install:
 
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
+  - echo $TRAVIS_PYTHON_VERSION
+  - conda create --yes --name testenv python=$TRAVIS_PYTHON_VERSION
+  - source activate testenv
   - pip install grequests requests requests_cache
   - pip install easydev>=0.9.36 beautifulsoup4 suds-jurko appdirs colorlog
-  - pip install coveralls coverage 
+  - pip install coveralls coverage
   # numpydoc --> install sphinx, not required. Was failing in feb 2020
   #sphinx-gallery
-  - conda install -y pytest pytest-cov pytest-xdist pytest-mock pytest-timeout pytest-rerunfailures
+  - conda install -y pytest pytest-cov pytest-xdist pytest-mock pytest-timeout 
+  - pip install pytest-rerunfailures
   - pip install .
 
 
