@@ -10,6 +10,11 @@ methods of a services more visible
 - Where ever devtools is used to check input params, we should make sure the
 error message is informative. This may need to change easydev itself;
 
+Revision 1.7.1
+--------------
+
+Just updating the README and setup metadata
+
 Revision 1.7.0
 --------------
 
