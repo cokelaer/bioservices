@@ -39,7 +39,7 @@ BIOSERVICES: access to biological web services programmatically
 
 
 
-:Python version: Python 2.7, 3.4, 3.5, 3.6
+:Python version: Python 2.7, 3.6, 3.7
 :Source: See  `http://github.com/cokelaer/bioservices <https://github.com/cokelaer/bioservices/>`_.
 :Issues: Please fill a report on `github <https://github.com/cokelaer/bioservices/issues>`_
 
