@@ -10,13 +10,17 @@ methods of a services more visible
 - Where ever devtools is used to check input params, we should make sure the
 error message is informative. This may need to change easydev itself;
 
-Revision 1.7.1
---------------
+Revision 1.7.2 (March 2020)
+---------------------------
 
-Just updating the README and setup metadata
+* Fixing ReadTheDocs online documentation and Changeloh
 
-Revision 1.7.0
---------------
+Revision 1.7.1 (Feb 2020)
+-------------------------
+* Just updating the README and setup metadata
+
+Revision 1.7.0 (Feb 2020)
+-------------------------
 
 * Pull request
     * from @thobalose (https://github.com/cokelaer/bioservices/pull/149) to
