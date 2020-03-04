@@ -198,7 +198,7 @@ class ChEMBL(REST):
     Several filters can be applied at the same time using a list::
 
         filters = ['molecule_properties__mw_freebase__gte=300']
-        filters += ['molecule_properties__acd_logp__gte=3']
+        filters += ['molecule_properties__alogp__gte=3']
         res = c.get_molecule(filters)
 
     **Use Cases: (inspired from ChEMBL documentation)**
@@ -768,9 +768,17 @@ class ChEMBL(REST):
             c.get_substructure("BSYNRYMUTXBXSQ-UHFFFAOYSA-N")
 
 
-        The 'Substructure' and 'Similarity' web service resources allow for the chemical content of ChEMBL to be searched. Similar to the other resources, these search based resources except filtering, paging and ordering arguments. These methods accept SMILES, InChI Key and molecule ChEMBL_ID as arguments and in the case of similarity searches an additional identity cut-off is needed. Some example molecule searches are provided in the table below.
+        The 'Substructure' and 'Similarity' web service resources allow
+        for the chemical content of ChEMBL to be searched. Similar to the
+        other resources, these search based resources except filtering, paging
+        and ordering arguments. These methods accept SMILES, InChI Key and
+        molecule ChEMBL_ID as arguments and in the case of similarity searches
+        an additional identity cut-off is needed. Some example molecule searches
+        are provided in the table below.
 
-        Searching with InChI key is only possible for InChI keys found in the ChEMBL database. The system does not try and convert InChI key to a chemical representation.
+        Searching with InChI key is only possible for InChI keys found in the
+        ChEMBL database. The system does not try and convert InChI key to a
+        chemical representation.
 
         """
         # we use quote to formqt the SMILE/InChiKey for a URL parsing
@@ -812,10 +820,16 @@ class ChEMBL(REST):
             # using aspirin InChI Key
             c.get_similarity("BSYNRYMUTXBXSQ-UHFFFAOYSA-N")
 
-        The 'Substructure' and 'Similarity' web service resources allow for the chemical content of ChEMBL to be searched. Similar to the other resources, these search based resources except filtering, paging and ordering arguments. These methods accept SMILES, InChI Key and molecule ChEMBL_ID as arguments and in the case of similarity searches an additional identity cut-off is needed. Some example molecule searches are provided in the table below.
+        The 'Substructure' and 'Similarity' web service resources allow for the
+        chemical content of ChEMBL to be searched. Similar to the other resources, these
+        search based resources except filtering, paging and ordering arguments. These
+        methods accept SMILES, InChI Key and molecule ChEMBL_ID as arguments and in the
+        case of similarity searches an additional identity cut-off is needed. Some
+        example molecule searches are provided in the table below.
 
-        Searching with InChI key is only possible for InChI keys found in the ChEMBL database. The system does not try and convert InChI key to a chemical representation.
-
+        Searching with InChI key is only possible for InChI keys found in the
+        ChEMBL database. The system does not try and convert InChI key to a chemical
+        representation.
         """
         # we use quote to formqt the SMILE/InChiKey for a URL parsing
         structure = quote(structure)
@@ -982,6 +996,8 @@ class ChEMBL(REST):
         """Return number of entries for all resources
 
         .. note:: not in the ChEMBL API.
+
+        .. versionchanges:: 1.7.3 (removed target_prediction and document_term)
         """
         def _local_get(this):
             params = {"limit":1, "offset":0}
@@ -992,14 +1008,17 @@ class ChEMBL(REST):
         for this in ['activity', 'assay', 'atc_class', 'cell_line',
                 'binding_site', 'biotherapeutic', 'chembl_id_lookup',
                 'compound_record', 'compound_structural_alert',
-                'document', 'document_similarity', 'document_term',
+                'document', 'document_similarity', 
                 'drug', 'drug_indication', 'go_slim',
                 'mechanism', 'metabolism', 'molecule',
                 'molecule_form', 'protein_class', 'source',
                 'target', 'target_component',
-                'target_prediction', 'target_relation', 'tissue']:
+                'target_relation', 'tissue']:
             self.logging.info("Looking at {}".format(this))
-            data[this] = _local_get(this)
+            try:
+                data[this] = _local_get(this)
+            except:
+                self.logging.warning("{} resources seems down".format(this))
         return data
 
     def order_by(self, data, name, ascending=True):
@@ -1015,7 +1034,7 @@ class ChEMBL(REST):
 
         data = c.get_molecules()
             data1 = c.order_by(data, 'molecule_chembl_id')
-            data2 = c.order_by(data, 'molecule_properties__acd_logp')
+            data2 = c.order_by(data, 'molecule_properties__alogp')
 
         .. note:: the ChEMBL API allows for ordering but we do not use
             that API. Instead, we provide this generic function.
