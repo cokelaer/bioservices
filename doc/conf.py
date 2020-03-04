@@ -36,7 +36,7 @@ version = pkg_resources.require(pkg_name)[0].version
 release = version
 author = "Thomas Cokelaer, Lea M. Harder, Jordi Serra-Musach, \nDennis Pultz"
 title = "BioServices"
-copyright = author + ", 2012-2017"
+copyright = author + ", 2012-2020"
 project = pkg_name
 
 import easydev
