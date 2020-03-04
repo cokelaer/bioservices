@@ -4,11 +4,11 @@ Whats' new, what has changed
 Revision 1.8.0 roadmap
 ----------------------
 
-- make all services methods hidden or inside a single attributes to make the
-methods of a services more visible
-- finalise pubchem, pfam and eva modules
-- Where ever devtools is used to check input params, we should make sure the
-error message is informative. This may need to change easydev itself;
+* make all services methods hidden or inside a single attributes to make the
+  methods of a services more visible
+* finalise pubchem, pfam and eva modules
+* Where ever devtools is used to check input params, we should make sure the
+  error message is informative. This may need to change easydev itself;
 
 Revision 1.7.2 (March 2020)
 ---------------------------
