@@ -1,9 +1,6 @@
 name: bioservices
 
 channels:
-- bioconda
-- defaults
-- r
 - conda-forge
 
 dependencies:
