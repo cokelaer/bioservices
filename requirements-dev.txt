@@ -8,4 +8,5 @@ pytest-timeout
 pytest-runner
 sphinx
 sphinx_rtd_theme
+sphinx-gallery
 coveralls
