@@ -316,8 +316,9 @@ class WSDLService(Service):
 
 class RESTbase(Service):
     _service = "REST"
-    def __init__(self, name, url=None, verbose=True):
-        super(RESTbase, self).__init__(name, url, verbose=verbose)
+    def __init__(self, name, url=None, verbose=True, requests_per_sec=3):
+        super(RESTbase, self).__init__(name, url, verbose=verbose,
+            requests_per_sec=requests_per_sec)
         self.logging.info("Initialising %s service (REST)" % self.name)
         self.last_response = None
 
@@ -406,8 +407,10 @@ class REST(RESTbase):
     }
     #special_characters = ['/', '#', '+']
 
-    def __init__(self, name, url=None, verbose=True, cache=False):
-        super(REST, self).__init__(name, url, verbose=verbose)
+    def __init__(self, name, url=None, verbose=True, cache=False,
+        requests_per_sec=3):
+        super(REST, self).__init__(name, url, verbose=verbose,
+            requests_per_sec=requests_per_sec)
         bspath = self.settings.user_config_dir
         self.CACHE_NAME = bspath + os.sep + self.name + "_bioservices_db"
 
@@ -434,6 +437,20 @@ class REST(RESTbase):
     def clear_cache(self):
         from requests_cache import clear
         clear()
+
+    def _build_url(self, query):
+        url = None
+        
+        if query is None:
+            url = self.url
+        else:
+            if query.startswith("http"):
+                # assume we do want to use self.url
+                url = query
+            else:
+                url = '%s/%s' % (self.url, query)
+        
+        return url
 
     def _get_session(self):
         if self._session is None:
@@ -558,14 +575,8 @@ class REST(RESTbase):
 
         if query starts with http:// do not use self.url
         """
-        if query is None:
-            url = self.url
-        else:
-            if query.startswith("http"):
-                # assume we do want to use self.url
-                url = query
-            else:
-                url = '%s/%s' % (self.url, query)
+        url = self._build_url(query)
+
         if url.count('//') >1:
             self.logging.warning("URL of the services contains a double //." +
                 "Check your URL and remove trailing /")

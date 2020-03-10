@@ -304,6 +304,7 @@ class BioModels(REST):
 
         :param str frmt: the format of the result (xml, csv, json)
         :return: list of model identifiers
+
         """
         self._check_format(frmt)
         res = self.http_get("p2m/missing", params={"format": frmt})
