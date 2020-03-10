@@ -105,16 +105,15 @@ class BioModels(REST):
             raise ValueError("Supported format for this function are {}. You provided {}".format(
                 supported, frmt))
 
-    def get_all_models(self):
+    def get_all_models(self, chunk=100):
         """Return all models"""
         models = []
         offset = 0
-        res = self.search("*.*", numResults=100)
+        res = self.search("*.*", numResults=chunk)
         while type(res) is dict and 'models' in res:
             models.extend(res['models'])
-            offset += 100
-            print(offset)
-            res = self.search("*.*", offset=offset, numResults=100)
+            offset += chunk
+            res = self.search("*.*", offset=offset, numResults=chunk)
         return models
 
 
@@ -155,6 +154,11 @@ class BioModels(REST):
             bm.get_model_download("BIOMD0000000100", filename="BIOMD0000000100.png")
             bm.get_model_download("BIOMD0000000100")
 
+
+        This function can retrieve all files in a ZIP archive or a single image.
+        In the example below, we retrieve the PNG and plot it using matplotlib.
+        Using your favorite image viewver, you should get a better resolution.
+        Or just download the SVG version of the model.
 
         .. plot::
             :include-source:
