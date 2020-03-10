@@ -379,7 +379,7 @@ class EUtils(REST):
             Value must be a valid Entrez database name. See :attr:`databases`
             or don't provide any value to obtain the entire list
         :return: an XML or json data structure that depends on the
-           value of :param:`databases` (default to json)
+           value of :attr:`databases` (default to json)
 
         ::
 
