@@ -17,7 +17,7 @@ Revision 1.7.4 (March 2020 Combine/Harmany2020 hackathon)
 * Integration of BioModels new API (REST instead of WSDL and different
   functionalities) in coordination with Mihai Glont and Tung Nguyen at EMBL-EBI
   during the Combine-Harmony hackathon.
-* Integration of BigModels web service by Achilles
+* Integration of BiGG models service thanks to https://github.com/achillesrasquinha contribution.
 * Fixing notebooks (biomodels and uniprot)
 * Move the miriam services to the attic
 
