@@ -134,9 +134,6 @@ from .ncbiblast import *
 from . import biogrid
 from .biogrid import *
 
-from . import miriam
-from .miriam import *
-
 from . import arrayexpress
 from .arrayexpress import *
 

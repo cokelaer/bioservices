@@ -23,52 +23,33 @@ Start a biomodels interface:
     >>> from bioservices import BioModels
     >>> s = BioModels()
 
-look at the list of models Id::
+look at the list of model identifiers::
 
-    print(s.modelsId)
+    models = s.get_all_models()
 
-Get a specific model given its Id. Let us play with the first model:
 
-.. doctest:: biomodels
+If you have a specific model identifier, then it is easy. You can 
+etrieve the model itself::
 
-    >>> s.modelsId[0]
-    'BIOMD0000000299'
+    model bm.get_model("BIOMD0000000100")
 
-and look at some meta information:
+and get its name or other types of information::
 
-.. doctest:: biomodels
-    :options: +SKIP
+    >>> model['name']
+    Rozi2003_GlycogenPhosphorylase_Activation
 
-    >>> print(s.getSimpleModelsByIds(s.modelsId[0]))
-    <?xml version="1.0" encoding="UTF-8"?>
-    <simpleModels>
-    <simpleModel>
-        <referenceId>10643740</referenceId>
-        <modelId>BIOMD0000000299</modelId>
-        <modelSubmissionId>MODEL1101140000</modelSubmissionId>
-        <modelName>Leloup1999_CircadianRhythms_Neurospora</modelName>
-        <publicationId>10643740</publicationId>
-        <authors>
-            <author>Leloup JC</author>
-            <author>Gonze D</author>
-            <author>Goldbeter A</author>
-        </authors>
-        <encoders>
-            <encoder>Catherine Lloyd</encoder>
-            <encoder>Vijayalakshmi Chelliah</encoder>
-        </encoders>
-        <lastModificationDate>2011-01-18T12:23:47+00:00</lastModificationDate>
-    </simpleModel>
-    </simpleModels>
+In particular, description, author and files associated with this model. Here,
+we can see the files and in particular a PNG image called
+**BIOMD0000000100.png**. You can get it as follows::
+
+    bm.get_model_download("BIOMD0000000100", filename="BIOMD0000000100.png")
+
+or just download the whole bundle::
     
+    bm.get_model_download("BIOMD0000000100")
+
+saved into **BIOMD0000000100.zip**.
 
 
-Some of these information can be retrieved specifically:
-
-.. doctest:: biomodels
-
-    >>> ID = s.modelsId[0]
-    >>> print(s.getPublicationByModelId(ID))
-    10643740
 
 

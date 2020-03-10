@@ -200,7 +200,6 @@ class FASTA(object):
 
     known_dbtypes = ["sp", "gi"]
     def __init__(self):
-        print("Will be moved to BioKit github.com/biokit")
         self._fasta = None
 
     def _get_fasta(self):

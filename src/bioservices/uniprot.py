@@ -561,6 +561,7 @@ class UniProt(REST):
         # if empty result, nothing to do
         if res and len(res) == 0:
             return res
+
         # else populate a dictionary
         newres = {}
         for line in res.split("\n")[1:-1]:
@@ -605,13 +606,15 @@ class UniProt(REST):
             res = pd.read_csv(io.StringIO(str(res.strip())), sep="\t")
         return res
 
-    def get_df(self, entries, nChunk=100, organism=None):
+    def get_df(self, entries, nChunk=100, organism=None, limit=10):
         """Given a list of uniprot entries, this method returns a dataframe with all possible columns
 
 
         :param entries: list of valid entry name. if list is too large (about
             >200), you need to split the list
         :param chunk:
+        :param limit: limit number of entries per identifier to 10. You can 
+            set it to None to keep all entries but this will be very slow
         :return: dataframe with indices being the uniprot id (e.g. DIG1_YEAST)
 
         .. todo:: cleanup the content of the data frame to replace strings
@@ -637,7 +640,8 @@ class UniProt(REST):
                 if organism:
                     query += "+and+" + organism
                 res = self.search(query, frmt="tab",
-                                  columns=",".join(self._valid_columns))
+                                  columns=",".join(self._valid_columns),
+                                limit=limit)
             else:
                 break
             if len(res) == 0:
@@ -672,5 +676,5 @@ class UniProt(REST):
         # the spaces:
         output['Sequence'].fillna("", inplace=True)
         output.Sequence = output['Sequence'].apply(lambda x: x.replace(" ", ""))
-        
+
         return output
