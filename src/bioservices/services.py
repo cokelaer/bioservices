@@ -566,6 +566,9 @@ class REST(RESTbase):
                 url = query
             else:
                 url = '%s/%s' % (self.url, query)
+        if url.count('//') >1:
+            self.logging.warning("URL of the services contains a double //." +
+                "Check your URL and remove trailing /")
         self.logging.debug(url)
         try:
             kargs['params'] = params
