@@ -13,12 +13,12 @@ be executed by typing CTRL+enter
 UniProt
 ----------
 
-Here is a ipython notebook dedicated to UniProt, which can be downloaded :download:`doc/notebooks/UniProt.ipynb` or view its results on `uniprot nbviewer <https://github.com/cokelaer/bioservices/blob/master/notebooks/uniprot/UniProt.ipynb>`_
+Here is a ipython notebook dedicated to UniProt, which can be downloaded :download:`doc/notebooks/UniProt.ipynb` or view its results on `uniprot nbviewer <https://nbviewer.ipython.org/github.com/cokelaer/bioservices/blob/master/notebooks/uniprot/UniProt.ipynb>`_
 
 BioModels
 ----------
 
-Here is a ipython notebook dedicated to BioModels, which can be downloaded :download:`doc/notebooks/BioModels.ipynb` or view its results on `biomodels nbviewer <https://github.com/cokelaer/bioservices/blob/master/doc/notebooks/BioModels.ipynb>`_
+Here is a ipython notebook dedicated to BioModels, which can be downloaded :download:`doc/notebooks/BioModels.ipynb` or view its results on `biomodels nbviewer <https://nbviewer.ipython.org/url/github.com/cokelaer/bioservices/blob/master/doc/notebooks/BioModels.ipynb>`_
 
 
 **Here below, links may be broken and will be fixed asap (get the notebooks from
