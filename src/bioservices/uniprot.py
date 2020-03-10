@@ -561,6 +561,8 @@ class UniProt(REST):
         # if empty result, nothing to do
         if res and len(res) == 0:
             return res
+
+        
         # else populate a dictionary
         newres = {}
         for line in res.split("\n")[1:-1]:
