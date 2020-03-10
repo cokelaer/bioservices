@@ -997,7 +997,7 @@ class ChEMBL(REST):
 
         .. note:: not in the ChEMBL API.
 
-        .. versionchanges:: 1.7.3 (removed target_prediction and document_term)
+        .. versionchanged:: 1.7.3 (removed target_prediction and document_term)
         """
         def _local_get(this):
             params = {"limit":1, "offset":0}
