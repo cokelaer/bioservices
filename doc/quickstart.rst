@@ -227,12 +227,12 @@ protein P29375 found in two specific databases::
     >>> from bioservices.picr import PICR
     >>> p = PICR()
     >>> res = p.getUPIForAccession("P29375", ["IPI", "ENSEMBL"])
-    
+
 
 .. seealso:: Reference guide of :class:`bioservices.picr.PICR` for more details
 
 
-Biomodels service
+BioModels service
 ===================
 
 You can access the biomodels service and obtain a model as follows::
@@ -240,17 +240,13 @@ You can access the biomodels service and obtain a model as follows::
 
     >>> from bioservices import biomodels
     >>> b = biomodels.BioModels()
-    >>> model = b.getModelSBMLById('BIOMD0000000299')
+    >>> model = b.get_model('BIOMD0000000299')
 
 Then you can play with the SBML file with your favorite SBML tool.
 
 In order to get the model IDs, you can look at the full list::
 
-    >>> b.modelsId
-
-Of course it does not tell you anything about a model; there are more useful functions such as 
-:meth:`~bioservices.biomodels.BioModels.getModelsIdByUniprotId` and others from the getModelsIdBy family.
-
+    >>> b.get_models()
 
 .. seealso:: Reference guide of :class:`bioservices.biomodels.BioModels` for more details
 .. seealso:: :ref:`biomodels_tutorial` for more details

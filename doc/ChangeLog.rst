@@ -10,6 +10,16 @@ Revision 1.8.0 roadmap
 * Where ever devtools is used to check input params, we should make sure the
   error message is informative. This may need to change easydev itself;
 
+
+Revision 1.7.4 (March 2020 Combine/Harmany2020 hackathon)
+---------------------------------------------------------
+
+* Integration of BioModels new API (REST instead of WSDL and different
+functionalities) in coordination with Mihai Glont and Tung Nguyen at EMBL-EBI
+during the Combine-Harmony hackathon.
+* Integration of BigModels web service by Achilles
+
+
 Revision 1.7.3 (March 2020)
 ---------------------------
 
@@ -17,7 +27,7 @@ Revision 1.7.3 (March 2020)
   removing document_term and  target_prediction. Changed acd_log into alogp: for
   some reasons this was changed. There was a warning on 4th March 2020 telling
   that changes may occur.
-    
+
 
 
 Revision 1.7.2 (March 2020)
