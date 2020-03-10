@@ -31,7 +31,7 @@ install:
   - pip install coveralls coverage
   # numpydoc --> install sphinx, not required. Was failing in feb 2020
   #sphinx-gallery
-  - conda install -y pytest pytest-cov pytest-xdist pytest-mock pytest-timeout 
+  - conda install -y pytest pytest-cov pytest-xdist pytest-timeout 
   - pip install pytest-rerunfailures
   - pip install .
 
