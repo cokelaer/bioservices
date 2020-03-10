@@ -456,7 +456,7 @@ class BioModels(WSDLService):
 
         ::
 
-             >>> print(s.getModelsIdByPerson(u"Novère"))
+             >>> print(s.getModelsIdByPerson(u"Novï¿½re"))
 
         .. note:: the use of the letter **u** in front of the string to encode special characters.
 

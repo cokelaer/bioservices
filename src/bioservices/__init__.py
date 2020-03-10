@@ -155,6 +155,8 @@ from .muscle import *
 from . import dbfetch
 from .dbfetch import *
 
+from . import bigg
+from .bigg import BiGG
 
 # sub packages inside bioservices.
 
