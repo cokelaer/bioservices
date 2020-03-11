@@ -13,7 +13,7 @@ be executed by typing CTRL+enter
 UniProt
 ----------
 
-Here is a ipython notebook dedicated to UniProt, which can be downloaded :download:`notebooks/UniProt.ipynb` or view its results on `uniprot nbviewer <https://nbviewer.ipython.org/github.com/cokelaer/bioservices/blob/master/notebooks/UniProt.ipynb>`_
+Here is a ipython notebook dedicated to UniProt, which can be downloaded :download:`notebooks/UniProt.ipynb` or view its results on `uniprot nbviewer <https://nbviewer.ipython.org/url/github.com/cokelaer/bioservices/blob/master/doc/notebooks/UniProt.ipynb>`_
 
 BioModels
 ----------
