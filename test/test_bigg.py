@@ -25,8 +25,8 @@ def test_length(bigg):
 def test_models(bigg):
     models = bigg.models
     assert isinstance(models, list)
-    
-    assert keys_exists(models[0], 
+
+    assert keys_exists(models[0],
         ("bigg_id", "metabolite_count", "organism", "reaction_count",
         "gene_count"))
 
@@ -121,4 +121,4 @@ def test_download(bigg):
         bigg.download("iND750", target=f.name)
 
         assert osp.exists(f.name)
-        
+

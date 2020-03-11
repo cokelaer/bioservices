@@ -34,6 +34,15 @@ ArrayExpress
     :undoc-members:
     :synopsis:
 
+BiGG
+====
+
+.. automodule:: bioservices.bigg
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
 BioDBnet
 ============
 
@@ -164,15 +173,6 @@ MUSCLE
 ==============
 
 .. automodule:: bioservices.muscle
-    :members:
-    :undoc-members:
-    :synopsis:
-
-
-Miriam
-======================
-
-.. automodule:: bioservices.miriam
     :members:
     :undoc-members:
     :synopsis:

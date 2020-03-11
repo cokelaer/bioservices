@@ -1,3 +1,20 @@
+# -*- python -*-
+#
+#  This file is part of bioservices software
+#
+#  Copyright (c) 2013-2020 - EBI-EMBL
+#
+#  File author(s):
+#
+#
+#  Distributed under the GPLv3 License.
+#  See accompanying file LICENSE.txt or copy at
+#      http://www.gnu.org/licenses/gpl-3.0.html
+#
+#  website: https://github.com/cokelaer/bioservices
+#  documentation: http://bioservices.readthedocs.io
+#
+##############################################################################
 """
 Interface to the BiGG Models API Service
 
@@ -18,11 +35,14 @@ import os.path as osp
 from bioservices.services import REST
 from bioservices.util import sequencify, squash
 
+
 __all__ = ["BiGG"]
+
 
 _ACCEPTABLE_MODEL_RESOURCE_TYPES = ("metabolites", "reactions", "genes")
 _ACCEPTABLE_SEARCH_TYPES = tuple(["models"] + list(_ACCEPTABLE_MODEL_RESOURCE_TYPES))
 _ACCEPTABLE_MODEL_DOWNLOAD_FORMATS = ("xml", "json", "mat")
+
 
 class BiGG(REST):
     """
@@ -73,13 +93,13 @@ class BiGG(REST):
                 % (type_, _ACCEPTABLE_MODEL_RESOURCE_TYPES))
 
         query = "models/%s/%s" % (model_id, type_)
-        
+
         if ids is None:
             return self._http_get_results(query)
 
         ids = sequencify(ids)
         queries = [("%s/%s" % (query, id_)) for id_ in ids]
-        
+
         response = self.http_get(queries)
         return squash(response)
 
@@ -97,18 +117,18 @@ class BiGG(REST):
 
     def genes(self, model_id, ids=None):
         return self._get_model_resource("genes", model_id=model_id, ids=ids)
-            
+
     def search(self, query, type_):
         if type_ not in _ACCEPTABLE_SEARCH_TYPES:
-            raise TypeError("Unknown type %s. Acceptable types are %s" 
+            raise TypeError("Unknown type %s. Acceptable types are %s"
                 % (type_, _ACCEPTABLE_SEARCH_TYPES))
-        
+
         params = { "query": query, "search_type": type_ }
         return self._http_get_results("search", params=params)
 
     def download(self, model_id, format_="json", gzip=True, target=None):
         if format_ not in _ACCEPTABLE_MODEL_DOWNLOAD_FORMATS:
-            raise TypeError("Unknown format %s. Accepted types are %s." 
+            raise TypeError("Unknown format %s. Accepted types are %s."
                 % (format_, _ACCEPTABLE_MODEL_DOWNLOAD_FORMATS))
 
         path = "%s.%s" % (model_id, format_)
@@ -119,11 +139,11 @@ class BiGG(REST):
         if not target:
             target = path
 
-        url = self._build_url("%s/static/models/%s" % 
+        url = self._build_url("%s/static/models/%s" %
             (BiGG._base_url, path))
 
         response = self.session.get(url, stream=True)
-        
+
         if response.ok:
             with open(target, "wb") as f:
                 for content in response.iter_content():
