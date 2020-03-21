@@ -155,6 +155,9 @@ from .dbfetch import *
 from . import bigg
 from .bigg import BiGG
 
+from . import omicsdi
+from .omicsdi import OmicsDI
+
 # sub packages inside bioservices.
 
 #import mapping
