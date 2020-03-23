@@ -22,6 +22,7 @@ import os
 import sys
 import socket
 import platform
+import traceback
 
 from bioservices.settings import BioServicesConfig
 
@@ -643,7 +644,7 @@ Consider increasing it with settings.TIMEOUT attribute""".format(self.settings.T
                 self.logging.debug("BioServices:: Could not decode the response")
                 return res
         except Exception as err:
-            print(err)
+            traceback.print_exc()
             return None
 
     def getUserAgent(self):
