@@ -1088,12 +1088,14 @@ class KEGG(REST):
             d = k.parse(res)
 
         """
+        parse = dict()
+
         try:
-            res = self.keggParser.parse(entry)
-            return res
+            parse = self.keggParser.parse(entry)
         except:
             self.logging.warning('Could not parse the entry correctly.')
-            return entry
+
+        return parse
 
 
 class KEGGParser(object):
@@ -1186,25 +1188,32 @@ class KEGGParser(object):
 
             >>> d = s.parse(res)
         """
-        entry = res.split("\n")[0].split()[0]
-        if entry == "ENTRY":
+        parser = dict()
+        dbentry = "?"
+
+        # get() should return a large amount of text data
+        if not isinstance(res, str):
+            raise ValueError("Unexpected input, unable to parse data of type %s" % type(res))
+
+        if res[:5] == "ENTRY":
             dbentry = res.split("\n")[0].split(None, 2)[2]
         else:
-            dbentry='?'
-            raise ValueError
+            raise ValueError("Unable to parse data, it does not comform to expected KEGG format")
 
         try:
             parser = self._parse(res)
         except Exception as err:
             self.logging.warning("Could not parse the entry %s correctly" % dbentry)
             self.logging.warning(err)
-            parser = res
+
         return parser
 
     def _parse(self, res):
+        # If the result is a response code and not data,
+        # simply return an empty dict as there is nothing to parse
+        if isinstance(res, int):
+            return dict()
 
-        if res == 404:
-            return
         keys = [x.split(" ")[0] for x in res.split("\n") if len(x) and x[0]!=" "
                 and x!="///"]
         # let us go line by to not forget anything and know which entries are
