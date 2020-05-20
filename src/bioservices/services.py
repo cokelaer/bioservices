@@ -568,7 +568,10 @@ class REST(RESTbase):
         # OTHERWISE
         self.logging.debug("Running http_get (single call mode)")
         #return self.get_one(**{'frmt': frmt, 'query': query, 'params':params})
-        return self.get_one(query, frmt, params=params, **kargs)
+
+        headers = kargs.get("headers", self.get_headers())
+        kargs.update({"headers": headers})
+        return self.get_one(query, frmt, params=params,  **kargs)
 
     def get_one(self, query=None, frmt='json', params={}, **kargs):
         """
@@ -602,8 +605,8 @@ class REST(RESTbase):
             return res
         except Exception as err:
             self.logging.critical(err)
-            self.logging.critical("""Issue. Maybe your current timeout is {0} is not sufficient. 
-Consider increasing it with settings.TIMEOUT attribute""".format(self.settings.TIMEOUT))
+            self.logging.critical("""Query unsuccesful. Maybe too slow response. 
+    Consider increasing it with settings.TIMEOUT attribute {}""".format(self.settings.TIMEOUT))
 
     def http_post(self, query, params=None, data=None,
                     frmt='xml', headers=None, files=None, **kargs):
@@ -650,8 +653,9 @@ Consider increasing it with settings.TIMEOUT attribute""".format(self.settings.T
         self.logging.info('getUserAgent: Begin')
         urllib_agent = 'Python-requests/%s' % requests.__version__
         #clientRevision = ''
-        clientVersion = ''
-        user_agent = 'EBI-Sample-Client/%s (%s; Python %s; %s) %s' % (
+        from bioservices import version
+        clientVersion = version
+        user_agent = 'BioServices/%s (bioservices.%s; Python %s; %s) %s' % (
             clientVersion, os.path.basename(__file__),
             platform.python_version(), platform.system(),
             urllib_agent
@@ -662,7 +666,7 @@ Consider increasing it with settings.TIMEOUT attribute""".format(self.settings.T
 
     def get_headers(self, content='default'):
         """
-        :param str content: ste to default that is application/x-www-form-urlencoded
+        :param str content: set to default that is application/x-www-form-urlencoded
             so that it has the same behaviour as urllib2 (Sept 2014)
 
         """
