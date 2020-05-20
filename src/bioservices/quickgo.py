@@ -49,7 +49,7 @@ class QuickGO(REST):
 
         >>> from bioservices import QuickGO
         >>> s = QuickGO()
-        >>> res = s.Term("GO:0003824")
+        >>> res = s.goterms("GO:0003824")
 
     Retrieve information about a protein given its uniprot identifier, a
     taxonomy number. Let us also restrict the search to the UniProt database and
@@ -103,31 +103,28 @@ class QuickGO(REST):
 
         """
         url = "services/ontology/go/search"
+        query = query.replace(':', '%3A')
+        query = query.replace(',', '%2C')
         params = {"query":query, 'limit':limit, "page":page}
-        res = self.http_get(url, frmt="txt", params=params)
-        res = json.loads(res)
-        return res
+        res = self.http_get(url, frmt="json", params=params,
+            headers=self.get_headers("json"))
+        try:
+            return res['results']
+        except:
+            return res
 
-    def goterms(self, max_number_of_pages=None):
+    def goterms(self, query, max_number_of_pages=None):
         """Get information on all terms and page through the result"""
-        url = "services/ontology/go/terms"
-        results = []
 
-        data = self.http_get(url, frmt="txt", params={"page":1})
-        data = json.loads(data)
-        number_of_pages = data['pageInfo']['total']
-        if max_number_of_pages:
-            number_of_pages = max_number_of_pages
-
-        # unfortunately, the new API requires to call the service for each page.
-        results = []
-        for i in range(1, number_of_pages + 1):
-            print("fetching page %s / %s " % (i+1, number_of_pages))
-            json.loads
-            data = self.http_get(url, frmt="txt", params={'page':i+1})
-            data = json.loads(data)['results']
-            results.extend(data)
-        return results
+        query = query.replace(':', '%3A')
+        query = query.replace(',', '%2C')
+        url = "services/ontology/go/terms/{}".format(query)
+        results = self.http_get(url, frmt="json", params={},
+            headers=self.get_headers("json"))
+        try:
+            return results['results']
+        except:
+            return results
 
     def Annotation(self,
                     assignedBy=None,
@@ -324,7 +321,8 @@ Invalid parameter: source parameters must be a list of strings ['PUBMED']
 or a string (e.g., 'PUBMED:') """)
             params['reference'] = reference
 
-        res = self.http_get(url, frmt="txt", params=params)
+        res = self.http_get(url, frmt="txt", params=params,
+            headers=self.get_headers("json"))
 
         try:
             import json
@@ -366,14 +364,6 @@ or a string (e.g., 'PUBMED:') """)
             return results
 
 
-    def Terms(self, query):
-        url = "services/ontology/go/terms/"
-        url += query
-        res =self.http_get(url, frmt="txt")
-        if res not in [400,"400"]:
-            res = json.loads(res)['results'] 
-        return res
-
 
 class GeneOntology():
     """
@@ -399,4 +389,4 @@ class GeneOntology():
         self._quickgo = QuickGO(verbose=False)
 
     def getGOTerm(self, goid):
-        return self._quickgo.Term(goid)
+        return self._quickgo.goterms(goid)
