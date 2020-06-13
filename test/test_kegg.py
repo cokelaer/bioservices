@@ -2,12 +2,17 @@ from bioservices import KEGG, KEGGParser
 import pytest
 
 
-@pytest.fixture
+@pytest.fixture(scope = "module")
 def kegg():
     k = KEGG()
     k.organismIds
     k.organism = "hsa"
     return k
+
+
+@pytest.fixture(params = [None, "", 0, 400, {}])
+def parse_input(request):
+    yield request.param
 
 
 # This is a simple test class that do not test everything on purpose.
@@ -139,6 +144,13 @@ def test_get(kegg):
     except:
         assert True
 
+
+def test_parse(kegg, parse_input):
+    # Check that parse can handle return values that get()
+    # might reasonably produce like Service.response_codes
+    assert isinstance(kegg.parse(parse_input), dict)
+
+
 def test_conv(kegg):
     kegg.conv("ncbi-gi","hsa:10458+ece:Z5100")
 
@@ -217,25 +229,9 @@ def test_KEGGParser(kegg):
     assert d['SEQUENCE'][0]['TYPE'] == "NRP"
 
 
+def test_KEGGParser_parse_invalid(parse_input):
+    kp = KEGGParser()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    # Check that an exception is raised for invalid input
+    with pytest.raises(ValueError):
+        kp.parse(parse_input)
