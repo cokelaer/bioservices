@@ -28,4 +28,8 @@ def _test_get_xml_query():
     assert len(res.split("\n"))>10
 
 
+def test_get_ligand_info():
+    pdb.get_ligand_info("4HHV")
 
+def test_get_go_terms():
+    pdb.get_go_terms("4HHV")

@@ -131,10 +131,10 @@ Each database entry is identified by::
 
     db:entry
 
-where "db" is the database name or its abbreviation shown above and  
-"entry" is the entry name or the accession number that is uniquely 
-assigned within the database. In reality "db" may be omitted, for 
-the entry name called the KEGG object identifier (kid) is unique 
+where "db" is the database name or its abbreviation shown above and
+"entry" is the entry name or the accession number that is uniquely
+assigned within the database. In reality "db" may be omitted, for
+the entry name called the KEGG object identifier (kid) is unique
 across KEGG.::
 
     kid = database-dependent prefix + five-digit number
@@ -144,8 +144,8 @@ more specifically written as::
 
     org:gene
 
-where "org" is the three- or four-letter KEGG organism code or 
-the T number genome identifier and "gene" is the gene identifier, 
+where "org" is the three- or four-letter KEGG organism code or
+the T number genome identifier and "gene" is the gene identifier,
 usually locus_tag or ncbi GeneID, or the primary gene name.
 
 

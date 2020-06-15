@@ -2,11 +2,10 @@
 #
 #  This file is part of bioservices software
 #
-#  Copyright (c) 2013-2014 - EBI-EMBL
+#  Copyright (c) 2013-2020 - EBI-EMBL - Institut Pasteur
 #
 #  File author(s):
-#      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#
+#      Thomas Cokelaer <thomas.cokelaer@pasteur.fr>
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -33,14 +32,13 @@
     :Status: in progress not for production
 
 """
-from __future__ import print_function
-
 from bioservices.services import REST
+
 
 __all__ = ["PDB"]
 
 
-class PDB(REST):
+class PDB():
     """Interface to part of the `PDB <http://www.rcsb.org/pdb>`_ service
 
     :Status: in progress not for production. You can get all ID and retrieve
@@ -61,9 +59,8 @@ class PDB(REST):
         :param bool verbose: prints informative messages (default is off)
 
         """
-        url="http://www.rcsb.org/pdb"
-        super(PDB, self).__init__(name="PDB", url=url, verbose=verbose,
-            cache=cache)
+        url="http://www.rcsb.org/pdb/rest"
+        self.services = REST(name="PDB", url=url, verbose=verbose, cache=cache)
 
     def search(self, query):
         """
@@ -75,13 +72,13 @@ class PDB(REST):
         <mvStructure.expMethod.value>SOLID-STATE NMR</mvStructure.expMethod.value>
         </orgPdbQuery>
         """
-        res = self.http_post("search", frmt="", data=query)
+        res = self.http_post("search", frmt="xml", data=query)
         return res
 
     def get_current_ids(self):
         """Get a list of all current PDB IDs."""
-        res = self.http_get("rest/getCurrent", frmt="xml")
-        res = self.easyXML(res)
+        res = self.services.http_get("getCurrent", frmt="xml")
+        res = self.services.easyXML(res)
         res = [x.attrib['structureId'] for x in res.getchildren()]
         return res
 
@@ -106,8 +103,8 @@ class PDB(REST):
         reference: http://www.rcsb.org/pdb/static.do?p=download/http/index.html
         """
         valid_formats = ["pdb", "cif", "xml"]
-        self.devtools.check_param_in_list(frmt, valid_formats)
-        self.devtools.check_param_in_list(headerOnly, [True, False])
+        self.services.devtools.check_param_in_list(frmt, valid_formats)
+        self.services.devtools.check_param_in_list(headerOnly, [True, False])
         if headerOnly is True:
             headerOnly = "YES"
         else:
@@ -120,11 +117,11 @@ class PDB(REST):
         params = {'headerOnly': headerOnly}
 
         if frmt == "xml":
-            res = self.http_get(query, frmt=frmt, params=params)
+            res = self.services.http_get(query, frmt=frmt, params=params)
             if compression is False:
                 res = self.easyXML(res)
         else:
-            res = self.http_get(query, frmt="txt", params=params)
+            res = self.services.http_get(query, frmt="txt", params=params)
         return res
 
     def get_ligands(self, identifier):
@@ -147,7 +144,7 @@ class PDB(REST):
 
         """
 
-        res = self.http_get("rest/ligandInfo", frmt='xml',
+        res = self.services.http_get("rest/ligandInfo", frmt='xml',
                 params={'structureId': identifier})
         return res
 
@@ -164,10 +161,25 @@ class PDB(REST):
         </orgPdbQuery>
         '
         """
-        res = self.http_post("query/post",
+        res = self.services.http_post("query/post",
                 data=query,
-                headers=self.get_headers(content='default'))
+                headers=self.services.get_headers(content='default'))
         return res
 
-
-
+    def get_go_terms(self, query):
+        res = self.services.http_get("goTerms", params={"structureId": query},
+            frmt="xml")
+        res = self.services.easyXML(res)
+        try:
+            return res.content
+        except:
+            return res
+    
+    def get_ligand_info(self, query):
+        res = self.services.http_get("ligandInfo", 
+            params={"structureId": query}, frmt="xml")
+        res = self.services.easyXML(res)
+        try:
+            return res.content
+        except:
+            return res

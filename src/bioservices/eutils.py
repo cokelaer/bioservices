@@ -102,7 +102,7 @@ class EUtils(REST):
                 xmlparser="EUtilsParser"):
         url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
         super(EUtils, self).__init__(name="EUtils", verbose=verbose, url=url,
-            cache=cache)
+            cache=cache, requests_per_sec=3)
 
         warning = """
 
@@ -115,8 +115,9 @@ class EUtils(REST):
         developers if NCBI observes requests that violate our policies, and we
         will attempt such contact prior to blocking access.  For more details
         see http://www.ncbi.nlm.nih.gov/books/NBK25497/#chapter2.chapter2_table1
-        BioServices does not check if you send more than 3 requests per
-        seconds. This is considered to be the user responsability. Within
+        BioServices limits requests to 3 per seconds for this services.
+        If you choose to set to a higher rate, this will be the user 
+        responsability. Within
         BioServices, we fill the parameter **tool** and **email**, however,
         to fill the latter you should provide your email either globablly
         when instanciating EUtils, or locally when calling a method.
@@ -613,8 +614,8 @@ class EUtils(REST):
         ret = self.parse_xml(ret, 'EUtilsParser')
         return ret
 
-    def ECitMatch(self,bdata, **kargs):
-        """
+    def ECitMatch(self, bdata, **kargs):
+        r"""
 
 
         :param bdata: Citation strings. Each input citation must
@@ -623,7 +624,7 @@ class EUtils(REST):
                 journal_title|year|volume|first_page|author_name|your_key|
 
             Multiple citation strings may be provided by separating the
-            strings with a carriage return character (%0D).
+            strings with a carriage return character (%0D) or simply \\r or \\n.
 
             The your_key value is an arbitrary label provided by the user
             that may serve as a local identifier for the citation,
@@ -635,7 +636,9 @@ class EUtils(REST):
 
         Only xml supported at the time of this implementation.
         """
-        params = {'bdata': bdata}
+        # Fixes https://github.com/cokelaer/bioservices/issues/169
+        from urllib.parse import unquote
+        params = {'bdata': unquote(bdata), "retmode": "xml"}
 
         # note here, we use .cgi not .fcgi
         query = "ecitmatch.cgi?db=pubmed&retmode=xml"

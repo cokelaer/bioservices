@@ -256,7 +256,7 @@ class QuickGO(REST):
 
         if geneProductType:
             for this in geneProductType.split(","):
-                assert this in ["protein", "RNA", "complex"]
+                assert this in ["protein", "miRNA", "complex"]
             params['geneProductType'] = geneProductType
 
         if evidenceCode:
@@ -363,6 +363,20 @@ or a string (e.g., 'PUBMED:') """)
                 "Cannot return a DataFrame. Returns the list. If you want the dataframe, install pandas library")
             return results
 
+    def gene_product_search(self, query, taxonID=None, page=1, limit=100,
+        type=None, dbSubSet=None, proteome=None):
+        """
+
+        """
+        if isinstance(limit, int) is False or limit >100 or limit<0:
+            raise TypeError("limit parameter must be an integer greater than zero and less than 100")
+        if isinstance(page, int) is False or limit<0:
+            raise TypeError("page parameter must be an integer greater than zero")
+
+        # fill params with parameters that have default values.
+        params = {'limit': limit, "page":page}
+    #def gene_product_targetset(self, name)
+    #def gene_product_retrieve(self, name)
 
 
 class GeneOntology():

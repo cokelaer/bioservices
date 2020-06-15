@@ -186,10 +186,12 @@ returns a list of parameters. See :meth:`getParameters`.""")
             sequence before performing the search.
         :param int scores:     maximum number of scores displayed in the output.
         :param int dropoff:     amount score must drop before extension of hits is halted.
-        :param match_scores:     match/miss-match scores to generate a scoring matrix for nucleotide searches.
+        :param match_scores:     match/miss-match scores to generate a scoring matrix 
+            for nucleotide searches.
         :param int gapopen:     penalty for the initiation of a gap.
         :param int gapext:     penalty for each base/residue in a gap.
-        :param seqrange: region of the query sequence to use for the search. Default: whole sequence.
+        :param seqrange: region of the query sequence to use for the search. 
+            Default: whole sequence.
 
 
         :return: A jobid that can be analysed with :meth:`getResult`,
@@ -221,13 +223,14 @@ returns a list of parameters. See :meth:`getParameters`.""")
 
         .. seealso:: :meth:`getResult`
 
-        .. warning:: Cases are not important. Spaces in the database case should be replaced by underscore.
+        .. warning:: Cases are not important. Spaces in the database case should 
+            be replaced by underscore.
 
         .. note:: database returned by the server have meaningless names since
-they do not map to the expected names. An example is "ENA Sequence Release" than
-should bie provided as em_rel
+            they do not map to the expected names. An example is "ENA Sequence Release" 
+            that should be provided as em_rel
 
-http://www.ebi.ac.uk/Tools/sss/ncbiblast/help/index-nucleotide.html
+        http://www.ebi.ac.uk/Tools/sss/ncbiblast/help/index-nucleotide.html
 
         """
         # There are compulsary arguments:

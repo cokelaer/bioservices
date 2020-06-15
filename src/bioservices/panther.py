@@ -57,10 +57,37 @@ class Panther(REST):
     """Interface to `Panther <http://www.pantherdb.org/services/oai/pantherdb>`_ pages
 
 
+    ::
+
         >>> from bioservics import Panther
         >>> p = Panther()
         >>> p.get_supported_genomes()
         >>> p.get_ortholog("zap70", 9606)
+
+
+        >>> from bioservics import Panther
+        >>> p = Panther()
+        >>> taxon = [x[0]['taxon_id'] for x in p.get_supported_genomes() if "coli" in x['name'].lower()]
+        >>> # you may also use our method called search_organism
+        >>> taxon = p.get_taxon_id(pattern="coli")
+        >>> res = p.get_mapping("abrB,ackA,acuI", taxon)
+
+    The get_mapping returns for each gene ID the GO terms corresponding to each
+    ID. Those go terms may belong to different categories (see
+    meth:`get_annotation_datasets`):
+
+    - MF for molecular function
+    - BP for biological process
+    - PC for Protein class
+    - CC Cellular location
+    - Pathway
+
+    Note that results from the website application http://pantherdb.org/
+    do not agree with the oupput of the get_mapping service... Try out the dgt
+    gene from ecoli for example
+
+
+
 
     """
     _url = "http://www.pantherdb.org/services/oai/pantherdb"
@@ -93,12 +120,26 @@ class Panther(REST):
         res = [x for x in res["search"]["output"]["genomes"]['genome']]
         return res
 
-    def get_taxon_id(self):
-        res = self.get_supported_genomes()
-        taxon = [x["taxon_id"] for x in res]
-        return taxon
+    def get_taxon_id(self, pattern=None):
+        """return all taxons supported by the service
 
-    def get_mapping(self, gene_list, organism):
+        If pattern is provided, we filter the name to keep those that contain
+        the filter. If only one is found, we return the name itself, otherwise a
+        list of candidates
+
+        """
+        res = self.get_supported_genomes()
+        if pattern:
+            taxon = [x['taxon_id'] for x in res if pattern.lower() in x['name'].lower()]
+            if len(taxon) == 1:
+                return taxon[0]
+            else:
+                return taxon
+        else:
+            taxon = [x["taxon_id"] for x in res]
+            return taxon
+
+    def get_mapping(self, gene_list, taxon):
         """Map identifiers
 
         Each identifier to be delimited by comma i.e. ',. Maximum of 1000 Identifiers
@@ -108,7 +149,7 @@ class Panther(REST):
         and UniProt id
 
         :param gene_list: see above
-        :param organism: one taxon ID. See supported
+        :param taxon: one taxon ID. See supported
             :meth:`~bioservices.panther.Panther.get_supported_genomes`
 
         If an identifier is not found, information can be found in the
@@ -202,7 +243,6 @@ class Panther(REST):
         res = self.http_get("supportedannotdatasets")
         res = res["search"]["annotation_data_sets"]["annotation_data_type"]
         return res
-
 
     def get_ortholog(self, gene_list, organism, target_organism=None,
         ortholog_type="all"):
@@ -310,12 +350,12 @@ class Panther(REST):
         return results
 
     def get_family_ortholog(self, family, taxon_list=None):
-        """Search for matching orthologs in target organisms 
+        """Search for matching orthologs in target organisms
 
         Also return the corresponding position in the target
-        organism sequence. The system searches for matching 
-        orthologs in the gene family that contains the search 
-        gene associated with the search term. 
+        organism sequence. The system searches for matching
+        orthologs in the gene family that contains the search
+        gene associated with the search term.
 
         :param family: Family ID
         :param taxon_list: Zero or more taxon IDs separated by ','.

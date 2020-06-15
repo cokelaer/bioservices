@@ -97,6 +97,9 @@ from .omnipath import *
 from . import pdb
 from .pdb import *
 
+from . import pdbe
+from .pdbe import *
+
 from . import pride
 from .pride import *
 

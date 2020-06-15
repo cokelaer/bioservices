@@ -20,6 +20,7 @@
 from __future__ import print_function
 import os
 import sys
+import time
 import socket
 import platform
 import traceback
@@ -49,7 +50,7 @@ from easydev import Logging
 from easydev import DevTools
 
 
-__all__ = ["Service", "WSDLService", 
+__all__ = ["Service", "WSDLService",
            "BioServicesError", "REST"]
 
 
@@ -81,7 +82,7 @@ class Service(object):
         503: 'Service not available. The server is being updated, try again later'
         }
 
-    def __init__(self, name, url=None, verbose=True, requests_per_sec=3):
+    def __init__(self, name, url=None, verbose=True, requests_per_sec=10):
         """.. rubric:: Constructor
 
         :param str name: a name for this service
@@ -91,7 +92,7 @@ class Service(object):
         :param requests_per_sec: maximum number of requests per seconds
             are restricted to 3. You can change that value. If you reach the
             limit, an error is raise. The reason for this limitation is
-            that some services (e.g.., NCBI) may black list you IP. 
+            that some services (e.g.., NCBI) may black list you IP.
             If you need or can do more (e.g., ChEMBL does not seem to have
             restrictions), change the value. You can also have several instance
             but again, if you send too many requests at the same, your future
@@ -116,7 +117,6 @@ class Service(object):
         """
         super(Service, self).__init__()
         self.requests_per_sec = requests_per_sec
-
         self.name = name
         self.logging = Logging("bioservices:%s" % self.name, verbose)
 
@@ -135,6 +135,25 @@ class Service(object):
 
         self.devtools = DevTools()
         self.settings = BioServicesConfig()
+
+        self._last_call = 0
+
+    def _calls(self):
+        time_lapse = 1. / self.requests_per_sec
+        current_time = time.time()
+        dt = current_time - self._last_call
+        
+        if self._last_call == 0:
+            self._last_call = current_time
+            return
+        else:
+            self._last_call = current_time
+            if dt > time_lapse:
+                return
+            else:
+                time.sleep(time_lapse - dt)
+        
+
 
     def _get_caching(self):
         return self.settings.params['cache.on'][0]
@@ -164,7 +183,7 @@ class Service(object):
             raise TypeError("value must be a boolean value (True/False)")
         self._easyXMLConversion = value
     easyXMLConversion = property(_get_easyXMLConversion,
-            _set_easyXMLConversion, 
+            _set_easyXMLConversion,
             doc="""If True, xml output from a request are converted to easyXML object (Default behaviour).""")
 
     def easyXML(self, res):
@@ -188,7 +207,6 @@ class Service(object):
         """
         from bioservices import xmltools
         return xmltools.easyXML(res)
-
 
     def __str__(self):
         txt = "This is an instance of %s service" % self.name
@@ -283,7 +301,7 @@ class WSDLService(Service):
     def _get_methods(self):
         return [x.name for x in
                 self.suds.wsdl.services[0].ports[0].methods.values()]
-    wsdl_methods = property(_get_methods, 
+    wsdl_methods = property(_get_methods,
             doc="returns methods available in the WSDL service")
 
     def wsdl_create_factory(self, name, **kargs):
@@ -383,12 +401,29 @@ class REST(RESTbase):
 
     There is no need for authentication if the web services available
     in bioservices except for a few exception. In such case, the username and
-    password are to be provided with the method call. However, 
+    password are to be provided with the method call. However,
     in the future if a services requires authentication, one can set the
     attribute :attr:`authentication` to a tuple::
 
         s = REST()
         s.authentication = ('user', 'pass')
+
+
+    Note about headers and content type. The Accept header is 
+    used by HTTP clients to tell the server what content types 
+    they will accept. The server will then send back a
+    response, which will include a Content-Type header telling 
+    the client what the content type of the returned content 
+    actually is. When using the :meth:`get__headers`, you can see
+    the User-Agent, the Accept and Content-Type keys. So, here the 
+    HTTP requests also contain Content-Type headers. In POST or PUT requests
+    the client is actually sendingdata to the server as part of the
+    request, and the Content-Type header tells the server what the data actually is
+    For a POST request resulting from an HTML form submission, the
+    Content-Type of the request should be one of the standard form content
+    types: application/x-www-form-urlencoded (default, older, simpler) or 
+    multipart/form-data (newer, adds support for file uploads)
+
     """
     content_types = {
         'bed': 'text/x-bed',
@@ -441,7 +476,7 @@ class REST(RESTbase):
 
     def _build_url(self, query):
         url = None
-        
+
         if query is None:
             url = self.url
         else:
@@ -450,7 +485,7 @@ class REST(RESTbase):
                 url = query
             else:
                 url = '%s/%s' % (self.url, query)
-        
+
         return url
 
     def _get_session(self):
@@ -579,6 +614,7 @@ class REST(RESTbase):
 
         if query starts with http:// do not use self.url
         """
+        self._calls()
         url = self._build_url(query)
 
         if url.count('//') >1:
@@ -606,7 +642,7 @@ class REST(RESTbase):
             return res
         except Exception as err:
             self.logging.critical(err)
-            self.logging.critical("""Query unsuccesful. Maybe too slow response. 
+            self.logging.critical("""Query unsuccesful. Maybe too slow response.
     Consider increasing it with settings.TIMEOUT attribute {}""".format(self.settings.TIMEOUT))
 
     def http_post(self, query, params=None, data=None,
@@ -631,6 +667,7 @@ class REST(RESTbase):
         return self.post_one(**kargs)
 
     def post_one(self, query=None, frmt='json', **kargs):
+        self._calls()
         self.logging.debug("BioServices:: Entering post_one function")
         if query is None:
             url = self.url
@@ -689,9 +726,12 @@ class REST(RESTbase):
         kargs.update({'query': query})
         kargs.update({'params': params})
         kargs.update({'frmt': frmt})
+
+
         return self.delete_one(**kargs)
 
     def delete_one(self, query, frmt='json', **kargs):
+        self._calls()
         self.logging.debug("BioServices:: Entering delete_one function")
         if query is None:
             url = self.url

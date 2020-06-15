@@ -1032,7 +1032,7 @@ class ChEMBL(REST):
         ::
 
 
-        data = c.get_molecules()
+            data = c.get_molecules()
             data1 = c.order_by(data, 'molecule_chembl_id')
             data2 = c.order_by(data, 'molecule_properties__alogp')
 

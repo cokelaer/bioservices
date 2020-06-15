@@ -14,7 +14,8 @@ DOCSDIR					= ${BASEDIR}/docs
 PYTHONPATH		 	   ?= python
 
 VIRTUAL_ENV			   ?= ${BASEDIR}/.venv
-VENVBIN					= ${VIRTUAL_ENV}/bin
+#VENVBIN					= ${VIRTUAL_ENV}/bin
+VENVBIN					= ${CONDAENV}/bin
 
 PYTHON				  	= ${VENVBIN}/python
 IPYTHON					= ${VENVBIN}/ipython
