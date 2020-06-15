@@ -30,7 +30,7 @@ ChEMBL
 
 Here is a ipython notebook dedicated to ChEMBL, which can be 
 downloaded :download:`notebooks/ChEMBL.ipynb` or view its results on 
-`chembl nbviewer <https://nbviewer.ipython.org/url/github.com/cokelaer/bioservices/blob/master/doc/notebooks/ChEMBL.ipynb>`_
+`chembl nbviewer <https://nbviewer.ipython.org/github/cokelaer/bioservices/blob/master/doc/notebooks/ChEMBL.ipynb>`_
 
 Entrez/Eutils
 ---------------

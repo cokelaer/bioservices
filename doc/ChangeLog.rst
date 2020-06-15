@@ -7,8 +7,22 @@ Revision 1.8.0 roadmap
 * make all services methods hidden or inside a single attributes to make the
   methods of a services more visible
 * finalise pubchem, pfam and eva modules
-* Where ever devtools is used to check input params, we should make sure the
+* Wherever devtools is used to check input params, we should make sure the
   error message is informative. This may need to change easydev itself;
+* All Classes/Services should hide the REST/WSDL methods to make the API easier.
+  Instead of inheriting from REST, we should use an aggregation and store all
+  methods in a single attribute
+
+Revision 1.7.5 
+--------------
+
+* NEW MODULE: mygeneinfo, pdbe
+* Limits the request to 10 per seconds (3 for eutils). This fixes
+  https://github.com/cokelaer/bioservices/issues/7
+* update quickgo
+* Update PDB module (will not be maintained in the future, to usePDB instead.)
+* Fix issue in Eutils/ECitMatch reported here https://github.com/cokelaer/bioservices/issues/169 
+  and here https://tinyurl.com/y6u2cyjq on stackoverflow
 
 
 Revision 1.7.4 (March 2020 Combine/Harmany2020 hackathon)

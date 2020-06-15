@@ -144,14 +144,14 @@ modindex_common_prefix = ["bioservices."]
 # to force their creation. Note that it requires singularity or dot to be
 # installed. Fixes https://github.com/biokit/bioconvert/issues/153
 
-plot_gallery = True
+plot_gallery = False
 
-sphinx_gallery_conf = {
-    "doc_module": "bioservices",
-    'backreferences_dir': os.path.join("modules", "generated"),
-    #"examples_dirs": "examples",
-    #"gallery_dirs": "auto_examples",
-}
+#sphinx_gallery_conf = {
+#    "doc_module": "bioservices",
+#    'backreferences_dir': os.path.join("modules", "generated"),
+#    #"examples_dirs": "examples",
+#    #"gallery_dirs": "auto_examples",
+#}
 
 # Get rid of spurious warnings due to some interaction between
 # autosummary and numpydoc. See

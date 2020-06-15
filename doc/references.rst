@@ -177,6 +177,13 @@ MUSCLE
     :undoc-members:
     :synopsis:
 
+MyGeneInfo
+==========
+
+.. automodule:: bioservices.mygeneinfo
+    :members:
+    :undoc-members:
+    :synopsis:
 
 
 NCBIblast
@@ -212,10 +219,15 @@ Pathway Commons
     :undoc-members:
     :synopsis:
 
-PDB module
+PDB/PDBe modules
 ========================
 
 .. automodule:: bioservices.pdb
+    :members:
+    :undoc-members:
+    :synopsis:
+
+.. automodule:: bioservices.pdbe
     :members:
     :undoc-members:
     :synopsis:
