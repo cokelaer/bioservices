@@ -355,29 +355,29 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
         :param str jobid: a job identifier returned by :meth:`run`.
         :param str  resultType: type of result to retrieve. See :meth:`getResultTypes`.
 
-   The output from the tool itself.
-    Use the 'format' parameter to retireve the output in different formats,
-    the 'compressed' parameter to retrieve the xml output in compressed form.
-     Format options:
+        The output from the tool itself.
+        Use the 'format' parameter to retireve the output in different formats,
+        the 'compressed' parameter to retrieve the xml output in compressed form.
+        Format options::
 
-     0 = pairwise,
-     1 = query-anchored showing identities,
-     2 = query-anchored no identities,
-     3 = flat query-anchored showing identities,
-     4 = flat query-anchored no identities,
-     5 = XML Blast output,
-     6 = tabular,
-     7 = tabular with comment lines,
-     8 = Text ASN.1,
-     9 = Binary ASN.1,
-    10 = Comma-separated values,
-    11 = BLAST archive format (ASN.1).
-See NCBI Blast documentation for details.
-Use the 'compressed' parameter to return the XML output in compressed form.
-e.g. '?format=5&compressed=true'.
+           0 = pairwise,
+           1 = query-anchored showing identities,
+           2 = query-anchored no identities,
+           3 = flat query-anchored showing identities,
+           4 = flat query-anchored no identities,
+           5 = XML Blast output,
+           6 = tabular,
+           7 = tabular with comment lines,
+           8 = Text ASN.1,
+           9 = Binary ASN.1,
+           10 = Comma-separated values,
+           11 = BLAST archive format (ASN.1).
+
+      See NCBI Blast documentation for details.
+      Use the 'compressed' parameter to return the XML output in compressed form.
+      e.g. '?format=5&compressed=true'.
 
 
-    em_rel_vrl
         """
         if self.getStatus(jobid)!='FINISHED':
             self.logging.warning("waiting for the job to be finished. May take a while")
