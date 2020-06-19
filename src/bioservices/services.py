@@ -436,6 +436,8 @@ class REST(RESTbase):
         'phylip': 'text/x-phyloxml+xml',
         'phyloxml': 'text/x-phyloxml+xml',
         'seqxml': 'text/x-seqxml+xml',
+        'png': 'image/png',
+        'jpg': 'image/jpg',
         'txt': 'text/plain',
         'text': 'text/plain',
         'xml': 'application/xml',
@@ -688,7 +690,7 @@ class REST(RESTbase):
             return None
 
     def getUserAgent(self):
-        self.logging.info('getUserAgent: Begin')
+        #self.logging.info('getUserAgent: Begin')
         urllib_agent = 'Python-requests/%s' % requests.__version__
         #clientRevision = ''
         from bioservices import version
@@ -698,8 +700,8 @@ class REST(RESTbase):
             platform.python_version(), platform.system(),
             urllib_agent
         )
-        self.logging.info('getUserAgent: user_agent: ' + user_agent)
-        self.logging.info('getUserAgent: End')
+        #self.logging.info('getUserAgent: user_agent: ' + user_agent)
+        #self.logging.info('getUserAgent: End')
         return user_agent
 
     def get_headers(self, content='default'):
