@@ -635,6 +635,13 @@ class EUtils(REST):
 
 
         Only xml supported at the time of this implementation.
+
+        ::
+
+            from bioservices import EUtils
+            s = EUtils()
+            print(s.ECitMatch("proc+natl+acad+sci+u+s+a|1991|88|3248|mann+bj|Art1|%0Dscience|1987|235|182|palmenberg+ac|Art2|"))
+
         """
         # Fixes https://github.com/cokelaer/bioservices/issues/169
         from urllib.parse import unquote
