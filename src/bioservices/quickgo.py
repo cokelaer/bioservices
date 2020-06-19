@@ -32,7 +32,6 @@
         -- from QuickGO home page, Dec 2012
 
 """
-from __future__ import print_function
 import json
 
 from bioservices.services import REST
@@ -48,40 +47,13 @@ class QuickGO(REST):
     .. doctest::
 
         >>> from bioservices import QuickGO
-        >>> s = QuickGO()
-        >>> res = s.goterms("GO:0003824")
-
-    Retrieve information about a protein given its uniprot identifier, a
-    taxonomy number. Let us also restrict the search to the UniProt database and
-    print only 3 columns of information (protein name, GO identifier and GO
-    name)::
-
-        print(s.Annotation(protein="Q8IYB3", frmt="tsv", tax=9606,
-            source="UniProt", col="proteinName,goID,goName"))
-
-    Here is the Term output for a given GO identifier::
-
-        >>> print(s.Term("GO:0000016", frmt="obo"))
-        [Term]
-        id: GO:0000016
-        name: lactase activity
-        def: "Catalysis of the reaction: lactose + H2O = D-glucose + D-galactose."
-        synonym: "lactase-phlorizin hydrolase activity" broad
-        synonym: "lactose galactohydrolase activity" exact
-        xref: EC:3.2.1.108
-        xref: MetaCyc:LACTASE-RXN
-        xref: RHEA:10079
-        is_a: GO:0004553 ! hydrolase activity, hydrolyzing O-glycosyl compounds
+        >>> go = QuickGO()
+        >>> res = go.get_go_terms("GO:0003824")
 
     .. versionchanged:: we use the new QuickGO API since version 1.5.0
         To use the old API, please use version of bioservices below 1.5
 
     """
-    _goid_example = "GO:0003824"
-    _valid_col = ['proteinDB', 'proteinID', 'proteinSymbol', 'qualifier',
-                  'goID', 'goName', 'aspect', 'evidence', 'ref', 'with', 'proteinTaxon',
-                  'date', 'from', 'splice', 'proteinName', 'proteinSynonym', 'proteinType',
-                  'proteinTaxonName', 'originalTermID', 'originalGOName']
 
     def __init__(self, verbose=False, cache=False):
         """.. rubric:: Constructor
@@ -93,7 +65,7 @@ class QuickGO(REST):
         super(QuickGO, self).__init__(url="https://www.ebi.ac.uk/QuickGO",
                                       name="quickGO", verbose=verbose, cache=cache)
 
-    def gosearch(self, query, limit=600, page=1):
+    def go_search(self, query, limit=600, page=1):
         """Searches a simple user query, e.g., query=apopto
 
         :param str query: 
@@ -110,10 +82,10 @@ class QuickGO(REST):
             headers=self.get_headers("json"))
         try:
             return res['results']
-        except:
+        except: #pragma: no cover
             return res
 
-    def goterms(self, query, max_number_of_pages=None):
+    def get_go_terms(self, query, max_number_of_pages=None):
         """Get information on all terms and page through the result"""
 
         query = query.replace(':', '%3A')
@@ -123,8 +95,69 @@ class QuickGO(REST):
             headers=self.get_headers("json"))
         try:
             return results['results']
-        except:
+        except: #pragma: no cover
             return results
+
+    def get_go_ancestors(self, query,
+        relations="is_a,part_of,occurs_in,regulates"):
+
+        query = query.replace(':', '%3A')
+        query = query.replace(',', '%2C')
+        url = "services/ontology/go/terms/{}/ancestors".format(query)
+        results = self.http_get(url, frmt="json", params={},
+         headers=self.get_headers("json"))
+        try:
+            return results['results']
+        except: #pragma: no cover
+            return results
+
+    def get_go_children(self, query):
+        query = query.replace(':', '%3A')
+        query = query.replace(',', '%2C')
+        url = "services/ontology/go/terms/{}/children".format(query)
+        results = self.http_get(url, frmt="json", params={},
+         headers=self.get_headers("json"))
+        try:
+            return results['results']
+        except: #pragma: no cover
+            return results
+
+    def get_go_chart(self, query):
+        """
+
+        ::
+
+            res = go.get_chart("GO:0022804")
+            with open("temp.png", "wb") as fout:
+                fout.write(res)
+        """
+        query = query.replace(':', '%3A')
+        query = query.replace(',', '%2C')
+        url = "services/ontology/go/terms/{}/chart".format(query)
+        res = self.http_get(url, frmt="json", params={},
+             headers={"Accept": "image/png"})
+        #import base64
+        #res = base64.b64decode(res).decode()
+        return res
+
+    def get_go_paths(self, _from, _to, 
+            relations="is_a,part_of,occurs_in,regulates"):
+        """Retrieves the paths between two specified sets of ontology terms.
+        Each path is formed from a list of (term, relationship, term) triples.
+
+            paths = go.go_terms_path("GO:0005215", "GO:0003674")
+            # First path is found as the first item in the "results"
+            paths["results"][0]
+
+        """
+        _from = _from.replace(':', '%3A')
+        _from = _from.replace(',', '%2C')
+        _to = _to.replace(':', '%3A')
+        _to = _to.replace(',', '%2C')
+        url = "services/ontology/go/terms/{}/paths/{}".format(_from, _to)
+        results = self.http_get(url, frmt="json", params={},
+         headers=self.get_headers("json"))
+        return results
 
     def Annotation(self,
                     assignedBy=None,
@@ -375,32 +408,3 @@ or a string (e.g., 'PUBMED:') """)
 
         # fill params with parameters that have default values.
         params = {'limit': limit, "page":page}
-    #def gene_product_targetset(self, name)
-    #def gene_product_retrieve(self, name)
-
-
-class GeneOntology():
-    """
-
-
-    Given a list of GO terms, read them with QuickGO and convert them to a list.
-    Each entry contains a dictionary
-
-    [Term]
-    id: GO:0031655
-    name: negative regulation of heat dissipation
-    def: "Any process that stops, prevents, or reduces the rate or extent of heat dissipation."
-    synonym: "downregulation of heat dissipation" exact
-    synonym: "inhibition of heat dissipation" narrow
-    synonym: "down-regulation of heat dissipation" exact
-    synonym: "down regulation of heat dissipation" exact
-    is_a: GO:0031654 ! regulation of heat dissipation
-    is_a: GO:0032845 ! negative regulation of homeostatic process
-    is_a: GO:0051241 ! negative regulation of multicellular organismal process
-
-    """
-    def __init__(self):
-        self._quickgo = QuickGO(verbose=False)
-
-    def getGOTerm(self, goid):
-        return self._quickgo.goterms(goid)
