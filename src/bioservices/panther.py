@@ -163,7 +163,7 @@ class Panther(REST):
 
         """
         params = {"geneInputList": gene_list,
-                    "organism": organism}
+                    "organism": taxon}
         res = self.http_post("geneinfo", params=params, frmt='json')
 
         if "mapped_genes" in res['search']:
@@ -214,11 +214,19 @@ class Panther(REST):
             gene symbol, NCBI GI, HGNC Id, International protein index id,
             NCBI UniGene id, UniProt accession andUniProt id.
 
+        :return: a dictionary with the following keys. 'reference' contains the
+            orgnaism, 'input_list' is the input gene list with unmapped genes. 
+            'result' contains the list of candidates. 
+
         ::
 
             >>> from bioservices import Panther
             >>> p = Panther()
             >>> res = p.get_enrichment('zap70,mek1,erk', 9606, "GO:0008150")
+            >>> For molecular function, use :
+            >>> res = p.get_enrichment('zap70,mek1,erk', 9606,
+                    "ANNOT_TYPE_ID_PANTHER_GO_SLIM_MF")
+
         """
         assert enrichment_test.lower() in ['fisher', 'binomial']
         if correction is None:
@@ -230,10 +238,14 @@ class Panther(REST):
 
         params = {'enrichmentTestType': enrichment_test.upper()}
         params['organism'] = organism
-        params['geneInputList'] = gene_list
-        params['refInputList'] = ref_gene_list
+        if gene_list:
+                params['geneInputList'] = gene_list
+        if ref_gene_list:
+            params['refInputList'] = ref_gene_list
         params['annotDataSet'] = annotation
         params['correction'] = correction.upper()
+
+        print(params)
 
         res = self.http_post("enrich/overrep", params=params, frmt="json")
         return res['results']
@@ -390,5 +402,5 @@ class Panther(REST):
         if taxon_list:
             params['taxonFltr'] = taxon_list
         res = self.http_get("treeinfo", params=params, frmt="json")
-        return res['search']['tree_topology']['annotation_node']
+        return res['search']#['tree_topology']['annotation_node']
 
