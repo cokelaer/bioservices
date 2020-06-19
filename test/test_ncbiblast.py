@@ -12,15 +12,15 @@ def ncbi():
 
 
 def test_param(ncbi):
-    ncbi.getParameters()
+    ncbi.get_parameters()
     assert(len(ncbi.parameters)>0)
     assert(len(ncbi.parameters)>0)
 
 
 def test_paramdetails(ncbi):
-    names = ncbi.parametersDetails("matrix") 
+    names = ncbi.get_parameter_details("matrix") 
     try:
-        names = ncbi.parametersDetails("matrixddddd") 
+        names = ncbi.get_parameter_details("matrixddddd") 
         assert False
     except:
         assert True
@@ -37,9 +37,9 @@ def test_run(ncbi):
     ncbi.jobid = ncbi.run(program="blastp", sequence=ncbi._sequence_example,
         stype="protein", database="uniprotkb", email="cokelaer@ebi.ac.uk",
         matrix="BLOSUM45")
-    res = ncbi.getResult(ncbi.jobid, "out")
+    res = ncbi.get_result(ncbi.jobid, "out")
 
-    res = ncbi.getResultTypes(ncbi.jobid)
+    res = ncbi.get_result_types(ncbi.jobid)
 
 def test_attributse(ncbi):
     ncbi.databases
