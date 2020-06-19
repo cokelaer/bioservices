@@ -942,7 +942,7 @@ class ChEMBL(REST):
             >>> from pylab import imread, imshow
             >>> from bioservices import *
             >>> s = ChEMBL(verbose=False)
-            >>> res = s.get_image(s._image_chemblId_example)
+            >>> res = s.get_image(31863)
             >>> imshow(imread(res['filenames'][0]))
 
         .. todo:: ignorecoords option
