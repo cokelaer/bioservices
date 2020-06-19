@@ -91,7 +91,7 @@ class easyXML(object):
 
         This is just an alias to self.soup.getchildren()
         """
-        return self.root.getchildren()
+        return [x for x in self.root]
 
     def _get_soup(self):
         if self._soup is None:
