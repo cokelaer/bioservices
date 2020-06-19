@@ -13,6 +13,12 @@ Revision 1.8.0 roadmap
   Instead of inheriting from REST, we should use an aggregation and store all
   methods in a single attribute
 
+Revision 1.7.6
+--------------
+
+* Fixing ncbiblast and muscle services
+* Fixing quickgo services  
+
 Revision 1.7.5 
 --------------
 
