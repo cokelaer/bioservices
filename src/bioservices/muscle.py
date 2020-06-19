@@ -48,7 +48,7 @@ logger.name = __name__
 __all__ = ["MUSCLE"]
 
 
-class MUSCLE(REST):
+class MUSCLE():
     """Interface to the `MUSCLE <http://www.ebi.ac.uk/Tools/webservices/services/msa/muscle_rest>`_ service.
 
     ::
@@ -79,14 +79,17 @@ class MUSCLE(REST):
 
     """
 
-    _url = "http://www.ebi.ac.uk/Tools/services/rest/muscle"
-    def __init__(self, verbose=True):
-        super(MUSCLE, self).__init__(name='MUSCLE', 
-                url=MUSCLE._url, verbose=verbose)
+
+    def __init__(self, verbose=False):
+        url = "http://www.ebi.ac.uk/Tools/services/rest/muscle"
+        self.services = REST(name='MUSCLE', url=url, verbose=verbose)
         self._parameters = None
         self._parametersDetails = {}
+        self._headers = {
+                "User-Agent": self.services.getUserAgent(), 
+                "accept": "application/json"}
 
-    def getParameters(self):
+    def get_arameters(self):
         """List parameter names.
 
          :returns: An XML document containing a list of parameter names.
@@ -95,29 +98,28 @@ class MUSCLE(REST):
 
              >>> from bioservices import muscle
              >>> n = muscle.Muscle()
-             >>> res = n.getParameters()
+             >>> res = n.get_parameters()
              >>> [x.text for x in res.findAll("id")]
 
          .. seealso:: :attr:`parameters` to get a list of the parameters without
             need to process the XML output.
         """
 
-        res = self.http_get("parameters", frmt="xml")
-        res = self.easyXML(res)
-        return res
+        res = self.services.http_get("parameters", frmt="json", 
+                headers=self._headers)
+        return res['parameters']
 
     def _get_parameters(self):
         if self._parameters:
             return self._parameters
         else:
-            res = self.getParameters()
-            parameters = [x.text for x in res.getchildren()]
-
-            self._parameters = parameters
+            # on 2 lines in case it fails, self._parameters remaisn None
+            res = self.get_parameters()
+            self._parameters = res
         return self._parameters
-    parameters = property(_get_parameters, doc=r"""Read-only attribute that returns a list of parameters. See :meth:`getParameters`.""")
+    parameters = property(_get_parameters)
 
-    def getParametersDetails(self, parameterId):
+    def get_parameter_details(self, parameterId):
         """Get detailed information about a parameter.
 
           :returns: An XML document providing details about the parameter or a list
@@ -125,7 +127,7 @@ class MUSCLE(REST):
 
           For example::
 
-              >>> n.getParametersDetails("format")
+              >>> n.get_parameter_details("format")
 
         """
         if parameterId not in self.parameters:
@@ -133,17 +135,9 @@ class MUSCLE(REST):
 
         if parameterId not in self._parametersDetails.keys():
             request = "parameterdetails/" + parameterId
-            res = self.http_get(request, frmt="xml")
-            res = self.easyXML(res)
+            res = self.services.http_get(request, frmt="json",
+                headers=self._headers)
             self._parametersDetails[parameterId] = res
-
-        try:
-            # try to interpret the content to return a list of values instead of the XML
-            res = [x for x in self._parametersDetails[parameterId].findAll("value")]
-            res = [y[0].text for y in [x.findAll('label') for x in res] if len(y)]
-        except:
-            pass
-
         return res
 
     def run(self, frmt=None, sequence=None, tree="none", email=None):
@@ -165,7 +159,7 @@ class MUSCLE(REST):
             :meth:`getStatus`, ...
 
         The up to data values accepted for each of these parameters can be
-        retrieved from the :meth:`parametersDetails`.
+        retrieved from the :meth:`get_parameter_details`.
 
         For instance,::
 
@@ -198,9 +192,9 @@ class MUSCLE(REST):
         # catch some before, it is better
 
         # FIXME: return parameters from server are not valid
-        self.devtools.check_param_in_list(frmt,
+        self.services.devtools.check_param_in_list(frmt,
                 ['fasta', 'clw', 'clwstrict', 'html', 'msf', 'phyi', 'phys'])
-        self.devtools.check_param_in_list(tree, ['none', 'tree1', 'tree2'])
+        self.services.devtools.check_param_in_list(tree, ['none', 'tree1', 'tree2'])
 
         # parameter structure
         params = {
@@ -213,11 +207,14 @@ class MUSCLE(REST):
         # work.
         headers = {}
 
-        # IMPORTANTN: use data parameter, not params !!!
-        res = self.http_post("run", frmt="txt", data=params, headers=headers)
+        # IMPORTANT: use data parameter, not params !!!
+        res = self.services.http_post("run", data=params,
+            headers={
+                "User-Agent": self.services.getUserAgent(), 
+                "accept": "text/plain"})
         return res
 
-    def getStatus(self, jobid):
+    def get_status(self, jobid):
         """Get status of a submitted job
 
         :param str jobid:
@@ -234,11 +231,13 @@ class MUSCLE(REST):
 
 
         """
-        url = 'status/' + str(jobid)
-        res = self.http_get(url, frmt="txt")
+        res = self.services.http_get("status/{}".format(jobid), frmt="txt", 
+            headers={
+                "User-Agent": self.services.getUserAgent(), 
+                "accept": "text/plain"})
         return res
 
-    def getResultTypes(self, jobid):
+    def get_result_types(self, jobid):
         """ Get available result types for a finished job.
 
         :param str jobid: a job identifier returned by :meth:`run`.
@@ -249,32 +248,17 @@ class MUSCLE(REST):
             identifier is itself a dictionary containing the label, description,
             file suffix and mediaType of the identifier.
         """
-        if self.getStatus(jobid) != 'FINISHED':
+        if self.get_status(jobid) != 'FINISHED':
             self.logging.warning("waiting for the job to be finished. May take a while")
             self.wait(jobid, verbose=False)
         url = 'resulttypes/' + jobid
-        res = self.http_get(url, frmt="xml")
-        res = self.easyXML(res)
-        output = {}
+        res = self.services.http_get(url, frmt="json", 
+            headers={
+                "User-Agent": self.services.getUserAgent(), 
+                "accept": "application/json"})
+        return [x["identifier"] for x in res['types']]
 
-        def myf(x):
-            if len(x) == 0: 
-                return ""
-            else: 
-                return x[0].text
-
-        descriptions = [myf(x.findall("description")) for x in res.getchildren()]
-        identifiers = [myf(x.findall("identifier")) for x in res.getchildren()]
-        mediaTypes = [myf(x.findall("mediaType")) for x in res.getchildren()]
-        labels = [myf(x.findall("label")) for x in res.getchildren()]
-        suffixes = [myf(x.findall("fileSuffix")) for x in res.getchildren()]
-
-        for i, ident in enumerate(identifiers):
-            output[ident] = {'label':labels[i], 'mediaType': mediaTypes[i],
-                       'description':descriptions[i], 'fileSuffix':suffixes[i]}
-        return output
-
-    def getResult(self, jobid, resultType):
+    def get_result(self, jobid, result_type):
         """ Get the job result of the specified type.
 
 
@@ -282,13 +266,19 @@ class MUSCLE(REST):
         :param str  resultType: type of result to retrieve. See :meth:`getResultTypes`.
  
         """
-        if self.getStatus(jobid) != 'FINISHED':
-            self.logging.warning("waiting for the job to be finished. May take a while")
+        if self.get_status(jobid) != 'FINISHED': #pragma: no cover
+            self.services.logging.warning("waiting for the job to be finished. May take a while")
             self.wait(jobid, verbose=False)
-        if self.getStatus(jobid) != "FINISHED":
+
+        if self.get_status(jobid) != "FINISHED":  #pragma: no cover
             raise ValueError("job is not finished")
-        url = '/result/' + jobid + '/' + resultType
-        res = self.http_get(url, frmt=resultType)
+
+        assert result_type in self.get_result_types(jobid)
+        url = '/result/' + jobid + '/' + result_type
+        res = self.services.http_get(url, frmt=result_type,
+            headers={
+                "User-Agent": self.services.getUserAgent(),
+                "accept": "application/json"})
 
         return res
 
@@ -299,12 +289,11 @@ class MUSCLE(REST):
         :param int checkInterval: interval between requests in seconds.
 
         """
-
-        if checkInterval < 1:
+        if checkInterval < 1:  #prgma: no cover
             raise ValueError("checkInterval must be positive and less than minute")
         result = 'PENDING'
         while result == 'RUNNING' or result == 'PENDING':
-            result = self.getStatus(jobId)
+            result = self.get_status(jobId)
             if verbose:
                 # required from __future__ import print_function
                 print("WARNING: ", jobId, " is ", result, file=sys.stderr)

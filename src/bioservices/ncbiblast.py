@@ -46,9 +46,8 @@ logger.name = __name__
 __all__ = ["NCBIblast"]
 
 
-class NCBIblast(REST):
+class NCBIblast():
     """Interface to the `NCBIblast <http://blast.ncbi.nlm.nih.gov/>`_ service.
-
 
     ::
 
@@ -74,23 +73,22 @@ class NCBIblast(REST):
     * tblastn     Search translated nucleotide database using a protein query
     * tblastx     Search translated nucleotide database using a translated nucleotide query
 
-
     """
 
-    _url = "http://www.ebi.ac.uk/Tools/services/rest/ncbiblast"
     _sequence_example = "MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS"
-    def __init__(self, verbose=True):
+    def __init__(self, verbose=False):
         """.. rubric:: NCBIblast constructor
 
         :param bool verbose: prints informative messages
 
         """
-        super(NCBIblast, self).__init__(name="NCBIblast", url=NCBIblast._url, verbose=verbose)
+        url = "http://www.ebi.ac.uk/Tools/services/rest/ncbiblast"
+        self.services = REST(name="NCBIblast", url=url, verbose=verbose)
         self._parameters = None
         self._parametersDetails = {}
         self.checkInterval = 2
 
-    def getParameters(self):
+    def get_parameters(self):
         """List parameter names.
 
         :returns: An XML document containing a list of parameter names.
@@ -99,28 +97,30 @@ class NCBIblast(REST):
 
             >>> from bioservices import ncbiblast 
             >>> n = ncbiblast.NCBIblast()
-            >>> res = n.getParameters()
+            >>> res = n.get_parameters()
             >>> [x.text for x in res.findAll("id")]
 
         .. seealso:: :attr:`parameters` to get a list of the parameters without
             need to process the XML output.
         """
-        res = self.http_get("parameters", frmt="xml")
-        res = self.easyXML(res)
-        return res
+
+        res = self.services.http_get("parameters", frmt="json", 
+                 headers={
+                    "User-Agent": self.services.getUserAgent(), 
+                    "Accept": "application/json"})
+        return res['parameters']
 
     def _get_parameters(self):
         if self._parameters:
             return self._parameters
         else:
-            res = self.getParameters()
-            parameters = [x.text for x in res.getchildren()]
-            self._parameters = parameters
+            # on 2 lines in case it fails, self._parameters remaisn None
+            res = self.get_parameters()
+            self._parameters = res
         return self._parameters
-    parameters = property(_get_parameters, doc=r"""Read-only attribute that
-returns a list of parameters. See :meth:`getParameters`.""")
+    parameters = property(_get_parameters)
 
-    def parametersDetails(self, parameterId):
+    def get_parameter_details(self, parameterId):
         """Get detailed information about a parameter.
 
         :returns: An XML document providing details about the parameter or a list
@@ -128,7 +128,7 @@ returns a list of parameters. See :meth:`getParameters`.""")
 
         For example::
 
-            >>> s.parametersDetails("matrix")
+            >>> s.parameter_details("matrix")
             [u'BLOSUM45',
              u'BLOSUM50',
              u'BLOSUM62',
@@ -144,18 +144,17 @@ returns a list of parameters. See :meth:`getParameters`.""")
 
         if parameterId not in self._parametersDetails.keys():
             request = "parameterdetails/" + parameterId
-            res = self.http_get(request, frmt="xml")
-            res = self.easyXML(res)
-            self._parametersDetails[parameterId] = res
+            res = self.services.http_get(request, frmt="json",
+                 headers={
+                    "User-Agent": self.services.getUserAgent(), 
+                    "Accept": "application/json"})
 
-        try:
-            # try to interpret the content to return a list of values instead of the XML
-            res = [x for x in self._parametersDetails[parameterId].findAll("value")]
-            res = [y[0].text for y in [x.findAll('label') for x in res] if len(y)]
-        except:
-            pass
-
-        return res
+            try:
+                data = [x['value'] for x in res["values"]["values"]]
+            except:
+                data = res
+            self._parametersDetails[parameterId] = data
+        return self._parametersDetails[parameterId]
 
     def run(self, program=None, database=None, sequence=None,stype="protein", email=None, **kargs):
         """ Submit a job with the specified parameters.
@@ -192,19 +191,17 @@ returns a list of parameters. See :meth:`getParameters`.""")
         :param int gapext:     penalty for each base/residue in a gap.
         :param seqrange: region of the query sequence to use for the search. 
             Default: whole sequence.
-
-
         :return: A jobid that can be analysed with :meth:`getResult`,
             :meth:`getStatus`, ...
 
         The up to data values accepted for each of these parameters can be
-        retrieved from the :meth:`parametersDetails`.
+        retrieved from the :meth:`get_parameter_details`.
 
         For instance,::
 
             from bioservices import NCBIblast
             n = NCBIblast()
-            n.parameterDetails("program")
+            n.get_parameter_details("program")
 
         Example::
 
@@ -237,12 +234,12 @@ returns a list of parameters. See :meth:`getParameters`.""")
         if program is None or sequence is None or database is None or email is None:
             raise ValueError("program, sequence, email  and database must be provided")
 
-        checkParam = self.devtools.check_param_in_list
+        checkParam = self.services.devtools.check_param_in_list
 
         # Here, we will check the arguments values (not the type)
         # Arguments will be checked by the service itself but if we can
         # catch some before, it is better
-        checkParam(program, self.parametersDetails("program"))
+        checkParam(program, self.get_parameter_details("program"))
         checkParam(stype, ["protein", "dna", "rna"])
 
         # So far, we have these parameters
@@ -259,7 +256,7 @@ returns a list of parameters. See :meth:`getParameters`.""")
         # is expected.
         for k, v in kargs.items():
             #print(k, v)
-            checkParam(v,self.parametersDetails(k))
+            checkParam(v,self.get_parameter_details(k))
             params[k] = v
 
         # similarly for the database, we must process it by hand because ther
@@ -286,13 +283,15 @@ parser.add_option('--polljob', action="store_true", help='get job result')
 parser.add_option('--status', action="store_true", help='get job status')
 parser.add_option('--resultTypes', action='store_true', help='get result types')
     """
-        res = self.http_post("run/", frmt=None, data=params, 
-                headers={})
+        # IMPORTANT: use data parameter, not params !!!
+        res = self.services.http_post("run", frmt=None, data=params,
+            headers={
+                 "User-Agent": self.services.getUserAgent(), 
+                "accept": "text/plain"})
 
         return res
 
-
-    def getStatus(self, jobid):
+    def get_status(self, jobid):
         """Get status of a submitted job
 
         :param str jobid:
@@ -309,12 +308,13 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
 
 
         """
-        url =  'status/' + jobid
-        res = self.http_get(url, frmt="txt")
+        res = self.services.http_get("status/{}".format(jobid), frmt="txt", 
+            headers={
+                "User-Agent": self.services.getUserAgent(), 
+                "accept": "text/plain"})
         return res
 
-
-    def getResultTypes(self, jobid):
+    def get_result_types(self, jobid):
         """ Get available result types for a finished job.
 
         :param str jobid: a job identifier returned by :meth:`run`.
@@ -325,38 +325,22 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
             identifier is itself a dictionary containing the label, description,
             file suffix and mediaType of the identifier.
         """
-        if self.getStatus(jobid)!='FINISHED':
-            self.logging.warning("waiting for the job to be finished. May take a while")
-            self.wait(jobid)
+        if self.get_status(jobid) != 'FINISHED':
+            self.services.logging.warning("waiting for the job to be finished. May take a while")
+            self.wait(jobid, verbose=False)
         url = 'resulttypes/' + jobid
-        res = self.http_get(url, frmt="xml")
-        res = self.easyXML(res)
+        res = self.services.http_get(url, frmt="json", 
+            headers={
+                "User-Agent": self.services.getUserAgent(), 
+                "accept": "application/json"})
+        return [x["identifier"] for x in res['types']]
 
-        output = {}
-        def myf(x):
-            if len(x)==0: return ""
-            else: return x[0].text
-
-        descriptions = [myf(x.findall("description")) for x in res.getchildren()]
-        identifiers = [myf(x.findall("identifier")) for x in res.getchildren()]
-        mediaTypes = [myf(x.findall("mediaType")) for x in res.getchildren()]
-        labels = [myf(x.findall("label")) for x in res.getchildren()]
-        suffixes = [myf(x.findall("fileSuffix")) for x in res.getchildren()]
-
-        for i, ident in enumerate(identifiers):
-            output[ident] = {'label':labels[i], 'mediaType': mediaTypes[i],
-                'description':descriptions[i], 'fileSuffix':suffixes[i]}
-
-        return output
-
-
-    # TODO need to check that jobid is finished
-    def getResult(self, jobid, resultType):
+    def get_result(self, jobid, result_type):
         """ Get the job result of the specified type.
 
 
         :param str jobid: a job identifier returned by :meth:`run`.
-        :param str  resultType: type of result to retrieve. See :meth:`getResultTypes`.
+        :param str  result_type: type of result to retrieve. See :meth:`getResultTypes`.
 
         The output from the tool itself.
         Use the 'format' parameter to retireve the output in different formats,
@@ -382,16 +366,23 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
 
 
         """
-        if self.getStatus(jobid)!='FINISHED':
-            self.logging.warning("waiting for the job to be finished. May take a while")
+        if self.get_status(jobid)!='FINISHED':
+            self.services.logging.warning("waiting for the job to be finished. May take a while")
             self.wait(jobid)
-        if self.getStatus(jobid) != "FINISHED":
+        if self.get_status(jobid) != "FINISHED":
             raise ValueError("job is not finished")
-        url = 'result/' + jobid + '/' + resultType
-        res = self.http_get(url, frmt=resultType)
-        if resultType == "xml":
-            res = self.easyXML(res)
+        url = 'result/' + jobid + '/' + result_type
 
+        if result_type in ['out', "error", "sequence", "ids"]:
+            res = self.services.http_get(url, frmt="txt",
+                 headers={
+                     "User-Agent": self.services.getUserAgent(),
+                     "accept": "text/plain"})
+        elif result_type in ['xml']:
+            res = self.services.http_get(url, frmt="xml",
+                 headers={
+                     "User-Agent": self.services.getUserAgent(),
+                     "accept": "text/plain"})
         return res
 
     def wait(self, jobId):
@@ -406,14 +397,13 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
             raise ValueError("checkInterval must be positive and less than a second")
         result = 'PENDING'
         while result == 'RUNNING' or result == 'PENDING':
-            result = self.getStatus(jobId)
+            result = self.get_status(jobId)
             if result == 'RUNNING' or result == 'PENDING':
                 time.sleep(self.checkInterval)
         return result
 
-
     def _get_database(self):
-        return self.parametersDetails
+        return self.get_parameter_details("database")
     databases = property(_get_database,
-        doc=r"""Returns accepted databases. Alias to *parametersDetails('database')*""")
+        doc=r"""Returns accepted databases.""")
 
