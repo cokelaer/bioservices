@@ -10,9 +10,9 @@ skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
 def test_muscle():
     m = MUSCLE(verbose=False)
     m.parameters
-    m.get_parameters_details("format")
+    m.get_parameter_details("format")
     try:
-        m.get_parameters_details("formattt")
+        m.get_parameter_details("formattt")
         assert False
     except:
         assert True
@@ -27,4 +27,6 @@ def test_muscle():
 
     m.get_result_types(jobid)
     m.get_result(jobid, 'phylotree')
+
+
 

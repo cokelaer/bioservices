@@ -17,9 +17,9 @@ def test_retrieveExperiments(array):
     #res = array.queryExperiments(array="A-AFFY-33")
     #assert len(res.getchildren())>0
     res = array.queryExperiments(array="A-AFFY-33", species="Homo Sapiens",expdesign="dose+response")
-    assert len(res.getchildren())>0
+    assert res['experiments']['total']>0
     res = array.queryExperiments(array="A-AFFY-33", species="Homo Sapiens",expdesign="dosestupid")
-    assert len(res.getchildren())==0
+    assert res['experiments']['total']==0
     res = array.queryExperiments(array="A-AFFY-33", species="Homo Sapiens", expdesign="dose+response", 
         sortby="releasedate", sortorder="ascending")
 
