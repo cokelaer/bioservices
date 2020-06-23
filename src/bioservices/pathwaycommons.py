@@ -387,7 +387,7 @@ class PathwayCommons(REST):
         if organism:
             params['organism'] = organism
 
-        res = self.http_get(url, frmt=None, params=params)
+        res = self.http_get(url, frmt="txt", params=params)
         return res
 
     def traverse(self, uri, path):

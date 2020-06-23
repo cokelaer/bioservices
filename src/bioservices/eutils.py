@@ -116,7 +116,7 @@ class EUtils(REST):
         will attempt such contact prior to blocking access.  For more details
         see http://www.ncbi.nlm.nih.gov/books/NBK25497/#chapter2.chapter2_table1
         BioServices limits requests to 3 per seconds for this services.
-        If you choose to set to a higher rate, this will be the user 
+        If you choose to set to a higher rate, this will be the user
         responsability. Within
         BioServices, we fill the parameter **tool** and **email**, however,
         to fill the latter you should provide your email either globablly
@@ -264,7 +264,7 @@ class EUtils(REST):
 
         """
         sid = self._check_ids(id)
-        ret = self.ESummary('taxonomy', sid, retmode='json')
+        ret = self.ESummary('taxonomy', sid)
         return ret
 
     def snp_summary(self, id):
@@ -373,13 +373,13 @@ class EUtils(REST):
 
         return ret
 
-    def EInfo(self, db=None, retmode='json', **kargs):
+    def EInfo(self, db=None, **kargs):
         """Provides information about a database (e.g., number of records)
 
         :param str db: target database about which to gather statistics.
             Value must be a valid Entrez database name. See :attr:`databases`
             or don't provide any value to obtain the entire list
-        :return: an XML or json data structure that depends on the
+        :return: a json data structure that depends on the
            value of :attr:`databases` (default to json)
 
         ::
@@ -387,10 +387,10 @@ class EUtils(REST):
             >>> all_database_names = s.EInfo()
             >>> # specific info about one database:
             >>> ret = s.EInfo("taxonomy")
-            >>> ret['count']
+            >>> ret[0]['count']
             u'1445358'
             >>> ret = s.EInfo('pubmed')
-            >>> ret['fieldlist'][2]['fullname']
+            >>> ret[0]['fieldlist'][2]['fullname']
             'Filter'
 
         You can use the *retmode* parameter to 'xml' as well. In that
@@ -398,10 +398,7 @@ class EUtils(REST):
 
         ::
 
-            >>> ret = s.EInfo("taxonomy", retmode='xml')
-            >>> ret = s.parse_xml('objectify')
-            >>> ret.root.DbInfo.FieldList.getchildren()[2].FullName
-            'Filter'
+            >>> ret = s.EInfo("taxonomy")
 
         .. note:: Note that the name in the XML or json outputs
             differ (some have lower cases, some have upper cases). This
@@ -413,8 +410,7 @@ class EUtils(REST):
         else:
             return self.databases
 
-        self._check_retmode(retmode, valids=['xml', 'json'])
-        kargs['retmode'] = retmode
+        kargs['retmode'] = "json"
 
         # let us create the query now
         query = 'einfo.fcgi'
@@ -425,13 +421,14 @@ class EUtils(REST):
         params = self._get_einfo_params(**kargs)
 
         # the real call using GET method
-        ret = self.http_get(query,  params=params)
+        ret = self.http_get(query,  frmt="json", params=params)
         try: ret = ret.content
         except: pass
 
-        if retmode == 'json':
-            ret = ret['einforesult']['dbinfo']
-        return ret
+        try:
+            return ret['einforesult']['dbinfo']
+        except:
+            return ret
 
     def parse_xml(self, ret, method=None):
         if method is None:
@@ -447,7 +444,7 @@ class EUtils(REST):
             import xmltodict
             return xmltodict.parse(ret)
 
-    def ESummary(self, db, id=None,  retmode='json', **kargs):
+    def ESummary(self, db, id=None,  **kargs):
         """Returns document summaries for a list of input UIDs
 
 
@@ -476,21 +473,16 @@ class EUtils(REST):
         """
         sid = self._check_ids(id)
         self._check_db(db)
-        self._check_retmode(retmode, valids=['xml', 'json'])
-        kargs['retmode'] = retmode
+        kargs['retmode'] = "json"
 
         params = self._get_esummary_params(**kargs)
         # the real call using GET method
         query = "esummary.fcgi?db=%s&id=%s" % (db, sid)
-        ret = self.http_get(query, None,  params=params)
-        try: ret = ret.content
-        except: pass
-
-        # if XMl, we can parse it using dedicated parser
-        if retmode == 'json':
-            ret = json.loads(ret)
-            ret = ret['result']
-        return ret
+        ret = self.http_get(query, frmt="json",  params=params)
+        try:
+            return ret['result']
+        except:
+            return ret
 
     def EGQuery(self, term, **kargs):
         """Provides the number of records retrieved in all Entrez databases by a text query.
@@ -502,7 +494,7 @@ class EUtils(REST):
             PubMed or Entrez help for information about search field
             descriptions and tags.
             Search fields and tags are database specific.
-        :return: returns a XML data structure parsed with :class:`EUtilsParser`
+        :return: returns a json data structure
 
         ::
 
@@ -521,15 +513,14 @@ class EUtils(REST):
         params = self._get_egquery_params(**kargs)
 
         query = "egquery.fcgi?term=%s" % (term)
-        ret = self.http_get(query, None,  params=params)
-        try: ret = ret.content
-        except: pass
+        ret = self.http_get(query, frmt="xml",  params=params)
+        try:
+            ret = self.parse_xml(ret)['Result']
+            return ret
+        except:
+            return ret
 
-        ret = self.parse_xml(ret, 'EUtilsParser').Result
-
-        return ret
-
-    def ESearch(self, db, term, retmode='json', **kargs):
+    def ESearch(self, db, term, **kargs):
         """Responds to a query in a given database
 
         The response can be used later in ESummary, EFetch or ELink,
@@ -546,7 +537,7 @@ class EUtils(REST):
             >>> ret = e.ESearch('taxonomy', 'Staphylococcus aureus[all names]')
             >>> ret = e.ESearch('pubmed', "cokelaer AND BioServices")
 
-            >>> ret = e.ESearch('protein', '15718680', retmode='json')
+            >>> ret = e.ESearch('protein', '15718680')
             >>> # Let us show the first pubmed identifier in a browser
             >>> identifiers = e.pubmed(ret['idlist'][0])
 
@@ -566,19 +557,16 @@ class EUtils(REST):
             :meth:`_get_esearch_params`
         """
         self._check_db(db)
-        self._check_retmode(retmode, valids=['xml', 'json'])
-        kargs['retmode'] = retmode
+        kargs['retmode'] = "json"
 
         params = self._get_esearch_params(**kargs)
 
         query = "esearch.fcgi?db=%s&term=%s" % (db, term)
-        ret = self.http_get(query, None,  params=params)
-        try: ret = ret.content
-        except: pass
-        if retmode == 'json':
-            ret = json.loads(ret)
-            ret = ret['esearchresult']
-        return ret
+        ret = self.http_get(query, frmt="json",  params=params)
+        try:
+            return ret['esearchresult']
+        except:
+            return ret
 
     def ESpell(self, db, term, **kargs):
         """Retrieve spelling suggestions for a text query in a given database.
@@ -590,29 +578,30 @@ class EUtils(REST):
 
         ::
 
-            >>> ret = e.ESpell(db="omim", term="aasthma+OR+alergy")
-            >>> ret.Query
-            'asthmaa OR alergies'
-            >>> ret.CorrectedQuery
+            >>> ret = e.ESpell(db="pubmed", term="aasthma+OR+alergy")
+            >>> ret = ret['eSpellResult']
+            >>> ret['Query']            'asthmaa OR alergies'
+            >>> ret['CorrectedQuery']
             'asthma or allergy'
             >>> ret = e.ESpell(db="pubmed", term="biosservices")
-            >>> ret.CorrectedQuery
+            >>> ret = ret['eSpellResult']
+            >>> ret['CorrectedQuery']
             bioservices
 
-
-        .. note:: only WSDL protocol available
         """
         self._check_db(db)
 
         params = self._get_esearch_params(**kargs)
 
         query = "espell.fcgi?db=%s&term=%s" % (db, term)
-        ret = self.http_get(query, None,  params=params)
-        try: ret = ret.content
-        except: pass
+        ret = self.http_get(query, frmt="json",  params=params)
+        try: 
+            ret = ret.content
+            ret = self.parse_xml(ret, 'EUtilsParser')
+            return ret
+        except: 
+            return ret
 
-        ret = self.parse_xml(ret, 'EUtilsParser')
-        return ret
 
     def ECitMatch(self, bdata, **kargs):
         r"""
@@ -689,9 +678,9 @@ class EUtils(REST):
             {'Id': '16539535'}
 
 
-            >>> s.Elink(dbfrom="nucleotide", db="protein",
+            >>> s.ELink(dbfrom="nucleotide", db="protein",
                               id="48819,7140345")
-            >>> s.Elink(dbfrom="nucleotide", db="protein",
+            >>> s.ELink(dbfrom="nucleotide", db="protein",
                               id="48819,7140345")
             >>> s.ELink(dbfrom='nuccore', id='21614549,219152114',
                     cmd='ncheck')
@@ -734,9 +723,9 @@ class EUtils(REST):
 
         params = self._get_elink_params(**kargs)
 
-        ret = self.http_get(query, None,  params=params)
-        try: ret = ret.content
-        except: pass
+        ret = self.http_get(query, frmt="txt",  params=params)
+        #try: ret = ret.content
+        #except: pass
 
         return ret
 
@@ -759,7 +748,7 @@ class EUtils(REST):
 
         query = "epost.fcgi/?db=%s&id=%s" % (db, sid)
 
-        ret = self.http_get(query, None,  params=params)
+        ret = self.http_get(query, "xml",  params=params)
         try: ret = ret.content
         except: pass
         ret = self.easyXML(ret)
@@ -793,12 +782,12 @@ class EUtilsParser(AttrDict):
             #children = xml.root.getchildren()[0].getchildren()
             #self.__name = xml.root.getchildren()[0].tag
         except:
-            children = xml.getchildren()
+            children = [x for x in xml]
             if len(children) == 0:
                 self[xml.tag] = xml.text
 
         for i, child in enumerate(children):
-            if len(child.getchildren()) == 0:
+            if len([x for x in child]) == 0:
                 if child.tag in self.keys():
                     try:
                         self[child.tag].append(child.text)
@@ -819,9 +808,6 @@ class EUtilsParser(AttrDict):
                         self[child.tag] = [self[child.tag]]
                         self[child.tag].append(e)
 
-                #self[child.tag] = []
-                #for subchild in child.getchildren():
-                #    self[child.tag].append(EUtilsParser(subchild))
 
     def __str__(self):
         name = self._EUtilsParser__name

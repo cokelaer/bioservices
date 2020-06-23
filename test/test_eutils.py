@@ -30,11 +30,10 @@ def test_summary(eutils):
 
 
 def test_espell(eutils):
-    ret = eutils.ESpell(db="omim", term="aasthma+OR+alergy")
-    ret = ret.eSpellResult
-    print(ret.Query)
-    assert ret.Query == 'aasthma OR alergy'
-    assert ret.CorrectedQuery == 'asthma or allergy'
+    ret = eutils.ESpell(db="pubmed", term="aasthma+OR+alergy")
+    ret = ret['eSpellResult']
+    assert ret['Query'] == 'aasthma OR alergy'
+    assert ret['CorrectedQuery'] == 'asthma or allergy'
 
 
 def test_esearch(eutils):
@@ -53,13 +52,11 @@ def test_elink(eutils):
 
 def test_einfo(eutils):
     # Use XML
-    dbinfo = eutils.EInfo("gtr", retmode='xml')
-    dbinfo = eutils.parse_xml(dbinfo, 'EUtilsParser').eInfoResult
-    dbinfo = dbinfo.DbInfo
-    assert dbinfo.DbName == 'gtr'
-    assert dbinfo.MenuName == 'GTR'
-    assert dbinfo.Description == 'GTR Database'
-    assert dbinfo.FieldList.Field[0].Name == 'ALL'
+    dbinfo = eutils.EInfo("gtr")
+    dbinfo = dbinfo[0]
+    assert dbinfo['dbname'] == 'gtr'
+    assert dbinfo['menuname'] == 'GTR'
+    assert dbinfo['description'] == 'GTR Database'
 
     # use JSON
     ret = eutils.EInfo("taxonomy")[0]

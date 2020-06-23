@@ -55,7 +55,7 @@ __all__ = ["Rhea"]
 
 
 
-class Rhea(REST):
+class Rhea():
     """Interface to the `Rhea <http://www.ebi.ac.uk/rhea/rest/1.0/>`_ service
 
     You can search by compound name, ChEBI ID, reaction ID, cross reference
@@ -83,7 +83,7 @@ class Rhea(REST):
     See :meth:`search` :meth:`entry` methods for more information about format.
 
     """
-    _url = "http://www.rhea-db.org"
+    _url = "http://www.rhea-db.org/rest"
     def __init__(self, version="1.0",  verbose=True, cache=False):
         """.. rubric:: Rhea constructor
 
@@ -95,11 +95,11 @@ class Rhea(REST):
             >>> from bioservices import Rhea
             >>> r = Rhea()
         """
-        super(Rhea, self).__init__(name="Rhea", url=Rhea._url,
+        self.services = REST(name="Rhea", url=Rhea._url,
             verbose=verbose, cache=cache)
+
         self.version = version
         self.format_entry = ["cmlreact", "biopax2", "rxn"]
-        self.url += "/rest"
 
     def search(self, query, frmt=None):
         """Search for reactions
@@ -130,8 +130,9 @@ class Rhea(REST):
         url = self.version + "/ws/reaction/%s?q=" % frmt
         url += query
 
-        response = self.http_get(url, frmt="xml")
-        response = self.easyXML(response)
+        response = self.services.http_get(url, frmt="xml")
+
+        #response = self.services.easyXML(response)
         return response
 
     def entry(self, id, frmt):
@@ -151,14 +152,14 @@ class Rhea(REST):
         what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of
         the XML file.
         """
-        self.devtools.check_param_in_list(frmt, self.format_entry)
+        self.services.devtools.check_param_in_list(frmt, self.format_entry)
         url = self.version + "/ws/reaction/%s/%s" % (frmt, id)
 
         if frmt=="rxn":
-            response = self.http_get(url, frmt=frmt)
+            response = self.services.http_get(url, frmt="txt")
         else:
-            response = self.http_get(url, frmt="xml")
-            response = self.easyXML(response)
+            response = self.services.http_get(url, frmt="xml")
+            response = self.services.easyXML(response)
         return response
 
 

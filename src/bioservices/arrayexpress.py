@@ -303,7 +303,7 @@ class ArrayExpress(REST):
 
 
         """
-        res = self.queryExperiments(keywords=experiment)
+        res = self.queryExperiments(keywords=experiment, frmt="json")
         return res
 
     def retrieveFile(self, experiment, filename, save=False):

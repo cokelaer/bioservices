@@ -339,7 +339,7 @@ class BioMart(REST):
         """
         if dataset not in [x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]]:
             raise ValueError("provided dataset (%s) is not found. see valid_attributes" % dataset)
-        ret = self.http_get("?type=filters&dataset=%s" %dataset, frmt=None)
+        ret = self.http_get("?type=filters&dataset=%s" %dataset, frmt="txt")
         ret = [x for x in ret.split("\n") if len(x)]
         results = {}
         for line in ret:
