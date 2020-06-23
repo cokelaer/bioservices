@@ -219,7 +219,7 @@ class UniChem(REST):
         self.devtools.check_param_in_list(target, list(self.source_ids.keys()))
 
         query = "mapping/%s/%s/" % (self.source_ids[source], self.source_ids[target])
-        res = self.http_get(query, frmt=None)
+        res = self.http_get(query, frmt="txt")
         # evaluation the string as a list
         res = eval(res)
         # convert to a convenient dictionary
@@ -269,8 +269,8 @@ class UniChem(REST):
             >>> uni.get_all_src_ids()
 
         """
-        res = self.http_get("src_ids", frmt=None)
-        res = [x['src_id'] for x in eval(res)]
+        res = self.http_get("src_ids", frmt="json")
+        res = [x['src_id'] for x in res]
         return res
 
     def get_source_information(self, src_id):
