@@ -438,6 +438,9 @@ class REST(RESTbase):
         'seqxml': 'text/x-seqxml+xml',
         'png': 'image/png',
         'jpg': 'image/jpg',
+        'svg': 'image/svg',
+        'gif': 'image/gif',
+        'jpeg': 'image/jpg',
         'txt': 'text/plain',
         'text': 'text/plain',
         'xml': 'application/xml',
@@ -607,9 +610,24 @@ class REST(RESTbase):
         self.logging.debug("Running http_get (single call mode)")
         #return self.get_one(**{'frmt': frmt, 'query': query, 'params':params})
 
-        headers = kargs.get("headers", self.get_headers())
+
+        # if user provide a content, let us use it, otherwise, it will be the
+        # same as the frmt provided
+        content = kargs.get("content", self.content_types[frmt])
+
+        # if user provide a header, we use it otherwise, we use the header from
+        # bioservices and the content defined here above
+        headers = kargs.get("headers")
+        if headers is None:
+            headers = {}
+            headers['User-Agent'] = self.getUserAgent()
+            if content is None:
+                headers['Accept'] = self.content_types[frmt]
+            else:
+                headers['Accept'] = content
         kargs.update({"headers": headers})
-        return self.get_one(query, frmt, params=params,  **kargs)
+
+        return self.get_one(query, frmt=frmt, params=params,  **kargs)
 
     def get_one(self, query=None, frmt='json', params={}, **kargs):
         """
@@ -648,16 +666,23 @@ class REST(RESTbase):
     Consider increasing it with settings.TIMEOUT attribute {}""".format(self.settings.TIMEOUT))
 
     def http_post(self, query, params=None, data=None,
-                    frmt='xml', headers=None, files=None, **kargs):
+                    frmt='xml', headers=None, files=None, content=None, **kargs):
         # query and frmt are bioservices parameters. Others are post parameters
         # NOTE in requests.get you can use params parameter
         # BUT in post, you use data
         # only single post implemented for now unlike get that can be asynchronous
         # or list of queries
+
+
+        # if user provide a header, we use it otherwise, we use the header from
+        # bioservices and the content defined here above
         if headers is None:
             headers = {}
             headers['User-Agent'] = self.getUserAgent()
-            headers['Accept'] = self.content_types[frmt]
+            if content is None:
+                headers['Accept'] = self.content_types[frmt]
+            else:
+                headers['Accept'] = content
 
         self.logging.debug("Running http_post (single call mode)")
         kargs.update({'query':query})
