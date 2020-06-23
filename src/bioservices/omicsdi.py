@@ -45,7 +45,7 @@ class OmicsDIAuth(requests.auth.AuthBase):
     def __init__(self, token):
         if not isinstance(token, string_types):
             raise TypeError("Authentication Token cannot be %s. Must be of type str." % token)
-        
+
         self._token = token
 
     @property
@@ -60,7 +60,7 @@ class OmicsDIAuth(requests.auth.AuthBase):
             raise TypeError("Authentication Token must be of type str.")
         else:
             self._token = token
-        
+
     def __call__(self, r):
         r.headers["x-auth-token"] = self._token
         return r
@@ -203,7 +203,7 @@ class OmicsDI(REST):
                 },
                 "database": {
                     "required": True
-                }
+                },
             },
             "doc": """
                 Retrieve all file links for a given dataset
@@ -250,7 +250,7 @@ class OmicsDI(REST):
         }, {
             "path": "/dataset/getSimilar",
             "params": {
-                "acc": {
+                "accession": {
                     "required": True,
                     "argument": "accession"
                 },
@@ -435,7 +435,7 @@ class OmicsDI(REST):
                         "name": "Proteome analysis by charge state-selective separation of peptides: a multidimensional approach",
                         "url": null,
                         "keywords": "Mouse,SCX,RP-HPLC basic pH,LC-MSMS",...
-                
+
             """
         }, {
             "path": "/seo/about",
@@ -502,7 +502,7 @@ class OmicsDI(REST):
             "path": "/statistics/diseases",
             "doc": """
                 Return statistics about the number of datasets per diseases
-                
+
                 :example:
                     >>> from bioservices import OmicsDI
                     >>> omicsdi = OmicsDI()
@@ -518,7 +518,7 @@ class OmicsDI(REST):
             "path": "/statistics/domains",
             "doc": """
                 Return statistics about the number of datasets per Repository
-                
+
                 :example:
                     >>> from bioservices import OmicsDI
                     >>> omicsdi = OmicsDI()
@@ -533,7 +533,7 @@ class OmicsDI(REST):
             "path": "/statistics/omicsByYear",
             "doc": """
                 Return statistics about the number of datasets per OmicsType on recent 5 years.
-                
+
                 :example:
                     >>> from bioservices import OmicsDI
                     >>> omicsdi = OmicsDI()
@@ -575,7 +575,7 @@ class OmicsDI(REST):
 
         def fn(*args, **kwargs):
             data = { }
-            
+
             query = api["path"]
             params = api.get("params")
             method = api.get("method", "GET")
@@ -600,26 +600,26 @@ class OmicsDI(REST):
                         else:
                             kwargs[param] = kwargs.get(argument, default)
                             parameters.append(param)
-                     
+
                 parameters = sequencify(parameters)
                 for parameter in parameters:
                     if parameter in kwargs:
                         value = kwargs.get(parameter)
                         data[parameter] = value
 
-            args = { "params": data }
+            args = { "params": data , "frmt": "json"}
 
             if auth_required:
                 auth = OmicsDIAuth(token = self.token)
                 args.update({ "auth": auth })
-            
+
             method_caller = METHOD_CALLERS.get(method, self.http_get)
 
             return method_caller(query, **args)
 
         if doc:
             fn.__doc__ = doc
-            
+
         return fn
 
     def _build_api(self):

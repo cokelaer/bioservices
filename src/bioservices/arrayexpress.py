@@ -147,7 +147,7 @@ class ArrayExpress(REST):
             verbose=verbose)
 
         self.easyXMLConversion = True
-        self._format = "xml"
+        self._format = "json"
         self.version = "v2"
 
     def _set_format(self, f):
@@ -303,7 +303,7 @@ class ArrayExpress(REST):
 
 
         """
-        res = self.queryExperiments(keywords=experiment, frmt="json")
+        res = self.queryExperiments(keywords=experiment)
         return res
 
     def retrieveFile(self, experiment, filename, save=False):
@@ -331,7 +331,7 @@ class ArrayExpress(REST):
             f.write(res)
             f.close()
         else:
-            res = self.http_get(url, frmt=None)
+            res = self.http_get(url, frmt="txt")
             return  res
 
     def retrieveFilesFromExperiment(self, experiment):
@@ -358,6 +358,8 @@ class ArrayExpress(REST):
             res = self.queryExperiments(keywords=experiment)
             exp = res.getchildren()[0]
             files = [x.getchildren() for x in exp.getchildren() if x.tag == "files"]
+
+            
             output = [x.get("name") for x in files[0]]
             if self.format != 'xml':
                 self.format = frmt

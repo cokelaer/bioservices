@@ -219,10 +219,13 @@ class PathwayCommons(REST):
         if frmt != "BIOPAX":
             url += "&format=%s" % frmt
 
-        res = self.http_get(url, frmt=None)
+        if frmt.lower() in ["biopax", "sbgn"]: 
+            frmt = "xml"
+        else:
+            frmt = "txt"
+        res = self.http_get(url, frmt=frmt)
 
         return res
-
 
     def top_pathways(self, datasource=None, organism=None):
         """This command returns all *top* pathways
@@ -460,7 +463,7 @@ class PathwayCommons(REST):
 
         url += "&path=" + path
 
-        res = self.http_get(url, frmt=None)
+        res = self.http_get(url, frmt="json")
         return res
 
 
