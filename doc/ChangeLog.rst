@@ -17,7 +17,8 @@ Revision 1.7.6
 --------------
 
 * Fixing ncbiblast and muscle services
-* Fixing quickgo services  
+* Fixing quickgo services by adding new methods
+* Fixing chembl and all failing tests and modules (omicdi, seqret,etc)
 
 Revision 1.7.5 
 --------------
