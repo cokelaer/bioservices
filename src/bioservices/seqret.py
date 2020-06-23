@@ -43,7 +43,7 @@ __all__ = ["Seqret"]
 
 
 
-class Seqret(REST):
+class Seqret():
     """Interface to the `Seqret <http://www.ebi.ac.uk/readseq>`_ service
 
     ::
@@ -51,39 +51,43 @@ class Seqret(REST):
         >>> from bioservices import *
         >>> s = Seqret()
 
-    The ReadSeq service was replaced by the Seqret services (2015).
+    The ReadSeq service was replaced by #the Seqret services (2015).
 
     .. versionchanged:: 0.15
 
     """
-    _url = "https://www.ebi.ac.uk/Tools/services/rest/emboss_seqret"
+
     def __init__(self, verbose=True):
         """.. rubric:: Constructor
 
         :param bool verbose:
 
         """
-        super(Seqret, self).__init__(name="seqret", url=Seqret._url, verbose=verbose)
+        url = "https://www.ebi.ac.uk/Tools/services/rest/emboss_seqret"
+        self.services = REST(name="seqret", url=url, verbose=verbose)
         self._parameters = None
 
-    def _get_parameter(self):
-        if self._parameters is None:
-            self._parameters = self._get_parameters()
-        return self._parameters
-    parameters = property(_get_parameter, doc="Get list of parameter names")
 
-    def _get_parameters(self):
+    def get_parameters(self):
         """Get a list of the parameter names.
 
         :returns: a list of strings giving the names of the parameters.
 
         """
-        parameters = self.http_get("parameters", frmt="xml")
-        res = self.easyXML(parameters)
-        parameters = [x.text for x in res.findAll("id")]
-        return parameters
+        parameters = self.services.http_get("parameters", frmt="json")
 
-    def get_parameter_details(self, parameter):
+        return parameters['parameters']
+
+    def _get_parameters(self):
+        if self._parameters:
+            return self._parameters
+        else:
+            res = self.get_parameters()
+            self._parameters = res
+        return self._parameters
+    parameters = property(_get_parameters, doc="Get list of parameter names")
+
+    def get_parameter_details(self, parameterId):
         """Get details of a specific parameter.
 
         :param str parameter: identifier/name of the parameter to fetch details of.
@@ -95,19 +99,13 @@ class Seqret(REST):
             print(rs.get_parameter_details("stype"))
 
         """
-        parameters = self.http_get("parameterdetails/{}".format(parameter), frmt="xml")
-        res = self.easyXML(parameters)
+        if parameterId not in self.parameters:
+            raise ValueError("Invalid parameterId provided(%s). See parameters attribute" % parameterId)
 
-        results = []
-        for value in res.findAll('values')[0].findAll("value"):
-            items = value.findAll()
-            if len(items):
-                results.append({
-                    "text": items[0].text,
-                    "value": items[1].text,
-                    "defaultvalue": items[2].text})
+        request = "parameterdetails/" + parameterId
+        res = self.services.http_get(request, frmt="json")
+        return res
 
-        return results
 
     def run(self, email, title, **kargs):
         """Submit a job to the service.
@@ -156,7 +154,7 @@ class Seqret(REST):
 
         """
         for k in kargs.keys():
-            self.devtools.check_param_in_list(k, self.parameters)
+            self.services.devtools.check_param_in_list(k, self.parameters)
 
         assert "sequence" in kargs.keys()
         params = {"email":email, "title":title}
@@ -165,11 +163,9 @@ class Seqret(REST):
                   "reverse", 'outputcase', 'seqrange']:
             if k in kargs.keys():
                 value = kargs.get(k)
-
                 details = self.get_parameter_details(k)
-                valid_values = [x['value'] for x in details]
-
-                self.devtools.check_param_in_list(str(value), valid_values)
+                valid_values = [x['value'] for x in details['values']['values']]
+                self.services.devtools.check_param_in_list(str(value), valid_values)
                 params[k] = value
         #r = requests.post(url + "/run?", data={"sequence":fasta, "stype": "protein",
         #"inputformat":"raw", "outputformat":"fasta", "email":"thomas.cokelaer@pasteur.fr",
@@ -177,7 +173,7 @@ class Seqret(REST):
 
         params['sequence'] = kargs['sequence']
 
-        jobid = self.http_post("run", frmt="txt", data=params)
+        jobid = self.services.http_post("run", frmt="txt", data=params)
         self._jobid = jobid
         return jobid
 
@@ -196,8 +192,8 @@ class Seqret(REST):
         - NOT_FOUND: the job cannot be found.
 
         """
-        res = self.http_get("status/{}".format(jobid))
-        return res.content.decode()
+        res = self.services.http_get("status/{}".format(jobid), frmt="txt")
+        return res
 
     def get_result_types(self, jobid):
         """Get the available result types for a finished job.
@@ -205,36 +201,24 @@ class Seqret(REST):
         :param str jobid: job identifier.
         :return: a list of wsResultType data structures describing the available result types.
         """
-        res = self.http_get("resulttypes/{}".format(jobid))
+        res = self.services.http_get("resulttypes/{}".format(jobid), frmt="json")
+        return [x['identifier'] for x in res["types"]]
 
-        res = self.easyXML(res.content.decode())
-        this = res.findAll("types")[0].findAll("type")[0].findAll('identifier')
-        return this[0].text
 
-    def get_result(self, jobid, parameters=None):
+    def get_result(self, jobid, result_type="out"):
         """Get the result of a job of the specified type.
 
         :param str jobid: job identifier.
         :param parameters: optional list of wsRawOutputParameter used to
             provide additional parameters for derived result types.
-        :return: the result data for the specified type, base64 encoded.
-            Depending on the SOAP library and programming language used the
-            result may be returned in decoded form. For some result types
-            (e.g. images) this will be binary data rather than a text string.
         """
         if self.get_status(jobid) != 'FINISHED':
             self.logging.warning("Your job is not finished yet. Try again later.")
             return
 
-        result_types = self.get_result_types(jobid)
+        #result_types = self.get_result_types(jobid)
+        #assert parameters in result_types
+        res = self.services.http_get("result/{}/{}".format(jobid, result_type),
+            frmt="txt")
 
-        res = self.http_get("result/{}/{}".format(jobid, result_types))
-        res = res.content.decode()
-
-        try:
-            import base64
-            res = base64.b64decode(res).decode()
-        except:
-            pass
         return res
-

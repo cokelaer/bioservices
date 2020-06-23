@@ -89,7 +89,7 @@ class MUSCLE():
                 "User-Agent": self.services.getUserAgent(), 
                 "accept": "application/json"}
 
-    def get_arameters(self):
+    def get_parameters(self):
         """List parameter names.
 
          :returns: An XML document containing a list of parameter names.
@@ -275,7 +275,11 @@ class MUSCLE():
 
         assert result_type in self.get_result_types(jobid)
         url = '/result/' + jobid + '/' + result_type
-        res = self.services.http_get(url, frmt=result_type,
+
+
+        if result_type in ['out', 'sequence', "aln-fasta", "pim", "phylotree"]:
+            frmt = "txt"
+        res = self.services.http_get(url, frmt=frmt,
             headers={
                 "User-Agent": self.services.getUserAgent(),
                 "accept": "application/json"})
