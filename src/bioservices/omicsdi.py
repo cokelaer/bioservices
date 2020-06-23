@@ -155,7 +155,7 @@ class OmicsDI(REST):
         }, {
             "path": "/dataset/batch",
             "params": {
-                "acc": {
+                "accession": {
                     "required": True,
                     "argument": "accession"
                 },
@@ -197,7 +197,7 @@ class OmicsDI(REST):
         }, {
             "path": "/dataset/getFileLinks",
             "params": {
-                "acc": {
+                "accession": {
                     "required": True,
                     "argument": "accession"
                 },
