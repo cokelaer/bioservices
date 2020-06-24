@@ -213,7 +213,7 @@ class Seqret():
             provide additional parameters for derived result types.
         """
         if self.get_status(jobid) != 'FINISHED':
-            self.logging.warning("Your job is not finished yet. Try again later.")
+            self.services.logging.warning("Your job is not finished yet. Try again later.")
             return
 
         #result_types = self.get_result_types(jobid)
