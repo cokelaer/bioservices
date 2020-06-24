@@ -393,10 +393,10 @@ class ArrayExpress(REST):
     def getAE(self, accession, type='full'):
         """retrieve all files from an experiments and save them locally"""
         filenames = self.retrieveFilesFromExperiment(accession)
-        self.info("Found %s files" % len(filenames))
+        self.logging.info("Found %s files" % len(filenames))
         for i,filename in enumerate(filenames):
             res = self.retrieveFile(accession, filename)
             fh = open(filename, 'w')
-            self.info("Downloading %s" % filename)
+            self.logging.info("Downloading %s" % filename)
             fh.write(res)
             fh.close()
