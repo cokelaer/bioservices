@@ -53,7 +53,7 @@ logger.name = __name__
 __all__ = ["Panther"]
 
 
-class Panther(REST):
+class Panther():
     """Interface to `Panther <http://www.pantherdb.org/services/oai/pantherdb>`_ pages
 
 
@@ -96,14 +96,15 @@ class Panther(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(Panther, self).__init__(name="Panther", url=Panther._url,
-                verbose=verbose, cache=cache)
+        #super(Panther, self).__init__(name="Panther", url=Panther._url,
+        #       verbose=verbose, cache=cache)
+        self.services = REST(name="Panther", url=Panther._url, verbose=verbose, cache=cache)
 
         self._allPathwaysURL =  "http://www.pantherdb.org/pathway/pathwayList.jsp"
 
     def get_pathways(self):
         """Returns all pathways from pantherdb"""
-        return self.http_get("supportedpantherpathways")
+        return self.services.http_get("supportedpantherpathways")
 
     def get_supported_genomes(self, type=None):
         """Returns list of supported organisms.
@@ -116,7 +117,7 @@ class Panther(REST):
             params = {'type': type}
         else:
             params = {}
-        res = self.http_get("supportedgenomes", params=params)
+        res = self.services.http_get("supportedgenomes", params=params)
         res = [x for x in res["search"]["output"]["genomes"]['genome']]
         return res
 
@@ -164,7 +165,7 @@ class Panther(REST):
         """
         params = {"geneInputList": gene_list,
                     "organism": taxon}
-        res = self.http_post("geneinfo", params=params, frmt='json')
+        res = self.services.http_post("geneinfo", params=params, frmt='json')
 
         if "mapped_genes" in res['search']:
             mapped_genes = res['search']['mapped_genes']['gene']
@@ -250,12 +251,12 @@ class Panther(REST):
         params['correction'] = correction.upper()
 
 
-        res = self.http_post("enrich/overrep", params=params, frmt="json")
+        res = self.services.http_post("enrich/overrep", params=params, frmt="json")
         return res['results']
 
     def get_annotation_datasets(self):
         """Retrieve the list of supported annotation data sets"""
-        res = self.http_get("supportedannotdatasets")
+        res = self.services.http_get("supportedannotdatasets")
         res = res["search"]["annotation_data_sets"]["annotation_data_type"]
         return res
 
@@ -287,7 +288,7 @@ class Panther(REST):
             "orthologType": ortholog_type}
         if params['targetOrganism'] is None:
             del params['targetOrganism']
-        res = self.http_get("ortholog/matchortho", frmt='json', params=params)
+        res = self.services.http_get("ortholog/matchortho", frmt='json', params=params)
         res = res['search']['mapping']
         mapped = res['mapped']
 
@@ -322,7 +323,7 @@ class Panther(REST):
             "pos": position,
             "orthologType": ortholog_type
         }
-        res = self.http_get("ortholog/homologpos", params=params, frmt="json")
+        res = self.services.http_get("ortholog/homologpos", params=params, frmt="json")
         res = res['search']['mapping']
         if "mapped" in res.keys():
             res = res['mapped']
@@ -345,7 +346,7 @@ class Panther(REST):
         """
         from easydev import Progress
         params = {'startIndex': 1}
-        res = self.http_get("supportedpantherfamilies", params=params)
+        res = self.services.http_get("supportedpantherfamilies", params=params)
         results = res['search']['panther_family_subfam_list']['family']
         if len(results) != N:
             msg = "looks like the services changed. Call this function with N={}"
@@ -357,7 +358,7 @@ class Panther(REST):
         pb.animate(1)
         for i in range(1, int(number_of_families / N)+1):
             params = {'startIndex': i * N+1}
-            res = self.http_get("supportedpantherfamilies", params=params)
+            res = self.services.http_get("supportedpantherfamilies", params=params)
             data = res['search']['panther_family_subfam_list']['family']
             results.extend(data)
             if progress:
@@ -379,7 +380,7 @@ class Panther(REST):
         params = {"family": family}
         if taxon_list:
             params['taxonFltr'] = taxon_list
-        res = self.http_get("familyortholog", params=params, frmt="json")
+        res = self.services.http_get("familyortholog", params=params, frmt="json")
         return res['search']['ortholog_list']['ortholog']
 
     def get_family_msa(self, family, taxon_list=None):
@@ -392,7 +393,7 @@ class Panther(REST):
         params = {"family": family}
         if taxon_list:
             params['taxonFltr'] = taxon_list
-        res = self.http_get("familymsa", params=params, frmt="json")
+        res = self.services.http_get("familymsa", params=params, frmt="json")
         return res['search']['MSA_list']['sequence_info']
 
     def get_tree_info(self, family, taxon_list=None):
@@ -404,6 +405,6 @@ class Panther(REST):
         params = {"family": family}
         if taxon_list:
             params['taxonFltr'] = taxon_list
-        res = self.http_get("treeinfo", params=params, frmt="json")
+        res = self.services.http_get("treeinfo", params=params, frmt="json")
         return res['search']#['tree_topology']['annotation_node']
 
