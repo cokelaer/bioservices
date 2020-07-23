@@ -232,8 +232,12 @@ class Panther(REST):
         if correction is None:
             correction = 'none'
 
-        assert correction.lower() in ['fdr', 'bonferonni', 'none']
+        assert correction.lower() in ['fdr', 'bonferroni', 'none']
 
+        # This is a bug in panther DB where they used bonferonni . should be
+        # bonferroni...
+        if correction.lower() == "bonferroni":
+            correction = "bonferonni"
         assert annotation in [x['id'] for x in self.get_annotation_datasets()]
 
         params = {'enrichmentTestType': enrichment_test.upper()}
@@ -245,7 +249,6 @@ class Panther(REST):
         params['annotDataSet'] = annotation
         params['correction'] = correction.upper()
 
-        print(params)
 
         res = self.http_post("enrich/overrep", params=params, frmt="json")
         return res['results']
