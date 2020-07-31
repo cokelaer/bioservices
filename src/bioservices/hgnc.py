@@ -52,7 +52,7 @@ except:
 __all__ = ["HGNC", 'HGNCDeprecated']
 
 
-class HGNC(REST):
+class HGNC():
     """Wrapper to the genenames web service
 
 
@@ -61,7 +61,7 @@ class HGNC(REST):
     """
     def __init__(self, verbose=False, cache=False):
         url = "http://rest.genenames.org/"
-        super(HGNC, self).__init__("HGNC", url=url, verbose=verbose,
+        self.services = REST("HGNC", url=url, verbose=verbose,
                 cache=cache)
 
         self._info = self.get_info()
@@ -78,8 +78,8 @@ class HGNC(REST):
 
 
         """
-        headers = self.get_headers(content=frmt)
-        res = self.http_get("info", frmt=frmt, headers=headers)
+        headers = self.services.get_headers(content=frmt)
+        res = self.services.http_get("info", frmt=frmt, headers=headers)
         return res
 
     def fetch(self, database, query, frmt='json'):
@@ -97,8 +97,8 @@ class HGNC(REST):
         """
         easydev.check_param_in_list(database, self.searchable_fields)
         url = 'fetch/{0}/{1}'.format(database, query)
-        headers = self.get_headers(content=frmt)
-        res = self.http_get(url, frmt=frmt, headers=headers)
+        headers = self.services.get_headers(content=frmt)
+        res = self.services.http_get(url, frmt=frmt, headers=headers)
         return res
 
     def search(self, database_or_query=None, query=None, frmt='json'):
@@ -153,8 +153,8 @@ class HGNC(REST):
             easydev.check_param_in_list(database, self.searchable_fields)
             url = 'search/{0}/{1}'.format(database, query)
 
-        headers = self.get_headers(content=frmt)
-        res = self.http_get(url, frmt=frmt, headers=headers)
+        headers = self.services.get_headers(content=frmt)
+        res = self.services.http_get(url, frmt=frmt, headers=headers)
         return res
 
 
@@ -237,9 +237,9 @@ class HGNCDeprecated(REST):
         """
         try:
             if ";" in gene:
-                res = self.http_get("genes/%s" % gene)
+                res = self.services.http_get("genes/%s" % gene)
             else:
-                res = self.http_get("gene/%s.xml" % gene)
+                res = self.services.http_get("gene/%s.xml" % gene)
                 res = self.easyXML(res)
             #res = bs4.BeautifulSoup(res)
         except HTTPError:
@@ -352,7 +352,7 @@ class HGNCDeprecated(REST):
         """
         params = {'search': 'symbol', 'value':pattern}
         # note the extra s before ;index.xml
-        xml = self.http_get("s;index.xml?" + self.urlencode(params))
+        xml = self.services.http_get("s;index.xml?" + self.urlencode(params))
         xml = self.easyXML(xml)
         res = [x.attrs for x in xml.findAll("gene")]
         return res
@@ -380,7 +380,7 @@ class HGNCDeprecated(REST):
         .. seealso:: :meth:`mapping_all`
         """
 
-        xml = self.http_get("s;index.xml?" + self.urlencode({'search': 'xref', 'value':value}))
+        xml = self.services.http_get("s;index.xml?" + self.urlencode({'search': 'xref', 'value':value}))
         xml = self.easyXML(xml)
         genes = xml.findAll("gene")
         res = [g.attrs for g in genes]

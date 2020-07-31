@@ -42,7 +42,7 @@ logger.name = __name__
 __all__ = ["Ensembl"]
 
 
-class Ensembl(REST):
+class Ensembl():
     """Interface to the `Ensembl <http://rest.ensembl.org>`_ service
 
     For the BioServices documentation see the documentation of
@@ -68,12 +68,12 @@ class Ensembl(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(Ensembl, self).__init__(name="Ensembl", url=Ensembl._url,
+        self.services = REST(name="Ensembl", url=Ensembl._url,
                 verbose=verbose, cache=cache)
         self.callback = None #use in all methods
 
     def _check_frmt(self, frmt, values=[]):
-        self.devtools.check_param_in_list(frmt, ['json','jsonp'] + values)
+        self.services.devtools.check_param_in_list(frmt, ['json','jsonp'] + values)
 
     def _check_id(self, identifier):
         pass
@@ -87,11 +87,11 @@ class Ensembl(REST):
             return 'json'
 
     def check_sequence(self, value):
-        self.devtools.check_param_in_list(value,
+        self.services.devtools.check_param_in_list(value,
                 ['none', 'cdna', 'protein'])
 
     def check_nh_format(self, value):
-        self.devtools.check_param_in_list(value,
+        self.services.devtools.check_param_in_list(value,
                 ['full', 'display_label_composite', 'simple', 'species',
                     'species_short_name', 'ncbi_taxon', 'ncbi_name', 'njtree',
                     'phylip'])
@@ -113,8 +113,8 @@ class Ensembl(REST):
         """
         self._check_frmt(frmt, ['xml'])
         self._check_id(identifier)
-        res = self.http_get("archive/id/" + identifier, frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get("archive/id/" + identifier, frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback})
 
         if frmt == 'xml':
@@ -129,9 +129,9 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_post("archive/id/", frmt=frmt,
-                headers = self.get_headers(content=frmt),
-                data =self.devtools.to_json({'id':identifiers}),
+        res = self.services.http_post("archive/id/", frmt=frmt,
+                headers = self.services.get_headers(content=frmt),
+                data =self.services.devtools.to_json({'id':identifiers}),
                 params={'callback': self.callback})
         if frmt == 'xml':
             res = self.easyXML(res)
@@ -150,9 +150,9 @@ class Ensembl(REST):
         self.check_sequence(sequence)
         self.check_nh_format(nh_format)
 
-        res = self.http_get("genetree/member/symbol/%s/%s" %(species, symbol),
+        res = self.services.http_get("genetree/member/symbol/%s/%s" %(species, symbol),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'nh_format':nh_format, 'sequence':sequence,
                     'aligned':int(aligned), 'compara':compara,
                     'db_type':db_type})
@@ -185,8 +185,8 @@ class Ensembl(REST):
         frmt = self.nh_format_to_frmt(nh_format)
         self.check_sequence(sequence)
 
-        res = self.http_get("genetree/member/id/" + identifier, frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get("genetree/member/id/" + identifier, frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params={'nh_format':nh_format, 'sequence':sequence,
                     'aligned':int(aligned), 'compara':compara,
                     'db_type':db_type, 'species':species})
@@ -226,8 +226,8 @@ class Ensembl(REST):
         self.check_nh_format(nh_format)
         aligned = int(aligned)
         self.check_sequence(sequence)
-        res = self.http_get("genetree/id/" + identifier, frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get("genetree/id/" + identifier, frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params={'nh_format':nh_format, 'sequence':sequence,
                     'aligned':aligned})
         return res
@@ -276,9 +276,9 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml', 'phyloxml'])
-        res = self.http_get("alignment/region/{0}/{1}".format(species, region),
+        res = self.services.http_get("alignment/region/{0}/{1}".format(species, region),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'aligned':int(aligned), 'callback':self.callback,
                     'compact':compact, 'compara':compara,
                     'display_species_set': display_species_set,
@@ -293,9 +293,9 @@ class Ensembl(REST):
             target_taxon=None, type='all'):
         """Retrieves homology information (orthologs) by Ensembl gene id"""
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get("homology/id/{0}".format(identifier),
+        res = self.services.http_get("homology/id/{0}".format(identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'aligned':int(aligned), 'callback':self.callback,
                     'compara':compara, 'format':format,'sequence':sequence,
                     'species': species,
@@ -333,8 +333,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt)
-        res = self.http_get('xrefs/id/{0}'.format(identifier), frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get('xrefs/id/{0}'.format(identifier), frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params = {'db_type': db_type, 'callback':self.callback,
                     'db_type':db_type, 'all_levels': int(all_levels),
                     'external_db':external_db, 'object_type':object_type,
@@ -358,8 +358,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('xrefs/name/{0}/{1}'.format(species, name), frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get('xrefs/name/{0}/{1}'.format(species, name), frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params = {'db_type': db_type, 'callback':self.callback,
                     'external_db': external_db})
         return res
@@ -384,8 +384,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('xrefs/symbol/{0}/{1}'.format(species, symbol), frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get('xrefs/symbol/{0}/{1}'.format(species, symbol), frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
         #      params = {'db_type': db_type, 'callback':self.callback,
         #           'object_type':object_type, 'external_db': external_db}
         )
@@ -402,8 +402,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('info/analysis/{0}'.format(species), frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get('info/analysis/{0}'.format(species), frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params = {'callback':self.callback})
         return res
 
@@ -417,8 +417,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('info/assembly/{0}'.format(species), frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get('info/assembly/{0}'.format(species), frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params = {'bands': bands,'callback':self.callback})
         return res
 
@@ -427,9 +427,9 @@ class Ensembl(REST):
         """Returns information about the specified toplevel sequence region for the
             given species."""
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('info/assembly/{0}/{1}'.format(species,region),
+        res = self.services.http_get('info/assembly/{0}/{1}'.format(species,region),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params = {'bands': bands, 'callback':self.callback
                     })
         return res
@@ -444,8 +444,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('info/biotypes/{0}'.format(species), frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get('info/biotypes/{0}'.format(species), frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params = {'callback':self.callback})
         return res
 
@@ -465,8 +465,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('info/compara/methods', frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get('info/compara/methods', frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params = {'class':method_class, 'compara':compara,
                     'callback':self.callback})
         return res
@@ -486,9 +486,9 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.http_get('info/compara/species_sets/{0}'.format(method),
+        res = self.services.http_get('info/compara/species_sets/{0}'.format(method),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params = {'compara':compara, 'callback':self.callback})
         return res
 
@@ -498,8 +498,8 @@ class Ensembl(REST):
         :param str frmt: response formats: json, jsonp,xml
         """
         self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.http_get('info/comparas', frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get('info/comparas', frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params = {'callback':self.callback})
         return res
 
@@ -512,8 +512,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('info/data', frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get('info/data', frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params = {'callback':self.callback})
         return res
 
@@ -530,17 +530,17 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('info/external_dbs/{0}'.format(species),
+        res = self.services.http_get('info/external_dbs/{0}'.format(species),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params = {'callback':self.callback, 'filter':filter})
         return res
 
     def get_info_ping(self, frmt='json'):
         """Checks if the service is alive."""
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('info/ping/', frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get('info/ping/', frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params = {'callback':self.callback})
         return res['ping']
 
@@ -551,8 +551,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('info/rest/', frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get('info/rest/', frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params = {'callback':self.callback})
         return res
 
@@ -562,8 +562,8 @@ class Ensembl(REST):
         :param str frmt: response formats: json, jsonp,xml
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('info/software/', frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get('info/software/', frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params = {'callback':self.callback})
         return res
 
@@ -575,8 +575,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('info/species/', frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get('info/species/', frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params = {'callback':self.callback})
         return res
 
@@ -604,8 +604,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get("lookup/id/" + identifier, frmt=frmt,
-                headers = self.get_headers(content=frmt),
+        res = self.services.http_get("lookup/id/" + identifier, frmt=frmt,
+                headers = self.services.get_headers(content=frmt),
                 params = {'db_type': db_type, 'expand': int(expand), 'format': format,
                     'callback': self.callback, 'species': species})
         return res
@@ -634,11 +634,11 @@ class Ensembl(REST):
         .. todo: frmt can only be json or jsonp
         """
         self._check_frmt(frmt)
-        identifiers = self.devtools.to_list(identifiers)
+        identifiers = self.services.devtools.to_list(identifiers)
         expand = int(expand)
-        res = self.http_post("lookup/id/", frmt=frmt,
-                headers = self.get_headers(content=frmt),
-                data =self.devtools.to_json({'ids':identifiers}),
+        res = self.services.http_post("lookup/id/", frmt=frmt,
+                headers = self.services.get_headers(content=frmt),
+                data =self.services.devtools.to_json({'ids':identifiers}),
                 params={'db_type': db_type, 'expand': expand, 'format': format,
                     'callback': self.callback, 'species': species})
         return res
@@ -664,9 +664,9 @@ class Ensembl(REST):
         """
         self._check_frmt(frmt, ['xml'])
         expand = int(expand)
-        res = self.http_get("lookup/symbol/{0}/{1}".format(species, symbol),
+        res = self.services.http_get("lookup/symbol/{0}/{1}".format(species, symbol),
                 frmt=frmt,
-                headers = self.get_headers(content=frmt),
+                headers = self.services.get_headers(content=frmt),
                 params = {'format': format,
                     'callback': self.callback, 'expand':expand})
         return res
@@ -691,12 +691,12 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        symbols = self.devtools.to_list(symbols)
+        symbols = self.services.devtools.to_list(symbols)
         expand = int(expand)
-        res = self.http_post("lookup/symbol/{0}".format(species),
+        res = self.services.http_post("lookup/symbol/{0}".format(species),
                 frmt=frmt,
-                headers = self.get_headers(content=frmt),
-                data = self.devtools.to_json({'symbols':symbols}),
+                headers = self.services.get_headers(content=frmt),
+                data = self.services.devtools.to_json({'symbols':symbols}),
                 params = {'format': format,
                     'callback': self.callback, 'expand':expand})
         return res
@@ -717,8 +717,8 @@ class Ensembl(REST):
             get_map_cds_to_region('ENST00000288602', '1..1000')
         """
         self._check_frmt(frmt, ['json'])
-        res = self.http_get("map/cds/{0}/{1}".format(identifier, region),
-                frmt=frmt,  headers=self.get_headers(content=frmt),
+        res = self.services.http_get("map/cds/{0}/{1}".format(identifier, region),
+                frmt=frmt,  headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback, 'species':species})
 
         return res
@@ -741,8 +741,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get("map/cdna/{0}/{1}".format(identifier, region),
-                frmt=frmt,  headers=self.get_headers(content=frmt),
+        res = self.services.http_get("map/cdna/{0}/{1}".format(identifier, region),
+                frmt=frmt,  headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback, 'species':species})
         return res
 
@@ -763,8 +763,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get("map/{0}/{1}/{2}/{3}".format(species, first, region, second ),
-                frmt=frmt,  headers=self.get_headers(content=frmt),
+        res = self.services.http_get("map/{0}/{1}/{2}/{3}".format(species, first, region, second ),
+                frmt=frmt,  headers=self.services.get_headers(content=frmt),
                 params={})
         return res
 
@@ -784,8 +784,8 @@ class Ensembl(REST):
             get_map_translation_to_region('ENSP00000288602', '100..300')
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get("map/translation/{0}/{1}".format(identifier, region),
-                frmt=frmt,  headers=self.get_headers(content=frmt),
+        res = self.services.http_get("map/translation/{0}/{1}".format(identifier, region),
+                frmt=frmt,  headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback})
         return res
 
@@ -813,9 +813,9 @@ class Ensembl(REST):
         """
         self._check_frmt(frmt, ['xml', 'yaml'])
         identifier = str(identifier)
-        res = self.http_get("ontology/id/{0}".format(identifier),
+        res = self.services.http_get("ontology/id/{0}".format(identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'simple': int(simple), 'relation':relation,
                     'callback':self.callback})
         return res
@@ -844,8 +844,8 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.http_get("ontology/name/{0}".format(name), frmt=frmt,
-                headers=self.get_headers(content=frmt),
+        res = self.services.http_get("ontology/name/{0}".format(name), frmt=frmt,
+                headers=self.services.get_headers(content=frmt),
                 params={'simple':int(simple), 'relation':relation,
                     'callback':self.callback, 'ontology':ontology})
         return res
@@ -859,9 +859,9 @@ class Ensembl(REST):
         :param str frmt: response formats in json, xml, yaml, jsonp
         """
         self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.http_get("taxonomy/id/{0}".format(identifier),
+        res = self.services.http_get("taxonomy/id/{0}".format(identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'simple':int(simple)})
         return res
 
@@ -880,9 +880,9 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.http_get("taxonomy/name/{0}".format(name),
+        res = self.services.http_get("taxonomy/name/{0}".format(name),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback})
         return res
 
@@ -903,9 +903,9 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.http_get("taxonomy/classification/{0}".format(identifier),
+        res = self.services.http_get("taxonomy/classification/{0}".format(identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback})
         return res
 
@@ -923,9 +923,9 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.http_get("ontology/ancestors/{0}".format(identifier),
+        res = self.services.http_get("ontology/ancestors/{0}".format(identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback, 'ontology':ontology})
         return res
 
@@ -941,9 +941,9 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.http_get("ontology/ancestors/chart/{0}".format(identifier),
+        res = self.services.http_get("ontology/ancestors/chart/{0}".format(identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback, 'ontology':ontology})
         return res
         #'getAncestorsChartById': {'url': '/ontology/ancestors/chart/{{id}}',
@@ -964,9 +964,9 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get("ontology/descendants/{0}".format(identifier),
+        res = self.services.http_get("ontology/descendants/{0}".format(identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback, 'ontology':ontology,
                     'closest_term': closest_term, 'subset':subset,
                     'zero_distance': zero_distance})
@@ -1005,9 +1005,9 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml', 'gff3', 'bed'])
-        res = self.http_get("overlap/id/{0}".format(identifier),
+        res = self.services.http_get("overlap/id/{0}".format(identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback, 'biotype':biotype,
                     'db_type':  db_type, 'logic_name': logic_name,
                     'misc_set': misc_set, 'object_type': object_type,
@@ -1055,9 +1055,9 @@ class Ensembl(REST):
         .. todo:: feature can take several values. how can be do that.
         """
         self._check_frmt(frmt, ['xml', 'gff3', 'bed'])
-        res = self.http_get("overlap/region/{0}/{1}".format(species, region),
+        res = self.services.http_get("overlap/region/{0}/{1}".format(species, region),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback, 'biotype':biotype,
                     'cell_type': cell_type, 'feature':feature,
                     'db_type':  db_type, 'logic_name': logic_name,
@@ -1090,9 +1090,9 @@ class Ensembl(REST):
             type. (e.g.,  low_complexity)
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get("overlap/translation/{0}".format(identifier),
+        res = self.services.http_get("overlap/translation/{0}".format(identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback,
                     'db_type':  db_type, 'feature': feature,
                     'so_term': so_term, 'species': species,
@@ -1111,9 +1111,9 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get("regulatory/{0}/{1}".format(species, identifier),
+        res = self.services.http_get("regulatory/{0}/{1}".format(species, identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback})
         return res
 
@@ -1178,9 +1178,9 @@ class Ensembl(REST):
         """
         self._check_frmt(frmt, ['fasta', 'text', 'yaml', 'seqxml'])
         multiple_sequences = int(multiple_sequences)
-        res = self.http_get('sequence/id/{0}'.format(identifier),
+        res = self.services.http_get('sequence/id/{0}'.format(identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={
                     'db_type': db_type, 'object_type':object_type,
                     'multiple_sequences':multiple_sequences,  'species':species,
@@ -1222,9 +1222,9 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['fasta', 'text', 'yaml', 'seqxml'])
-        res = self.http_get('sequence/region/{0}/{1}'.format(species, region),
+        res = self.services.http_get('sequence/region/{0}/{1}'.format(species, region),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={
                     'callback': self.callback, 'coord_system':coord_system,
                     'coord_system_version': coord_system_version,
@@ -1251,9 +1251,9 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('variation/{0}/{1}'.format(species, identifier),
+        res = self.services.http_get('variation/{0}/{1}'.format(species, identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'genotypes':int(genotypes), 'phenotypes':int(phenotypes),
                     'pops': int(pops)}
                 )
@@ -1279,9 +1279,9 @@ class Ensembl(REST):
             exon structure and protein product
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('vep/{0}/id/{1}'.format(species, identifier),
+        res = self.services.http_get('vep/{0}/id/{1}'.format(species, identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback, 'canonical':canonical,
                     'ccds':ccds, 'domains':domains,
                     'hgvs': hgvs, 'numbers':numbers, 'protein': protein,
@@ -1293,9 +1293,9 @@ class Ensembl(REST):
         raise NotImplementedError
         #POST vep/:species/id/   Fetch variant consequences for multiple ids
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('variation/{0}/{1}'.format(species, identifier),
+        res = self.services.http_get('variation/{0}/{1}'.format(species, identifier),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'genotypes':int(genotypes), 'phenotypes':int(phenotypes),
                     'pops': int(pops)}
                 )
@@ -1322,9 +1322,9 @@ class Ensembl(REST):
 
         """
         self._check_frmt(frmt, ['xml'])
-        res = self.http_get('vep/{0}/region/{1}/{2}'.format(species, region, allele),
+        res = self.services.http_get('vep/{0}/region/{1}/{2}'.format(species, region, allele),
                 frmt=frmt,
-                headers=self.get_headers(content=frmt),
+                headers=self.services.get_headers(content=frmt),
                 params={'callback':self.callback, 'canonical':canonical,
                     'ccds':ccds, 'domains':domains,
                     'hgvs': hgvs, 'numbers':numbers, 'protein': protein,
