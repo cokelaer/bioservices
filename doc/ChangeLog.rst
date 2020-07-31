@@ -13,11 +13,18 @@ Revision 1.8.0 roadmap
   Instead of inheriting from REST, we should use an aggregation and store all
   methods in a single attribute
 
+<<<<<<< HEAD
 
 Revision 1.7.7
 --------------
 
 * Fix typo in PantherDB 
+=======
+Revision 1.7.7
+--------------
+
+* small fix on pantherdb (autocorrect typo in pantherdb api)
+>>>>>>> bd722cfcd17ec03a3461cd3ee79b9356b32528c2
 
 Revision 1.7.6
 --------------
