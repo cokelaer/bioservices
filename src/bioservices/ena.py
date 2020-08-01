@@ -110,7 +110,7 @@ class ENA(REST):
     .. todo:: Taxon viewer, image retrieval.
 
     """
-    _url = "http://www.ebi.ac.uk/ena/data"
+    _url = "https://www.ebi.ac.uk/ena/browser"
 
 
     def __init__(self, verbose=False, cache=False):
@@ -123,10 +123,10 @@ class ENA(REST):
         self.TIMEOUT = 100
 
     def get_data(self, identifier, frmt, fasta_range=None, expanded=None,
-            header=None, download=None):
+            header=None, download=None, line_limit=None, gzip=None, annotation_only=None):
         """
 
-        :param frmt : xml, text, fasta, fastq, html
+        :param frmt : xml, text, fasta, embl
 
 
         .. todo:: download and save at the same time. Right now the fasta is
@@ -136,10 +136,19 @@ class ENA(REST):
 
         # somehow the params param does not work, we need to construct the
         # entire url
-        url = self.url + '/view/' + identifier
-        #assert frmt in ['fasta', 'xml', 'text'], \
-        #    "Only fasta, xml and text are recognised"
-        url += "&display=%s" % frmt
+        # assert frmt in ['fasta', 'embl', 'text', 'xml'], \
+        #    "Only fasta, xml, embl and text are recognised"
+
+        url = self.url + '/api/%s/%s' % (frmt, identifier)
+
+        if line_limit is not None and fasta_range is not None:
+            raise AssertionError("Fasta_range cannot be used with line_limit")
+
+        if annotation_only is not None:
+            url += "&annotationOnly=%s" % annotation_only
+
+        if line_limit is not None:
+            url += "&lineLimit=%s" % line_limit
 
         if fasta_range is not None:
             url += "&range=%s-%s" % (fasta_range[0], fasta_range[1])
@@ -147,20 +156,28 @@ class ENA(REST):
         if expanded is not None and expanded is True:
             url += "&expanded=true"
 
+        # obsolete in new browser, can be removed if deemed necessary
         if header is not None and header is True:
             url += "&header=true"
 
         if download is not None:
             url += "&download=%s" % download
 
+        if gzip is not None and download is True:
+            url += "&gzip=%s" % gzip
+
+        # first param must be preceded with a ?
+        url = url.replace('&', '?', 1)
         res = self.http_get(url)
         res = res.content
         return res
 
     def view_data(self, identifier, fasta_range=None):
         url = self.url + '/view/' + identifier
+
+        # obsolete in new browser, can be removed if deemed necessary
         if fasta_range is not None:
-            url += "&range=%s-%s" % (fasta_range[0], fasta_range[1])
+            url += "?range=%s-%s" % (fasta_range[0], fasta_range[1])
         self.on_web(url)
 
     def data_warehouse(self):
@@ -168,5 +185,4 @@ class ENA(REST):
         pass
 
     def get_taxon(self, taxon):
-        return e.get_data("Taxon:%s" % taxon, "xml").decode()
-
+        return self.get_data("Taxon:%s" % taxon, "xml").decode()
