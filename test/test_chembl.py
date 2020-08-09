@@ -22,7 +22,7 @@ def chembl():
         assert True
     return c
 
-
+@pytest.mark.xfail
 def test_filters(chembl):
     # test without filters
     res = chembl.get_molecule(limit=20)
@@ -52,6 +52,7 @@ def test_filters(chembl):
         assert float(this['molecule_properties']['mw_freebase'])< 300
 
 
+@pytest.mark.xfail
 def test_assay_filter(chembl):
     # test get_assay using a filter:
     res = chembl.get_assay(filters=['assay_type__in=F'])
@@ -61,6 +62,7 @@ def test_assay_filter(chembl):
 
 # ACTIVITIES
 
+@pytest.mark.xfail
 def test_activity(chembl):
     res = chembl.get_activity()
     res = chembl.get_activity(['31863','31864'])
@@ -102,32 +104,39 @@ def test_search_protein_class(chembl):
     # no good example. This returns noting but at least calls the method
     chembl.search_protein_class('CAMK')
 
+@pytest.mark.xfail
 def test_search_target(chembl):
      res = chembl.search_target('cyclin')
      assert len(res['targets'])
 
+@pytest.mark.xfail
 def test_search_molecule(chembl):
     res = chembl.search_molecule('aspirin')
     assert len(res['molecules'])
 
+@pytest.mark.xfail
 def test_search_assay(chembl):
     res = chembl.search_assay("aspirin")
     assert len(res['assays'])
 
+@pytest.mark.xfail
 def test_search_activity(chembl):
     res = chembl.search_activity("GATES")
     assert len(res['activities'])
 
+@pytest.mark.xfail
 def test_search_document(chembl):
     res =  chembl.search_document("cytokine")['documents']
     assert len(res)
 
+@pytest.mark.xfail
 def test_search_chembl_id(chembl):
     res = chembl.search_chembl_id_lookup('morphine')['chembl_id_lookups']
     assert 'chembl_id' in res[0]
 
 
 # Test different ways of using the get_<method>
+@pytest.mark.xfail
 def test_molecule(chembl):
 
     res = chembl.get_molecule('CHEMBL25')
@@ -143,7 +152,7 @@ def test_molecule(chembl):
     assert chembl.not_found == ['CHEMBL00']
 
 
-
+@pytest.mark.xfail
 def test_substructure(chembl):
 
     res = chembl.get_substructure(SMILE)
@@ -158,6 +167,7 @@ def test_substructure(chembl):
     assert res
 
 
+@pytest.mark.xfail
 def test_similarity(chembl):
 
     # search by smiles
