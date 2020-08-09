@@ -47,14 +47,14 @@ logger.name = __name__
 __all__ = ["ENA"]
 
 
-class ENA(REST):
+class ENA():
     """Interface to `ChEMBL <http://www.ebi.ac.uk/ena/index.php>`_
 
     Here is a quick example to retrieve a target given its ChEMBL Id
 
     .. doctest::
 
-        >>> from bioservices import ChEMBL
+        >>> from bioservices import ENQ
         >>> s = ENA(verbose=False)
 
 
@@ -106,11 +106,8 @@ class ENA(REST):
         e.get_data('AM407889.2', 'fasta')
 
 
-
-    .. todo:: Taxon viewer, image retrieval.
-
     """
-    _url = "http://www.ebi.ac.uk/ena/data"
+    url = "http://www.ebi.ac.uk/ena/browser/api"
 
 
     def __init__(self, verbose=False, cache=False):
@@ -118,43 +115,34 @@ class ENA(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(ENA, self).__init__(name="ENA", url=ENA._url,
+        self.services = REST(name="ENA", url=ENA.url,
                 verbose=verbose, cache=cache)
-        self.TIMEOUT = 100
+        self.services.TIMEOUT = 100
 
     def get_data(self, identifier, frmt, fasta_range=None, expanded=None,
             header=None, download=None):
         """
 
-        :param frmt : xml, text, fasta, fastq, html
+        :param frmt : xml, text, fasta, fastq, html, embl but does depend on the    
+            entry
 
+        Example:
 
-        .. todo:: download and save at the same time. Right now the fasta is
-            retuned as a string and needs to be saved manually. It may also be
-            an issue with very large fasta files.
+            get_data("/AL513382", "embl")
+
+        ENA API changed in 2020 but we tried to keep the same services in this
+        method.
         """
 
-        # somehow the params param does not work, we need to construct the
-        # entire url
-        url = self.url + '/view/' + identifier
-        #assert frmt in ['fasta', 'xml', 'text'], \
-        #    "Only fasta, xml and text are recognised"
-        url += "&display=%s" % frmt
+        url = f"{self.url}/{frmt}/{identifier}"
 
-        if fasta_range is not None:
-            url += "&range=%s-%s" % (fasta_range[0], fasta_range[1])
 
-        if expanded is not None and expanded is True:
-            url += "&expanded=true"
-
-        if header is not None and header is True:
-            url += "&header=true"
-
-        if download is not None:
-            url += "&download=%s" % download
-
-        res = self.http_get(url)
-        res = res.content
+        if frmt in ['text', 'fasta', 'fastq']:
+            res = self.services.http_get(url, frmt="txt")
+        elif frmt in ['html']:
+            res = self.services.http_get(url, frmt="default")
+        elif frmt in ['xml']:
+            res = self.services.http_get(url, frmt="xml")
         return res
 
     def view_data(self, identifier, fasta_range=None):
@@ -168,5 +156,5 @@ class ENA(REST):
         pass
 
     def get_taxon(self, taxon):
-        return e.get_data("Taxon:%s" % taxon, "xml").decode()
+        print("deprecated since v.7.8 due to ENA update")
 
