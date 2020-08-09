@@ -6,8 +6,46 @@ and many more. In BioMart terminology a service is called a **mart**. As an
 example, we will consider the COSMIC interface provided by
 BioMart (see `COSMIC <http://cancer.sanger.ac.uk/biomart/martview/>`_). You 
 can play with the interface itself to get an idea of what can be selected (e.g.,
-datasets, filters, attributes) but let us use BioServices to access to the
-Cosmic mart programmatically. 
+datasets, filters, attributes). To help you, let us give a simple example that
+consists in converting the ensemble identifiers into entrez identifiers. 
+
+First you create an instance. There are lots of services behind the scene. The
+ENSEMBL_MART_ENSEMBL provides the conversion we are looking for. 
+::
+
+
+    from bioservices import BioMart
+    b = BioMart()
+    datasets = b.get_datasets("ENSEMBL_MART_ENSEMBL")
+
+In datasets, there is a hsapiens_gene_ensembl database. Let us add it to the
+request that will be send::
+ 
+    b.add_dataset_to_xml(dataset)
+
+We want to extract only the to following attributes::
+
+    b.add_attribute_to_xml("ensemble_gene_id")
+    b.add_attribute_to_xml("entrezgene_id")
+
+If you are interested in a set of identifiers, provide it as a list (here below
+the queries::
+
+    queries = ["", ""]
+    b.add_filter_to_xml("ensemble_gene_id", queries)
+
+and finally do the query itself::
+
+    xml = b.get_xml()
+    res = b.query(xml)
+
+You can obtain the attributes and filters of a dataset as follows::
+
+    dataset = 'hsapiens_gene_ensembl'
+    attributes = b.attributes(dataset)
+    filters = b.attributes(dataset)
+
+Here is another example with cosmic.
 
 .. note:: the cosmic mart was available at the time of 1.0 but not during
     release 1.4.1 . This is not a BioServices issue but the COSMIC mart being 

@@ -37,11 +37,12 @@ to all the BioModel service.
 
 .. note:: SOAP and REST are available. We use REST for the wrapping.
 """
+from io import StringIO
 from bioservices import REST, BioServicesError
 from functools import wraps
 from bioservices import logger
 logger.name = __name__
-
+import pandas as pd
 
 __all__ = ["BioMart"]
 
@@ -210,6 +211,7 @@ class BioMart(REST):
             cache=cache)
 
         self._names = None
+        self._marts = None
         self._databases = None
         self._display_names = None
         self._valid_attributes = None
@@ -218,8 +220,13 @@ class BioMart(REST):
         self._secure = secure
 
         if host is None:
-            host = "www.biomart.org"
-            url = "http://{}/biomart/martservice".format(host)
+            i = 0
+            hosts = ["www.ensembl.org", "asia.ensembl.org", "useast.ensembl.org"]
+            while self.host is None and (i<3):
+                self.host = hosts[i]
+                i += 1
+            if self.host is None:
+                raise IOError("no host provided and no default hosts {} not reachable".format(hosts))
         else:
             self.host = host
         self._biomartQuery = BioMartQuery()
@@ -297,8 +304,19 @@ class BioMart(REST):
                 ret = [x[1] for x in ret2]
             except:
                 ret = ["?"]
-
         return ret
+
+    def get_datasets(self, mart): 
+        """Retrieve datasets with description"""
+        if mart not in self.names:
+            raise BioServicesError("Provided mart name (%s) is not valid. see 'names' attribute" % mart)
+
+        ret = self.http_get("?type=datasets&mart=%s" %mart, frmt="txt")
+        import pandas as pd
+        df = pd.read_csv(StringIO(ret), sep='\t', 
+            header=None, usecols=[1,2], names=['name', 'description']) 
+        return df
+
 
     @require_host
     def attributes(self, dataset):
@@ -467,10 +485,19 @@ class BioMart(REST):
     def _get_databases(self):
         if self._databases is None:
             ret = self.registry()
-            names = sorted([x.get("database", "?") for x in ret])
-            self._databases = names[:]
+            names = [x.get("database", "?") for x in ret]
+            self._databases = names
         return self._databases
     databases = property(_get_databases, doc="list of valid datasets")
+
+    @require_host
+    def _get_marts(self):
+        if self._marts is None:
+            ret = self.registry()
+            df = pd.DataFrame(ret)[["database", "displayName", "name"]]
+            self._marts = df
+        return self._marts
+    marts = property(_get_marts, doc="list of marts")
 
     @require_host
     def _get_hosts(self):

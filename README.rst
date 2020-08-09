@@ -70,11 +70,15 @@ This is a summary of the changelog. Complete change can be found in the
 
 
 
-Revision 1.7.0
+Revision 1.7.X
 --------------
 
+* Fix NCBIBlast and Muscle services (new API)
+* Update Quickgo
+* NEw module: mygeneinfom pdbe
+* Integration nez Biomodels API following Combine/Harmony meetng
+* Update ChEMBL after an ChEMBL API change
 * General fixes and update from @thobalose (https://github.com/cokelaer/bioservices/pull/149) to
-  updating matplotlib to 3.0.3
 * added  panther module (pantherdb.org)
 * added tests for pubchem, pfam and eva modules, which are still in draft version though
 * deprecated PICR and TCGA modules (the latter was not really available anyway)

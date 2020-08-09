@@ -20,7 +20,7 @@ def download_fasta(accession, output_filename=None, method="EUtils", service=Non
 
     """
     if service:
-        method = service.name
+        method = service.services.name
 
     if output_filename is None:
         output_filename = accession.replace(".", "_") + ".fa"
@@ -37,7 +37,7 @@ def _download_fasta_ena(accession, output_filename, service=None):
     if service is None:
         service = ENA()
     data = service.get_data(accession, "fasta")
-    data = data.decode()
+    #data = data.decode()
     return _data_to_file(data, output_filename)
 
 

@@ -5,6 +5,7 @@ pytest-cov
 pytest-xdist
 pytest-timeout
 pytest-runner
+flaky
 sphinx
 sphinx_rtd_theme
 sphinx-gallery

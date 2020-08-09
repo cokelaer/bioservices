@@ -9,12 +9,12 @@ def biomart():
     return biomart
 
 
-@pytest.mark.flaky(max_runs=5)
+@pytest.mark.flaky
 def test_version(biomart):
     biomart.version(biomart.mart_test)
 
 
-@pytest.mark.flaky(max_runs=10, reruns_delay=1)
+@pytest.mark.flaky
 def _test_datasets(biomart):
     # there are about 70 datasets but let us check that at least the list is
     # not emptyt
@@ -23,36 +23,37 @@ def _test_datasets(biomart):
     assert "mmusculus_gene_ensembl" in biomart.datasets(biomart.mart_test)
 
 
-@pytest.mark.flaky(max_runs=10, reruns_delay=1)
+@pytest.mark.flaky
 def _test_attributes(biomart):
     assert 'oanatinus_gene_ensembl' in \
         biomart.valid_attributes[biomart.mart_test]
 
 
-@pytest.mark.flaky(max_runs=5)
+@pytest.mark.flaky
 def test_filteres(biomart):
     biomart.filters("oanatinus_gene_ensembl")
 
 
-@pytest.mark.flaky(max_runs=5)
+@pytest.mark.flaky
 def test_config(biomart):
     biomart.configuration("oanatinus_gene_ensembl")
 
 
 #fails on travais sometines
-@pytest.mark.flaky(max_runs=8, reruns_delay=2)
+@pytest.mark.flaky
 def _test_query(biomart):
     res = biomart.query(biomart._xml_example)
     assert "ENSMUS" in res
 
 
-@pytest.mark.flaky(max_runs=5)
+@pytest.mark.flaky
 def test_xml(biomart):
     # build own xml using the proper functions
     biomart.add_dataset_to_xml("mmusculus_gene_ensembl")
     biomart.get_xml()
 
 
+@pytest.mark.flaky
 def test_biomart_constructor():
     s = BioMart()
     try:

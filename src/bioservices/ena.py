@@ -145,12 +145,6 @@ class ENA():
             res = self.services.http_get(url, frmt="xml")
         return res
 
-    def view_data(self, identifier, fasta_range=None):
-        url = self.url + '/view/' + identifier
-        if fasta_range is not None:
-            url += "&range=%s-%s" % (fasta_range[0], fasta_range[1])
-        self.on_web(url)
-
     def data_warehouse(self):
         #http://www.ebi.ac.uk/ena/data/warehouse/search?query="geo_circ(-0.587,-90.5713,170)"&result=sequence_release&display=text&download=gzip
         pass
