@@ -40,16 +40,6 @@ def test_retrieveFile(array):
         pass
 
 @pytest.mark.xfail
-def test_format(array):
-    array.format = "json"
-    array.format = "xml"
-    try:
-        array.format = "dummy"
-        assert False
-    except:
-        assert True
-
-@pytest.mark.xfail
 def test_retrieveExperiment(array):
     array.retrieveExperiment("E-MEXP-31")
 

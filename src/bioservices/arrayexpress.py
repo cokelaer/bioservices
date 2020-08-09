@@ -41,7 +41,7 @@ logger.name = __name__
 __all__ = ["ArrayExpress"]
 
 
-class ArrayExpress(REST):
+class ArrayExpress():
     """Interface to the `ArrayExpress <http://www.ebi.ac.uk/arrayexpress>`_ service
 
     ArrayExpress allows to retrieve data sets used in various experiments.
@@ -115,16 +115,12 @@ class ArrayExpress(REST):
          'E-MEXP-31.idf.txt',
          'E-MEXP-31.sdrf.txt']
 
-    Nnew in version 1.3.7 you can use the method :meth:`getEA`
+    New in version 1.3.7 you can use the method :meth:`getEA`
 
     Then, you may want to download a particular file::
 
         >>> s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")
 
-
-    You can get json file instead of XML by setting the format to "json"::
-
-        >>> a.format = "json"
 
     .. seealso:: :meth:`queryFiles` for more details about the parameters to be
         used in queries.
@@ -142,26 +138,16 @@ class ArrayExpress(REST):
         :param bool verbose: prints informative messages
 
         """
-        super(ArrayExpress, self).__init__(name="ArrayExpress",
+        self.services = REST(name="ArrayExpress",
             url="http://www.ebi.ac.uk/arrayexpress", cache=cache,
             verbose=verbose)
 
-        self.easyXMLConversion = True
-        self._format = "json"
         self.version = "v2"
-
-    def _set_format(self, f):
-        self.devtools.check_param_in_list(f, ["json", "xml"])
-        self._format = f
-    def _get_format(self):
-        return self._format
-    format = property(_get_format, _set_format,
-        doc="Read/Write access to specify the output format (json or xml)")
 
     def _search(self, mode, **kargs):
         """common function to search for files or experiments"""
         assert mode in ["experiments", "files"]
-        url = "{0}/{1}/{2}".format(self.format, self.version, mode)
+        url = "{0}/{1}/{2}".format("json", self.version, mode)
 
         defaults = {
             "accession":None, #ex: E-MEXP-31
@@ -208,7 +194,7 @@ class ArrayExpress(REST):
                     raise ValueError("directsub must be true or false")
             else:
                 if k in ["sortby", "sortorder"]:
-                    self.devtools.check_param_in_list(v, defaults[k])
+                    self.services.devtools.check_param_in_list(v, defaults[k])
                 #params.append(k + "=" + v)
                 params[k] = v
 
@@ -219,10 +205,8 @@ class ArrayExpress(REST):
         for k,v in params.items():
             params[k] = v.replace("+",  " ")
 
-        self.logging.info(url)
-        res = self.http_get(url, frmt=self.format, params=params)
-        if self.format == "xml":
-            res = self.easyXML(res)
+        self.services.logging.info(url)
+        res = self.services.http_get(url, frmt="json", params=params)
         return res
 
     def queryFiles(self, **kargs):
@@ -294,13 +278,11 @@ class ArrayExpress(REST):
     def retrieveExperiment(self, experiment):
         """alias to queryExperiments if you know the experiment name
 
-
         ::
 
             >>> s.retrieveExperiment("E-MEXP-31")
             >>> # equivalent to
             >>> s.queryExperiments(accession="E-MEXP-31")
-
 
         """
         res = self.queryExperiments(keywords=experiment)
@@ -315,10 +297,7 @@ class ArrayExpress(REST):
 
             >>> s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")
         """
-        frmt = self.format[:]
-        self.format = "xml"
         files = self.retrieveFilesFromExperiment(experiment)
-        self.format = frmt[:]
 
         assert filename in files, """Error. Provided filename does not seem to be correct.
             Files available for %s experiment are %s """ % (experiment, files)
@@ -326,12 +305,12 @@ class ArrayExpress(REST):
         url =  "files/" + experiment + "/" + filename
 
         if save:
-            res = self.http_get(url, frmt="txt")
+            res = self.services.http_get(url, frmt="txt")
             f = open(filename,"w")
             f.write(res)
             f.close()
         else:
-            res = self.http_get(url, frmt="txt")
+            res = self.services.http_get(url, frmt="txt")
             return  res
 
     def retrieveFilesFromExperiment(self, experiment):
@@ -349,24 +328,11 @@ class ArrayExpress(REST):
             ['E-MEXP-31.raw.1.zip', 'E-MEXP-31.processed.1.zip', 'E-MEXP-31.idf.txt', 'E-MEXP-31.sdrf.txt']
 
 
-        .. warning:: if format is json, filenames cannot be found so you
-            must use format set to xml
         """
-        if self.format != "xml":
-            frmt = 'xml'
-        try:
-            res = self.queryExperiments(keywords=experiment)
-            exp = res.getchildren()[0]
-            files = [x.getchildren() for x in exp.getchildren() if x.tag == "files"]
-
-            
-            output = [x.get("name") for x in files[0]]
-            if self.format != 'xml':
-                self.format = frmt
-        except Exception as err:
-            if self.format != 'xml':
-                self.format = frmt
-            raise Exception(err)
+        res = self.queryExperiments(keywords=experiment)
+        exp = res['experiments']['experiment']
+        files = exp['files']
+        output = [v['name'] for k,v in files.items() if k]
         return output
 
     def queryAE(self, **kargs):
@@ -381,22 +347,21 @@ class ArrayExpress(REST):
 
             a.queryAE(keywords="pneumonia", species='homo+sapiens')
         """
-        frmt = self.format
-        self.format = 'json'
-        try:
-            sets = self.queryExperiments(**kargs)
-        except Exception as err:
-            raise Exception(err)
-        self.format = frmt
+        sets = self.queryExperiments(**kargs)
         return [x['accession'] for x in sets['experiments']['experiment']]
 
     def getAE(self, accession, type='full'):
         """retrieve all files from an experiments and save them locally"""
         filenames = self.retrieveFilesFromExperiment(accession)
-        self.logging.info("Found %s files" % len(filenames))
+        self.services.logging.info("Found %s files" % len(filenames))
         for i,filename in enumerate(filenames):
             res = self.retrieveFile(accession, filename)
-            fh = open(filename, 'w')
-            self.logging.info("Downloading %s" % filename)
-            fh.write(res)
-            fh.close()
+            if filename.endswith('.zip'):
+                with open(filename, 'wb') as fout:
+                    self.services.logging.info("Downloading %s" % filename)
+                    fout.write(res)
+            else:
+                with open(filename, 'w') as fout:
+                    self.services.logging.info("Downloading %s" % filename)
+                    fout.write(res)
+                
