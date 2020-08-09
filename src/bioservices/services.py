@@ -449,9 +449,12 @@ class REST(RESTbase):
     #special_characters = ['/', '#', '+']
 
     def __init__(self, name, url=None, verbose=True, cache=False,
-        requests_per_sec=3):
+        requests_per_sec=3, proxies=[], cert=None):
         super(REST, self).__init__(name, url, verbose=verbose,
             requests_per_sec=requests_per_sec)
+        self.proxies = proxies
+        self.cert = cert
+
         bspath = self.settings.user_config_dir
         self.CACHE_NAME = bspath + os.sep + self.name + "_bioservices_db"
 
@@ -644,6 +647,8 @@ class REST(RESTbase):
         try:
             kargs['params'] = params
             kargs['timeout'] = self.TIMEOUT
+            kargs['proxies'] = self.proxies
+            kargs['cert'] = self.cert
             # Used only in biomart with cosmic database
             # See doc/source/biomart.rst for an example
             if hasattr(self, 'authentication'):
@@ -688,6 +693,8 @@ class REST(RESTbase):
         kargs.update({'query':query})
         kargs.update({'headers':headers})
         kargs.update({'files':files})
+        kargs['proxies'] = self.proxies
+        kargs['cert'] = self.cert
         kargs.update({'params':params})
         kargs.update({'data':data})
         kargs.update({'frmt':frmt})

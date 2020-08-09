@@ -12,19 +12,18 @@ Revision 1.8.0 roadmap
 * All Classes/Services should hide the REST/WSDL methods to make the API easier.
   Instead of inheriting from REST, we should use an aggregation and store all
   methods in a single attribute
+* Get rid of multifasta and fasta modules
 
-<<<<<<< HEAD
-
-Revision 1.7.7
+Revision 1.7.8
 --------------
 
-* Fix typo in PantherDB 
-=======
+* Fix ENA new API
+* fix missing plugin in requirements-dev.txt
+
 Revision 1.7.7
 --------------
 
 * small fix on pantherdb (autocorrect typo in pantherdb api)
->>>>>>> bd722cfcd17ec03a3461cd3ee79b9356b32528c2
 
 Revision 1.7.6
 --------------
@@ -68,7 +67,7 @@ Revision 1.7.3 (March 2020)
 Revision 1.7.2 (March 2020)
 ---------------------------
 
-* Fixing ReadTheDocs online documentation and Changeloh
+* Fixing ReadTheDocs online documentation and Changelog
 
 Revision 1.7.1 (Feb 2020)
 -------------------------
