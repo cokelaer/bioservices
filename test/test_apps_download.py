@@ -1,9 +1,9 @@
 from bioservices.apps import download_fasta as df
+import pytest
 
 
 
-
-
+@pytest.mark.flaky
 def test_ena():
 
     from easydev import TempFile

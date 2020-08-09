@@ -1,7 +1,8 @@
 from bioservices.apps.fasta import FASTA, MultiFASTA
 import tempfile
+import pytest
 
-
+@pytest.mark.flaky
 def test_fasta():
     fasta = FASTA()
     fasta.load_fasta(None)
@@ -18,7 +19,7 @@ def test_fasta():
     fh.delete = True
     fh.close()
 
-
+@pytest.mark.flaky
 def test_multi_fasta():
     klass = MultiFASTA()
 
