@@ -7,6 +7,7 @@ skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
      reason="too long On travis ")
 
 @skiptravis
+@pytest.mark.xfail
 def test_muscle():
     m = MUSCLE(verbose=False)
     m.parameters

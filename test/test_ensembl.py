@@ -11,6 +11,7 @@ def test_get_archive(ensembl):
     assert 'id' in res.keys()
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_post_archive(ensembl):
     res = ensembl.post_archive(["ENSG00000157764"])
     assert "ENSG00000157764" in [x['id'] for x in res]
