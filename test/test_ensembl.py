@@ -6,6 +6,7 @@ def ensembl():
     return Ensembl(verbose=False)
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_get_archive(ensembl):
     res = ensembl.get_archive("ENSG00000157764")
     assert 'id' in res.keys()
@@ -17,6 +18,7 @@ def test_post_archive(ensembl):
     assert "ENSG00000157764" in [x['id'] for x in res]
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_genetree_by_id(ensembl):
     res = ensembl.get_genetree_by_id("ENSGT00390000003602",
                                     frmt='phyloxml', aligned=False, sequence='cdna')[0:1000]
@@ -33,12 +35,14 @@ def test_genetree_by_id(ensembl):
                               sequence='none')
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_get_genetree_by_member_id(ensembl):
     res = ensembl.get_genetree_by_member_id('ENSG00000157764',
                                            frmt='json', nh_format='phylip')
     assert len(res) > 1000
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_get_genetree_by_member_symbol(ensembl):
     res = ensembl.get_genetree_by_member_symbol('human', 'BRCA2',
                                                nh_format='simple')
@@ -57,6 +61,7 @@ def __test_get_alignment_by_region(ensembl):
     assert 'gallus_gallus' in res[0]['tree']
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_get_homology_by_id(ensembl):
     res = ensembl.get_homology_by_id('ENSG00000157764')
     assert res.keys()
@@ -66,6 +71,7 @@ def test_get_homology_by_id(ensembl):
     assert 'homologies' in res['data'][0].keys()
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_references(ensembl):
     # does not work anymore Dev 2018 returns empty list
     #res = ensembl.get_xrefs_by_id('ENST00000288602', external_db='PDB',
@@ -82,6 +88,7 @@ def test_references(ensembl):
     assert 'id' in res[0]
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_info(ensembl):
     assert len(ensembl.get_info_analysis('human')) > 0
     assert len(ensembl.get_info_assembly('human')['karyotype']) == 25
@@ -108,6 +115,7 @@ def test_info(ensembl):
     assert 'ovis_aries' in [x['name'] for x in res['species'] if 'ovis' in x['name']]
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_lookup(ensembl):
     res = ensembl.get_lookup_by_id('ENSG00000157764', expand=True)
 
@@ -124,6 +132,7 @@ def test_lookup(ensembl):
     assert len(res['BRCA2']['Transcript'])
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_mapping(ensembl):
     res = ensembl.get_map_assembly_one_to_two('GRCh37', 'GRCh38',
                                              region='X:1000000..1000100:1')
@@ -136,6 +145,7 @@ def test_mapping(ensembl):
     res = ensembl.get_map_cdna_to_region('ENST00000288602', '100..300')
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_ontologies(ensembl):
     res = ensembl.get_ontology_ancestors_by_id('GO:0005667')
     res = ensembl.get_ontology_ancestors_chart_by_id('GO:0005667')
@@ -154,6 +164,7 @@ def test_ontologies(ensembl):
     assert res
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_taxonomy(ensembl):
     res = ensembl.get_taxonomy_by_name('homo')
     assert len(res[0]) > 1
