@@ -43,7 +43,7 @@ You can obtain the attributes and filters of a dataset as follows::
 
     dataset = 'hsapiens_gene_ensembl'
     attributes = b.attributes(dataset)
-    filters = b.attributes(dataset)
+    filters = b.filters(dataset)
 
 Here is another example with cosmic.
 
