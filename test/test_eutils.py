@@ -85,7 +85,7 @@ def test_gquery(eutils):
     [(x.DbName, x.Count) for x in ret.eGQueryResult.ResultItem
      if x.Count != '0']
 
-
+@pytest.mark.xfail
 def test_efetch(eutils):
     ret = eutils.EFetch("omim", "269840")
     ret1 = eutils.EFetch("protein", "34577063",
