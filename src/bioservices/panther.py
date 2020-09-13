@@ -249,10 +249,14 @@ class Panther():
             params['refInputList'] = ref_gene_list
         params['annotDataSet'] = annotation
         params['correction'] = correction.upper()
-
-
-        res = self.services.http_post("enrich/overrep", params=params, frmt="json")
-        return res['results']
+        try:
+            res = self.services.http_post("enrich/overrep", params=params, frmt="json")
+            try:
+                return res['results']
+            except:
+                return res
+        except:
+            return res
 
     def get_annotation_datasets(self):
         """Retrieve the list of supported annotation data sets"""
