@@ -37,6 +37,6 @@ install:
 
 # # command to run tests, e.g. python setup.py test
 script:
-  - pytest -v --durations=10 test/ --cov=bioservices --cov-report term-missing --timeout 60 -n 1 --maxfail 8
+  - python -m pytest -v --durations=10 test/ --cov=bioservices --cov-report term-missing --timeout 60 -n 1 --maxfail 8
 
 after_success: coveralls
