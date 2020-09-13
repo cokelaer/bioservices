@@ -1329,7 +1329,7 @@ class KEGGParser(object):
                     try: # empty orthology in rc:RC00004
                         k,v = line.strip().split(None,1)
                     except:
-                        self.logging.warning("empty line in %s %s" % (key, line))
+                        #self.logging.warning("empty line in %s %s" % (key, line))
                         k = line.strip()
                         v = ''
                     if k.endswith(":"):
