@@ -1301,7 +1301,7 @@ class KEGGParser(object):
                         try:
                             k,v = line.strip().split(None,1)
                         except:
-                            self.logging.warning("empty line in %s %s" % (key, line))
+                            #self.logging.warning("empty line in %s %s" % (key, line))
                             k = line.strip()
                             v = ''
                         kp[k] = v
@@ -1315,7 +1315,7 @@ class KEGGParser(object):
                     try:
                         k, v = line.strip().split(None, 1)
                     except:
-                        self.logging.warning("empty line in %s %s" % (key, line))
+                        #self.logging.warning("empty line in %s %s" % (key, line))
                         k = line.strip()
                         v = ''
                     kp[k] = v
