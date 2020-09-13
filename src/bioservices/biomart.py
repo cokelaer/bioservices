@@ -208,7 +208,7 @@ class BioMart(REST):
         """
         url = "undefined"
         super(BioMart, self).__init__("BioMart", url=url, verbose=verbose,
-            cache=cache)
+            cache=cache, url_defined_later=True)
 
         self._names = None
         self._marts = None

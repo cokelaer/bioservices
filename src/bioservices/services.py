@@ -82,7 +82,8 @@ class Service(object):
         503: 'Service not available. The server is being updated, try again later'
         }
 
-    def __init__(self, name, url=None, verbose=True, requests_per_sec=10):
+    def __init__(self, name, url=None, verbose=True, requests_per_sec=10,
+            url_defined_later=False):
         """.. rubric:: Constructor
 
         :param str name: a name for this service
@@ -125,7 +126,8 @@ class Service(object):
             if self.url is not None:
                 urlopen(self.url)
         except Exception as err:
-            self.logging.warning("The URL (%s) provided cannot be reached." % self.url)
+            if url_defined_later is False:
+                self.logging.warning("The URL (%s) provided cannot be reached." % self.url)
         self._easyXMLConversion = True
 
         # used by HGNC where some XML contains non-utf-8 characters !!
@@ -335,9 +337,11 @@ class WSDLService(Service):
 
 class RESTbase(Service):
     _service = "REST"
-    def __init__(self, name, url=None, verbose=True, requests_per_sec=3):
+    def __init__(self, name, url=None, verbose=True, requests_per_sec=3,
+                 url_defined_later=False):
         super(RESTbase, self).__init__(name, url, verbose=verbose,
-            requests_per_sec=requests_per_sec)
+            requests_per_sec=requests_per_sec,
+            url_defined_later=url_defined_later)
         self.logging.info("Initialising %s service (REST)" % self.name)
         self.last_response = None
 
@@ -449,9 +453,10 @@ class REST(RESTbase):
     #special_characters = ['/', '#', '+']
 
     def __init__(self, name, url=None, verbose=True, cache=False,
-        requests_per_sec=3, proxies=[], cert=None):
+        requests_per_sec=3, proxies=[], cert=None, url_defined_later=False):
         super(REST, self).__init__(name, url, verbose=verbose,
-            requests_per_sec=requests_per_sec)
+            requests_per_sec=requests_per_sec,
+            url_defined_later=url_defined_later)
         self.proxies = proxies
         self.cert = cert
 
