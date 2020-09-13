@@ -73,10 +73,11 @@ This is a summary of the changelog. Complete change can be found in the
 Revision 1.7.X
 --------------
 
+* Fix ENA new API
 * Fix NCBIBlast and Muscle services (new API)
 * Update Quickgo
-* NEw module: mygeneinfom pdbe
-* Integration nez Biomodels API following Combine/Harmony meetng
+* New module: mygeneinfom pdbe
+* Integration new Biomodels API following Combine/Harmony meetng
 * Update ChEMBL after an ChEMBL API change
 * General fixes and update from @thobalose (https://github.com/cokelaer/bioservices/pull/149) to
 * added  panther module (pantherdb.org)
