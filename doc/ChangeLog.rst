@@ -14,6 +14,12 @@ Revision 1.8.0 roadmap
   methods in a single attribute
 * Get rid of multifasta and fasta modules
 
+Revision 1.7.9
+--------------
+
+* add missing field in KEgg Parser (REL_PATHWAY)
+* fix panther.get_enrichment output (try/except)
+
 Revision 1.7.8
 --------------
 
