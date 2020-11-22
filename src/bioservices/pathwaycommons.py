@@ -56,7 +56,7 @@ class PathwayCommons(REST):
     """
 
     #: valid formats
-    _valid_format = ["GSEA", "SBGN", "BIOPAX", "BINARY_SIF", "EXTENDED_BINARY_SIF"]
+    _valid_format = ["GSEA", "SBGN", "BIOPAX", "BINARY_SIF", "EXTENDED_BINARY_SIF", "SIF"]
     _valid_direction = ["BOTHSTREAM", "DOWNSTREAM", "UPSTREAM"]
     def __init__(self, verbose=True):
         """.. rubric:: Constructor
