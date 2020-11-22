@@ -17,12 +17,6 @@ def test_get():
     pc2.get("http://identifiers.org/uniprot/Q06609")
 
 
-def test_idmapping():
-    pc2 = pathwaycommons.PathwayCommons(verbose=False)
-    pc2.idmapping("BRCA2")
-    pc2.idmapping(["TP53", "BRCA2"])
-
-
 def test_top_pathways():
     pc2 = pathwaycommons.PathwayCommons(verbose=False)
     res = pc2.top_pathways()
@@ -51,6 +45,12 @@ def test_traverse():
      #res =pc2.traverse(uri=["http://identifiers.org/uniprot/P38398",
      #       "http://identifiers.org/taxonomy/9606"],
      #       path="Named/name")
+
+def test_sifgraph():
+    
+    pc2 = pathwaycommons.PathwayCommons(verbose=False)
+    pc2.get_sifgraph_neighborhood("BRD4")
+    res = pc2.get_sifgraph_common_stream(['BRD4', 'MYC'])
 
 
 

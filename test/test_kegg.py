@@ -68,14 +68,26 @@ def test_org_conv(kegg):
 def test_parse_kgml_pathway(kegg):
     res = kegg.parse_kgml_pathway("hsa04660")
 
-
-def test_ids(kegg):
+@pytest.mark.flaky(max_runs=3, min_passes=1)
+def test_ids1(kegg):
     assert kegg.enzymeIds[0].startswith("ec")
+@pytest.mark.flaky(max_runs=3, min_passes=1)
+def test_ids2(kegg):
     assert kegg.compoundIds[0].startswith("cpd")
+@pytest.mark.flaky(max_runs=3, min_passes=1)
+def test_ids3(kegg):
     assert kegg.glycanIds[0].startswith("gl")
+@pytest.mark.flaky(max_runs=3, min_passes=1)
+def test_ids4(kegg):
     assert kegg.reactionIds[0].startswith("rn")
+@pytest.mark.flaky(max_runs=3, min_passes=1)
+def test_ids5(kegg):
     assert kegg.drugIds[0].startswith("dr")
+@pytest.mark.flaky(max_runs=3, min_passes=1)
+def test_ids6(kegg):
     assert kegg.koIds[0].startswith("ko")
+@pytest.mark.flaky(max_runs=3, min_passes=1)
+def test_ids7(kegg):
     assert kegg.briteIds[0].startswith("br")
 
 

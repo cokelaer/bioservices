@@ -44,7 +44,8 @@ from bioservices.services import REST, BioServicesError
 
 __all__ = ["PathwayCommons"]
 
-class PathwayCommons(REST):
+
+class PathwayCommons():
     """Interface to the `PathwayCommons <http://www.pathwaycommons.org/about>`_ service
 
 
@@ -53,28 +54,36 @@ class PathwayCommons(REST):
     >>> res = pc2.get("http://identifiers.org/uniprot/Q06609")
 
 
+
+    .. todo:: traverse() method not implemented. 
     """
 
     #: valid formats
-    _valid_format = ["GSEA", "SBGN", "BIOPAX", "BINARY_SIF", "EXTENDED_BINARY_SIF", "SIF"]
-    _valid_direction = ["BOTHSTREAM", "DOWNSTREAM", "UPSTREAM"]
-    def __init__(self, verbose=True):
+    _valid_format = ["GSEA", "SBGN", "BIOPAX", "SIF", "TXT", "JSONLD"]
+    _valid_directions = ["BOTHSTREAM", "UPSTREAM", "DOWNSTREAM", "UNDIRECTED"]
+    _valid_patterns = [
+            "CONTROLS_STATE_CHANGE_OF", "CONTROLS_PHOSPHORYLATION_OF", 
+            "CONTROLS_TRANSPORT_OF", "CONTROLS_EXPRESSION_OF",
+            "IN_COMPLEX_WITH", "INTERACTS_WITH", "CATALYSIS_PRECEDES", "NEIGHBOR_OF",
+            "CONSUMPTION_CONTROLLED_BY", "CONTROLS_TRANSPORT_OF_CHEMICAL",
+            "CONTROLS_PRODUCTION_OF",
+            "CHEMICAL_AFFECTS", "REACTS_WITH", "USED_TO_PRODUCE"]
+    _url = "https://www.pathwaycommons.org"
+    def __init__(self, verbose=True, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose: prints informative messages
 
         """
-        # Note that the url must end with / character to be reachable...
-        super(PathwayCommons, self).__init__(name="PathwayCommons",
-                url="http://www.pathwaycommons.org/pc2/", verbose=verbose)
         self.easyXMLConversion = False
-
-
         self._default_extension = "json"
+
+        self.services = REST(name='PathwayCommons', url=PathwayCommons._url,
+            verbose=verbose, cache=cache)
 
     # just a get/set to the default extension
     def _set_default_ext(self, ext):
-        self.devtools.check_param_in_list(ext, ["json","xml"])
+        self.services.devtools.check_param_in_list(ext, ["json", "xml"])
         self._default_extension = ext
     def _get_default_ext(self):
         return self._default_extension
@@ -119,7 +128,7 @@ class PathwayCommons(REST):
             are declared a union of all hits from specified organisms
             is returned. For example organism=[9606, 10016] returns results
             for both human and mice.
-        :param str type: BioPAX class filter
+        :param str type: BioPAX class filter. (e.g., 'pathway', 'proteinreference')
 
 
         .. doctest::
@@ -132,17 +141,41 @@ class PathwayCommons(REST):
             >>> pc2.search("name:'col5a1'", type="proteinreference", organism=9606)
             >>> pc2.search("a*", page=3)
 
+        Find the FGFR2 keyword::
+
+            pc2.search("FGFR2")
+
+        Find pathways by FGFR2 keyword in any index field.::
+
+            pc2.search("FGFR2", type="pathway")
+
+        Finds control interactions that contain the word binding but not
+        transcription in their indexed fields::
+
+            pc2.search("binding NOT transcription", type="control")
+
+        Find all interactions that directly or indirectly participate
+        in a pathway that has a keyword match for "immune" (Note the star after
+        immune):
+
+            pc.search("pathway:immune*", type="conversion")
+
+
+        Find all Reactome pathways::
+
+            pc.search("*", type="pathway", datasource="reactome")
+
         """
         if self.default_extension == "xml":
-            url = "search.xml?q=%s"  % q
+            url = "pc2/search.xml?q=%s"  % q
         elif self.default_extension == "json":
-            url = "search.json?q=%s"  % q
+            url = "pc2/search.json?q=%s"  % q
 
         params = {}
-        if page>0:
+        if page>=0:
             params['page'] = page
         else:
-            self.logging.warning("page should be >=0")
+            self.services.logging.warning("page should be >=0")
 
         if datasource:
             params['datasource'] = datasource
@@ -153,7 +186,7 @@ class PathwayCommons(REST):
         if organism:
             params['organism'] = organism
 
-        res = self.http_get(url, frmt=self.default_extension,
+        res = self.services.http_get(url, frmt=self.default_extension,
                 params=params)
 
         #if self.default_extension == "json":
@@ -162,7 +195,6 @@ class PathwayCommons(REST):
             res = self.easyXML(res)
 
         return res
-
 
     def get(self, uri, frmt="BIOPAX"):
         """Retrieves full pathway information for a set of elements
@@ -201,14 +233,18 @@ class PathwayCommons(REST):
             >>> res = pc2.get("col5a1")
             >>> res = pc2.get("http://identifiers.org/uniprot/Q06609")
 
+
         """
-        self.devtools.check_param_in_list(frmt, self._valid_format)
+
+
+
+        self.services.devtools.check_param_in_list(frmt, self._valid_format)
 
         # validates the URIs
         if isinstance(uri, str):
-            url = "get?uri=" +uri
+            url = "pc2/get?uri=" +uri
         elif instance(uri, list):
-            url = "get?uri=" +uri[0]
+            url = "pc2/get?uri=" +uri[0]
             if len(uri)>1:
                 for u in uri[1:]:
                     url += "&uri=" + u
@@ -223,18 +259,20 @@ class PathwayCommons(REST):
             frmt = "xml"
         else:
             frmt = "txt"
-        res = self.http_get(url, frmt=frmt)
+        res = self.services.http_get(url, frmt=frmt)
 
         return res
 
-    def top_pathways(self, datasource=None, organism=None):
+    def top_pathways(self, query="*", datasource=None, organism=None):
         """This command returns all *top* pathways
 
         Pathways can be top or pathways that are neither
         'controlled' nor 'pathwayComponent' of another process.
 
+        :param query: a keyword, name, external identifier or lucene query
+            string like in 'search'. Default is "*"
         :param str datasource: filter by data source (same as search)
-        :param str organism: organism filter
+        :param str organism: organism filter. 9606 for human.
 
         :return: dictionary with information about top pathways. Check the
             "searchHit" key for information about "dataSource" for instance
@@ -247,69 +285,27 @@ class PathwayCommons(REST):
             >>> res = pc2.top_pathways()
 
 
+https://www.pathwaycommons.org/pc2/top_pathways?q=TP53
 
         """
         if self.default_extension == "json":
-            url = "top_pathways.json"
+            url = "pc2/top_pathways.json"
         else:
-            url = "top_pathways"
+            url = "pc2/top_pathways"
 
         params = {}
         if datasource:
             params['datasource'] = datasource
         if organism:
             params['organism'] = organism
+        params['q'] = query
 
-        # version 1.4.3 not required anymore 
-        #if len(params):
-        #    url += "&" + self.urlencode(params)
 
-        res = self.http_get(url, frmt=self.default_extension,
+        res = self.services.http_get(url, frmt=self.default_extension,
                 params=params)
 
         if self.default_extension == "xml":
             res = self.easyXML(res)
-        return res
-
-
-
-    def idmapping(self, ids):
-        """Identifier mapping tool
-
-        Unambiguously maps, e.g., HGNC gene symbols, NCBI Gene, RefSeq, ENS,
-        and secondary UniProt identifiers to the primary UniProt accessions,
-        or - ChEBI and PubChem IDs to primary ChEBI. You can mix different
-        standard ID types in one query.
-
-        .. note:: this is a specific id-mapping (not general-purpose) for
-            reference proteins and small molecules; the mapping tables
-            were derived exclusively from Swiss-Prot (DR fields) and
-            ChEBI data
-
-        :param str ids: list of Identifiers or a single identifier string.
-        :return: a dictionary
-
-        .. doctest::
-
-            >>> from bioservices import PathwayCommons
-            >>> pc2 = PathwayCommons(verbose=False)
-            >>> pc2.idmapping("BRCA2")
-            {u'BRCA2': u'P51587'}
-            >>> pc2.idmapping(["TP53", "BRCA2"])
-            {"BRCA2":"P51587","TP53":"P04637"}
-
-
-        """
-        url = "idmapping?id="
-        if isinstance(ids, str):
-            url += ids
-        elif isinstance(ids, list):
-            url += ids[0]
-            if len(ids) > 1:
-                for id_ in ids[1:]:
-                    url += "&id=" + id_
-        res = self.http_get(url, frmt="json")
-        #res = json.loads(res)
         return res
 
     def graph(self, kind, source, target=None, direction=None, limit=1,
@@ -348,7 +344,7 @@ class PathwayCommons(REST):
             URI/ID. Multiple target URIs must be encoded as list (see source
             parameter).
         :param str direction: graph search  direction in [BOTHSTREAM,
-            DOWNSTREAM, UPSTREAM] see :attr:`_valid_direction` attribute.
+            DOWNSTREAM, UPSTREAM] see :attr:`_valid_directions` attribute.
         :param int limit: graph query search distance limit (default = 1).
         :param str format: output format. see :attr:`_valid-format`
         :param str datasource: datasource filter (same as for 'search').
@@ -374,7 +370,7 @@ class PathwayCommons(REST):
 
 
         """
-        url = "graph"
+        url = "pc2/graph"
         params = {}
         params['source'] = source
         params['kind'] = kind
@@ -390,7 +386,7 @@ class PathwayCommons(REST):
         if organism:
             params['organism'] = organism
 
-        res = self.http_get(url, frmt="txt", params=params)
+        res = self.services.http_get(url, frmt="txt", params=params)
         return res
 
     def traverse(self, uri, path):
@@ -452,7 +448,7 @@ class PathwayCommons(REST):
 
 
         """
-        url =  "traverse?"
+        url =  "pc2/traverse?"
 
         if isinstance(uri, str):
             url += "?uri=" + uri
@@ -463,7 +459,181 @@ class PathwayCommons(REST):
 
         url += "&path=" + path
 
-        res = self.http_get(url, frmt="json")
+        res = self.services.http_get(url, frmt="json")
         return res
+
+    def get_sifgraph_neighborhood(self, source, limit=1, direction="BOTHSTREAM", pattern=None):
+        """finds the neighborhood sub-network in the Pathway Commons Simple Interaction 
+        Format (extented SIF) graph (see http://www.pathwaycommons.org/pc2/formats#sif)
+
+
+        :param source: set of gene identifiers (HGNC symbol). Can be a list of
+            identifiers or just one string(if only one identifier)
+        :param int limit: Graph traversal depth. Limit > 1 value can result
+            in very large data or error.
+        :param str direction: Graph traversal direction. Use UNDIRECTED if you want 
+            to see interacts-with relationships too.
+        :param str pattern: Filter by binary relationship (SIF edge) type(s).
+            one of "BOTHSTREAM", "UPSTREAM", "DOWNSTREAM", "UNDIRECTED".
+
+        returns: the graph in SIF format. The output must be stripped and
+            returns one line per relation. In each line, items are separated by
+            a tabulation. You can save the text with .sif extensions and it
+            should be ready to use e.g. in cytoscape viewer.
+
+        ::
+
+            res = pc.get_sifgraph_neighborhood('BRD4')
+
+        """
+        self.services.devtools.check_param_in_list(direction, self._valid_directions)
+        if pattern:
+            self.services.devtools.check_param_in_list(pattern, self._valid_patterns)
+        assert limit>=1
+
+        if isinstance(source, str):
+            source = [source]
+        assert isinstance(source, list)
+        source = ",".join(source)
+
+        params = {  "source": source,
+                    "limit": limit,
+                    "direction": direction}
+
+        if pattern:
+            params['pattern'] = pattern
+
+        res = self.services.http_get("sifgraph/v1/neighborhood", params=params,
+            headers=self.services.get_headers(content="text"))
+
+        return res.content
+
+
+    def get_sifgraph_common_stream(self, source, limit=1, direction="DOWNSTREAM", pattern=None):
+        """finds the common stream for them; extracts a sub-network from the loaded 
+        Pathway Commons SIF model.
+
+        :param source: set of gene identifiers (HGNC symbol). Can be a list of
+            identifiers or just one string(if only one identifier)
+        :param int limit: Graph traversal depth. Limit > 1 value can result
+            in very large data or error.
+        :param str direction: Graph traversal direction. Use UNDIRECTED if you want 
+            to see interacts-with relationships too.
+        :param str pattern: Filter by binary relationship (SIF edge) type(s).
+            one of "BOTHSTREAM", "UPSTREAM", "DOWNSTREAM", "UNDIRECTED".
+
+        returns: the graph in SIF format. The output must be stripped and
+            returns one line per relation. In each line, items are separated by
+            a tabulation. You can save the text with .sif extensions and it
+            should be ready to use e.g. in cytoscape viewer.
+
+        ::
+
+            res = pc.get_sifgraph_common_stream(['BRD4', 'MYC'])
+        """
+        self.services.devtools.check_param_in_list(direction, self._valid_directions)
+        if pattern:
+            self.services.devtools.check_param_in_list(pattern, self._valid_patterns)
+        assert limit>=1
+
+        if isinstance(source, str):
+            source = [source]
+        assert isinstance(source, list)
+        source = ",".join(source)
+
+        params = {  "source": source,
+                    "limit": limit,
+                    "direction": direction}
+
+        if pattern:
+            params['pattern'] = pattern
+
+        res = self.services.http_get("sifgraph/v1/commonstream", params=params,
+            headers=self.services.get_headers(content="text"))
+        try:
+            return res.content
+        except:
+            # if no match, returns code 406 and ""
+            return None
+
+
+    def get_sifgraph_pathsbetween(self, source, limit=1, directed=False, pattern=None):
+        """finds the paths between them; extracts a sub-network from the Pathway Commons SIF graph.
+
+        :param source: set of gene identifiers (HGNC symbol). Can be a list of
+            identifiers or just one string(if only one identifier)
+        :param int limit: Graph traversal depth. Limit > 1 value can result
+            in very large data or error.
+        :param bool directed: Directionality: 'true' is for DOWNSTREAM/UPSTREAM, 'false' - UNDIRECTED
+        :param str pattern: Filter by binary relationship (SIF edge) type(s).
+            one of "BOTHSTREAM", "UPSTREAM", "DOWNSTREAM", "UNDIRECTED".
+
+        returns: the graph in SIF format. The output must be stripped and
+            returns one line per relation. In each line, items are separated by
+            a tabulation. You can save the text with .sif extensions and it
+            should be ready to use e.g. in cytoscape viewer.
+        """
+        if pattern:
+            self.services.devtools.check_param_in_list(pattern, self._valid_patterns)
+        assert limit>=1
+
+        if isinstance(source, str):
+            source = [source]
+        assert isinstance(source, list)
+        source = ",".join(source)
+
+        params = {  "source": source,
+                    "limit": limit,
+                    "directed": directed}
+
+        if pattern:
+            params['pattern'] = pattern
+
+        res = self.services.http_get("sifgraph/v1/pathsbetween", params=params,
+            headers=self.services.get_headers(content="text"))
+
+        return res.content
+
+
+    def get_sifgraph_pathsfromto(self, source, target, limit=1, pattern=None):
+        """finds the paths between them; extracts a sub-network from the Pathway Commons SIF graph.
+
+        :param source: set of gene identifiers (HGNC symbol). Can be a list of
+            identifiers or just one string(if only one identifier)
+        param target: A target set of gene identifiers.
+        :param int limit: Graph traversal depth. Limit > 1 value can result
+            in very large data or error.
+        :param str pattern: Filter by binary relationship (SIF edge) type(s).
+            one of "BOTHSTREAM", "UPSTREAM", "DOWNSTREAM", "UNDIRECTED".
+
+        returns: the graph in SIF format. The output must be stripped and
+            returns one line per relation. In each line, items are separated by
+            a tabulation. You can save the text with .sif extensions and it
+            should be ready to use e.g. in cytoscape viewer.
+        """
+        if pattern:
+            self.services.devtools.check_param_in_list(pattern, self._valid_patterns)
+        assert limit>=1
+
+        if isinstance(source, str):
+            source = [source]
+        assert isinstance(source, list)
+        source = ",".join(source)
+        if isinstance(target, str):
+            target = [target]
+        assert isinstance(target, list)
+        target = ",".join(target)
+
+        params = {  "source": source,
+                    "target": target,
+                    "limit": limit}
+
+        if pattern:
+            params['pattern'] = pattern
+
+        res = self.services.http_get("sifgraph/v1/pathsfromto", params=params,
+            headers=self.services.get_headers(content="text"))
+
+        return res.content
 
 
