@@ -1346,7 +1346,6 @@ class KEGGParser(object):
                         #self.logging.warning("empty line in %s %s" % (key, line))
                         k = line.strip()
                         v = ''
-                    print(k,v)
                     if k.endswith(":"):
                         k = k.strip().rstrip(":")
                     if k == "ELEMENT":
@@ -1391,13 +1390,16 @@ class KEGGParser(object):
                 # hsa:1525
                 new = {}
                 import re
+
                 value = re.sub("\n {6,20}", " ", value)
                 for line in value.split("\n"):
-                    thiskey, content = line.split(None, 1)
-                    if thiskey.endswith(":"):
-                        new[thiskey[:-1]] = content
-                    else:
-                        self.logging.warning("Could not fully interpret %s " % key )
+                    thiskey, content = line.split(":", 1)
+                    print(thiskey, content)
+                    new[thiskey] = content
+                    #if thiskey.endswith(":"):
+                    #    new[thiskey[:-1]] = content
+                    #else:
+                    #    self.logging.warning("Could not fully interpret %s " % key )
                 output[key] = new
             elif key in ['DBLINKS', 'INTERACTION', 'METABOLISM']:
                 # D01441 for metabolism
