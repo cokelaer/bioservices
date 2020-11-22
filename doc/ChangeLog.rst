@@ -14,6 +14,14 @@ Revision 1.8.0 roadmap
   methods in a single attribute
 * Get rid of multifasta and fasta modules
 
+
+Revision 1.7.10 (Nov 2020)
+--------------------------
+
+* Fix KEGG https://github.com/cokelaer/bioservices/issues/182 adding NETWORK
+field
+* Fix Pathway common with new API https://github.com/cokelaer/bioservices/issues/135
+
 Revision 1.7.9
 --------------
 
