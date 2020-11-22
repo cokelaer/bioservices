@@ -1336,6 +1336,27 @@ class KEGGParser(object):
                         k = k.strip().rstrip(":")
                     kp[k] = v
                 output[key] = kp.copy()
+            elif key in ['NETWORK']:
+                kp = {"ELEMENT": {}}
+                ELEMENT = False
+                for line in value.split("\n"):
+                    try: # empty orthology in rc:RC00004
+                        k,v = line.strip().split(None,1)
+                    except:
+                        #self.logging.warning("empty line in %s %s" % (key, line))
+                        k = line.strip()
+                        v = ''
+                    print(k,v)
+                    if k.endswith(":"):
+                        k = k.strip().rstrip(":")
+                    if k == "ELEMENT":
+                        ELEMENT = True
+                        k, v = v.split(None, 1)
+                    if ELEMENT is False:
+                        kp[k] = v
+                    else:
+                        kp["ELEMENT"][k] = v
+                output[key] = kp.copy()
             # list of dictionaries
             elif key == 'REFERENCE':
                 # transform to a list since you may have several entries
