@@ -42,7 +42,7 @@ BioServices provides access to 25 Web Services including. For a quick start,
 look at some notebooks here `github cokelaer/bioservices <https://github.com/cokelaer/bioservices/tree/master/notebooks/>`_ and here `github bioservices <https://github.com/bioservices/notebooks>`_.
 
 An up-to-date list of Web Services is provided within 
-the online `documentation <http://http://bioconvert.readthedocs.io/>`_.
+the online `documentation <http://bioservices.readthedocs.io/>`_.
 
 Here is a small example using the UniProt Web Service to search for the zap70 specy in human
 organism::
