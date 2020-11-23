@@ -21,6 +21,8 @@ Revision 1.7.10 (Nov 2020)
 * Fix KEGG https://github.com/cokelaer/bioservices/issues/182 adding NETWORK
 field
 * Fix Pathway common with new API https://github.com/cokelaer/bioservices/issues/135
+* Update the PathwayCommon service with new API
+* Update the Rhea service with new API
 
 Revision 1.7.9
 --------------
