@@ -80,14 +80,36 @@ class Rhea():
         r = Rhea()
         response = r.search("a?e?o*")
 
-    See :meth:`search` :meth:`entry` methods for more information about format.
+    The :meth:`search` :meth:`entry` methods require a list of valid columns.
+    By default all columns are used but you can restrict to only a few. Here is
+    the description of the columns:
 
+        rhea-id	:   reaction identifier (with prefix RHEA)
+        equation :  textual description of the reaction equation
+        chebi :	    comma-separated list of ChEBI names used as reaction participants
+        chebi-id :  comma-separated list of ChEBI identifiers used as reaction participants
+        ec :        comma-separated list of EC numbers (with prefix EC)
+        uniprot :   number of proteins (UniProtKB entries) annotated with the Rhea reaction
+        pubmed :    comma-separated list of PubMed identifiers (without prefix)
+
+    and 5 cross-references:
+
+        reaction-xref(EcoCyc)
+        reaction-xref(MetaCyc)
+        reaction-xref(KEGG)
+        reaction-xref(Reactome)
+        reaction-xref(M-CSA)
     """
-    _url = "http://www.rhea-db.org/rest"
-    def __init__(self, version="1.0",  verbose=True, cache=False):
+    _url = "https://www.rhea-db.org"
+
+    _valid_columns = ['rhea-id', 'equation', 'chebi', 'chebi-id',
+            'ec', 'uniprot', 'pubmed', 'reaction-xref(EcoCyc)',
+            'reaction-xref(MetaCyc)', 'reaction-xref(KEGG)',
+            'reaction-xref(Reactome)', 'reaction-ref(M-CSA)']
+
+    def __init__(self, verbose=True, cache=False):
         """.. rubric:: Rhea constructor
 
-        :param str version: the current version of the interface (1.0)
         :param bool verbose: True by default
 
         ::
@@ -98,69 +120,92 @@ class Rhea():
         self.services = REST(name="Rhea", url=Rhea._url,
             verbose=verbose, cache=cache)
 
-        self.version = version
-        self.format_entry = ["cmlreact", "biopax2", "rxn"]
-
-    def search(self, query, frmt=None):
-        """Search for reactions
+    def search(self, query, columns=None, limit=None, frmt='tsv'):
+        """Search for Rhea (mimics https://www.rhea-db.org/)
 
         :param str query: the search term using format parameter
         :param str format: the biopax2 or cmlreact format (default)
 
-        :Returns: An XML document containing the reactions with undefined
-            direction, with links to the corresponding bi-directional ones.
-            The format is easyXML.
+        :Returns: A pandas DataFrame. 
 
         ::
 
             >>> r = Rhea()
-            >>> r.search("caffeine")  # id 10280
-            >>> r.search("caffeine", frmt="biopax2")  # id 10280
+            >>> df = r.search("caffeine")
+            >>> df = r.search("caffeine", columns='rhea-id,equation')
 
-        The output is in XML format. This page from the Rhea web site explains
-        what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of
-        the XML file.
 
         """
-        if frmt is None:
-            frmt = "cmlreact" # default is cmlreact
-        if frmt not in ["biopax2", "cmlreact"]:
-            raise ValueError("format must be either cmlreact (default) or biopax2")
+        params = {}
+        if limit:
+            params['limit'] = limit
+        if columns:
+            params['columns'] = columns
+        params['format'] = frmt
+        if columns is None:
+            params['columns'] = ",".join(self._valid_columns)
 
-        url = self.version + "/ws/reaction/%s?q=" % frmt
-        url += query
+        response = self.services.http_get("rhea/?query={}".format(query), 
+            frmt="txt", params=params)
 
-        response = self.services.http_get(url, frmt="xml")
+        try:
+            import pandas as pd
+            import io
+            df = pd.read_csv(io.StringIO(response), sep='\t')
+            return df
+        except Exception as err:
+            return response
 
-        #response = self.services.easyXML(response)
-        return response
-
-    def entry(self, id, frmt):
+    def query(self, query, columns=None, frmt="tsv", limit=None):
         """Retrieve a concrete reaction for the given id in a given format
 
-        :param int id: the id of a reaction
-        :param format: can be rxn, biopax2, or cmlreact
-        :Returns: An XML document containing the reactions with undefined
-            direction, with links to the corresponding bi-directional ones.
-            The format is easyXML. If frmt is rnx,
+        :param str query: the entry to retrieve
+        :param str frmt: the result format (tsv); only tsv accepted for now (Nov
+            2020).
+        :param int limit: maximum number of results to retrieve
+        :Returns: dataframe
 
-        ::
 
-            >>> print(r.entry(10281, frmt="rxn"))
+        Retrieve Rhea reaction identifiers and equation text::
 
-        The output is in XML format. This page from the Rhea web site explains
-        what are the `data fields <http://www.ebi.ac.uk/rhea/manual.xhtml>`_ of
-        the XML file.
+            r.query("", columns="rhea-id,equation", limit=10)
+
+        Retrieve Rhea reactions with enzymes curated in UniProtKB (only first 10
+        entries)::
+
+            r.query("uniprot:*", columns="rhea-id,equation", limit=10)
+            
+        To retrieve a specific entry:: 
+
+            df = r.get_entry("rhea:10661")
+
+
+        .. versionchanged:: 1.8.0 (entry() method renamed in query() and no
+            more format required. Must be given in the entry name e.g.
+            query("10281.rxn") instead of entry(10281, format="rxn")
+            the option *frmt* is now related to the result format
+
         """
-        self.services.devtools.check_param_in_list(frmt, self.format_entry)
-        url = self.version + "/ws/reaction/%s/%s" % (frmt, id)
 
-        if frmt=="rxn":
-            response = self.services.http_get(url, frmt="txt")
-        else:
-            response = self.services.http_get(url, frmt="xml")
-            response = self.services.easyXML(response)
-        return response
+        params = {"query": query}
+        if limit:
+            params['limit'] = limit
+        if columns:
+            params['columns'] = columns
+        params['format'] = frmt
+        if columns is None:
+            params['columns'] = ",".join(self._valid_columns)
+
+        response = self.services.http_get("rhea?".format(query), 
+            frmt="txt", params=params)
+        try:
+            import pandas as pd
+            import io
+            df = pd.read_csv(io.StringIO(response), sep='\t')
+            return df
+        except Exception as err:
+            return response
+
 
 
     def get_metabolites(self, rxn_id):
