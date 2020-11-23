@@ -108,3 +108,34 @@ suds and client auth
 =======================
 http://stackoverflow.com/questions/6277027/suds-over-https-with-cert
 
+
+
+How to include tests ?
+=======================
+
+We use pytest. There are many web services included in BioServices. Consequently
+there are many tests. It is common to have failed tests on Travis and the
+continuous integration. 
+
+Some tests are known to be long or failing from time to time (e.g. service is
+down). 
+
+When a test is known to fail sometimes, we can add this decorator::
+
+    @pytest.mark.flaky(max_runs=3, min_passes=1)
+
+On travis we allows 8 failures. 
+
+For long tests, we allows 60s at most. You can mark a tests if you knw it will
+fail on travis (e.g. too long)::
+
+    pytest.mark.xfail
+
+Finally, we skip some tests for some conditions::
+
+    skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+      reason="On travis")
+    @skiptravis
+    def test():
+        ...
+

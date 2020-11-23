@@ -35,7 +35,7 @@ defaultParams = {
 class ConfigReadOnly(object):
     """A generic Config file handler
 
-    Uses appdirs from ypi to handle the XDG protocol
+    Uses appdirs from pypi to handle the XDG protocol
 
     Read the configuration in the XDG directory. If not found, the
     config and cache directories are created. Then, reads the configuration

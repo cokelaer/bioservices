@@ -26,6 +26,7 @@ def test_paramdetails(ncbi):
         assert True
 
 @skiptravis
+@pytest.mark.xfail
 def test_run(ncbi):
 
     try:
