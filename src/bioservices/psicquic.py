@@ -143,7 +143,7 @@ from bioservices import REST, UniProt
 __all__ = ["PSICQUIC"]
 
 
-class PSICQUIC(REST):
+class PSICQUIC():
     """Interface to the `PSICQUIC <http://code.google.com/p/psicquic/>`_ service
 
     There are 2 interfaces to the PSICQUIC service (REST and WSDL) but we used
@@ -191,12 +191,9 @@ class PSICQUIC(REST):
     #. Interaction identifier(s) i
     #. Confidence score. Denoted as scoreType:value.
 
-
-
     Another example with reactome database::
 
         res = s.query("reactome", "Q9Y266")
-
 
     .. warning:: PSICQUIC gives access to 25 other services. We cannot create
         a dedicated parsing for all of them. So, the ::`query` method returns
@@ -243,14 +240,16 @@ class PSICQUIC(REST):
             >>> s = PSICQUIC()
 
         """
-        urlStr = 'http://www.ebi.ac.uk/Tools/webservices/psicquic'
-        super(PSICQUIC, self).__init__("PSICQUIC", verbose=verbose, url=urlStr)
+        self.services = REST("PSICQUIC", verbose=verbose, 
+            url="https://www.ebi.ac.uk/Tools/webservices/psicquic",
+            url_defined_later=True) # this prevent annoying warning
+
         self._registry = None
 
         try:
             self.uniprot = UniProt(verbose=False)
         except:
-            self.logging.warning("UniProt service could be be initialised")
+            self.services.logging.warning("UniProt service could be be initialised")
         self.buffer = {}
 
     def _get_formats(self):
@@ -269,7 +268,7 @@ class PSICQUIC(REST):
 
         """
         url = 'registry/registry?action=ACTIVE&format=txt'
-        res = self.http_get(url, frmt='txt')
+        res = self.services.http_get(url, frmt='txt')
         return res.split()
 
     def print_status(self):
@@ -292,7 +291,7 @@ class PSICQUIC(REST):
             starting with registry such as :meth:`registry_names`
         """
         url = 'registry/registry?action=STATUS&format=xml'
-        res = self.http_get(url, frmt="txt")
+        res = self.services.http_get(url, frmt="txt")
 
         names = self.registry_names
         counts = self.registry_counts
@@ -316,8 +315,8 @@ class PSICQUIC(REST):
     def _get_registry(self):
         if self._registry is None:
             url = 'registry/registry?action=STATUS&format=xml'
-            res = self.http_get(url, frmt="xml")
-            res = self.easyXML(res)
+            res = self.services.http_get(url, frmt="xml")
+            res = self.services.easyXML(res)
             self._registry = res
         return self._registry
     registry = property(_get_registry, doc="returns the registry of psicquic")
@@ -424,7 +423,7 @@ class PSICQUIC(REST):
 
         params = {}
         if output is not None:
-            self.devtools.check_param_in_list(output, self.formats)
+            self.services.devtools.check_param_in_list(output, self.formats)
             params['format'] = output
         else: output="none"
 
@@ -446,9 +445,9 @@ class PSICQUIC(REST):
         url = resturl  + 'query/' + query
 
         if "xml" in output:
-            res = self.http_get(url, frmt="xml", params=params)
+            res = self.services.http_get(url, frmt="xml", params=params)
         else:
-            res = self.http_get(url, frmt="txt", params=params)
+            res = self.services.http_get(url, frmt="txt", params=params)
             res = res.strip().split("\n")
 
         if output.startswith("tab"):

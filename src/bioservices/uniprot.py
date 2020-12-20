@@ -195,7 +195,7 @@ class UniProt(REST):
         'genes(OLN)', 'genes(ORF)', 'organism', 'organism-id', 'protein names',
         'proteome', 'lineage(ALL)', 'lineage-id', 'virus hosts',
         # Sequences
-        'fragement', 'sequence', 'length', 'mass', 'encodedon',
+        'fragment', 'sequence', 'length', 'mass', 'encodedon',
         'comment(ALTERNATIVE PRODUCTS)', 'comment(ERRONEOUS GENE MODEL PREDICTION)',
         'comment(ERRONEOUS INITIATION)', 'comment(ERRONEOUS TERMINATION)',
         'comment(ERRONEOUS TRANSLATION)', 'comment(FRAMESHIFT)',
@@ -232,7 +232,8 @@ class UniProt(REST):
         # Structure
         '3d', 'feature(BETA STRAND)', 'feature(HELIX)', 'feature(TURN)',
         # Subcellular location
-        'comment(SUBCELLULAR LOCATION)', 'feature(INTRAMEMBRANE)',
+        'comment(SUBCELLULAR LOCATION)', 
+        'feature(INTRAMEMBRANE)',
         'feature(TOPOLOGICAL DOMAIN)',
         'feature(TRANSMEMBRANE)',
         # Miscellaneous
@@ -664,8 +665,8 @@ class UniProt(REST):
         # to transform into list:
         columns = ['PubMed ID', 'Comments', u'Domains', 'Protein families',
                    'Gene names', 'Gene ontology (GO)', 'Gene ontology IDs',
-                   'InterPro', 'Interacts with', 'Keywords',
-                   'Subcellular location']
+                   'InterPro', 'Interacts with', 'Keywords']
+                   #'Subcellular location']
         for col in columns:
             try:
                 res = output[col].apply(lambda x: [this.strip() for this in str(x).split(";") if this != "nan"])

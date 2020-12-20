@@ -1,6 +1,9 @@
 Whats' new, what has changed
 ================================
 
+
+
+
 Revision 1.8.0 roadmap
 ----------------------
 
@@ -14,6 +17,11 @@ Revision 1.8.0 roadmap
   methods in a single attribute
 * Get rid of multifasta and fasta modules
 
+
+Revision 1.7.11 (Dec 2020)
+---------------------------
+* Fix https://github.com/cokelaer/bioservices/issues/183 (warning in uniprot
+* Fix annoying warning https://github.com/cokelaer/bioservices/issues/184
 
 Revision 1.7.10 (Nov 2020)
 --------------------------
