@@ -119,8 +119,6 @@ def test_info(ensembl):
 def test_lookup(ensembl):
     res = ensembl.get_lookup_by_id('ENSG00000157764', expand=True)
 
-    res = ensembl.get_lookup_by_id('ENSG00000157764', expand=True)
-    assert res.keys()
 
     res = ensembl.post_lookup_by_id(["ENSG00000157764", "ENSG00000248378"],
                                    expand=0)
