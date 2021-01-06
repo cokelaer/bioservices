@@ -44,7 +44,7 @@ _ACCEPTABLE_SEARCH_TYPES = tuple(["models"] + list(_ACCEPTABLE_MODEL_RESOURCE_TY
 _ACCEPTABLE_MODEL_DOWNLOAD_FORMATS = ("xml", "json", "mat")
 
 
-class BiGG(REST):
+class BiGG():
     """
     Interface to the `BiGG Models <http://bigg.ucsd.edu/>` API Service.
 
@@ -67,20 +67,21 @@ class BiGG(REST):
     _url = "%s/api/%s" % (_base_url, _api_version)
 
     def __init__(self, verbose=False, cache=False):
-        self.super = super(BiGG, self)
-        self.super.__init__(name="bigg", url=BiGG._url, verbose=verbose,
-            cache=cache, requests_per_sec=10 # http://bigg.ucsd.edu/data_access
-        )
+
+        # http://bigg.ucsd.edu/data_access
+        self.services = REST(name="BiGG",
+            url=BiGG._url, cache=cache, requests_per_sec=10,
+            verbose=verbose)
 
     def __len__(self):
         return len(self.models)
 
     @property
     def version(self):
-        return self.http_get("database_version")
+        return self.services.http_get("database_version")
 
     def _http_get_results(self, *args, **kwargs):
-        response = self.http_get(*args, **kwargs)
+        response = self.services.http_get(*args, **kwargs)
         return response["results"]
 
     @property
@@ -100,7 +101,7 @@ class BiGG(REST):
         ids = sequencify(ids)
         queries = [("%s/%s" % (query, id_)) for id_ in ids]
 
-        response = self.http_get(queries)
+        response = self.services.http_get(queries)
         return squash(response)
 
     def metabolites(self, model_id=None, ids=None):
@@ -142,7 +143,7 @@ class BiGG(REST):
         url = self._build_url("%s/static/models/%s" %
             (BiGG._base_url, path))
 
-        response = self.session.get(url, stream=True)
+        response = self.services.session.get(url, stream=True)
 
         if response.ok:
             with open(target, "wb") as f:

@@ -52,7 +52,9 @@ from bs4 import BeautifulSoup
 from bioservices.services import REST
 from bioservices.xmltools import readXML, HTTPError
 
+
 __all__ = ["BioCarta"]
+
 
 # method for unicode transformation
 try:
@@ -61,7 +63,7 @@ except NameError:
     text = str
 
 
-class BioCarta(REST):
+class BioCarta():
     """Interface to `BioCarta <http://www.biocarta.com>`_ pages
 
     This is not a REST interface actually but rather a parser to some of the
@@ -87,12 +89,13 @@ class BioCarta(REST):
     _pathway_categories = None
     _all_pathways_url =  "http://cgap.nci.nih.gov/Pathways/BioCarta_Pathways"
 
-    def __init__(self, verbose=True):
+    def __init__(self, verbose=True, cache=False):
         """**Constructor**
 
         :param verbose: set to False to prevent informative messages
         """
-        super(BioCarta, self).__init__(name="BioCarta", url=BioCarta._url, verbose=verbose)
+        self.services = REST(name="BioCarta", url=BioCarta._url, cache=cache,
+            verbose=verbose)
         self.fname  = "biocarta_pathways.txt"
 
         self._organism = None
@@ -117,7 +120,7 @@ class BioCarta(REST):
 
     def _get_pathway_categories(self):
         if self._pathway_categories is None:
-            self._pathway_categories = self.http_get_ou_post()
+            self._pathway_categories = self.services.http_get_ou_post()
         return self._pathway_categories
     pathway_categories = property(_get_pathway_categories)
 
