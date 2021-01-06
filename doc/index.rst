@@ -49,7 +49,7 @@ BIOSERVICES: access to biological web services programmatically
 
 
 .. note:: Contributions to implement new wrappers are more than welcome. 
-    See `BioServices wiki <https://github.com/cokelaer/bioservices/>`_
+    See `BioServices github page <https://github.com/cokelaer/bioservices/>`_
     to join the development, and the :ref:`developer` on how to implement new
     wrappers. Although contributors have their names in the header files, you
     can also look at the :ref:`contributors` directly.
@@ -64,9 +64,9 @@ Overview
 ==========
 
 `BioServices <http://pypi.python.org/pypi/bioservices>`_  is a Python package
-that provides access to many Bioinformatics Web Services (e.g., UniProt) and 
-a framework to easily implement Web Service wrappers (based on WSDL/SOAP or 
-REST protocols).
+that provides access to many Bioinformatics Web Services (e.g., UniProt, KeGG,
+PDB, etc) as well as a framework to easily implement Web Service wrappers 
+(based on WSDL/SOAP protocol or nowadays mostly REST protocol).
 
 The primary goal of **BioServices** is to use Python as a glue language to provide 
 a programmatic access to Biological Web Services. By doing so, elaboration of 
@@ -80,7 +80,8 @@ The first release of **BioServices** provides a wrapping to more than 18 Web
 Services (more if we consider **BioMart** and **PSICQUIC** portals that link to
 many other Web Services). 
 
-Here are only some of Web Services that are available in **BioServices**:
+Here are only some of Web Services that are available in **BioServices** (from
+EBI mostly but not only; NCBI, KEGG, etc):
 
 .. autosummary::
     :nosignatures:
@@ -89,8 +90,11 @@ Here are only some of Web Services that are available in **BioServices**:
     bioservices.biomodels.BioModels
     bioservices.chembl.ChEMBL
     bioservices.chebi.ChEBI
+    bioservices.eutils.EUtils
+    bioservices.ensembl.Ensembl
     bioservices.kegg.KEGG
     bioservices.muscle.MUSCLE
+    bioservices.panther.PantherDB
     bioservices.pdb.PDB
     bioservices.uniprot.UniProt
     bioservices.unichem.UniChem
@@ -98,7 +102,11 @@ Here are only some of Web Services that are available in **BioServices**:
     bioservices.wikipathway.Wikipathway
 
 
-Full list is available in the User Guide and Reference here below.
+
+Full list is available in the User Guide and Reference here below. Some of the
+services may be down. BioServices developers are not responsible for the
+maintenance or failure of underlying services. Generally speaking (and by
+experience) the services are up most of the time.
 
 
 .. _installation:
@@ -117,7 +125,8 @@ Regarding the dependencies, BioServices depends on the following
 packages: **BeautifulSoup4** (for parsing XML), **SOAPpy** and **suds** (to access to
 SOAP/WSDL services; suds is used by ChEBI only for which SOAPpy fails to
 correctly fetch the service) and **easydev**. All those packages should be
-installed automatically when using **pip** installer.
+installed automatically when using **pip** installer. Since version 1.6.0, we
+also make use of pandas and matplotlib to offer some extra functionalities. 
 
 
 .. toctree::
