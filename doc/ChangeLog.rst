@@ -22,6 +22,7 @@ Revision 1.7.11 (Dec 2020)
 ---------------------------
 * Fix https://github.com/cokelaer/bioservices/issues/183 (warning in uniprot
 * Fix annoying warning https://github.com/cokelaer/bioservices/issues/184
+* Implemented new PDB services (Update API changed in Nov/DEc 2020)
 
 Revision 1.7.10 (Nov 2020)
 --------------------------
