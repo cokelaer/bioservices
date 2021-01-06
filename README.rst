@@ -69,10 +69,10 @@ This is a summary of the changelog. Complete change can be found in the
 `main documentation <http://bioconvert.readthedocs.io/en/master/ChangeLog.html>`_.
 
 
-
 Revision 1.7.X
 --------------
 
+* Migrate to PDB new API (Jan 2021)
 * Fix ENA new API
 * Fix NCBIBlast and Muscle services (new API)
 * Update Quickgo
