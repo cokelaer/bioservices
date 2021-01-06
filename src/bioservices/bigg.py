@@ -140,7 +140,7 @@ class BiGG():
         if not target:
             target = path
 
-        url = self._build_url("%s/static/models/%s" %
+        url = self.services._build_url("%s/static/models/%s" %
             (BiGG._base_url, path))
 
         response = self.services.session.get(url, stream=True)
