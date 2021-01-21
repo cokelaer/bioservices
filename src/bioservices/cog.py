@@ -70,7 +70,7 @@ class COG():
         """
         self.services = REST(name="cog", url=COG._url, verbose=verbose, cache=cache)
 
-    def get_cogs(self, page):
+    def get_cogs(self, page=1):
         """Get COGs. Unfortunately, the API sends 10 COGS at a tine given a
         specific page.
 
