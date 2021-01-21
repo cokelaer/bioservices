@@ -3,7 +3,7 @@ import pytest
 
 def test_cog():
     c = COG()
-    c.get_all_cogs()
+    c.get_cogs()
     c.get_cogs_by_gene("MK0280")
     c.get_cogs_by_id("COG0003")
     c.get_cogs_by_assembly_id("GCA_000007185.1")
