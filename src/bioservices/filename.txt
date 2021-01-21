@@ -1,0 +1,16 @@
+{
+  "query": {
+    "type": "terminal",
+    "service": "sequence",
+    "parameters": {
+      "evalue_cutoff": 1,
+      "identity_cutoff": 0.9,
+      "target": "pdb_protein_sequence",
+      "value": "MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQIKRVKDSDDVPMVLVGNKCDLPARTVETRQAQDLARSYGIPYIETSAKTRQGVEDAFYTLVREIRQHKLRKLNPPDESGPGCMNCKCVIS"
+    }
+  },
+  "request_options": {
+    "scoring_strategy": "sequence"
+  },
+  "return_type": "polymer_entity"
+}

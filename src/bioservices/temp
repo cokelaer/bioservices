@@ -1,0 +1,14 @@
+
+from sequana import enrichment
+ke = enrichment.KeggPathwayEnrichment("tables/B2933-v1.t8vst4.complete.xls", organism='dme')
+up = ke.rnadiff.df.loc[ke.rnadiff.gene_lists['up']].gene_symbol.values
+down = ke.rnadiff.df.loc[ke.rnadiff.gene_lists['down']].gene_symbol.values
+all = ke.rnadiff.df.loc[ke.rnadiff.gene_lists['all']].gene_symbol.values
+ke.rnadiff.gene_lists['up'] = up
+ke.rnadiff.gene_lists['down'] = down
+ke.rnadiff.gene_lists['all'] = all
+ke.compute_enrichment()
+ke.rnadiff.df = ke.rnadiff.df.rename({"gene_symbol":"ID"}, axis=1)
+ke.compute_enrichment()
+ke.save_significant_pathways("up")
+ke.save_significant_pathways("down")

@@ -51,6 +51,9 @@ from .biocarta import *
 from . import biomodels
 from .biomodels import *
 
+from . import cog
+from .cog import *
+
 from . import chebi
 from .chebi import *
 

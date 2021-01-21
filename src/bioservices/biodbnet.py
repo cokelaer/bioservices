@@ -55,7 +55,7 @@ __all__ = ["BioDBNet"]
 
 
 
-class BioDBNet(REST):
+class BioDBNet():
     """Interface to the `BioDBNet <http://biodbnet.abcc.ncifcrf.gov/>`_ service
 
     ::
@@ -78,8 +78,7 @@ class BioDBNet(REST):
         :param bool verbose:
 
         """
-        super(BioDBNet, self).__init__(name="BioDBNet",
-                url=BioDBNet._url, verbose=verbose, cache=cache)
+        self.services = REST(name="BioDBNet", url=BioDBNet._url, verbose=verbose, cache=cache)
         self._valid_inputs = self.getInputs() 
 
     def _list_to_string(self, values):
@@ -138,13 +137,13 @@ class BioDBNet(REST):
         # input.
         outputs = self._interpret_output_db(input_db, output_db)
 
-        url = self.url + "?method=db2db"
+        url = self._url + "?method=db2db"
         url += "&input={}".format(input_db)
         url += "&outputs={}".format(outputs)
         url += "&inputValues={}".format(self._list_to_string(input_values))
         url += "&taxonId={}".format(taxon)
         url += "&format={}".format("row")
-        request = self.http_get(url)
+        request = self.services.http_get(url)
         try: # TODO can be removed in v2
             df = pd.DataFrame(request)
             df.set_index("InputValue", inplace=True)
@@ -179,12 +178,12 @@ class BioDBNet(REST):
         """
         self._check_db(output_db)
 
-        url = self.url + "?method=dbfind"
+        url = self._url + "?method=dbfind"
         url += "&output={}".format(output_db)
         url += "&inputValues={}".format(self._list_to_string(input_values))
         url += "&taxonId={}".format(taxon)
         url += "&format={}".format("row")
-        request = self.http_get(url)
+        request = self.services.http_get(url)
         try:
             return pd.DataFrame(request).set_index("InputValue")
         except:
@@ -214,14 +213,14 @@ class BioDBNet(REST):
         """
         self._check_db(input_db)
         self._check_db(output_db)
-        url = self.url + "?method=dbortho"
+        url = self._url + "?method=dbortho"
         url += "&input={}".format(input_db)
         url += "&output={}".format(output_db)
         url += "&inputValues={}".format(self._list_to_string(input_values))
         url += "&inputTaxon={}".format(input_taxon)
         url += "&outputTaxon={}".format(output_taxon)
         url += "&format={}".format("row")
-        request = self.http_get(url)
+        request = self.services.http_get(url)
 
         try:
             df = pd.DataFrame(request).set_index("InputValue")
@@ -247,12 +246,12 @@ class BioDBNet(REST):
         self._check_db(input_db)
         # This also check that the outputs exist and are compatible with the
         # input.
-        url = self.url + "?method=dbreport"
+        url = self._url + "?method=dbreport"
         url += "&input={}".format(input_db)
         url += "&inputValues={}".format(self._list_to_string(input_values))
         url += "&taxonId={}".format(taxon)
         url += "&format={}".format("row")
-        request = self.http_get(url)
+        request = self.services.http_get(url)
         try: # TODO can be removed in v2
             df = pd.DataFrame(request)
             df.set_index("InputValue", inplace=True)
@@ -293,12 +292,12 @@ class BioDBNet(REST):
         .. todo:: check validity of the path
 
         """
-        url = self.url + "?method=dbwalk"
+        url = self._url + "?method=dbwalk"
         url += "&inputValues={}".format(self._list_to_string(input_values))
         url += "&dbPath={}".format(db_path)
         url += "&taxonId={}".format(taxon)
         url += "&format={}".format("row")
-        request = self.http_get(url)
+        request = self.services.http_get(url)
         try:
             return pd.DataFrame(request)
         except:
@@ -319,10 +318,10 @@ class BioDBNet(REST):
         """
         self._check_db(input_db)
 
-        url = self.url
+        url = self._url
         url += "?method=getdirectoutputsforinput"
         url += "&input={}&directOutput=1".format(input_db)
-        request = self.http_get(url)
+        request = self.services.http_get(url)
         try:
             return request['output']
         except:
@@ -335,7 +334,7 @@ class BioDBNet(REST):
 
             s.getInputs()
         """
-        request = self.http_get(self.url + "?method=getinputs")
+        request = self.services.http_get(self._url + "?method=getinputs")
         try:
             return request['input']
         except:
@@ -350,9 +349,9 @@ class BioDBNet(REST):
 
         """
         self._check_db(input_db)
-        url = self.url + "?method=getoutputsforinput"
+        url = self._url + "?method=getoutputsforinput"
         url += "&input={}".format(input_db)
-        request = self.http_get(url)
+        request = self.services.http_get(url)
         try:
             return request['output']
         except:
