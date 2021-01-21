@@ -108,6 +108,14 @@ Clinvitae
     :undoc-members:
     :synopsis:
 
+COG
+===
+
+.. automodule:: bioservices.cog
+    :members:
+    :undoc-members:
+    :synopsis:
+
 
 ENA
 ==========
