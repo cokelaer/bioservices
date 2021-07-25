@@ -8,11 +8,19 @@
 Developer Guide
 ===================
 
+Naming convention
+-----------------
+
+To add a web services in BioServices, decide on a name for the python module. By
+convention we have the module name in lower case. Internally, class uses
+standard Python convention (Upper case for first letter).
+
+The module name (e.g. uniprot) should be use to name the module (uniprot.py).
+
+It will also be used to add a test or the continuous integration
+
 Creating a service class (REST case)
 --------------------------------------------------
-.. warning:: since version 1.3.0, RESTService is deprecated and REST should be
-    used. The changes should be easy: get method is now called http_get and
-    requestPost is now http_post.
 
 You can test directly a SOAP/WSDL or REST service in a few lines. For instance,
 to access to the biomart REST service, type::
@@ -138,4 +146,13 @@ Finally, we skip some tests for some conditions::
     @skiptravis
     def test():
         ...
+
+
+Continuous integration
+----------------------
+
+1. add a test in ./test/webservices/test_**yourmodule**.py
+2. add a continous integration file named after **yourmodule**.yml. See example
+in .github/workflows/template.txt and replace **__name__** by your module name
+
 

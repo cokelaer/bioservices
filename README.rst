@@ -67,9 +67,12 @@ Here is the list of services available and their testing status
 ================= =============================================================================================
 Service           CI testing
 ================= =============================================================================================
-Uniprot
-EUtils            .. image:: https://github.com/cokelaer/bioservices/actions/workflows/ci.yml/badge.svg
-                      :target: https://github.com/cokelaer/bioservices/actions/workflows/ci.yml
+Uniprot           .. image:: https://github.com/cokelaer/bioservices/actions/workflows/uniprot.yml/badge.svg
+                      :target: https://github.com/cokelaer/bioservices/actions/workflows/uniprot.yml
+EUtils            .. image:: https://github.com/cokelaer/bioservices/actions/workflows/eutils.yml/badge.svg
+                      :target: https://github.com/cokelaer/bioservices/actions/workflows/eutils.yml
+UniChem           .. image:: https://github.com/cokelaer/bioservices/actions/workflows/unichem.yml/badge.svg
+                      :target: https://github.com/cokelaer/bioservices/actions/workflows/unichem.yml
 ================= =============================================================================================
 
 
