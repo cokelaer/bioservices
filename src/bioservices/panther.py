@@ -98,7 +98,8 @@ class Panther():
         """
         #super(Panther, self).__init__(name="Panther", url=Panther._url,
         #       verbose=verbose, cache=cache)
-        self.services = REST(name="Panther", url=Panther._url, verbose=verbose, cache=cache)
+        self.services = REST(name="Panther", url=Panther._url, verbose=verbose,
+            cache=cache, url_defined_later=True)
 
         self._allPathwaysURL =  "http://www.pantherdb.org/pathway/pathwayList.jsp"
 
