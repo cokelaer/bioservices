@@ -1,9 +1,11 @@
-name: Core Testing
+name: Biomodels Testing
 
 on:
   push:
     branches:
       - master
+    paths:
+      - src/bioservices/biomodels.py
   pull_request:
     branches-ignore: []
 
@@ -28,5 +30,5 @@ jobs:
     - name: Test with pytest
       run: |
         pip install -r requirements_dev.txt
-        pytest -n 1 --cov-report term --cov=bioservices.services --cov bioservices.xmltools test/test_*py
+        pytest -n 1  --cov-report term --cov=bioservices.biomodels test/webservices/test_biomodels.py 
 
