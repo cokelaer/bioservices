@@ -1,4 +1,4 @@
-name: Uniprot Testing
+name: uniprot Testing
 
 on:
   push:
@@ -23,12 +23,12 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
-    - name: Install the package itself
+    - name: Install the package itself and dependencies
       run: |
           pip install .
+          pip install -r requirements_dev.txt
 
     - name: Test with pytest
       run: |
-        pip install -r requirements_dev.txt
-        pytest -n 1  --cov-report term --cov=bioservices.uniprot test/webservices/test_uniprot.py 
+        pytest -n 1  --cov-report term --cov=bioservices.uniprot test/webservices/test_uniprot.py
 
