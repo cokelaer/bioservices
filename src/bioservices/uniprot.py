@@ -393,15 +393,6 @@ class UniProt(REST):
             res = res[0]
         return res
 
-    """def _batch(self, entries):
-        #TODO test and validation
-        entries = self.devtools.list2string(entries)
-        res = self.http_post("batch/", frmt="txt",
-                data={'format':'txt'},
-                files={'file': entries}, headers={'Content_Type':'form-data'}  )
-        return res
-    """
-
     def get_fasta(self, id_):
         """Returns FASTA string given a valid identifier
 
