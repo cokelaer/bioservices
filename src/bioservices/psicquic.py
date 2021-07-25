@@ -689,9 +689,13 @@ class PSICQUIC():
         dbsB = [x.split(":")[0] for x in entriesB]
         for x in set(dbsA):
             query[x] = set()
+
         for x in set(dbsB):
             query[x] = set()
-        for k in query.keys():
+
+        # 
+        query_copy = query.copy()
+        for k in query_copy.keys():
             if k.startswith("?"):
                 del query[k]
 
