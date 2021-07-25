@@ -1,6 +1,7 @@
 name: __name__ Testing
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
