@@ -25,8 +25,8 @@ BIOSERVICES: access to biological web services programmatically
     <a href="https://pypi.python.org/pypi/bioservices">
     <img src="https://badge.fury.io/py/bioservices.svg"></a>
 
-    <a href="https://travis-ci.org/cokelaer/bioservices">
-    <img src="https://travis-ci.org/cokelaer/bioservices.svg?branch=master"></a>
+    <a href="https://github.com/cokelaer/bioservices/actions/workflows/ci.yml">
+    <img src="https://github.com/cokelaer/bioservices/actions/workflows/ci.yml/badge.svg"></a>
 
     <a href="https://coveralls.io/github/cokelaer/bioservices?branch=master">
     <img src="https://coveralls.io/repos/github/cokelaer/bioservices/badge.svg?branch=master"></a>
@@ -82,6 +82,7 @@ many other Web Services).
 
 Here are only some of Web Services that are available in **BioServices** (from
 EBI mostly but not only; NCBI, KEGG, etc):
+
 
 .. autosummary::
     :nosignatures:

@@ -4,8 +4,9 @@ BioServices
 .. image:: https://badge.fury.io/py/bioservices.svg
     :target: https://pypi.python.org/pypi/bioservices
 
-.. image:: https://secure.travis-ci.org/cokelaer/bioservices.png
-    :target: http://travis-ci.org/cokelaer/bioservices
+
+.. image:: https://github.com/cokelaer/bioservices/actions/workflows/ci.yml/badge.svg
+   :target: https://github.com/cokelaer/bioservices/actions/workflows/ci.yml
 
 .. image:: https://coveralls.io/repos/cokelaer/bioservices/badge.png?branch=master
    :target: https://coveralls.io/r/cokelaer/bioservices?branch=master
@@ -59,6 +60,17 @@ organism::
 
 More examples and tutorials are available in the exhaustive 
 `On-line documentation <http://bioconvert.readthedocs.io/>`_
+
+
+Here is the list of services available and their testing status
+
+================= =============================================================================================
+Service           CI testing
+================= =============================================================================================
+Uniprot
+EUtils            .. image:: https://github.com/cokelaer/bioservices/actions/workflows/ci.yml/badge.svg
+                      :target: https://github.com/cokelaer/bioservices/actions/workflows/ci.yml
+================= =============================================================================================
 
 
 
