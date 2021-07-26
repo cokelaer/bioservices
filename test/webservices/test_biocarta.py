@@ -1,7 +1,7 @@
 import pytest
 from bioservices import BioCarta
 
-def _test_biocarta():
+def test_biocarta():
 
     b = BioCarta()
     res = b.get_pathway_protein_names('h_RELAPathway')

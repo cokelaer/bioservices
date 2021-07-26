@@ -16,7 +16,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
 """Interface to some part of the UniProt web service
 
 .. topic:: What is UniProt ?
@@ -50,7 +49,7 @@ except:
 
 from bs4 import BeautifulSoup
 from bioservices.services import REST
-from bioservices.xmltools import readXML, HTTPError
+from bioservices.xmltools import readXML
 
 
 __all__ = ["BioCarta"]
@@ -108,7 +107,8 @@ class BioCarta():
 
     def _set_organism(self, organism):
         organism = organism[:1].upper() + organism[1:].lower()
-        if organism == self._organism: return
+        if organism == self._organism: 
+            return
         if organism not in BioCarta.organisms:
             raise ValueError("Invalid organism. Check the list in :attr:`organisms` attribute")
 
@@ -120,7 +120,7 @@ class BioCarta():
 
     def _get_pathway_categories(self):
         if self._pathway_categories is None:
-            self._pathway_categories = self.services.http_get_ou_post()
+            self._pathway_categories = self.services.http_get
         return self._pathway_categories
     pathway_categories = property(_get_pathway_categories)
 
@@ -160,7 +160,7 @@ class BioCarta():
 
 
         """
-        self.logging.info("Fetching the pathway")
+        self.services.logging.info("Fetching the pathway")
         # first identify gene from GeneInfo tag
         # this is not XML but HTML
         url = "http://cgap.nci.nih.gov/Pathways/BioCarta/%s" % pathway
@@ -171,7 +171,7 @@ class BioCarta():
 
         links = set([link.attrs['href'] for link in links])
 
-        self.logging.info("Scanning information about %s genes" % len(links))
+        self.services.logging.info("Scanning information about %s genes" % len(links))
         # open each page and get info
         genes = {}
         for link in links:
@@ -181,19 +181,22 @@ class BioCarta():
             table_gene_info = soup.findAll("table")[1]
 
             gene_name = link.rsplit("=", 1)[1]
-            self.logging.info(" - " + gene_name)
+            self.services.logging.info(" - " + gene_name)
 
             genes[gene_name] = {}
             self.tt = table_gene_info
             for row in table_gene_info.find_all('tr'):
                 entry = row.find_all('td')
-                try:key = entry[0].text.strip()
-                except:continue
-                try:value = entry[1].text.strip()
-                except:continue
+                try:
+                    key = entry[0].text.strip()
+                except:
+                    continue
+                try:
+                    value = entry[1].text.strip()
+                except:
+                    continue
                 if "[Text]" in key:
                     continue
                 genes[gene_name][key] = value
-
 
         return genes
