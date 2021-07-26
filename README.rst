@@ -152,9 +152,9 @@ wikipathway           .. image:: https://github.com/cokelaer/bioservices/actions
 
 .. note:: Contributions to implement new wrappers are more than welcome. 
     See `BioServices github page <https://github.com/cokelaer/bioservices/>`_
-    to join the development, and the :ref:`developer` on how to implement new
-    wrappers. Although contributors have their names in the header files, you
-    can also look at the :ref:`contributors` directly.
+    to join the development, and the Developer guide on how to implement new
+    wrappers.
+    
 
 
 
