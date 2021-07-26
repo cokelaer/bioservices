@@ -1,0 +1,35 @@
+name: hgnc Testing
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - src/bioservices/hgnc.py
+  pull_request:
+    branches-ignore: []
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+      matrix:
+        python: [3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.X
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install the package itself and dependencies
+      run: |
+          pip install .
+          pip install -r requirements_dev.txt
+
+    - name: Test with pytest
+      run: |
+        pytest -n 1  --cov-report term --cov=bioservices.hgnc test/webservices/test_hgnc.py
+

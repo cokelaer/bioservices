@@ -94,7 +94,7 @@ proper class.
 
 
 Others
-========
+------
 
 When wrapper a WSDL services, it may be difficult to know what parameters
 to provide if the API doc is not clear. This can be known as follows using 
@@ -113,13 +113,13 @@ For eutils, this was more difficult::
 
 
 suds and client auth
-=======================
+------------------------
 http://stackoverflow.com/questions/6277027/suds-over-https-with-cert
 
 
 
 How to include tests ?
-=======================
+------------------------
 
 We use pytest. There are many web services included in BioServices. Consequently
 there are many tests. It is common to have failed tests on Travis and the

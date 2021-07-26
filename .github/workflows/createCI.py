@@ -57,4 +57,21 @@ for service in services:
         fout.write(code)
 
 
+print("==================== ================================================================================================")
+print("Service              CI testing")
+print("==================== ================================================================================================")
+for service in sorted(services):
+    service_name = f"{service}".ljust(14)
+    print(f'{service_name}        .. image:: https://github.com/cokelaer/bioservices/actions/workflows/{service}.yml/badge.svg')
+    print(f"                         :target: https://github.com/cokelaer/bioservices/actions/workflows/{service}.yml")
+
+print("==================== ================================================================================================")
+
+
+
+
+
+
+
+
 
