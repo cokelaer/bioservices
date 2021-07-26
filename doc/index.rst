@@ -28,12 +28,8 @@ BIOSERVICES: access to biological web services programmatically
     <a href="https://github.com/cokelaer/bioservices/actions/workflows/ci.yml">
     <img src="https://github.com/cokelaer/bioservices/actions/workflows/ci.yml/badge.svg"></a>
 
-    <a href="https://coveralls.io/github/cokelaer/bioservices?branch=master">
-    <img src="https://coveralls.io/repos/github/cokelaer/bioservices/badge.svg?branch=master"></a>
-
     <a href="https://anaconda.org/conda-forge/spectrum/badges/license.svg">
     <img src="https://anaconda.org/conda-forge/spectrum/badges/license.svg"></a>
-
 
     <a href="http://bioservices.readthedocs.org/en/master/?badge=master">
     <img src='https://readthedocs.org/projects/bioservices/badge/?version=master' alt='Documentation Status' />

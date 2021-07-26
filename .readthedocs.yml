@@ -6,9 +6,9 @@ sphinx:
 formats: all
 
 python:
-    version: 3.6
+    version: 3.7
     install:
         - requirements: requirements.txt
-        - requirements: requirements-dev.txt
+        - requirements: requirements_dev.txt
         - method: pip
           path: .

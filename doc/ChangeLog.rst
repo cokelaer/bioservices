@@ -4,6 +4,7 @@ Whats' new, what has changed
 
 
 
+
 Revision 1.8.0 roadmap
 ----------------------
 
@@ -24,7 +25,8 @@ Revision 1.7.12 (Jan 2021)
 
 * NEW module COG
 * update dbbionet to fulfill future new API
-
+* continous integration revisited with github actions
+* Fix #189 (psicquic fix)
 
 
 Revision 1.7.11 (Dec 2020)

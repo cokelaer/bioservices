@@ -4,12 +4,8 @@ BioServices
 .. image:: https://badge.fury.io/py/bioservices.svg
     :target: https://pypi.python.org/pypi/bioservices
 
-
 .. image:: https://github.com/cokelaer/bioservices/actions/workflows/ci.yml/badge.svg
    :target: https://github.com/cokelaer/bioservices/actions/workflows/ci.yml
-
-.. image:: https://coveralls.io/repos/cokelaer/bioservices/badge.png?branch=master
-   :target: https://coveralls.io/r/cokelaer/bioservices?branch=master
 
 .. image:: http://readthedocs.org/projects/bioservices/badge/?version=master
     :target: http://bioservices.readthedocs.org/en/master/?badge=master
@@ -67,6 +63,20 @@ Here is the list of services available and their testing status
 ================= =============================================================================================
 Service           CI testing
 ================= =============================================================================================
+ChEBI             .. image:: https://github.com/cokelaer/bioservices/actions/workflows/chebi.yml/badge.svg
+                      :target: https://github.com/cokelaer/bioservices/actions/workflows/chebi.yml
+ChEMBL            .. image:: https://github.com/cokelaer/bioservices/actions/workflows/chembl.yml/badge.svg
+                      :target: https://github.com/cokelaer/bioservices/actions/workflows/chembl.yml
+ENA               .. image:: https://github.com/cokelaer/bioservices/actions/workflows/ena.yml/badge.svg
+                      :target: https://github.com/cokelaer/bioservices/actions/workflows/ena.yml
+KEGG              .. image:: https://github.com/cokelaer/bioservices/actions/workflows/kegg.yml/badge.svg
+                      :target: https://github.com/cokelaer/bioservices/actions/workflows/kegg.yml
+PFAM              .. image:: https://github.com/cokelaer/bioservices/actions/workflows/pfam.yml/badge.svg
+                      :target: https://github.com/cokelaer/bioservices/actions/workflows/pfam.yml
+PSICQUIC          .. image:: https://github.com/cokelaer/bioservices/actions/workflows/psicquic.yml/badge.svg
+                      :target: https://github.com/cokelaer/bioservices/actions/workflows/psicquic.yml
+Rhea              .. image:: https://github.com/cokelaer/bioservices/actions/workflows/rhea.yml/badge.svg
+                      :target: https://github.com/cokelaer/bioservices/actions/workflows/rhea.yml
 Uniprot           .. image:: https://github.com/cokelaer/bioservices/actions/workflows/uniprot.yml/badge.svg
                       :target: https://github.com/cokelaer/bioservices/actions/workflows/uniprot.yml
 EUtils            .. image:: https://github.com/cokelaer/bioservices/actions/workflows/eutils.yml/badge.svg
