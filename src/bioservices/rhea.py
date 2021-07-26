@@ -82,7 +82,7 @@ class Rhea():
 
     The :meth:`search` :meth:`entry` methods require a list of valid columns.
     By default all columns are used but you can restrict to only a few. Here is
-    the description of the columns:
+    the description of the columns::
 
         rhea-id	:   reaction identifier (with prefix RHEA)
         equation :  textual description of the reaction equation
@@ -92,7 +92,7 @@ class Rhea():
         uniprot :   number of proteins (UniProtKB entries) annotated with the Rhea reaction
         pubmed :    comma-separated list of PubMed identifiers (without prefix)
 
-    and 5 cross-references:
+    and 5 cross-references::
 
         reaction-xref(EcoCyc)
         reaction-xref(MetaCyc)
@@ -222,18 +222,4 @@ class Rhea():
         reactants = [xx.attrs['title'] for xx in response.findAll("reactant")]
         products = [xx.attrs['title'] for xx in response.findAll("product")]
         return {"reactants": reactants, "products": products}
-
-        """ms = defaultdict(lambda: 0)
-        if response.content:
-            # parse XML that comes as a resonse
-            tree = ElementTree.fromstring(response.content)
-
-            ms.update({m.attrib['title']: -float(m.attrib['count'])
-                   for m in
-                tree.iter('{http://www.xml-cml.org/schema/cml2/react}reactant')})
-            ms.update({m.attrib['title']: float(m.attrib['count'])
-                       for m in
-            tree.iter('{http://www.xml-cml.org/schema/cml2/react}product')})
-        return ms
-        """
 

@@ -261,34 +261,28 @@ Create a :class:`~bioservices.rhea.Rhea` instance as follows:
     from bioservices import Rhea
     r = Rhea()
 
-Rhea provides only 2 type of requests with a REST interface that are available with the :meth:`~bioservices.rhea.Rhea.search` and :meth:`~bioservices.rhea.Rhea.entry` methods. Let us first find information about the chemical product **caffein** using the :meth:`search` method::
+Rhea provides only 2 type of requests with a REST interface that are available with the :meth:`~bioservices.rhea.Rhea.search` and :meth:`~bioservices.rhea.Rhea.query` methods. 
+Let us first find information about the chemical product **caffein** using the :meth:`search` method::
 
-    xml_response = r.search("caffein*")
+    response = r.search("caffein*")
 
-The output is in XML format. Python provides lots of tools to deal with xml so
-you can surely find good tools. 
+The output is a JSON file that we convert in BioServices into a Pandas dataframe. 
 
 
-Within bioservices, we wrap all returned XML documents into a BeautifulSoup
-object that ease the manipulation of XML documents.
+The previous request returns more than 10,000 entries. Here are the first two
+entries::
 
-As an example, we can extract all fields "id" as follows::
+      Reaction identifier                                           Equation             ChEBI name           Cross-reference (KEGG)  Cross-reference (Reactome)
+  0   RHEA:47148              a ubiquinone + caffeine + H2O = 1,3,7-trimethy...          MetaCyc:RXN-11523           KEGG:R07980                         NaN
+  1   RHEA:10280              1,7-dimethylxanthine + S-adenosyl-L-methionine...          MetaCyc:RXN-7601            KEGG:R07921                         NaN
 
-    >>> [x.getText() for x in xml_response.findAll("id")]
-    [u'27902', u'10280', u'20944', u'30447', u'30319', u'30315', u'30311', u'30307']
 
-The second method provided is the :meth:`entry` method. Given an Id, 
-you can query the Rhea database using Id found earlier (e.g., 10280)::
+The second method provided is the :meth:`query` method. Given an Id, 
+you can query the Rhea database using Id found earlier (e.g., 10280). This is
+finally a filtering method as compared to the search method. If you kow what
+your are looking for (the rhea-id) use this method instead of the search method::
 
-    >>> xml_response = r.entry(10280, "biopax2")
-
-.. warning:: the r.entry output is also in XML format but we do not provide a
-   specific XML parser for it unlike for the "search" method.
-
-output format can be found in ::
-
-    >>> r.format_entry
-    ['cmlreact', 'biopax2', 'rxn']
+    info = r.query("10280", columns="rhea-id,equation", limit=10)
 
 
 .. seealso:: Reference guide of :class:`bioservices.rhea.Rhea` for more details
