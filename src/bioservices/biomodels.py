@@ -45,7 +45,6 @@ from functools import wraps
 from bioservices import logger
 logger.name = __name__
 
-from bioservices.services import WSDLService
 from bioservices.services import REST
 
 try:

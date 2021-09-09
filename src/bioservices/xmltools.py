@@ -16,7 +16,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
+# $Id$
 """This module includes common tools to manipulate XML files"""
 from __future__ import print_function
 import xml.etree.ElementTree as ET
@@ -58,6 +58,7 @@ class easyXML(object):
     There is also aliases findAll and prettify.
 
     """
+
     def __init__(self, data, encoding="utf-8"):
         """.. rubric:: Constructor
 
@@ -72,10 +73,10 @@ class easyXML(object):
         have an URL instead, use :class:`readXML`
 
         """
-        #if fixing_unicode:
+        # if fixing_unicode:
         #    x = unicodefix.FixingUnicode(data, verbose=False, encoding=encoding)
         #    self.data = x.fixed_string.encode("utf-8")
-        #else:
+        # else:
         self.data = data[:]
 
         try:
@@ -97,6 +98,7 @@ class easyXML(object):
         if self._soup is None:
             self._soup = bs4.BeautifulSoup(self.data, "lxml")
         return self._soup
+
     soup = property(_get_soup, doc="Returns the beautiful soup instance")
 
     def __str__(self):
@@ -116,6 +118,7 @@ class readXML(easyXML):
     .. seealso:: :class:`easyXML`
 
     """
+
     def __init__(self, url, encoding="utf-8"):
         self.data = urlopen(url).read()
         super(readXML, self).__init__(self.data, encoding)
@@ -125,6 +128,7 @@ class XMLObjectify(object):
     def __init__(self, obj):
         """obj can be easyXML data set"""
         from lxml import objectify
+
         try:
             self.root = objectify.fromstring(obj.data)
         except:
