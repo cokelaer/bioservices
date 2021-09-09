@@ -383,7 +383,7 @@ or a string (e.g., 'PUBMED:') """)
 
         # unfortunately, the new API requires to call the service for each page.
         results = []
-        for i in range(1, number_of_pages + 1):
+        for i in range(0, number_of_pages ):
             print("fetching page %s / %s " % (i+1, number_of_pages))
             data = self.Annotation(goId=goId, page=i+1, **kargs)
             if data not in [400, '400']:
