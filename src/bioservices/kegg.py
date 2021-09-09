@@ -1,4 +1,3 @@
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -16,7 +15,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
 """This module provides a class :class:`~KEGG` to access to the
 REST KEGG interface. There are additional methods and functionalities added by
 **BioServices**.
@@ -150,6 +148,7 @@ usually locus_tag or ncbi GeneID, or the primary gene name.
 
 
 """
+import re
 from __future__ import print_function
 from __future__ import unicode_literals
 try:
@@ -1389,17 +1388,11 @@ class KEGGParser(object):
                 # STRUCTURE PDB can be long and span over several lines. e.g.,
                 # hsa:1525
                 new = {}
-                import re
 
                 value = re.sub("\n {6,20}", " ", value)
                 for line in value.split("\n"):
                     thiskey, content = line.split(":", 1)
-                    print(thiskey, content)
                     new[thiskey] = content
-                    #if thiskey.endswith(":"):
-                    #    new[thiskey[:-1]] = content
-                    #else:
-                    #    self.logging.warning("Could not fully interpret %s " % key )
                 output[key] = new
             elif key in ['DBLINKS', 'INTERACTION', 'METABOLISM']:
                 # D01441 for metabolism
