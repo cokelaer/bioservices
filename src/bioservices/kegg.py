@@ -149,8 +149,6 @@ usually locus_tag or ncbi GeneID, or the primary gene name.
 
 """
 import re
-from __future__ import print_function
-from __future__ import unicode_literals
 try:
     from functools import reduce # python3 compat
 except:
