@@ -8,15 +8,7 @@ Whats' new, what has changed
 Revision 1.8.0 roadmap
 ----------------------
 
-* make all services methods hidden or inside a single attributes to make the
-  methods of a services more visible
-* finalise pubchem, pfam and eva modules
-* Wherever devtools is used to check input params, we should make sure the
-  error message is informative. This may need to change easydev itself;
-* All Classes/Services should hide the REST/WSDL methods to make the API easier.
-  Instead of inheriting from REST, we should use an aggregation and store all
-  methods in a single attribute
-* Get rid of multifasta and fasta modules
+* removed chemspider,picr and clinvitae services due to deprecated services
 
 
 
