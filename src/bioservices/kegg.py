@@ -160,7 +160,7 @@ from bioservices import logger
 logger.name = __name__
 
 
-#from easydev.logging_tools import Logging
+from easydev.logging_tools import Logging
 
 __all__ = ["KEGG",  "KEGGParser"]
 
