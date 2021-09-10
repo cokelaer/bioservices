@@ -155,6 +155,7 @@ Version   Description
 ========= ====================================================================
 1.8.0     * add main standalone application. 
           * moved chemspider and clinvitae to the attic
+          * removed picr service, not active anymore
 ========= ====================================================================
 
 
