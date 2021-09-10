@@ -36,8 +36,7 @@ One of the main philosophy of **BioServices** is to make use of the existing
 biological databases (not to re-invent new databases) and to alleviates the
 needs for expertise in Web Services for the developers/users.
 
-BioServices provides access to 43 Web Services. For a quick start,
-look at some notebooks here `github cokelaer/bioservices <https://github.com/cokelaer/bioservices/tree/master/notebooks/>`_ and here `github bioservices <https://github.com/bioservices/notebooks>`_.
+BioServices provides access to about 40 Web Services. 
 
 Here is a small example using the UniProt Web Service to search for the zap70 specy in human
 organism::
@@ -52,10 +51,9 @@ organism::
     B4E0E2_HUMAN 185     B4E0E2
     RHOH_HUMAN   191     Q15669  RHOH ARHH TTF
 
-More examples and tutorials are available in the `On-line documentation <http://bioconvert.readthedocs.io/>`_
+More examples and tutorials are available in the `On-line documentation <http://bioservices.readthedocs.io/>`_
 
-Here is the list of services available and their testing status (non
-exhaustive). Not all services are currently tested (WIP, july 2021)
+Here is the list of services available and their testing status.
 
 
 ==================== ================================================================================================
@@ -117,8 +115,6 @@ pdbe                  .. image:: https://github.com/cokelaer/bioservices/actions
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/pdbe.yml
 pfam                  .. image:: https://github.com/cokelaer/bioservices/actions/workflows/pfam.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/pfam.yml
-picr                  .. image:: https://github.com/cokelaer/bioservices/actions/workflows/picr.yml/badge.svg
-                         :target: https://github.com/cokelaer/bioservices/actions/workflows/picr.yml
 pride                 .. image:: https://github.com/cokelaer/bioservices/actions/workflows/pride.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/pride.yml
 psicquic              .. image:: https://github.com/cokelaer/bioservices/actions/workflows/psicquic.yml/badge.svg
