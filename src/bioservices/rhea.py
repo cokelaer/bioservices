@@ -1,4 +1,3 @@
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -16,7 +15,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
 """Interface to the Rhea web services
 
 .. topic:: What is Rhea ?
@@ -43,7 +41,6 @@
         -- from Rhea Home page, Dec 2012 (http://www.ebi.ac.uk/rhea/about.xhtml)
 
 """
-from __future__ import print_function
 from collections import defaultdict
 
 from bioservices.services import REST

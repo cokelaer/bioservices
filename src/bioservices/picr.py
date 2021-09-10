@@ -1,4 +1,3 @@
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -16,7 +15,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
 """This module provides a class :class:`~bioservices.picr.PICR` that allows an
 access to the REST interface of the PICR web service. There is also a SOAP web service but we implemented only the REST interface since they both provide access to the same functionalities.
 

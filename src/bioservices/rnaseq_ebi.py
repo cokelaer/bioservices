@@ -1,4 +1,3 @@
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -16,7 +15,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-# $Id$
 """Interface to web service that analysed 200,000 RNA-seq runs in 185 organisms
 provided by EMBL-EBI Gene Expression Team.
 

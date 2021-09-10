@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: latin-1 -*-
 #
 #  This file is part of bioservices software
 #
@@ -16,8 +14,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-# $Id: chembldb.py 318 2014-02-28 13:30:26Z cokelaer $
-
 """This module provides a class :class:`ChEMBL`
 
 .. topic:: What is ChEMBL

@@ -86,6 +86,12 @@ setup(
 
     # If user of python2.6 ordereddict must be installed manually
     install_requires = install_requires,
+    entry_points = {
+        'console_scripts':[
+           'bioservices=bioservices.main:main',
+        ]
+    }
+
     )
 
 

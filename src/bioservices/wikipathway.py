@@ -1,4 +1,3 @@
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -15,7 +14,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-# $Id: $
 """Interface to the WikiPathway service
 
 .. topic:: What is WikiPathway ?

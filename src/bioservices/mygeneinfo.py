@@ -1,4 +1,3 @@
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -17,7 +16,6 @@
 #  documentation: http://bioservices.readthedocs.io
 #
 ##############################################################################
-#$Id$
 """Interface to the mygeneinfo web Service.
 
 .. topic:: What is MyGeneInfo ?

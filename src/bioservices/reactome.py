@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -16,7 +14,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-# $Id$
 """Interface to the Reactome webs services
 
 .. topic:: What is Reactome?
@@ -37,7 +34,6 @@
         -- from Reactome web site
 
 """
-from __future__ import print_function
 
 import sys
 import webbrowser

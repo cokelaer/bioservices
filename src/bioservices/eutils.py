@@ -1,4 +1,3 @@
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -16,7 +15,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-# $Id$
 """Interface to the EUtils web Service.
 
 .. topic:: What is EUtils ?

@@ -1,4 +1,3 @@
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -15,9 +14,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-# $Id$
 """Modules with common tools to access web resources"""
-from __future__ import print_function
 import os
 import sys
 import time

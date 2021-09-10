@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Fri Aug  8 15:31:34 2014
 
@@ -14,7 +13,6 @@ import appdirs
 __all__ = ["defaultParams", "BioServicesConfig"]
 
 
-#TODO Move some contents to easydev.config_tools
 
 # first item if the value
 # second item if a type or TUPLE of types possible

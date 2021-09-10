@@ -1,4 +1,3 @@
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -16,7 +15,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-# $Id$
 """Interface to some part of the UniProt web service
 
 .. topic:: What is COG service?
@@ -32,7 +30,6 @@
 
 
 """
-from __future__ import print_function
 import types
 import io
 import sys

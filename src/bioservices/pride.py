@@ -1,4 +1,3 @@
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -34,7 +33,6 @@
 
 
 """
-#from decorator import decorator
 import wrapt
 
 from bioservices.services import REST

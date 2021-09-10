@@ -8,9 +8,6 @@ u.search("ZAP70")
 see online documentation for details on pypi or github.
 
 """
-#from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import division
 import sys
 
 import pkg_resources

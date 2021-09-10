@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: latin-1 -*-
 #
 #  This file is part of bioservices software
 #
@@ -37,7 +35,6 @@
         -- from EMBL-EBI web page
 
 """
-from __future__ import print_function
 import sys
 import time
 from bioservices.services import REST
@@ -299,7 +296,6 @@ class MUSCLE():
         while result == 'RUNNING' or result == 'PENDING':
             result = self.get_status(jobId)
             if verbose:
-                # required from __future__ import print_function
                 print("WARNING: ", jobId, " is ", result, file=sys.stderr)
 
             if result == 'RUNNING' or result == 'PENDING':

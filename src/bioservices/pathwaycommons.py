@@ -1,4 +1,3 @@
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -16,7 +15,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-# $Id$
 """This module provides a class :class:`~PathwayCommons`
 
 .. topic:: What is PathwayCommons ?
@@ -37,8 +35,6 @@
 Data is freely available, under the license terms of each contributing database.
 
 """
-from __future__ import print_function
-
 from bioservices.services import REST, BioServicesError
 
 

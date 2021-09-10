@@ -1,4 +1,3 @@
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -16,7 +15,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
 """Interface to the ArrayExpress web Service.
 
 .. topic:: What is ArrayExpress ?
@@ -31,7 +29,6 @@
         -- ArrayExpress home page, Jan 2013
 
 """
-from __future__ import print_function
 
 from bioservices.services import REST
 from bioservices import logger

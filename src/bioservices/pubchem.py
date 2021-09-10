@@ -1,4 +1,3 @@
-# -*- python -*-
 #
 #  This file is part of bioservices software
 #
@@ -16,7 +15,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-# $Id$
 """Interface to PubChem web service
 
 .. topic:: What is PubChem ?
@@ -31,8 +29,6 @@
 
 
 """
-# for the print function compatibility
-from __future__ import print_function
 import sys
 
 from bioservices.services import REST
