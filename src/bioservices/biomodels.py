@@ -99,6 +99,7 @@ class BioModels(REST):
         """
         super(BioModels, self).__init__(name="BioModels", url=BioModels._url, 
                                         verbose=verbose)
+
     def _check_format(self, frmt, supported=['json', 'xml', 'html']):
         if frmt not in supported:
             raise ValueError("Supported format for this function are {}. You provided {}".format(
@@ -114,7 +115,6 @@ class BioModels(REST):
             offset += chunk
             res = self.search("*.*", offset=offset, numResults=chunk)
         return models
-
 
     def get_model(self, model_id, frmt="json"):
         """Fetch information about a given model at a particular revision."""

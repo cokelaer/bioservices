@@ -160,7 +160,7 @@ from bioservices import logger
 logger.name = __name__
 
 
-from easydev.logging_tools import Logging
+#from easydev.logging_tools import Logging
 
 __all__ = ["KEGG",  "KEGGParser"]
 
@@ -1386,7 +1386,8 @@ class KEGGParser(object):
                 # STRUCTURE PDB can be long and span over several lines. e.g.,
                 # hsa:1525
                 new = {}
-
+                # somehow the import at the top is lost
+                import re
                 value = re.sub("\n {6,20}", " ", value)
                 for line in value.split("\n"):
                     thiskey, content = line.split(":", 1)

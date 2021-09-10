@@ -167,5 +167,3 @@ from .omicsdi import OmicsDI
 from . import apps
 #import dev
 
-from . import clinvitae
-from .clinvitae import Clinvitae

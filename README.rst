@@ -79,10 +79,6 @@ chebi                 .. image:: https://github.com/cokelaer/bioservices/actions
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/chebi.yml
 chembl                .. image:: https://github.com/cokelaer/bioservices/actions/workflows/chembl.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/chembl.yml
-chemspider            .. image:: https://github.com/cokelaer/bioservices/actions/workflows/chemspider.yml/badge.svg
-                         :target: https://github.com/cokelaer/bioservices/actions/workflows/chemspider.yml
-clinvitae             .. image:: https://github.com/cokelaer/bioservices/actions/workflows/clinvitae.yml/badge.svg
-                         :target: https://github.com/cokelaer/bioservices/actions/workflows/clinvitae.yml
 cog                   .. image:: https://github.com/cokelaer/bioservices/actions/workflows/cog.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/cog.yml
 dbfetch               .. image:: https://github.com/cokelaer/bioservices/actions/workflows/dbfetch.yml/badge.svg
@@ -158,6 +154,7 @@ wikipathway           .. image:: https://github.com/cokelaer/bioservices/actions
 Version   Description
 ========= ====================================================================
 1.8.0     * add main standalone application. 
+          * moved chemspider and clinvitae to the attic
 ========= ====================================================================
 
 
