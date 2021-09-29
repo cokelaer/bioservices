@@ -38,6 +38,7 @@ from bioservices import REST
 from bioservices.xmltools import bs4
 import easydev
 from bioservices import logger
+
 logger.name = __name__
 
 
@@ -47,26 +48,26 @@ except:
     from urllib2 import HTTPError
 
 
-__all__ = ["HGNC", 'HGNCDeprecated']
+__all__ = ["HGNC", "HGNCDeprecated"]
 
 
-class HGNC():
+class HGNC:
     """Wrapper to the genenames web service
 
 
     See details at http://www.genenames.org/help/rest-web-service-help
 
     """
+
     def __init__(self, verbose=False, cache=False):
         url = "http://rest.genenames.org/"
-        self.services = REST("HGNC", url=url, verbose=verbose,
-                cache=cache)
+        self.services = REST("HGNC", url=url, verbose=verbose, cache=cache)
 
         self._info = self.get_info()
-        self.searchable_fields = self._info['searchableFields']
-        self.stored_fields = self._info['storedFields']
+        self.searchable_fields = self._info["searchableFields"]
+        self.stored_fields = self._info["storedFields"]
 
-    def get_info(self, frmt='json'):
+    def get_info(self, frmt="json"):
         """Request information about the service
 
         Fields are when the server was last updated (lastModified),
@@ -80,7 +81,7 @@ class HGNC():
         res = self.services.http_get("info", frmt=frmt, headers=headers)
         return res
 
-    def fetch(self, database, query, frmt='json'):
+    def fetch(self, database, query, frmt="json"):
         """Retrieve particular records from a searchable fields
 
         Returned object is a json object with fields as in
@@ -94,12 +95,12 @@ class HGNC():
             >>> h.fetch('alias_name', 'A-kinase anchor protein, 350kDa')
         """
         easydev.check_param_in_list(database, self.searchable_fields)
-        url = 'fetch/{0}/{1}'.format(database, query)
+        url = "fetch/{0}/{1}".format(database, query)
         headers = self.services.get_headers(content=frmt)
         res = self.services.http_get(url, frmt=frmt, headers=headers)
         return res
 
-    def search(self, database_or_query=None, query=None, frmt='json'):
+    def search(self, database_or_query=None, query=None, frmt="json"):
         """Search a searchable field (database) for a pattern
 
         The search request is more powerful than fetch for querying the
@@ -111,7 +112,7 @@ class HGNC():
         user could use the hgnc_id returned by search to then fire off a fetch
         request by hgnc_id.
 
-        :param database: if not provided, search all databases. 
+        :param database: if not provided, search all databases.
 
 
         ::
@@ -124,32 +125,32 @@ class HGNC():
 
             # Return all records that have symbols that start with ZNF
             # followed by one and only one character (e.g. ZNF3)
-            # Nov 2015 does not work neither here nor in within in the 
+            # Nov 2015 does not work neither here nor in within in the
             # official documentation
             h.search('symbol', 'ZNF?')
 
-            # search for symbols starting with ZNF that have been approved 
+            # search for symbols starting with ZNF that have been approved
             # by HGNC
             h.search('symbol', 'ZNF*+AND+status:Approved')
-            
+
             # return ZNF3 and ZNF12
             h.search('symbol', 'ZNF3+OR+ZNF12')
 
-            # Return all records that have symbols that start with ZNF which 
+            # Return all records that have symbols that start with ZNF which
             # are not approved (ie entry withdrawn)
             h.search('symbol', 'ZNF*+NOT+status:Approved')
 
         """
         if database_or_query is None and query is None:
-            raise ValueError('you must provide at least one parameter')
+            raise ValueError("you must provide at least one parameter")
         elif database_or_query is not None and query is None:
             # presumably user wants to search all databases
             query = database_or_query
-            url = 'search/{0}'.format(query)
+            url = "search/{0}".format(query)
         else:
             database = database_or_query
             easydev.check_param_in_list(database, self.searchable_fields)
-            url = 'search/{0}/{1}'.format(database, query)
+            url = "search/{0}/{1}".format(database, query)
 
         headers = self.services.get_headers(content=frmt)
         res = self.services.http_get(url, frmt=frmt, headers=headers)
@@ -196,21 +197,25 @@ class HGNCDeprecated(REST):
     .. warning:: this maybe not the official.
 
     """
+
     def __init__(self, verbose=False, cache=False):
         url = "http://www.avatar.se/HGNC/wr/"
         super(HGNC, self).__init__("HGNC", url=url, verbose=verbose, cache=cache)
-        self.logging.warning("Service unavailable when testing (Aug 2014). May not work")
+        self.logging.warning(
+            "Service unavailable when testing (Aug 2014). May not work"
+        )
 
         self._always_return_list = False
 
         # FIXME
         #: Force XML to be checked for unicode consistency see :class:`Service`
-        #self._fixing_unicode = True
-        #self._fixing_encoding = "utf-8"
+        # self._fixing_unicode = True
+        # self._fixing_encoding = "utf-8"
 
     def _set_return(self, mode):
         assert mode in [False, True]
         self._always_return_list = mode
+
     def _get_return(self):
         return self.always_return_list
 
@@ -239,12 +244,14 @@ class HGNCDeprecated(REST):
             else:
                 res = self.services.http_get("gene/%s.xml" % gene)
                 res = self.easyXML(res)
-            #res = bs4.BeautifulSoup(res)
+            # res = bs4.BeautifulSoup(res)
         except HTTPError:
-            self.logging.critical("!!BioServices HTTPError caught in HGNC. Probably an invalid gene name")
+            self.logging.critical(
+                "!!BioServices HTTPError caught in HGNC. Probably an invalid gene name"
+            )
 
             res = bs4.BeautifulSoup()
-        #except Exception:
+        # except Exception:
         #    raise Exception
         return res
 
@@ -306,21 +313,27 @@ class HGNCDeprecated(REST):
 
     def _get_xref(self, xml, keep):
         # get all dbs and build up a dict out of it
-        dbs =  [x.attrs['xdb'] for x in xml.findAll("xref")]
-        values =  dict([(this,{}) for this in dbs])
+        dbs = [x.attrs["xdb"] for x in xml.findAll("xref")]
+        values = dict([(this, {}) for this in dbs])
 
         # rescan the xml to get the other attributes
         refs = [x.attrs for x in xml.findAll("xref")]
         for ref in refs:
-            db = ref['xdb']
+            db = ref["xdb"]
             values[db] = ref.copy()
             # this looks quite complicated so here is a bit of explanation:
             # Each reference may have a few links. However, we are interested
             # only in this function by the HTML format. So, for a given database (res.findAll(xref)),
             # we search for all links (findAll(link)) and for each link found, we keep only those where
             # format is HTML. Finally; we get only the attribute 'xlink:href'
-            links = [y.attrs['xlink:href'] for y in [x for x in xml.findAll("xref") if x['xdb']==db][0].findAll("link") if y.attrs['format']==keep]
-            values[db]['link'] = links[:]
+            links = [
+                y.attrs["xlink:href"]
+                for y in [x for x in xml.findAll("xref") if x["xdb"] == db][0].findAll(
+                    "link"
+                )
+                if y.attrs["format"] == keep
+            ]
+            values[db]["link"] = links[:]
 
         return values
 
@@ -348,7 +361,7 @@ class HGNCDeprecated(REST):
             len(s.lookfor('*'))
 
         """
-        params = {'search': 'symbol', 'value':pattern}
+        params = {"search": "symbol", "value": pattern}
         # note the extra s before ;index.xml
         xml = self.services.http_get("s;index.xml?" + self.urlencode(params))
         xml = self.easyXML(xml)
@@ -358,7 +371,7 @@ class HGNCDeprecated(REST):
     def get_all_names(self):
         """Returns all gene names"""
         entries = self.lookfor("*")
-        names = [entry['xlink:title'] for entry in entries]
+        names = [entry["xlink:title"] for entry in entries]
         return names
 
     def mapping(self, value):
@@ -378,7 +391,9 @@ class HGNCDeprecated(REST):
         .. seealso:: :meth:`mapping_all`
         """
 
-        xml = self.services.http_get("s;index.xml?" + self.urlencode({'search': 'xref', 'value':value}))
+        xml = self.services.http_get(
+            "s;index.xml?" + self.urlencode({"search": "xref", "value": value})
+        )
         xml = self.easyXML(xml)
         genes = xml.findAll("gene")
         res = [g.attrs for g in genes]
@@ -396,36 +411,29 @@ class HGNCDeprecated(REST):
 
         """
         from math import ceil
+
         results = {}
 
         if entries is None:
             print("First, get all entries")
-            entries = self.lookfor('*')
+            entries = self.lookfor("*")
 
-        names = [entry['xlink:title'] for entry in entries]
+        names = [entry["xlink:title"] for entry in entries]
         N = len(names)
 
         # split query in sets of 300 names
 
         dn = 300
         N = len(names)
-        n = int(ceil(N/float(dn)))
+        n = int(ceil(N / float(dn)))
         for i in range(0, n):
-            print("Completed ", i+1, "/", n)
-            query  = ";".join(names[i*dn:(i+1)*dn])
+            print("Completed ", i + 1, "/", n)
+            query = ";".join(names[i * dn : (i + 1) * dn])
             xml = self.get_xml(query)
             genes = xml.findAll("gene")
             for gene in genes:
                 res = self._get_xref(gene, None)
-                #acc = gene.attrs['acc'] not needed. can be access from ['HGNC']['xkey']
-                name = gene.attrs['symbol']
+                # acc = gene.attrs['acc'] not needed. can be access from ['HGNC']['xkey']
+                name = gene.attrs["symbol"]
                 results[name] = res.copy()
         return results
-
-
-
-
-
-
-
-

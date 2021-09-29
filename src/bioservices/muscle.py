@@ -5,7 +5,7 @@
 #
 #  File author(s):
 #      Sven-Maurice Althoff, Christian Knauth
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -39,13 +39,14 @@ import sys
 import time
 from bioservices.services import REST
 from bioservices import logger
+
 logger.name = __name__
 
 
 __all__ = ["MUSCLE"]
 
 
-class MUSCLE():
+class MUSCLE:
     """Interface to the `MUSCLE <http://www.ebi.ac.uk/Tools/webservices/services/msa/muscle_rest>`_ service.
 
     ::
@@ -76,35 +77,34 @@ class MUSCLE():
 
     """
 
-
     def __init__(self, verbose=False):
         url = "http://www.ebi.ac.uk/Tools/services/rest/muscle"
-        self.services = REST(name='MUSCLE', url=url, verbose=verbose)
+        self.services = REST(name="MUSCLE", url=url, verbose=verbose)
         self._parameters = None
         self._parametersDetails = {}
         self._headers = {
-                "User-Agent": self.services.getUserAgent(), 
-                "accept": "application/json"}
+            "User-Agent": self.services.getUserAgent(),
+            "accept": "application/json",
+        }
 
     def get_parameters(self):
         """List parameter names.
 
-         :returns: An XML document containing a list of parameter names.
+        :returns: An XML document containing a list of parameter names.
 
-         ::
+        ::
 
-             >>> from bioservices import muscle
-             >>> n = muscle.Muscle()
-             >>> res = n.get_parameters()
-             >>> [x.text for x in res.findAll("id")]
+            >>> from bioservices import muscle
+            >>> n = muscle.Muscle()
+            >>> res = n.get_parameters()
+            >>> [x.text for x in res.findAll("id")]
 
-         .. seealso:: :attr:`parameters` to get a list of the parameters without
-            need to process the XML output.
+        .. seealso:: :attr:`parameters` to get a list of the parameters without
+           need to process the XML output.
         """
 
-        res = self.services.http_get("parameters", frmt="json", 
-                headers=self._headers)
-        return res['parameters']
+        res = self.services.http_get("parameters", frmt="json", headers=self._headers)
+        return res["parameters"]
 
     def _get_parameters(self):
         if self._parameters:
@@ -114,31 +114,34 @@ class MUSCLE():
             res = self.get_parameters()
             self._parameters = res
         return self._parameters
+
     parameters = property(_get_parameters)
 
     def get_parameter_details(self, parameterId):
         """Get detailed information about a parameter.
 
-          :returns: An XML document providing details about the parameter or a list
-              of values that can take the parameters if the XML could be parsed.
+        :returns: An XML document providing details about the parameter or a list
+            of values that can take the parameters if the XML could be parsed.
 
-          For example::
+        For example::
 
-              >>> n.get_parameter_details("format")
+            >>> n.get_parameter_details("format")
 
         """
         if parameterId not in self.parameters:
-            raise ValueError("Invalid parameterId provided(%s). See parameters attribute" % parameterId)
+            raise ValueError(
+                "Invalid parameterId provided(%s). See parameters attribute"
+                % parameterId
+            )
 
         if parameterId not in self._parametersDetails.keys():
             request = "parameterdetails/" + parameterId
-            res = self.services.http_get(request, frmt="json",
-                headers=self._headers)
+            res = self.services.http_get(request, frmt="json", headers=self._headers)
             self._parametersDetails[parameterId] = res
         return res
 
     def run(self, frmt=None, sequence=None, tree="none", email=None):
-        """ Submit a job with the specified parameters.
+        """Submit a job with the specified parameters.
 
         .. python ncbiblast_urllib2.py -D ENSEMBL --email "test@yahoo.com" --sequence
         .. MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS
@@ -181,7 +184,7 @@ class MUSCLE():
 
         """
         # There are compulsary arguments:
-        if frmt is None or sequence is None  or email is None:
+        if frmt is None or sequence is None or email is None:
             raise ValueError("frmt, sequence and email must be provided")
 
         # Here, we will check the arguments values (not the type)
@@ -189,15 +192,13 @@ class MUSCLE():
         # catch some before, it is better
 
         # FIXME: return parameters from server are not valid
-        self.services.devtools.check_param_in_list(frmt,
-                ['fasta', 'clw', 'clwstrict', 'html', 'msf', 'phyi', 'phys'])
-        self.services.devtools.check_param_in_list(tree, ['none', 'tree1', 'tree2'])
+        self.services.devtools.check_param_in_list(
+            frmt, ["fasta", "clw", "clwstrict", "html", "msf", "phyi", "phys"]
+        )
+        self.services.devtools.check_param_in_list(tree, ["none", "tree1", "tree2"])
 
         # parameter structure
-        params = {
-            'format': frmt,
-            'sequence': sequence,
-            'email': email}
+        params = {"format": frmt, "sequence": sequence, "email": email}
 
         # headers is muscle is not required. If provided
         # by the default values from bioservices, it does not
@@ -205,10 +206,14 @@ class MUSCLE():
         headers = {}
 
         # IMPORTANT: use data parameter, not params !!!
-        res = self.services.http_post("run", data=params,
+        res = self.services.http_post(
+            "run",
+            data=params,
             headers={
-                "User-Agent": self.services.getUserAgent(), 
-                "accept": "text/plain"})
+                "User-Agent": self.services.getUserAgent(),
+                "accept": "text/plain",
+            },
+        )
         return res
 
     def get_status(self, jobid):
@@ -228,14 +233,18 @@ class MUSCLE():
 
 
         """
-        res = self.services.http_get("status/{}".format(jobid), frmt="txt", 
+        res = self.services.http_get(
+            "status/{}".format(jobid),
+            frmt="txt",
             headers={
-                "User-Agent": self.services.getUserAgent(), 
-                "accept": "text/plain"})
+                "User-Agent": self.services.getUserAgent(),
+                "accept": "text/plain",
+            },
+        )
         return res
 
     def get_result_types(self, jobid):
-        """ Get available result types for a finished job.
+        """Get available result types for a finished job.
 
         :param str jobid: a job identifier returned by :meth:`run`.
         :param bool verbose: print the identifiers together with their label,
@@ -245,41 +254,50 @@ class MUSCLE():
             identifier is itself a dictionary containing the label, description,
             file suffix and mediaType of the identifier.
         """
-        if self.get_status(jobid) != 'FINISHED':
+        if self.get_status(jobid) != "FINISHED":
             self.logging.warning("waiting for the job to be finished. May take a while")
             self.wait(jobid, verbose=False)
-        url = 'resulttypes/' + jobid
-        res = self.services.http_get(url, frmt="json", 
+        url = "resulttypes/" + jobid
+        res = self.services.http_get(
+            url,
+            frmt="json",
             headers={
-                "User-Agent": self.services.getUserAgent(), 
-                "accept": "application/json"})
-        return [x["identifier"] for x in res['types']]
+                "User-Agent": self.services.getUserAgent(),
+                "accept": "application/json",
+            },
+        )
+        return [x["identifier"] for x in res["types"]]
 
     def get_result(self, jobid, result_type):
-        """ Get the job result of the specified type.
+        """Get the job result of the specified type.
 
 
         :param str jobid: a job identifier returned by :meth:`run`.
         :param str  resultType: type of result to retrieve. See :meth:`getResultTypes`.
- 
+
         """
-        if self.get_status(jobid) != 'FINISHED': #pragma: no cover
-            self.services.logging.warning("waiting for the job to be finished. May take a while")
+        if self.get_status(jobid) != "FINISHED":  # pragma: no cover
+            self.services.logging.warning(
+                "waiting for the job to be finished. May take a while"
+            )
             self.wait(jobid, verbose=False)
 
-        if self.get_status(jobid) != "FINISHED":  #pragma: no cover
+        if self.get_status(jobid) != "FINISHED":  # pragma: no cover
             raise ValueError("job is not finished")
 
         assert result_type in self.get_result_types(jobid)
-        url = '/result/' + jobid + '/' + result_type
+        url = "/result/" + jobid + "/" + result_type
 
-
-        if result_type in ['out', 'sequence', "aln-fasta", "pim", "phylotree"]:
+        if result_type in ["out", "sequence", "aln-fasta", "pim", "phylotree"]:
             frmt = "txt"
-        res = self.services.http_get(url, frmt=frmt,
+        res = self.services.http_get(
+            url,
+            frmt=frmt,
             headers={
                 "User-Agent": self.services.getUserAgent(),
-                "accept": "application/json"})
+                "accept": "application/json",
+            },
+        )
 
         return res
 
@@ -290,14 +308,14 @@ class MUSCLE():
         :param int checkInterval: interval between requests in seconds.
 
         """
-        if checkInterval < 1:  #prgma: no cover
+        if checkInterval < 1:  # prgma: no cover
             raise ValueError("checkInterval must be positive and less than minute")
-        result = 'PENDING'
-        while result == 'RUNNING' or result == 'PENDING':
+        result = "PENDING"
+        while result == "RUNNING" or result == "PENDING":
             result = self.get_status(jobId)
             if verbose:
                 print("WARNING: ", jobId, " is ", result, file=sys.stderr)
 
-            if result == 'RUNNING' or result == 'PENDING':
+            if result == "RUNNING" or result == "PENDING":
                 time.sleep(checkInterval)
         return result

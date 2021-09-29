@@ -33,7 +33,7 @@
 from bioservices import REST
 
 
-__all__ = ['IntactComplex']
+__all__ = ["IntactComplex"]
 
 
 class Intact(object):
@@ -58,10 +58,13 @@ class IntactComplex(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(IntactComplex, self).__init__(name="IntactComplex", url=IntactComplex._url,
-                verbose=verbose, cache=cache)
+        super(IntactComplex, self).__init__(
+            name="IntactComplex", url=IntactComplex._url, verbose=verbose, cache=cache
+        )
 
-    def search(self, query, frmt='json', facets=None, first=None, number=None, filters=None):
+    def search(
+        self, query, frmt="json", facets=None, first=None, number=None, filters=None
+    ):
         """Search for a complex inside intact complex.
 
         :param str query: the query (e.g., ndc80)
@@ -142,21 +145,27 @@ class IntactComplex(REST):
 
 
         """
-        self.devtools.check_param_in_list(frmt, ['pandas', 'json'])
+        self.devtools.check_param_in_list(frmt, ["pandas", "json"])
 
         # note that code format to be json, which is the only option so
         # we can use pandas as a frmt without addition code.
-        params = {'format': 'json', 'facets':facets, 'first':None,
-                'number':number, 'filters':filters}
+        params = {
+            "format": "json",
+            "facets": facets,
+            "first": None,
+            "number": number,
+            "filters": filters,
+        }
 
-        result = self.http_get('search/' + query, frmt="json", params=params)
+        result = self.http_get("search/" + query, frmt="json", params=params)
 
-        #if isinstance(result, int):
+        # if isinstance(result, int):
         #    raise ValueError("Got a number from Intact request. Check validity of the arguments ")
 
-        if frmt == 'pandas':
+        if frmt == "pandas":
             import pandas as pd
-            df = pd.DataFrame(result['elements'])
+
+            df = pd.DataFrame(result["elements"])
             return df
         else:
             return result
@@ -167,7 +176,5 @@ class IntactComplex(REST):
         :param str query: EBI-1163476
 
         """
-        result = self.http_get('details/' + query, frmt="json")
+        result = self.http_get("details/" + query, frmt="json")
         return result
-
-

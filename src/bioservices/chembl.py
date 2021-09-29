@@ -35,6 +35,7 @@ import os
 from bioservices.services import REST
 import webbrowser
 from bioservices import logger
+
 logger.name == __name__
 try:
     from urllib.parse import quote
@@ -349,20 +350,20 @@ class ChEMBL(REST):
         - https://arxiv.org/pdf/1607.00378.pdf
         - https://www.ebi.ac.uk/chembl/api/data/docs
     """
-    _url = "https://www.ebi.ac.uk/chembl/api/data"
-    def __init__(self, verbose=False, cache=False):
-        super(ChEMBL, self).__init__(url=ChEMBL._url,
-                                     name="ChEMBL",
-                                     verbose=verbose,
-                                     cache=cache)
-        self.format = 'json'
 
+    _url = "https://www.ebi.ac.uk/chembl/api/data"
+
+    def __init__(self, verbose=False, cache=False):
+        super(ChEMBL, self).__init__(
+            url=ChEMBL._url, name="ChEMBL", verbose=verbose, cache=cache
+        )
+        self.format = "json"
 
     def _get_data(self, name, params):
 
         # keep the number of events we want and original offset
-        max_data = params['limit']
-        offset = params['offset']
+        max_data = params["limit"]
+        offset = params["offset"]
 
         # I noticed that
         # if offset + limit > total_count, then limit is set to 1000 - offset
@@ -376,7 +377,7 @@ class ChEMBL(REST):
         # no such issues.
 
         # So, the best is to constraint limit to 1000
-        params['limit'] = 1000  # for the first call
+        params["limit"] = 1000  # for the first call
 
         # The limit used in all other calls
         limit = 1000
@@ -385,39 +386,42 @@ class ChEMBL(REST):
         self._check_request(res)
 
         # get rid of page_meta key/value
-        self.page_meta = res['page_meta']
+        self.page_meta = res["page_meta"]
         keys = list(res.keys())
-        keys.remove('page_meta')
+        keys.remove("page_meta")
         names = keys[0]  # the parameter name in plural form
 
         # keep first chunk of data
         data = res[names]
 
         if max_data == -1:
-            max_data = res['page_meta']['total_count']
-        elif max_data > res['page_meta']['total_count']:
-            max_data = res['page_meta']['total_count']
+            max_data = res["page_meta"]["total_count"]
+        elif max_data > res["page_meta"]["total_count"]:
+            max_data = res["page_meta"]["total_count"]
 
         N = max_data
         from easydev import Progress
+
         pb = Progress(N)
         count = 1
 
-        while res["page_meta"]['next'] and len(data)<max_data:
-            params['limit'] = limit
-            params['offset'] = limit * count + offset
+        while res["page_meta"]["next"] and len(data) < max_data:
+            params["limit"] = limit
+            params["offset"] = limit * count + offset
             res = self.http_get("{}".format(name), params=params)
             data += res[names]
             count += 1
             pb.animate(len(data))
-            self.page_meta = res['page_meta']
+            self.page_meta = res["page_meta"]
 
-        if self.page_meta['next']:
-            offset = self.page_meta['offset']
-            total = self.page_meta['total_count'] - len(data) - int(offset)
-            self.logging.warning('More data available ({}). rerun with higher'
-                    'limit and/or offset {}. Check content of page_meta'
-                    ' attribute'.format(total, offset))
+        if self.page_meta["next"]:
+            offset = self.page_meta["offset"]
+            total = self.page_meta["total_count"] - len(data) - int(offset)
+            self.logging.warning(
+                "More data available ({}). rerun with higher"
+                "limit and/or offset {}. Check content of page_meta"
+                " attribute".format(total, offset)
+            )
 
         if len(data) > max_data:
             return data[0:max_data]
@@ -427,9 +431,11 @@ class ChEMBL(REST):
     def _check_request(self, res):
         # If there is no output because of wrong query, a 404 is returned.
         if isinstance(res, int):
-            raise ValueError("Invalid request for {} {}. Check your query and parameters")
+            raise ValueError(
+                "Invalid request for {} {}. Check your query and parameters"
+            )
 
-    def _get_this_service(self, name, query, params={'limit':20, 'offset':0}):
+    def _get_this_service(self, name, query, params={"limit": 20, "offset": 0}):
         """
 
 
@@ -452,21 +458,21 @@ class ChEMBL(REST):
         """
 
         # look at any filters provided by the user
-        if params['filters'] is None:
-            del params['filters']
-        elif isinstance(params['filters'], list):
-            for filter in params['filters']:
+        if params["filters"] is None:
+            del params["filters"]
+        elif isinstance(params["filters"], list):
+            for filter in params["filters"]:
                 assert filter.count("=") == 1
-                key, value = filter.split('=')
+                key, value = filter.split("=")
                 params[key] = value
-            del params['filters']
+            del params["filters"]
         else:
-            assert params['filters'].count("=") == 1
-            k,v = params['filters'].split('=')
-            del params['filters']
+            assert params["filters"].count("=") == 1
+            k, v = params["filters"].split("=")
+            del params["filters"]
             params[k] = v
 
-        params['format'] = self.format
+        params["format"] = self.format
         # Here, we will switch between several ways of using each
         # service.
         if query is None:
@@ -476,18 +482,19 @@ class ChEMBL(REST):
             res = self.http_get("{}/{}".format(name, query), params=params)
             self._check_request(res)
         elif isinstance(query, list):
-            assert params['limit'] <= 1000, "limit must be less than 1000"
+            assert params["limit"] <= 1000, "limit must be less than 1000"
             ids = ";".join([str(x) for x in query])
-            res = self.http_get("{}/set/{}".format(
-                name, ids), params=params)
+            res = self.http_get("{}/set/{}".format(name, ids), params=params)
             self._check_request(res)
             # Note that there is no page_meta key in the returned object but a
             # single key that is the plural for of the resource except if some
             # entries are not found. In such case, a
-            if 'not_found' in res.keys():
-                self.logging.warning('Some entries were not found: {}'.format(res['not_found']))
-                self.not_found = res['not_found']
-                del res['not_found']
+            if "not_found" in res.keys():
+                self.logging.warning(
+                    "Some entries were not found: {}".format(res["not_found"])
+                )
+                self.not_found = res["not_found"]
+                del res["not_found"]
             names = list(res.keys())[0]
             res = res[names]
 
@@ -495,44 +502,47 @@ class ChEMBL(REST):
 
     def _search(self, name, query, params):
         # Check the validity of limits
-        assert params['limit'] > 0, "limits must be less than 1000"
-        assert params['limit'] <= 1000, "limits must be positive"
-        res = self.http_get("{}/search.{}?q={}".format(
-                name, self.format, query), params=params)
+        assert params["limit"] > 0, "limits must be less than 1000"
+        assert params["limit"] <= 1000, "limits must be positive"
+        res = self.http_get(
+            "{}/search.{}?q={}".format(name, self.format, query), params=params
+        )
 
         if isinstance(res, int):
-            self.logging.warning("Invalid request for {} {}. Check your parameters".format(name, params))
+            self.logging.warning(
+                "Invalid request for {} {}. Check your parameters".format(name, params)
+            )
             return {}
 
-        if 'page_meta' in res and res['page_meta']['next']:
-            Next = res['page_meta']['next']
+        if "page_meta" in res and res["page_meta"]["next"]:
+            Next = res["page_meta"]["next"]
             offset = Next.split("&offset=")[1]
-            self.logging.warning('More data available with offset {}'.format(offset))
+            self.logging.warning("More data available with offset {}".format(offset))
         return res
 
     def search_activity(self, query, limit=20, offset=0):
         """Activity values recorded in an Assay"""
-        params = {"limit":limit, "offset":offset}
+        params = {"limit": limit, "offset": offset}
         return self._search("activity", query, params=params)
 
     def get_activity(self, query=None, limit=20, offset=0, filters=None):
         """Activity values recorded in an Assay"""
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("activity", query, params=params)
 
     def search_assay(self, query, limit=20, offset=0):
         """Assay details as reported in source document"""
-        params = {"limit":limit, "offset":offset}
+        params = {"limit": limit, "offset": offset}
         return self._search("assay", query, params=params)
 
     def get_assay(self, query=None, limit=20, offset=0, filters=None):
         """Assay details as reported in source Document/Dataset
 
 
-            >>> c.get_assay("CHEMBL1217643")
+        >>> c.get_assay("CHEMBL1217643")
 
         """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("assay", query, params=params)
 
     def get_ATC(self, limit=20, offset=0, filters=None):
@@ -547,97 +557,72 @@ class ChEMBL(REST):
             API except for that one because it is an acronym
 
         """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         query = None
         return self._get_this_service("atc_class", query, params=params)
 
     def get_binding_site(self, limit=20, offset=0, filters=None):
         """Target binding site definition"""
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         query = None
         return self._get_this_service("binding_site", query, params=params)
 
     def get_biotherapeutic(self, limit=20, offset=0, filters=None):
-        """Biotherapeutic molecules, which includes HELM notation and sequence data
-
-
-        """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        """Biotherapeutic molecules, which includes HELM notation and sequence data"""
+        params = {"limit": limit, "offset": offset, "filters": filters}
         query = None
         return self._get_this_service("biotherapeutic", query, params=params)
 
-    def get_cell_line(self ,limit=20, offset=0, filters=None):
-        """Cell line information
-
-        """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+    def get_cell_line(self, limit=20, offset=0, filters=None):
+        """Cell line information"""
+        params = {"limit": limit, "offset": offset, "filters": filters}
         query = None
         return self._get_this_service("cell_line", query, params=params)
 
     def search_chembl_id_lookup(self, query, limit=20, offset=0):
-        """Look up ChEMBL Id entity type
-
-        """
-        params = {"limit":limit, "offset":offset}
+        """Look up ChEMBL Id entity type"""
+        params = {"limit": limit, "offset": offset}
         return self._search("chembl_id_lookup", query, params=params)
 
     def get_chembl_id_lookup(self, query=None, limit=20, offset=0, filters=None):
-        """Look up ChEMBL Id entity type
-
-        """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        """Look up ChEMBL Id entity type"""
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("chembl_id_lookup", query, params=params)
 
     def get_compound_record(self, query=None, limit=20, offset=0, filters=None):
-        """Occurence of a given compound in a spcecific document
+        """Occurence of a given compound in a spcecific document"""
+        params = {"limit": limit, "offset": offset, "filters": filters}
 
+        return self._get_this_service("compound_record", query, params=params)
 
-
-        """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
-
-        return self._get_this_service("compound_record", query,
-                params=params)
-
-    def get_compound_structural_alert(self, query=None, limit=20, offset=0, filters=None):
-        """Indicates certain anomaly in compound structure
-
-
-        """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+    def get_compound_structural_alert(
+        self, query=None, limit=20, offset=0, filters=None
+    ):
+        """Indicates certain anomaly in compound structure"""
+        params = {"limit": limit, "offset": offset, "filters": filters}
         query = None
         return self._get_this_service("compound_structural_alert", query, params=params)
 
     def search_document(self, query, limit=20, offset=0):
-        """Document/Dataset from which Assays have been extracted
-
-        """
-        params = {"limit":limit, "offset":offset}
+        """Document/Dataset from which Assays have been extracted"""
+        params = {"limit": limit, "offset": offset}
         return self._search("document", query, params=params)
 
-
     def get_document(self, query=None, limit=20, offset=0, filters=None):
-        """Document/Dataset from which Assays have been extracted
-
-        """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        """Document/Dataset from which Assays have been extracted"""
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("document", query, params=params)
 
     def get_document_similarity(self, query=None, limit=20, offset=0, filters=None):
-        """Provides documents similar to a given one
+        """Provides documents similar to a given one"""
 
-        """
-
-        params = {"limit":limit, "offset":offset, 'filters':filters}
-        return self._get_this_service("document_similarity", query,
-                params=params)
+        params = {"limit": limit, "offset": offset, "filters": filters}
+        return self._get_this_service("document_similarity", query, params=params)
 
     def get_document_term(self, query=None, limit=20, offset=0, filters=None):
-        """Provides keywords extracted from a document using the TextRank algorithm
-        """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
-        return self._get_this_service("document_term", query,
-                params=params)
+        """Provides keywords extracted from a document using the TextRank algorithm"""
+        params = {"limit": limit, "offset": offset, "filters": filters}
+        return self._get_this_service("document_term", query, params=params)
 
     def get_approved_drugs(self, max_phase=4, maxdrugs=1000000):
         """Return all approved drugs
@@ -645,42 +630,37 @@ class ChEMBL(REST):
         :param  max_phase: 4 by default for approved drugs.
 
         """
-        filters = 'development_phase__exact={}'.format(max_phase)
+        filters = "development_phase__exact={}".format(max_phase)
         data = self.get_drug(filters=filters, limit=maxdrugs)
         return data
 
     def get_drug(self, query=None, limit=20, offset=0, filters=None):
-        """Approved drugs information, icluding (but not limited to) applicants, patent numbers and research codes
-        """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        """Approved drugs information, icluding (but not limited to) applicants, patent numbers and research codes"""
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("drug", query, params=params)
 
     def get_drug_indication(self, query=None, limit=20, offset=0, filters=None):
-        """Joins drugs with diseases providing references to relevant sources
-        """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
-        return self._get_this_service("drug_indication", query,
-                params=params)
+        """Joins drugs with diseases providing references to relevant sources"""
+        params = {"limit": limit, "offset": offset, "filters": filters}
+        return self._get_this_service("drug_indication", query, params=params)
 
     def get_go_slim(self, query=None, limit=20, offset=0, filters=None):
         """GO slim ontology"""
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("go_slim", query, params=params)
 
-
     def get_mechanism(self, query=None, limit=20, offset=0, filters=None):
-        """Mechanism of action information for FDA-approved drugs
-        """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        """Mechanism of action information for FDA-approved drugs"""
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("mechanism", query, params=params)
 
     def get_metabolism(self, query=None, limit=20, offset=0, filters=None):
         """Metabolic pathways with references"""
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("metabolism", query, params=params)
 
     def search_molecule(self, query, limit=20, offset=0):
-        params = {"limit":limit, "offset":offset}
+        params = {"limit": limit, "offset": offset}
         return self._search("molecule", query, params=params)
 
     def get_molecule(self, query=None, limit=20, offset=0, filters=None):
@@ -701,38 +681,38 @@ class ChEMBL(REST):
 
 
         """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("molecule", query, params=params)
 
     def get_molecule_form(self, query=None, limit=20, offset=0, filters=None):
         """Relationships between molecule parents and salts
 
 
-            >>> s.get_molecule_form("CHEMBL2")['molecule_forms']
-            [{'is_parent': 'True',
-              'molecule_chembl_id': 'CHEMBL2',
-              'parent_chembl_id': 'CHEMBL2'},
-             {'is_parent': 'False',
-              'molecule_chembl_id': 'CHEMBL1558',
-              'parent_chembl_id': 'CHEMBL2'},
-             {'is_parent': 'False',
-              'molecule_chembl_id': 'CHEMBL1347191',
-              'parent_chembl_id': 'CHEMBL2'}]
+        >>> s.get_molecule_form("CHEMBL2")['molecule_forms']
+        [{'is_parent': 'True',
+          'molecule_chembl_id': 'CHEMBL2',
+          'parent_chembl_id': 'CHEMBL2'},
+         {'is_parent': 'False',
+          'molecule_chembl_id': 'CHEMBL1558',
+          'parent_chembl_id': 'CHEMBL2'},
+         {'is_parent': 'False',
+          'molecule_chembl_id': 'CHEMBL1347191',
+          'parent_chembl_id': 'CHEMBL2'}]
         """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("molecule_form", query, params=params)
 
     def get_organism(self, query=None, limit=20, offset=0, filters=None):
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("organism", query, params=params)
 
     def search_protein_class(self, query, limit=20, offset=0):
-        params = {"limit":limit, "offset":offset}
+        params = {"limit": limit, "offset": offset}
         return self._search("protein_class", query, params=params)
 
     def get_protein_class(self, query=None, limit=20, offset=0, filters=None):
         """Protein family classification of TargetComponents"""
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("protein_class", query, params=params)
 
     def get_substructure(self, structure, limit=20, offset=0, filters=None):
@@ -779,13 +759,15 @@ class ChEMBL(REST):
         """
         # we use quote to formqt the SMILE/InChiKey for a URL parsing
         structure = quote(structure)
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         query = None
-        return self._get_this_service("substructure/{}".format(
-            structure), query, params=params)
+        return self._get_this_service(
+            "substructure/{}".format(structure), query, params=params
+        )
 
-    def get_similarity(self, structure, similarity=80, limit=20,
-            offset=0, filters=None):
+    def get_similarity(
+        self, structure, similarity=80, limit=20, offset=0, filters=None
+    ):
         """Molecule similarity search
 
         :param structure: provide a valid / existing substructure in
@@ -831,34 +813,35 @@ class ChEMBL(REST):
         structure = quote(structure)
 
         assert isinstance(similarity, int)
-        assert similarity >=70 and similarity <=100, \
-                "similarity must be in the range [70, 100]"
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        assert (
+            similarity >= 70 and similarity <= 100
+        ), "similarity must be in the range [70, 100]"
+        params = {"limit": limit, "offset": offset, "filters": filters}
         query = None
-        return self._get_this_service("similarity/{}/{}".format(
-            structure, similarity), query, params=params)
+        return self._get_this_service(
+            "similarity/{}/{}".format(structure, similarity), query, params=params
+        )
 
     def get_source(self, query=None, limit=20, offset=0, filters=None):
         """Document/Dataset source"""
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("source", query, params=params)
-
 
     def search_target(self, query, limit=20, offset=0):
         """Targets (protein and non-protein) defined in Assay"""
-        params = {"limit":limit, "offset":offset}
+        params = {"limit": limit, "offset": offset}
         return self._search("target", query, params=params)
 
     def get_target(self, query=None, limit=20, offset=0, filters=None):
         """Targets (protein and non-protein) defined in Assay
 
 
-            >>> from bioservices import *
-            >>> s = ChEMBL(verbose=False)
-            >>> resjson = s.get_targetd('CHEMBL240')
+        >>> from bioservices import *
+        >>> s = ChEMBL(verbose=False)
+        >>> resjson = s.get_targetd('CHEMBL240')
 
         """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("target", query, params=params)
 
     def get_target_component(self, query=None, limit=20, offset=0, filters=None):
@@ -870,7 +853,7 @@ class ChEMBL(REST):
             res['sequence']
 
         """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("target_component", query, params=params)
 
     def get_target_prediction(self, query=None, limit=20, offset=0, filters=None):
@@ -883,7 +866,7 @@ class ChEMBL(REST):
                 >>> res['molecule_chembl_id']
                 'CHEMBL2'
         """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("target_prediction", query, params=params)
 
     def get_target_relation(self, query=None, limit=20, offset=0, filters=None):
@@ -899,25 +882,26 @@ class ChEMBL(REST):
 
 
         """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("target_relation", query, params=params)
 
     def get_tissue(self, query=None, limit=20, offset=0, filters=None):
         """Tissue classification
 
 
-            c.get_tissue(filters=['pref_name__contains=cervix'])
+        c.get_tissue(filters=['pref_name__contains=cervix'])
 
         """
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("tissue", query, params=params)
 
     def get_xref_source(self, query=None, limit=20, offset=0, filters=None):
-        params = {"limit":limit, "offset":offset, 'filters':filters}
+        params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("xref_source", query, params=params)
 
-    def get_image(self, query, dimensions=500, format='png',
-            save=True, view=True, engine='indigo'):
+    def get_image(
+        self, query, dimensions=500, format="png", save=True, view=True, engine="indigo"
+    ):
         """Get the image of a given compound in PNG png format.
 
         :param str query: a valid compound ChEMBLId or a list/tuple
@@ -945,36 +929,33 @@ class ChEMBL(REST):
         """
         # NOTE: not async requests here.
         self.devtools.check_range(dimensions, 1, 500)
-        self.devtools.check_param_in_list(engine, ['rdkit', 'indigo'])
-        self.devtools.check_param_in_list(format, ['png', 'svg'])
+        self.devtools.check_param_in_list(engine, ["rdkit", "indigo"])
+        self.devtools.check_param_in_list(format, ["png", "svg"])
         queries = self.devtools.to_list(query)
 
-        res = {'filenames': [], 'images': [], 'chemblids': []}
+        res = {"filenames": [], "images": [], "chemblids": []}
         for query in queries:
             req = "image/{}".format(query)
-            params = {
-                    'engine': engine,
-                    'format': format,
-                    'dimensions': dimensions}
+            params = {"engine": engine, "format": format, "dimensions": dimensions}
             target_data = self.http_get(req, frmt=None, params=params)
 
             file_out = os.getcwd()
             if format == "png":
-                file_out += '/%s.png' % query
+                file_out += "/%s.png" % query
                 with open(file_out, "wb") as thisfile:
                     thisfile.write(bytes(target_data))
-            elif format == 'svg':
-                file_out += '/%s.svg' % query
+            elif format == "svg":
+                file_out += "/%s.svg" % query
                 with open(file_out, "w") as thisfile:
                     thisfile.write(target_data)
             self.logging.info("saved to %s" % file_out)
 
             fout = file_out
-            res['chemblids'].append(query)
-            res['filenames'].append(fout)
-            res['images'].append(target_data)
+            res["chemblids"].append(query)
+            res["filenames"].append(fout)
+            res["images"].append(target_data)
         if view:
-            webbrowser.open(res['filenames'][0])
+            webbrowser.open(res["filenames"][0])
         return res
 
     def get_status(self):
@@ -995,21 +976,40 @@ class ChEMBL(REST):
 
         .. versionchanged:: 1.7.3 (removed target_prediction and document_term)
         """
+
         def _local_get(this):
-            params = {"limit":1, "offset":0}
-            return self.http_get("{}?format=json".format(this),
-                        params=params)['page_meta']['total_count']
+            params = {"limit": 1, "offset": 0}
+            return self.http_get("{}?format=json".format(this), params=params)[
+                "page_meta"
+            ]["total_count"]
 
         data = {}
-        for this in ['activity', 'assay', 'atc_class', 'cell_line',
-                'binding_site', 'biotherapeutic', 'chembl_id_lookup',
-                'compound_record', 'compound_structural_alert',
-                'document', 'document_similarity', 
-                'drug', 'drug_indication', 'go_slim',
-                'mechanism', 'metabolism', 'molecule',
-                'molecule_form', 'protein_class', 'source',
-                'target', 'target_component',
-                'target_relation', 'tissue']:
+        for this in [
+            "activity",
+            "assay",
+            "atc_class",
+            "cell_line",
+            "binding_site",
+            "biotherapeutic",
+            "chembl_id_lookup",
+            "compound_record",
+            "compound_structural_alert",
+            "document",
+            "document_similarity",
+            "drug",
+            "drug_indication",
+            "go_slim",
+            "mechanism",
+            "metabolism",
+            "molecule",
+            "molecule_form",
+            "protein_class",
+            "source",
+            "target",
+            "target_component",
+            "target_relation",
+            "tissue",
+        ]:
             self.logging.info("Looking at {}".format(this))
             try:
                 data[this] = _local_get(this)
@@ -1047,7 +1047,9 @@ class ChEMBL(REST):
             n1, n2, n3 = name.split("__")
             data = sorted(data, key=lambda k: k[n1][n2][n3], reverse=not ascending)
         else:
-            raise NotImplementedError("""Please submit a issue on https://github.com/cokelaer/bioservices to allow this level or ordering together will your code example.""")
+            raise NotImplementedError(
+                """Please submit a issue on https://github.com/cokelaer/bioservices to allow this level or ordering together will your code example."""
+            )
         return data
 
     def compounds2accession(self, compounds):
@@ -1073,6 +1075,7 @@ class ChEMBL(REST):
         # Here this is a one to many mapping so we initialise a default
         # dictionary.
         from collections import defaultdict
+
         compound2target = defaultdict(set)
 
         filter = "molecule_chembl_id__in={}"
@@ -1090,8 +1093,8 @@ class ChEMBL(REST):
             activities = self.get_activity(filters=filter.format(compounds[i]))
             # get target ChEMBL IDs from activities
             for act in activities:
-                compound2target[act['molecule_chembl_id']].add(act['target_chembl_id'])
-            pb.animate(i+1)
+                compound2target[act["molecule_chembl_id"]].add(act["target_chembl_id"])
+            pb.animate(i + 1)
 
         # What we need is to get targets for all targets found in the previous
         # step. For each compound/drug there are hundreds of targets though. And
@@ -1103,15 +1106,16 @@ class ChEMBL(REST):
         targets = self.get_target(limit=-1)
 
         # identifies all target chembl id to easily retrieve the entry later on
-        target_names = [target['target_chembl_id'] for target in targets]
+        target_names = [target["target_chembl_id"] for target in targets]
 
         # retrieve all uniprot accessions for all targets of each compound
         for compound, targs in compound2target.items():
             accessions = set()
             for target in targs:
                 index = target_names.index(target)
-                accessions = accessions.union([comp['accession']
-                    for comp in targets[index]['target_components']])
+                accessions = accessions.union(
+                    [comp["accession"] for comp in targets[index]["target_components"]]
+                )
             compound2target[compound] = accessions
 
         return compound2target

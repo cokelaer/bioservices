@@ -30,10 +30,10 @@
 
 """
 from bioservices import REST
-from easydev import to_list 
+from easydev import to_list
 from bioservices import logger
-logger.name = __name__
 
+logger.name = __name__
 
 
 class OmniPath(REST):
@@ -55,24 +55,23 @@ class OmniPath(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(OmniPath, self).__init__(name="OmniPath", url=OmniPath._url,
-            verbose=verbose, cache=cache)
-
+        super(OmniPath, self).__init__(
+            name="OmniPath", url=OmniPath._url, verbose=verbose, cache=cache
+        )
 
     def get_about(self):
         """Information about the version"""
         res = self.http_get(self.url + "about").content
         return res
 
-    def get_network(self, frmt='json'):
+    def get_network(self, frmt="json"):
         """Get basic statistics about the whole network including sources"""
-        assert frmt in ['json', 'tsv'] ,"frmt must be set to json or tsv"
-        res = self.http_get(self.url + "network", frmt=frmt, 
-            params={'format': frmt})
+        assert frmt in ["json", "tsv"], "frmt must be set to json or tsv"
+        res = self.http_get(self.url + "network", frmt=frmt, params={"format": frmt})
 
         return res
 
-    def get_interactions(self, query="", frmt='json', fields=[]):
+    def get_interactions(self, query="", frmt="json", fields=[]):
         """Interactions of proteins
 
         :param str query: a valid uniprot identifier (e.g. P00533). It can also
@@ -89,7 +88,7 @@ class OmniPath(REST):
             res_many = o.get_interactions('P00533,O15117,Q96FE5')
             res_many = o.get_interactions(['P00533','O15117','Q96FE5'])
 
-        
+
             res_one = o.get_interactions('P00533', fields='sources')
             res_one = o.get_interactions('P00533', fields=['source'])
             res_one = o.get_interactions('P00533', fields=['source', 'references'])
@@ -103,40 +102,40 @@ class OmniPath(REST):
         """
         # make sure there is no spaces
         if isinstance(query, list):
-            query=",".join(query)
+            query = ",".join(query)
         else:
-            try: # if input is a string
-                query = query.replace(' ', '')
+            try:  # if input is a string
+                query = query.replace(" ", "")
             except:
                 pass
-        assert frmt in ['json', 'tsv'] ,"frmt must be set to json or tsv"
+        assert frmt in ["json", "tsv"], "frmt must be set to json or tsv"
         params = {}
-        params['format'] = frmt
-        from easydev import to_list 
+        params["format"] = frmt
+        from easydev import to_list
+
         fields = to_list(fields)
 
         if len(fields):
-            params['fields'] = fields
+            params["fields"] = fields
 
-        #TODO handle multiple fields
-        res = self.http_get(self.url + "interactions/%s" % query,
-            frmt=frmt, params=params)
+        # TODO handle multiple fields
+        res = self.http_get(
+            self.url + "interactions/%s" % query, frmt=frmt, params=params
+        )
         return res
 
-    def get_resources(self, frmt='json'):
-        """Return statistics about the databases and their contents 
-
-        """
-        res = self.http_get(self.url + "resources", frmt=frmt, 
-            params={"format": frmt})
+    def get_resources(self, frmt="json"):
+        """Return statistics about the databases and their contents"""
+        res = self.http_get(self.url + "resources", frmt=frmt, params={"format": frmt})
         return res
 
     def get_info(self):
         """Currently returns HTML page"""
         from easydev import browser
+
         browser.browse(self.url + "info")
 
-    def get_ptms(self, query="", ptm_type=None, frmt='json', fields=[]):
+    def get_ptms(self, query="", ptm_type=None, frmt="json", fields=[]):
         """List enzymes, substrates and PTMs
 
         :param str query: a valid uniprot identifier (e.g. P00533). It can also
@@ -151,36 +150,17 @@ class OmniPath(REST):
         """
         # make sure there is no spaces
         if isinstance(query, list):
-            query=",".join(query)
+            query = ",".join(query)
         else:
-            try: # if input is a string
-                query = query.replace(' ', '')
+            try:  # if input is a string
+                query = query.replace(" ", "")
             except:
                 pass
-        assert frmt in ['json', 'tsv'] ,"frmt must be set to json or tsv"
+        assert frmt in ["json", "tsv"], "frmt must be set to json or tsv"
         params = {}
-        params['format'] = frmt
+        params["format"] = frmt
         if len(fields):
-            params['fields'] = fields
+            params["fields"] = fields
 
-        res = self.http_get(self.url + "ptms/%s" % query,
-            frmt='json', params=params)
+        res = self.http_get(self.url + "ptms/%s" % query, frmt="json", params=params)
         return res
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

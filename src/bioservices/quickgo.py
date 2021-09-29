@@ -5,7 +5,7 @@
 #
 #  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -59,65 +59,72 @@ class QuickGO(REST):
         :param bool verbose: print informative messages.
 
         """
-        #super(QuickGO, self).__init__(url="http://www.ebi.ac.uk/QuickGO-Old",
-        super(QuickGO, self).__init__(url="https://www.ebi.ac.uk/QuickGO",
-                                      name="quickGO", verbose=verbose, cache=cache)
+        # super(QuickGO, self).__init__(url="http://www.ebi.ac.uk/QuickGO-Old",
+        super(QuickGO, self).__init__(
+            url="https://www.ebi.ac.uk/QuickGO",
+            name="quickGO",
+            verbose=verbose,
+            cache=cache,
+        )
 
     def go_search(self, query, limit=600, page=1):
         """Searches a simple user query, e.g., query=apopto
 
-        :param str query: 
+        :param str query:
         :param int limit: max 600
         :param int page:
 
 
         """
         url = "services/ontology/go/search"
-        query = query.replace(':', '%3A')
-        query = query.replace(',', '%2C')
-        params = {"query":query, 'limit':limit, "page":page}
-        res = self.http_get(url, frmt="json", params=params,
-            headers=self.get_headers("json"))
+        query = query.replace(":", "%3A")
+        query = query.replace(",", "%2C")
+        params = {"query": query, "limit": limit, "page": page}
+        res = self.http_get(
+            url, frmt="json", params=params, headers=self.get_headers("json")
+        )
         try:
-            return res['results']
-        except: #pragma: no cover
+            return res["results"]
+        except:  # pragma: no cover
             return res
 
     def get_go_terms(self, query, max_number_of_pages=None):
         """Get information on all terms and page through the result"""
 
-        query = query.replace(':', '%3A')
-        query = query.replace(',', '%2C')
+        query = query.replace(":", "%3A")
+        query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}".format(query)
-        results = self.http_get(url, frmt="json", params={},
-            headers=self.get_headers("json"))
+        results = self.http_get(
+            url, frmt="json", params={}, headers=self.get_headers("json")
+        )
         try:
-            return results['results']
-        except: #pragma: no cover
+            return results["results"]
+        except:  # pragma: no cover
             return results
 
-    def get_go_ancestors(self, query,
-        relations="is_a,part_of,occurs_in,regulates"):
+    def get_go_ancestors(self, query, relations="is_a,part_of,occurs_in,regulates"):
 
-        query = query.replace(':', '%3A')
-        query = query.replace(',', '%2C')
+        query = query.replace(":", "%3A")
+        query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/ancestors".format(query)
-        results = self.http_get(url, frmt="json", params={},
-         headers=self.get_headers("json"))
+        results = self.http_get(
+            url, frmt="json", params={}, headers=self.get_headers("json")
+        )
         try:
-            return results['results']
-        except: #pragma: no cover
+            return results["results"]
+        except:  # pragma: no cover
             return results
 
     def get_go_children(self, query):
-        query = query.replace(':', '%3A')
-        query = query.replace(',', '%2C')
+        query = query.replace(":", "%3A")
+        query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/children".format(query)
-        results = self.http_get(url, frmt="json", params={},
-         headers=self.get_headers("json"))
+        results = self.http_get(
+            url, frmt="json", params={}, headers=self.get_headers("json")
+        )
         try:
-            return results['results']
-        except: #pragma: no cover
+            return results["results"]
+        except:  # pragma: no cover
             return results
 
     def get_go_chart(self, query):
@@ -129,17 +136,17 @@ class QuickGO(REST):
             with open("temp.png", "wb") as fout:
                 fout.write(res)
         """
-        query = query.replace(':', '%3A')
-        query = query.replace(',', '%2C')
+        query = query.replace(":", "%3A")
+        query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/chart".format(query)
-        res = self.http_get(url, frmt="json", params={},
-             headers={"Accept": "image/png"})
-        #import base64
-        #res = base64.b64decode(res).decode()
+        res = self.http_get(
+            url, frmt="json", params={}, headers={"Accept": "image/png"}
+        )
+        # import base64
+        # res = base64.b64decode(res).decode()
         return res
 
-    def get_go_paths(self, _from, _to, 
-            relations="is_a,part_of,occurs_in,regulates"):
+    def get_go_paths(self, _from, _to, relations="is_a,part_of,occurs_in,regulates"):
         """Retrieves the paths between two specified sets of ontology terms.
         Each path is formed from a list of (term, relationship, term) triples.
 
@@ -148,38 +155,40 @@ class QuickGO(REST):
             paths["results"][0]
 
         """
-        _from = _from.replace(':', '%3A')
-        _from = _from.replace(',', '%2C')
-        _to = _to.replace(':', '%3A')
-        _to = _to.replace(',', '%2C')
+        _from = _from.replace(":", "%3A")
+        _from = _from.replace(",", "%2C")
+        _to = _to.replace(":", "%3A")
+        _to = _to.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/paths/{}".format(_from, _to)
-        results = self.http_get(url, frmt="json", params={},
-         headers=self.get_headers("json"))
+        results = self.http_get(
+            url, frmt="json", params={}, headers=self.get_headers("json")
+        )
         return results
 
-    def Annotation(self,
-                    assignedBy=None,
-                    includeFields=None,
-                    limit=100,
-                    page=1,
-                    aspect=None,
-                    reference=None,
-                    geneProductId=None,
-                    evidenceCode=None,
-                    goId=None,
-                    qualifier=None,
-                    withFrom=None,
-                    taxonId=None,
-                    taxonUsage=None,
-                    goUsage=None,
-                    goUsageRelationships=None,
-                    evidenceCodeUsage=None,
-                    evidenceCodeUsageRelationships=None,
-                    geneProductType=None,
-                    targetSet=None,
-                    geneProductSubset=None,
-                    extension=None
-                   ):
+    def Annotation(
+        self,
+        assignedBy=None,
+        includeFields=None,
+        limit=100,
+        page=1,
+        aspect=None,
+        reference=None,
+        geneProductId=None,
+        evidenceCode=None,
+        goId=None,
+        qualifier=None,
+        withFrom=None,
+        taxonId=None,
+        taxonUsage=None,
+        goUsage=None,
+        goUsageRelationships=None,
+        evidenceCodeUsage=None,
+        evidenceCodeUsageRelationships=None,
+        geneProductType=None,
+        targetSet=None,
+        geneProductSubset=None,
+        extension=None,
+    ):
         """Calling the Annotation service
 
         .. versionchanged:: 1.4.18 due to service API changes, we refactored
@@ -195,8 +204,8 @@ class QuickGO(REST):
             downloading. To bypass this default, and return the entire data set,
             specify a limit of -1).
         :param int page: results may be stored on several pages. You must
-            provide this number. There is no way to retrieve more than 100 
-            results without calling  this function several times chanding this 
+            provide this number. There is no way to retrieve more than 100
+            results without calling  this function several times chanding this
             parameter (default to 1).
         :param char aspect: use this to limit the annotations returned to a
             specific ontology or ontologies (Molecular Function, Biological
@@ -250,21 +259,20 @@ class QuickGO(REST):
 
 
         """
-        #_valid_formats = ["gaf", "gene2go", "proteinList", "fasta", "tsv", "dict"]
-        _valid_db = ['UniProtKB', 'UniGene', 'Ensembl']
-        _valid_aspect = ['P', 'F', 'C']
-        validity = {
-            "includeFields": ['goName', 'taxonName', 'name', 'synonyms']
+        # _valid_formats = ["gaf", "gene2go", "proteinList", "fasta", "tsv", "dict"]
+        _valid_db = ["UniProtKB", "UniGene", "Ensembl"]
+        _valid_aspect = ["P", "F", "C"]
+        validity = {"includeFields": ["goName", "taxonName", "name", "synonyms"]}
 
-        }
-
-        if isinstance(limit, int) is False or limit >100 or limit<0:
-            raise TypeError("limit parameter must be an integer greater than zero and less than 100")
-        if isinstance(page, int) is False or limit<0:
+        if isinstance(limit, int) is False or limit > 100 or limit < 0:
+            raise TypeError(
+                "limit parameter must be an integer greater than zero and less than 100"
+            )
+        if isinstance(page, int) is False or limit < 0:
             raise TypeError("page parameter must be an integer greater than zero")
 
         # fill params with parameters that have default values.
-        params = {'limit': limit, "page":page}
+        params = {"limit": limit, "page": page}
 
         # beginning of the URL
         url = "services/annotation/search?"
@@ -272,74 +280,75 @@ class QuickGO(REST):
         # what is the ID being provided. We can have only one of:
         # taxonId, goid
         if goId is not None:
-            params['goId'] = goId
+            params["goId"] = goId
 
         if taxonId is not None:
             params["taxonId"] = taxonId
 
         if assignedBy:
-            params['assignedBy'] = assignedBy
+            params["assignedBy"] = assignedBy
 
         if includeFields:
             for this in includeFields.split(","):
-                assert this in validity['includeFields']
-            params['includeFields'] = includeFields
+                assert this in validity["includeFields"]
+            params["includeFields"] = includeFields
 
         if geneProductType:
             for this in geneProductType.split(","):
                 assert this in ["protein", "miRNA", "complex"]
-            params['geneProductType'] = geneProductType
+            params["geneProductType"] = geneProductType
 
         if evidenceCode:
-            params['evidenceCode'] = evidenceCode
+            params["evidenceCode"] = evidenceCode
 
         if evidenceCodeUsage:
-            assert evidenceCodeUsage in ['descendants', 'exact']
-            params['evidenceCodeUsage'] = evidenceCodeUsage
+            assert evidenceCodeUsage in ["descendants", "exact"]
+            params["evidenceCodeUsage"] = evidenceCodeUsage
 
         if taxonUsage:
-            assert taxonUsage in ['descendants', 'exact']
-            params['taxonUsage'] = taxonUsage
+            assert taxonUsage in ["descendants", "exact"]
+            params["taxonUsage"] = taxonUsage
 
         if goUsage:
-            assert goUsage in ['descendants', 'exact', 'slim']
-            params['goUsage'] = goUsage
+            assert goUsage in ["descendants", "exact", "slim"]
+            params["goUsage"] = goUsage
 
         if evidenceCodeUsageRelationships:
             for this in evidenceCodeUsageRelationships.split(","):
-                assert this in ['part_of', 'is_a', 'regulates', 'occurs_in']
-            params['evidenceCodeUsageRelationships'] = evidenceCodeUsageRelationships
+                assert this in ["part_of", "is_a", "regulates", "occurs_in"]
+            params["evidenceCodeUsageRelationships"] = evidenceCodeUsageRelationships
 
         if goUsageRelationships:
             for this in goUsageRelationships.split(","):
-                assert this in ['part_of', 'is_a', 'regulates', 'occurs_in']
-            params['goUsageRelationships'] = goUsageRelationships
+                assert this in ["part_of", "is_a", "regulates", "occurs_in"]
+            params["goUsageRelationships"] = goUsageRelationships
 
         if geneProductId:
-            params['geneProductId'] = geneProductId
+            params["geneProductId"] = geneProductId
 
         if qualifier:
-            params['qualifier'] = qualifier 
+            params["qualifier"] = qualifier
 
         if withFrom:
-            params['withFrom'] = withFrom
+            params["withFrom"] = withFrom
 
         if targetSet:
-            params['targetSet'] = targetSet
+            params["targetSet"] = targetSet
 
         if geneProductSubset:
-            params['geneProductSubset'] = geneProductSubset
+            params["geneProductSubset"] = geneProductSubset
 
         if extension:
-            params['extension'] = extension
+            params["extension"] = extension
 
         if aspect is not None:
             aspects = {
                 "P": "biological_process",
                 "F": "molecular_function",
-                "C": "cellular_component" }
+                "C": "cellular_component",
+            }
             self.devtools.check_param_in_list(aspect, _valid_aspect)
-            params['aspect'] = aspects[aspect]
+            params["aspect"] = aspects[aspect]
 
         if reference:
             if isinstance(reference, list):
@@ -347,16 +356,20 @@ class QuickGO(REST):
             elif isinstance(reference, str):
                 pass
             else:
-                raise ValueError("""
+                raise ValueError(
+                    """
 Invalid parameter: source parameters must be a list of strings ['PUBMED']
-or a string (e.g., 'PUBMED:') """)
-            params['reference'] = reference
+or a string (e.g., 'PUBMED:') """
+                )
+            params["reference"] = reference
 
-        res = self.http_get(url, frmt="txt", params=params,
-            headers=self.get_headers("json"))
+        res = self.http_get(
+            url, frmt="txt", params=params, headers=self.get_headers("json")
+        )
 
         try:
             import json
+
             res = json.loads(res)
         except:
             pass
@@ -374,35 +387,47 @@ or a string (e.g., 'PUBMED:') """)
 
         """
         data = self.Annotation(goId=goId, **kargs)
-        number_of_pages = data['pageInfo']['total']
+        number_of_pages = data["pageInfo"]["total"]
         if number_of_pages > max_number_of_pages:
-            print("As of 23d Oct 2017, the QuickGO API limits the number of pages to 25")
+            print(
+                "As of 23d Oct 2017, the QuickGO API limits the number of pages to 25"
+            )
             number_of_pages = max_number_of_pages
 
         # unfortunately, the new API requires to call the service for each page.
         results = []
-        for i in range(0, number_of_pages ):
-            print("fetching page %s / %s " % (i+1, number_of_pages))
-            data = self.Annotation(goId=goId, page=i+1, **kargs)
-            if data not in [400, '400']:
-                results.extend(data['results'])
+        for i in range(0, number_of_pages):
+            print("fetching page %s / %s " % (i + 1, number_of_pages))
+            data = self.Annotation(goId=goId, page=i + 1, **kargs)
+            if data not in [400, "400"]:
+                results.extend(data["results"])
         try:
             import pandas as pd
+
             return pd.DataFrame(results)
         except:
             self.logging.warning(
-                "Cannot return a DataFrame. Returns the list. If you want the dataframe, install pandas library")
+                "Cannot return a DataFrame. Returns the list. If you want the dataframe, install pandas library"
+            )
             return results
 
-    def gene_product_search(self, query, taxonID=None, page=1, limit=100,
-        type=None, dbSubSet=None, proteome=None):
-        """
-
-        """
-        if isinstance(limit, int) is False or limit >100 or limit<0:
-            raise TypeError("limit parameter must be an integer greater than zero and less than 100")
-        if isinstance(page, int) is False or limit<0:
+    def gene_product_search(
+        self,
+        query,
+        taxonID=None,
+        page=1,
+        limit=100,
+        type=None,
+        dbSubSet=None,
+        proteome=None,
+    ):
+        """ """
+        if isinstance(limit, int) is False or limit > 100 or limit < 0:
+            raise TypeError(
+                "limit parameter must be an integer greater than zero and less than 100"
+            )
+        if isinstance(page, int) is False or limit < 0:
             raise TypeError("page parameter must be an integer greater than zero")
 
         # fill params with parameters that have default values.
-        params = {'limit': limit, "page":page}
+        params = {"limit": limit, "page": page}

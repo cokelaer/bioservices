@@ -45,14 +45,14 @@ from collections import defaultdict
 
 from bioservices.services import REST
 from bioservices import logger
+
 logger.name = __name__
 
 
 __all__ = ["Rhea"]
 
 
-
-class Rhea():
+class Rhea:
     """Interface to the `Rhea <http://www.ebi.ac.uk/rhea/rest/1.0/>`_ service
 
     You can search by compound name, ChEBI ID, reaction ID, cross reference
@@ -97,12 +97,23 @@ class Rhea():
         reaction-xref(Reactome)
         reaction-xref(M-CSA)
     """
+
     _url = "https://www.rhea-db.org"
 
-    _valid_columns = ['rhea-id', 'equation', 'chebi', 'chebi-id',
-            'ec', 'uniprot', 'pubmed', 'reaction-xref(EcoCyc)',
-            'reaction-xref(MetaCyc)', 'reaction-xref(KEGG)',
-            'reaction-xref(Reactome)', 'reaction-ref(M-CSA)']
+    _valid_columns = [
+        "rhea-id",
+        "equation",
+        "chebi",
+        "chebi-id",
+        "ec",
+        "uniprot",
+        "pubmed",
+        "reaction-xref(EcoCyc)",
+        "reaction-xref(MetaCyc)",
+        "reaction-xref(KEGG)",
+        "reaction-xref(Reactome)",
+        "reaction-ref(M-CSA)",
+    ]
 
     def __init__(self, verbose=True, cache=False):
         """.. rubric:: Rhea constructor
@@ -114,16 +125,15 @@ class Rhea():
             >>> from bioservices import Rhea
             >>> r = Rhea()
         """
-        self.services = REST(name="Rhea", url=Rhea._url,
-            verbose=verbose, cache=cache)
+        self.services = REST(name="Rhea", url=Rhea._url, verbose=verbose, cache=cache)
 
-    def search(self, query, columns=None, limit=None, frmt='tsv'):
+    def search(self, query, columns=None, limit=None, frmt="tsv"):
         """Search for Rhea (mimics https://www.rhea-db.org/)
 
         :param str query: the search term using format parameter
         :param str format: the biopax2 or cmlreact format (default)
 
-        :Returns: A pandas DataFrame. 
+        :Returns: A pandas DataFrame.
 
         ::
 
@@ -135,20 +145,22 @@ class Rhea():
         """
         params = {}
         if limit:
-            params['limit'] = limit
+            params["limit"] = limit
         if columns:
-            params['columns'] = columns
-        params['format'] = frmt
+            params["columns"] = columns
+        params["format"] = frmt
         if columns is None:
-            params['columns'] = ",".join(self._valid_columns)
+            params["columns"] = ",".join(self._valid_columns)
 
-        response = self.services.http_get("rhea/?query={}".format(query), 
-            frmt="txt", params=params)
+        response = self.services.http_get(
+            "rhea/?query={}".format(query), frmt="txt", params=params
+        )
 
         try:
             import pandas as pd
             import io
-            df = pd.read_csv(io.StringIO(response), sep='\t')
+
+            df = pd.read_csv(io.StringIO(response), sep="\t")
             return df
         except Exception as err:
             return response
@@ -171,8 +183,8 @@ class Rhea():
         entries)::
 
             r.query("uniprot:*", columns="rhea-id,equation", limit=10)
-            
-        To retrieve a specific entry:: 
+
+        To retrieve a specific entry::
 
             df = r.get_entry("rhea:10661")
 
@@ -186,24 +198,24 @@ class Rhea():
 
         params = {"query": query}
         if limit:
-            params['limit'] = limit
+            params["limit"] = limit
         if columns:
-            params['columns'] = columns
-        params['format'] = frmt
+            params["columns"] = columns
+        params["format"] = frmt
         if columns is None:
-            params['columns'] = ",".join(self._valid_columns)
+            params["columns"] = ",".join(self._valid_columns)
 
-        response = self.services.http_get("rhea?".format(query), 
-            frmt="txt", params=params)
+        response = self.services.http_get(
+            "rhea?".format(query), frmt="txt", params=params
+        )
         try:
             import pandas as pd
             import io
-            df = pd.read_csv(io.StringIO(response), sep='\t')
+
+            df = pd.read_csv(io.StringIO(response), sep="\t")
             return df
         except Exception as err:
             return response
-
-
 
     def get_metabolites(self, rxn_id):
         """Given a Rhea (http://www.rhea-db.org/) reaction id,
@@ -216,7 +228,6 @@ class Rhea():
         """
         response = self.entry(rxn_id, frmt="cmlreact")
 
-        reactants = [xx.attrs['title'] for xx in response.findAll("reactant")]
-        products = [xx.attrs['title'] for xx in response.findAll("product")]
+        reactants = [xx.attrs["title"] for xx in response.findAll("reactant")]
+        products = [xx.attrs["title"] for xx in response.findAll("product")]
         return {"reactants": reactants, "products": products}
-

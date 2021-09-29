@@ -45,20 +45,19 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
 from bioservices import version
+
+
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option(version=version)
 def main(**kwargs):
-    """This is the main entry point for a set of BioServices application
-
-    """
+    """This is the main entry point for a set of BioServices application"""
     pass
 
 
 @main.command()
 @click.option("--accession", type=click.STRING)
 @click.option("--output", type=click.STRING, default=None)
-@click.option("--method", type=click.Choice(["ENA", "EUtils"]),
-    default="EUtils")
+@click.option("--method", type=click.Choice(["ENA", "EUtils"]), default="EUtils")
 def download_accession(**kwargs):
     """
 
@@ -67,6 +66,7 @@ def download_accession(**kwargs):
         bioservices download-accession FN433596.1
     """
     from bioservices.apps.download_fasta import download_fasta
-    download_fasta(kwargs['accession'], output_filename=kwargs['output'],
-        method=kwargs['method'])
 
+    download_fasta(
+        kwargs["accession"], output_filename=kwargs["output"], method=kwargs["method"]
+    )

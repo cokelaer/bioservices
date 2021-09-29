@@ -37,6 +37,7 @@ import wrapt
 
 from bioservices.services import REST
 from bioservices import logger
+
 logger.name = __name__
 
 
@@ -45,17 +46,13 @@ __all__ = ["PRIDE"]
 
 @wrapt.decorator
 def params_to_update(wrapped, instance, args, kwargs):
-    vars(wrapped)['actual_kwargs'] = kwargs
+    vars(wrapped)["actual_kwargs"] = kwargs
     return wrapped(*args, **kwargs)
 
 
-
 class PRIDE(REST):
-    """Interface to the `PRIDE <http://rest.ensembl.org>`_ service
+    """Interface to the `PRIDE <http://rest.ensembl.org>`_ service"""
 
-
-
-    """
     _url = "https://www.ebi.ac.uk/pride/ws/archive"
 
     def __init__(self, verbose=False, cache=False):
@@ -63,8 +60,9 @@ class PRIDE(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(PRIDE, self).__init__(name="PRIDE", url=PRIDE._url,
-                verbose=verbose, cache=cache)
+        super(PRIDE, self).__init__(
+            name="PRIDE", url=PRIDE._url, verbose=verbose, cache=cache
+        )
 
     def get_project(self, identifier):
         """Retrieve project information by accession
@@ -82,14 +80,27 @@ class PRIDE(REST):
             6758
 
         """
-        res = self.http_get('project/%s' % identifier)
+        res = self.http_get("project/%s" % identifier)
         return res
 
     @params_to_update
-    def get_project_list(self, query="", show=10, page=0, sort=None, order='desc',
-                         speciesFilter=None, ptmsFilter=None, tissueFilter=None, diseaseFilter=None,
-                         titleFilter=None, instrumentFilter=None, experimentTypeFilter=None,
-                         quantificationfilter=None, projectTagFilter=None):
+    def get_project_list(
+        self,
+        query="",
+        show=10,
+        page=0,
+        sort=None,
+        order="desc",
+        speciesFilter=None,
+        ptmsFilter=None,
+        tissueFilter=None,
+        diseaseFilter=None,
+        titleFilter=None,
+        instrumentFilter=None,
+        experimentTypeFilter=None,
+        quantificationfilter=None,
+        projectTagFilter=None,
+    ):
         """list projects or given criteria
 
         :param str query: search term to query for
@@ -115,18 +126,27 @@ class PRIDE(REST):
         """
         params = self.get_project_list.actual_kwargs
 
-        res = self.http_get('project/list', params=params)
+        res = self.http_get("project/list", params=params)
         try:
-            res = res['list']
+            res = res["list"]
         except:
             pass
         return res
 
     @params_to_update
-    def get_project_count(self, query="",
-            speciesFilter=None, ptmsFilter=None, tissueFilter=None, diseaseFilter=None,
-            titleFilter=None, instrumentFilter=None, experimentTypeFilter=None,
-            quantificationfilter=None, projectTagFilter=None):
+    def get_project_count(
+        self,
+        query="",
+        speciesFilter=None,
+        ptmsFilter=None,
+        tissueFilter=None,
+        diseaseFilter=None,
+        titleFilter=None,
+        instrumentFilter=None,
+        experimentTypeFilter=None,
+        quantificationfilter=None,
+        projectTagFilter=None,
+    ):
 
         """Count projects for given criteria
 
@@ -144,11 +164,11 @@ class PRIDE(REST):
         :param str quantificationFilter: filter by quantification annotation
         :param str projectTagFilter: filter by project tags
         :return: number of projects  (integer)
-        
+
 
         """
         params = self.get_project_count.actual_kwargs
-        res = self.http_get('project/count', params=params)
+        res = self.http_get("project/count", params=params)
         return res
 
     def get_assays(self, identifier):
@@ -164,7 +184,7 @@ class PRIDE(REST):
             276
 
         """
-        res = self.http_get('assay/%s' % identifier)
+        res = self.http_get("assay/%s" % identifier)
         return res
 
     def get_assay_list(self, identifier):
@@ -183,9 +203,9 @@ class PRIDE(REST):
             1643
 
         """
-        res = self.http_get('assay/list/project/%s' % identifier)
+        res = self.http_get("assay/list/project/%s" % identifier)
         try:
-            res = res['list']
+            res = res["list"]
         except:
             pass
         return res
@@ -204,7 +224,7 @@ class PRIDE(REST):
 
 
         """
-        res = self.http_get('assay/count/project/%s' % identifier)
+        res = self.http_get("assay/count/project/%s" % identifier)
         return res
 
     def get_file_list(self, identifier):
@@ -219,9 +239,9 @@ class PRIDE(REST):
             5
 
         """
-        res = self.http_get('file/list/project/%s' % identifier)
+        res = self.http_get("file/list/project/%s" % identifier)
         try:
-            res = res['list']
+            res = res["list"]
         except:
             pass
         return res
@@ -238,9 +258,8 @@ class PRIDE(REST):
             5
 
         """
-        res = self.http_get('file/count/project/%s' % identifier)
+        res = self.http_get("file/count/project/%s" % identifier)
         return res
-
 
     def get_file_list_assay(self, identifier):
         """list files for an assay
@@ -254,9 +273,9 @@ class PRIDE(REST):
             res = p.get_file_assay(1643)
 
         """
-        res = self.http_get('file/list/assay/%s' % identifier)
+        res = self.http_get("file/list/assay/%s" % identifier)
         try:
-            res = res['list']
+            res = res["list"]
         except:
             pass
         return res
@@ -271,7 +290,7 @@ class PRIDE(REST):
 
             p.get_file_assay(1643)
         """
-        res = self.http_get('file/count/assay/%s' % identifier)
+        res = self.http_get("file/count/assay/%s" % identifier)
         return res
 
     @params_to_update
@@ -284,9 +303,9 @@ class PRIDE(REST):
 
         """
         params = self.get_protein_list.actual_kwargs
-        res = self.http_get('protein/list/project/%s' % identifier, params=params)
+        res = self.http_get("protein/list/project/%s" % identifier, params=params)
         try:
-            res = res['list']
+            res = res["list"]
         except:
             pass
         return res
@@ -298,7 +317,7 @@ class PRIDE(REST):
         :return: int
 
         """
-        res = self.http_get('protein/count/project/%s' % identifier)
+        res = self.http_get("protein/count/project/%s" % identifier)
         return res
 
     @params_to_update
@@ -311,9 +330,9 @@ class PRIDE(REST):
 
         """
         params = self.get_protein_list_assay.actual_kwargs
-        res = self.http_get('protein/list/assay/%s' % identifier, params=params)
+        res = self.http_get("protein/list/assay/%s" % identifier, params=params)
         try:
-            res = res['list']
+            res = res["list"]
         except:
             pass
         return res
@@ -325,12 +344,11 @@ class PRIDE(REST):
         :return: int
 
         """
-        res = self.http_get('protein/count/assay/%s' % identifier)
+        res = self.http_get("protein/count/assay/%s" % identifier)
         return res
 
     @params_to_update
-    def get_peptide_list(self, identifier, sequence=None,
-                         show=10, page=0):
+    def get_peptide_list(self, identifier, sequence=None, show=10, page=0):
         """Retrieve peptide identifications by project accession (and sequence)
 
         :param str identifier: a project accession number
@@ -355,14 +373,14 @@ class PRIDE(REST):
         """
         params = self.get_peptide_list.actual_kwargs
         if sequence is None:
-            res = self.http_get('peptide/list/project/%s' % identifier, 
-                    params=params)
+            res = self.http_get("peptide/list/project/%s" % identifier, params=params)
         else:
-            res = self.http_get('peptide/list/project/%s/sequence/%s' 
-                    % (identifier, sequence))
+            res = self.http_get(
+                "peptide/list/project/%s/sequence/%s" % (identifier, sequence)
+            )
 
         try:
-            res = res['list']
+            res = res["list"]
         except:
             pass
         return res
@@ -381,14 +399,15 @@ class PRIDE(REST):
 
         """
         if sequence is None:
-            res = self.http_get('peptide/count/project/%s' % identifier)
+            res = self.http_get("peptide/count/project/%s" % identifier)
         else:
-            res = self.http_get('peptide/count/project/%s/sequence/%s' % (identifier, sequence))
+            res = self.http_get(
+                "peptide/count/project/%s/sequence/%s" % (identifier, sequence)
+            )
         return res
 
     @params_to_update
-    def get_peptide_list_assay(self, identifier, sequence=None,
-                         show=10, page=0):
+    def get_peptide_list_assay(self, identifier, sequence=None, show=10, page=0):
         """Retrieve peptide identifications by assay accession (and sequence)
 
         :param str identifier: an assay accession number
@@ -412,11 +431,13 @@ class PRIDE(REST):
         """
         params = self.get_peptide_list_assay.actual_kwargs
         if sequence is None:
-            res = self.http_get('peptide/list/assay/%s' % identifier, params=params)
+            res = self.http_get("peptide/list/assay/%s" % identifier, params=params)
         else:
-            res = self.http_get('peptide/list/assay/%s/sequence/%s' % (identifier, sequence))
+            res = self.http_get(
+                "peptide/list/assay/%s/sequence/%s" % (identifier, sequence)
+            )
         try:
-            res = res['list']
+            res = res["list"]
         except:
             pass
         return res
@@ -436,12 +457,9 @@ class PRIDE(REST):
 
         """
         if sequence is None:
-            res = self.http_get('peptide/count/assay/%s' % identifier)
+            res = self.http_get("peptide/count/assay/%s" % identifier)
         else:
-            res = self.http_get('peptide/count/assay/%s/sequence/%s' % (identifier, sequence))
+            res = self.http_get(
+                "peptide/count/assay/%s/sequence/%s" % (identifier, sequence)
+            )
         return res
-
-
-
-
-

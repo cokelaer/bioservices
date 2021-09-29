@@ -41,7 +41,7 @@ from bioservices.services import REST
 __all__ = ["MyGeneInfo"]
 
 
-class MyGeneInfo():
+class MyGeneInfo:
     """Interface to `mygene.infoe <http://mygene.info>`_ service
 
     .. doctest::
@@ -60,8 +60,14 @@ class MyGeneInfo():
         url = "https://mygene.info/v3"
         self.services = REST(name="PDBe", url=url, verbose=verbose, cache=cache)
 
-    def get_genes(self, ids, fields="symbol,name,taxid,entrezgene,ensemblgene", 
-            species=None, dotfield=True, email=None):
+    def get_genes(
+        self,
+        ids,
+        fields="symbol,name,taxid,entrezgene,ensemblgene",
+        species=None,
+        dotfield=True,
+        email=None,
+    ):
         """Get matching gene objects for a list of gene ids
 
 
@@ -83,7 +89,7 @@ class MyGeneInfo():
             (False), a single "refseq" field with a sub-field of "rna". Default:
             True.
         :param str email": If you are regular users of this services, the
-            mygeneinfo maintainers/authors encourage you to provide an email, 
+            mygeneinfo maintainers/authors encourage you to provide an email,
             so that we can better track the usage or follow up with you.
 
         ::
@@ -92,11 +98,11 @@ class MyGeneInfo():
             mgi.get_genes(("301345,22637"))
             # first one is rat, second is mouse. This will return a 'notfound'
             # entry and the second entry as expected.
-            mgi.get_genes("301345,22637", species="mouse") 
+            mgi.get_genes("301345,22637", species="mouse")
 
         """
-        params = {"ids": ids, "fields":fields}
-        if email:                        # pragma: no cover
+        params = {"ids": ids, "fields": fields}
+        if email:  # pragma: no cover
             params["email"] = email
 
         assert dotfield in [True, False]
@@ -105,16 +111,25 @@ class MyGeneInfo():
         if species:
             params["species"] = species
 
-        res = self.services.http_post("gene", #params=params, 
-            data=params, frmt="json",headers={
-            "User-Agent": self.services.getUserAgent(),
-            "accept": "application/json",
-            "Content-Type": "application/x-www-form-urlencoded"}
+        res = self.services.http_post(
+            "gene",  # params=params,
+            data=params,
+            frmt="json",
+            headers={
+                "User-Agent": self.services.getUserAgent(),
+                "accept": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
         )
         return res
 
-    def get_one_gene(self, geneid, fields="symbol,name,taxid,entrezgene,ensemblgene", 
-        dotfield=True, email=None):
+    def get_one_gene(
+        self,
+        geneid,
+        fields="symbol,name,taxid,entrezgene,ensemblgene",
+        dotfield=True,
+        email=None,
+    ):
         """Get matching gene objects for one gene id
 
         :param geneid: a valid gene ID
@@ -130,7 +145,7 @@ class MyGeneInfo():
             (False), a single "refseq" field with a sub-field of "rna". Default:
             True.
         :param str email": If you are regular users of this services, the
-            mygeneinfo maintainers/authors encourage you to provide an email, 
+            mygeneinfo maintainers/authors encourage you to provide an email,
             so that we can better track the usage or follow up with you.
 
         ::
@@ -139,7 +154,7 @@ class MyGeneInfo():
             mgi.get_genes("301345")
         """
         params = {"ids": geneid, "fields": fields}
-        if email:                        # pragma: no cover
+        if email:  # pragma: no cover
             params["email"] = email
 
         assert dotfield in [True, False]
@@ -148,10 +163,20 @@ class MyGeneInfo():
         res = self.services.http_get(f"gene/{geneid}", params=params, frmt="json")
         return res
 
-    def get_one_query(self, query, email=None, dotfield=True,
-            fields="symbol,name,taxid,entrezgene,ensemblgene",
-            species="human,mouse,rat", size=10,  _from=0, sort=None,
-            facets=None, entrezonly=False, ensemblonly=False):
+    def get_one_query(
+        self,
+        query,
+        email=None,
+        dotfield=True,
+        fields="symbol,name,taxid,entrezgene,ensemblgene",
+        species="human,mouse,rat",
+        size=10,
+        _from=0,
+        sort=None,
+        facets=None,
+        entrezonly=False,
+        ensemblonly=False,
+    ):
         """Make gene query and return matching gene list. Support JSONP and CORS as well.
 
         :param str query: Query string. Examples "CDK2", "NM_052827", "204639_at",
@@ -172,15 +197,15 @@ class MyGeneInfo():
             (with a cap of 1000 at the moment). Default: 10.
         :param int _from: the number of matching gene hits to skip, starting
             from 0. Combining with "size" parameter, this can be useful for paging. Default:
-            0.      
+            0.
         :param sort: the comma-separated fields to sort on. Prefix with "-" for
             descending order, otherwise in ascending order. Default: sort by matching scores
             in decending order.
         :param str facets: a single field or comma-separated fields to return
             facets, for example, "facets=taxid", "facets=taxid,type_of_gene".
-        :param bool entrezonly: when passed as True, the query returns only the hits 
+        :param bool entrezonly: when passed as True, the query returns only the hits
             with valid Entrez gene ids. Default: False.
-        :param bool ensembleonly: when passed as True, the query returns only the hits 
+        :param bool ensembleonly: when passed as True, the query returns only the hits
             with valid Ensembl gene ids. Default: False.
         :param dotfield: control the format of the returned fields when passed
             "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If True
@@ -188,23 +213,23 @@ class MyGeneInfo():
             (False), a single "refseq" field with a sub-field of "rna". Default:
             True.
         :param str email": If you are regular users of this services, the
-            mygeneinfo maintainers/authors encourage you to provide an email, 
+            mygeneinfo maintainers/authors encourage you to provide an email,
             so that we can better track the usage or follow up with you.
 
 
 
 
         """
-        params = {"fields": fields, "size":size, "from":_from}
-        if email:   # pragma: no cover
+        params = {"fields": fields, "size": size, "from": _from}
+        if email:  # pragma: no cover
             params["email"] = email
 
         assert dotfield in [True, False]
         params["dotfield"] = dotfield
 
-        if sort:    
+        if sort:
             params["sort"] = sort
-        if facets:   # pragma: no cover
+        if facets:  # pragma: no cover
             params["facets"] = sort
         assert entrezonly in [True, False]
         params["entrezonly"] = entrezonly
@@ -214,10 +239,15 @@ class MyGeneInfo():
         res = self.services.http_get(f"query?q={query}", params=params, frmt="json")
         return res
 
-    def get_queries(self, query, email=None, dotfield=True, scopes="all",
-            species="human,mouse,rat",
-            fields="symbol,name,taxid,entrezgene,ensemblgene", 
-            ):
+    def get_queries(
+        self,
+        query,
+        email=None,
+        dotfield=True,
+        scopes="all",
+        species="human,mouse,rat",
+        fields="symbol,name,taxid,entrezgene,ensemblgene",
+    ):
         """Make gene query and return matching gene list. Support JSONP and CORS as well.
 
         :param str query: Query string. Examples "CDK2", "NM_052827", "204639_at",
@@ -240,7 +270,7 @@ class MyGeneInfo():
              (False), a single "refseq" field with a sub-field of "rna". Default:
              True.
         :param str email": If you are regular users of this services, the
-            mygeneinfo maintainers/authors encourage you to provide an email, 
+            mygeneinfo maintainers/authors encourage you to provide an email,
             so that we can better track the usage or follow up with you.
         :param str scopes: not documented. Set to 'all'
 
@@ -251,23 +281,22 @@ class MyGeneInfo():
         assert dotfield in [True, False]
         params["dotfield"] = dotfield
 
-        res = self.services.http_post("query", 
-            params=params, frmt="json",headers={
-            "User-Agent": self.services.getUserAgent(),
-            "accept": "application/json",
-            "Content-Type": "application/x-www-form-urlencoded"})
+        res = self.services.http_post(
+            "query",
+            params=params,
+            frmt="json",
+            headers={
+                "User-Agent": self.services.getUserAgent(),
+                "accept": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        )
         return res
 
     def get_metadata(self):
         res = self.services.http_get(f"metadata", frmt="json")
         return res
+
     def get_taxonomy(self):
         res = self.services.http_get(f"metadata", frmt="json")
-        return res['taxonomy']
-
-
-
-
-
-
-
+        return res["taxonomy"]

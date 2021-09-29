@@ -4,7 +4,7 @@
 #  Copyright (c) 2013-2014 - EBI-EMBL
 #
 #  File author(s):
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -34,6 +34,7 @@
 """
 from bioservices import REST
 from bioservices import logger
+
 logger.name = __name__
 
 
@@ -55,37 +56,41 @@ class UniChem(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(UniChem, self).__init__(name="UniChem", url=UniChem._url, verbose=verbose, cache=cache)
+        super(UniChem, self).__init__(
+            name="UniChem", url=UniChem._url, verbose=verbose, cache=cache
+        )
         self.source_ids = {
-            "chembl":1,
-            "drugbank":2,
-            "pdb":3,
-            "iuphar":4,
-            "pubchem_dotf":5,
-            "kegg_ligand":6,
-            "chebi":7,
-            "nih_ncc":8,
-            "zinc":9,
-            "emolecules":10,
-            "ibm":11,
-            "atlas":12,
-            "patents":13,
-            "fdasrc":14,
-            "surechem":15,
-            "pharmgkb":17,
-            "hmdb":18,
-            "selleck":20,
-            "pubchem_tpharma":21,
-            "pubchem":22,
-            "mcule":23,
-            }# there was no 16 when I looked at the web site June 2013
+            "chembl": 1,
+            "drugbank": 2,
+            "pdb": 3,
+            "iuphar": 4,
+            "pubchem_dotf": 5,
+            "kegg_ligand": 6,
+            "chebi": 7,
+            "nih_ncc": 8,
+            "zinc": 9,
+            "emolecules": 10,
+            "ibm": 11,
+            "atlas": 12,
+            "patents": 13,
+            "fdasrc": 14,
+            "surechem": 15,
+            "pharmgkb": 17,
+            "hmdb": 18,
+            "selleck": 20,
+            "pubchem_tpharma": 21,
+            "pubchem": 22,
+            "mcule": 23,
+        }  # there was no 16 when I looked at the web site June 2013
         self.source_names = self.devtools.swapdict(self.source_ids)
 
         maxid_service = max(self.get_all_src_ids())
         maxid_bioservices = max(self.source_ids.values())
         if maxid_bioservices != maxid_service:
-            self.logging.warning("UniChem has added new source. "+
-                    "Please update the source_ids attribute in bioservices")
+            self.logging.warning(
+                "UniChem has added new source. "
+                + "Please update the source_ids attribute in bioservices"
+            )
 
     def _process(self, query, frmt, request):
         self.devtools.check_param_in_list(frmt, ["json", "xml", None])
@@ -110,17 +115,25 @@ class UniChem(REST):
             if int(src_id) in self.source_ids.values():
                 src_id = int(src_id)
             else:
-                raise ValueError("unrecognised src_id parameter. Valid names are %s"
-                    % self.source_ids.keys())
+                raise ValueError(
+                    "unrecognised src_id parameter. Valid names are %s"
+                    % self.source_ids.keys()
+                )
         else:
-            raise ValueError("unrecognised src_id parameter. Valid names are %s"
-                % self.source_ids.keys())
+            raise ValueError(
+                "unrecognised src_id parameter. Valid names are %s"
+                % self.source_ids.keys()
+            )
 
         return src_id
 
-    def get_src_compound_ids_from_src_compound_id(self, src_compound_id, src_id, target=None):
+    def get_src_compound_ids_from_src_compound_id(
+        self, src_compound_id, src_id, target=None
+    ):
         self.logging.warning("Deprecated. Please use get_compounds_from_source")
-        return self.get_src_compound_ids_from_src_id(src_compound_id, src_id, target=target)
+        return self.get_src_compound_ids_from_src_id(
+            src_compound_id, src_id, target=target
+        )
 
     def get_compound_ids_from_src_id(self, src_compound_id, src_id, target=None):
         """Obtain a list of all src_compound_ids from all sources which are
@@ -147,21 +160,24 @@ class UniChem(REST):
 
         """
         src_id = self._get_source_id(src_id)
-        request = "src_compound_id/%s/" + "%s" %src_id
+        request = "src_compound_id/%s/" + "%s" % src_id
         if target:
             target = self._get_source_id(target)
             request += "/%s" % target
         res = self._process(src_compound_id, "json", request)
         return res
 
-    def get_src_compound_ids_all_from_src_compound_id(self, src_compound_id,
-            src_id, target=None):
+    def get_src_compound_ids_all_from_src_compound_id(
+        self, src_compound_id, src_id, target=None
+    ):
         self.logging.warning("Deprecated us get_compound_ids")
-        return self.get_all_compound_ids_from_all_src_id(src_compound_id,
-                src_id, target=target)
+        return self.get_all_compound_ids_from_all_src_id(
+            src_compound_id, src_id, target=target
+        )
 
-    def get_all_compound_ids_from_all_src_id(self, src_compound_id,
-            src_id, target=None):
+    def get_all_compound_ids_from_all_src_id(
+        self, src_compound_id, src_id, target=None
+    ):
         """Obtain a list of all src_compound_ids from all sources (including
         BOTH current AND obsolete assignments) to the same structure as a currently
         assigned query src_compound_id.
@@ -219,7 +235,10 @@ class UniChem(REST):
         # evaluation the string as a list
         res = eval(res)
         # convert to a convenient dictionary
-        mapping = [(x[str(self.source_ids[source])], x[str(self.source_ids[target])]) for x in res]
+        mapping = [
+            (x[str(self.source_ids[source])], x[str(self.source_ids[target])])
+            for x in res
+        ]
         mapping = dict(mapping)
         return mapping
 
@@ -266,7 +285,7 @@ class UniChem(REST):
 
         """
         res = self.http_get("src_ids", frmt="json")
-        res = [x['src_id'] for x in res]
+        res = [x["src_id"] for x in res]
         return res
 
     def get_source_information(self, src_id):
@@ -349,7 +368,6 @@ class UniChem(REST):
             return res[0]
         return res
 
-
     def get_src_compound_id_url(self, src_compound_id, src_id, to_src_id):
         """Obtain a list of URLs for all src_compound_ids
 
@@ -379,13 +397,14 @@ class UniChem(REST):
         request = "src_compound_id_url/%s" + "/%s/%s" % (src_id, to_src_id)
         res = self._process(src_compound_id, "json", request)
         if isinstance(src_compound_id, list):
-            res = [x[0]['url'] for x in res]
+            res = [x[0]["url"] for x in res]
         else:
-            res = res[0]['url']
+            res = res[0]["url"]
         return res
 
-    def get_src_compound_ids_all_from_obsolete(self, obsolete_src_compound_id,
-            src_id, to_src_id=None):
+    def get_src_compound_ids_all_from_obsolete(
+        self, obsolete_src_compound_id, src_id, to_src_id=None
+    ):
         """Obtain a list of all src_compound_ids from all sources with BOTH
         current AND obsolete to the same structure with an obsolete assignment to the
         query src_compound_id.
@@ -416,7 +435,6 @@ class UniChem(REST):
             request += "/%s" % to_src_id
         res = self._process(obsolete_src_compound_id, "json", request)
         return res
-
 
     def get_verbose_src_compound_ids_from_inchikey(self, inchikey):
         """Obtain all src_compound_ids (from all sources)
@@ -484,11 +502,11 @@ class UniChem(REST):
         src_id = self._get_source_id(src_id)
         info = self.get_source_information(src_id)
 
-        if info['aux_for_url'] != '1':
-            self.logging.warning("This function accepts src_id that have auxiliary data only")
+        if info["aux_for_url"] != "1":
+            self.logging.warning(
+                "This function accepts src_id that have auxiliary data only"
+            )
 
         request = "mappingaux/%s"
         res = self._process(src_id, "json", request)
         return res
-
-

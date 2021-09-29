@@ -3,9 +3,6 @@
 #
 #  Copyright (c) 2013-2014 - EBI-EMBL
 #
-#  File author(s):
-#      
-#
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
 #      http://www.gnu.org/licenses/gpl-3.0.html
@@ -41,6 +38,7 @@
 import io
 from bioservices.services import REST
 from bioservices import logger
+
 logger.name = __name__
 
 try:
@@ -51,8 +49,7 @@ except:
 __all__ = ["BioDBNet"]
 
 
-
-class BioDBNet():
+class BioDBNet:
     """Interface to the `BioDBNet <http://biodbnet.abcc.ncifcrf.gov/>`_ service
 
     ::
@@ -68,15 +65,19 @@ class BioDBNet():
     databases.
 
     """
-    _url = 'https://biodbnet-abcc.ncifcrf.gov/webServices/rest.php/biodbnetRestApi.json'
+
+    _url = "https://biodbnet-abcc.ncifcrf.gov/webServices/rest.php/biodbnetRestApi.json"
+
     def __init__(self, verbose=True, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose:
 
         """
-        self.services = REST(name="BioDBNet", url=BioDBNet._url, verbose=verbose, cache=cache)
-        self._valid_inputs = self.getInputs() 
+        self.services = REST(
+            name="BioDBNet", url=BioDBNet._url, verbose=verbose, cache=cache
+        )
+        self._valid_inputs = self.getInputs()
 
     def _list_to_string(self, values):
         if isinstance(values, list):
@@ -92,7 +93,7 @@ class BioDBNet():
         # list of databases returned by getInputs
         outputs = self._list_to_string(output_db)
         inputResult = self.getInputs()
-        #getOutputsForInput method
+        # getOutputsForInput method
         outputResult = self.getOutputsForInput(input_db)
         outputResult = [this.lower().replace(" ", "") for this in outputResult]
         for output in outputs.split(","):
@@ -103,6 +104,7 @@ class BioDBNet():
     def _check_db(self, value):
         def convert(value):
             return value.lower().replace(" ", "")
+
         if convert(value) not in [convert(this) for this in self._valid_inputs]:
             raise ValueError("Invalid value {} not a known database".format(value))
 
@@ -141,7 +143,7 @@ class BioDBNet():
         url += "&taxonId={}".format(taxon)
         url += "&format={}".format("row")
         request = self.services.http_get(url)
-        try: # TODO can be removed in v2
+        try:  # TODO can be removed in v2
             df = pd.DataFrame(request)
             df.set_index("InputValue", inplace=True)
             df.index.name = input_db
@@ -156,7 +158,7 @@ class BioDBNet():
         dbFind can be used when you do not know the actual type of your identifiers or
         when you have a mixture of different types of identifiers. The tool finds the
         identifier type and converts them into the selected output if the identifiers
-        are within the network. 
+        are within the network.
 
         :param str output_db: valid database name
         :param list input_values: list of identifiers to look for
@@ -249,7 +251,7 @@ class BioDBNet():
         url += "&taxonId={}".format(taxon)
         url += "&format={}".format("row")
         request = self.services.http_get(url)
-        try: # TODO can be removed in v2
+        try:  # TODO can be removed in v2
             df = pd.DataFrame(request)
             df.set_index("InputValue", inplace=True)
             df.index.name = input_db
@@ -269,12 +271,12 @@ class BioDBNet():
         added to the path the input selection gets updated with all the nodes that it
         can access directly.
 
-        :param db_path: path to follow in the databases 
-        :param input_values: list of identifiers 
+        :param db_path: path to follow in the databases
+        :param input_values: list of identifiers
         :return: a dataframe with columns corresponding to the path nodes
 
-        A typical example is to get the Ensembl mouse homologs for  
-        Ensembl Gene ID's from human. This conversion is not possible 
+        A typical example is to get the Ensembl mouse homologs for
+        Ensembl Gene ID's from human. This conversion is not possible
         through :meth:`db2db` as Homologene does not have
         Ensembl ID's and the input and output nodes to acheive this would both be
         'Ensembl Gene ID'. It can however be run by using dbWalk as follows.
@@ -320,7 +322,7 @@ class BioDBNet():
         url += "&input={}&directOutput=1".format(input_db)
         request = self.services.http_get(url)
         try:
-            return request['output']
+            return request["output"]
         except:
             return request
 
@@ -333,7 +335,7 @@ class BioDBNet():
         """
         request = self.services.http_get(self._url + "?method=getinputs")
         try:
-            return request['input']
+            return request["input"]
         except:
             return request
 
@@ -350,6 +352,6 @@ class BioDBNet():
         url += "&input={}".format(input_db)
         request = self.services.http_get(url)
         try:
-            return request['output']
+            return request["output"]
         except:
             return request

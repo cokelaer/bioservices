@@ -34,13 +34,14 @@
 """
 from bioservices.services import REST
 from bioservices import logger
+
 logger.name = __name__
 
 
 __all__ = ["Ensembl"]
 
 
-class Ensembl():
+class Ensembl:
     """Interface to the `Ensembl <http://rest.ensembl.org>`_ service
 
     For the BioServices documentation see the documentation of
@@ -59,6 +60,7 @@ class Ensembl():
     .. note:: Some function uses SQL wildcards. See e.g. http://www.w3schools.com/sql/sql_wildcards.asp
         In brief, "_" can be use to substitute a single character and '%' a set of characters.
     """
+
     _url = "http://rest.ensembl.org"
 
     def __init__(self, verbose=False, cache=False):
@@ -66,37 +68,47 @@ class Ensembl():
 
         :param verbose: set to False to prevent informative messages
         """
-        self.services = REST(name="Ensembl", url=Ensembl._url,
-                verbose=verbose, cache=cache)
-        self.callback = None #use in all methods
+        self.services = REST(
+            name="Ensembl", url=Ensembl._url, verbose=verbose, cache=cache
+        )
+        self.callback = None  # use in all methods
 
     def _check_frmt(self, frmt, values=[]):
-        self.services.devtools.check_param_in_list(frmt, ['json','jsonp'] + values)
+        self.services.devtools.check_param_in_list(frmt, ["json", "jsonp"] + values)
 
     def _check_id(self, identifier):
         pass
 
     def nh_format_to_frmt(self, value):
-        if value == 'phylip':
-            return 'phyloxml'
-        elif value == 'simple':
-            return 'nh'
+        if value == "phylip":
+            return "phyloxml"
+        elif value == "simple":
+            return "nh"
         else:
-            return 'json'
+            return "json"
 
     def check_sequence(self, value):
-        self.services.devtools.check_param_in_list(value,
-                ['none', 'cdna', 'protein'])
+        self.services.devtools.check_param_in_list(value, ["none", "cdna", "protein"])
 
     def check_nh_format(self, value):
-        self.services.devtools.check_param_in_list(value,
-                ['full', 'display_label_composite', 'simple', 'species',
-                    'species_short_name', 'ncbi_taxon', 'ncbi_name', 'njtree',
-                    'phylip'])
+        self.services.devtools.check_param_in_list(
+            value,
+            [
+                "full",
+                "display_label_composite",
+                "simple",
+                "species",
+                "species_short_name",
+                "ncbi_taxon",
+                "ncbi_name",
+                "njtree",
+                "phylip",
+            ],
+        )
 
     # ARCHIVE
     # ---------------------------------------------------------------------
-    def get_archive(self, identifier, frmt='json'):
+    def get_archive(self, identifier, frmt="json"):
         """Uses the given identifier to return the archived sequence
 
         :param str identifier: An Ensembl stable ID
@@ -109,57 +121,85 @@ class Ensembl():
             >>> res = s.get_archive("ENSG00000157764")
 
         """
-        self._check_frmt(frmt, ['xml'])
+        self._check_frmt(frmt, ["xml"])
         self._check_id(identifier)
-        res = self.services.http_get("archive/id/" + identifier, frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback})
+        res = self.services.http_get(
+            "archive/id/" + identifier,
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback},
+        )
 
-        if frmt == 'xml':
+        if frmt == "xml":
             res = self.easyXML(res)
         return res
 
-    def post_archive(self, identifiers, frmt='json'):
+    def post_archive(self, identifiers, frmt="json"):
         """Retrieve the archived sequence for a set of identifiers
 
-            returned by the requested JSONP response. Required ONLY when using
-            JSONP as the serialisation method. Please see the user guide.
+        returned by the requested JSONP response. Required ONLY when using
+        JSONP as the serialisation method. Please see the user guide.
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_post("archive/id/", frmt=frmt,
-                headers = self.services.get_headers(content=frmt),
-                data =self.services.devtools.to_json({'id':identifiers}),
-                params={'callback': self.callback})
-        if frmt == 'xml':
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_post(
+            "archive/id/",
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            data=self.services.devtools.to_json({"id": identifiers}),
+            params={"callback": self.callback},
+        )
+        if frmt == "xml":
             res = self.easyXML(res)
         return res
 
     # COMPARATIVE GENOMICS
     # ------------------------------------------------------------------
 
-    def get_genetree_by_member_symbol(self, species, symbol, frmt='json',
-            aligned=False, db_type='core', object_type=None,
-            nh_format='simple', sequence='protein',
-            compara='multi'):
-        """ Retrieves a gene tree containing the gene identified by a symbol"""
-        self._check_frmt(frmt, ['nh', 'phyloxml'])
+    def get_genetree_by_member_symbol(
+        self,
+        species,
+        symbol,
+        frmt="json",
+        aligned=False,
+        db_type="core",
+        object_type=None,
+        nh_format="simple",
+        sequence="protein",
+        compara="multi",
+    ):
+        """Retrieves a gene tree containing the gene identified by a symbol"""
+        self._check_frmt(frmt, ["nh", "phyloxml"])
         frmt = self.nh_format_to_frmt(nh_format)
         self.check_sequence(sequence)
         self.check_nh_format(nh_format)
 
-        res = self.services.http_get("genetree/member/symbol/%s/%s" %(species, symbol),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'nh_format':nh_format, 'sequence':sequence,
-                    'aligned':int(aligned), 'compara':compara,
-                    'db_type':db_type})
+        res = self.services.http_get(
+            "genetree/member/symbol/%s/%s" % (species, symbol),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "nh_format": nh_format,
+                "sequence": sequence,
+                "aligned": int(aligned),
+                "compara": compara,
+                "db_type": db_type,
+            },
+        )
         return res
 
-    def get_genetree_by_member_id(self, identifier, frmt='json',
-            aligned=False, db_type='core', object_type=None,
-            nh_format='simple', sequence='protein', species='homo_sapiens',
-            compara='multi'):
+    def get_genetree_by_member_id(
+        self,
+        identifier,
+        frmt="json",
+        aligned=False,
+        db_type="core",
+        object_type=None,
+        nh_format="simple",
+        sequence="protein",
+        species="homo_sapiens",
+        compara="multi",
+    ):
         """Retrieves a gene tree containing the gene identified by a symbol
 
         :param str compara: Name of the compara database to use. Multiple
@@ -177,22 +217,36 @@ class Ensembl():
 
 
         """
-        self._check_frmt(frmt, ['nh', 'phyloxml'])
+        self._check_frmt(frmt, ["nh", "phyloxml"])
         self._check_frmt(frmt)
         self.check_nh_format(nh_format)
         frmt = self.nh_format_to_frmt(nh_format)
         self.check_sequence(sequence)
 
-        res = self.services.http_get("genetree/member/id/" + identifier, frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'nh_format':nh_format, 'sequence':sequence,
-                    'aligned':int(aligned), 'compara':compara,
-                    'db_type':db_type, 'species':species})
+        res = self.services.http_get(
+            "genetree/member/id/" + identifier,
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "nh_format": nh_format,
+                "sequence": sequence,
+                "aligned": int(aligned),
+                "compara": compara,
+                "db_type": db_type,
+                "species": species,
+            },
+        )
         return res
 
-    def get_genetree_by_id(self, identifier, aligned=False, frmt='json',
-            nh_format='simple', sequence='protein',
-            compara='multi'):
+    def get_genetree_by_id(
+        self,
+        identifier,
+        aligned=False,
+        frmt="json",
+        nh_format="simple",
+        sequence="protein",
+        compara="multi",
+    ):
         """Retrieves a gene tree dump for a gene tree stable identifier
 
         :param str identifier: An Ensembl genetree ID
@@ -220,20 +274,32 @@ class Ensembl():
             >>> s.get_genetree('ENSGT00390000003602', frmt='phyloxml', sequence='none')
 
         """
-        self._check_frmt(frmt, ['nh', 'phyloxml'])
+        self._check_frmt(frmt, ["nh", "phyloxml"])
         self.check_nh_format(nh_format)
         aligned = int(aligned)
         self.check_sequence(sequence)
-        res = self.services.http_get("genetree/id/" + identifier, frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'nh_format':nh_format, 'sequence':sequence,
-                    'aligned':aligned})
+        res = self.services.http_get(
+            "genetree/id/" + identifier,
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"nh_format": nh_format, "sequence": sequence, "aligned": aligned},
+        )
         return res
 
-    def get_alignment_by_region(self, region, species, frmt='json', aligned=True,
-            compact=True, compara='multi',
-            display_species_set=None, mask=None, method='EPO', species_set=None,
-            species_set_group='mammals'):
+    def get_alignment_by_region(
+        self,
+        region,
+        species,
+        frmt="json",
+        aligned=True,
+        compact=True,
+        compara="multi",
+        display_species_set=None,
+        mask=None,
+        method="EPO",
+        species_set=None,
+        species_set_group="mammals",
+    ):
         """Retrieves genomic alignments as separate blocks based on a region and
         species
 
@@ -273,47 +339,80 @@ class Ensembl():
 
 
         """
-        self._check_frmt(frmt, ['xml', 'phyloxml'])
-        res = self.services.http_get("alignment/region/{0}/{1}".format(species, region),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'aligned':int(aligned), 'callback':self.callback,
-                    'compact':compact, 'compara':compara,
-                    'display_species_set': display_species_set,
-                    'mask':mask, 'method':method, 'species_set':species_set,
-                    'species_set_group': species_set_group})
+        self._check_frmt(frmt, ["xml", "phyloxml"])
+        res = self.services.http_get(
+            "alignment/region/{0}/{1}".format(species, region),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "aligned": int(aligned),
+                "callback": self.callback,
+                "compact": compact,
+                "compara": compara,
+                "display_species_set": display_species_set,
+                "mask": mask,
+                "method": method,
+                "species_set": species_set,
+                "species_set_group": species_set_group,
+            },
+        )
         return res
 
-
-    def get_homology_by_id(self, identifier, frmt='json', aligned=True,
-            compara='multi',
-            format=None, sequence=None, species=None, target_species=None,
-            target_taxon=None, type='all'):
+    def get_homology_by_id(
+        self,
+        identifier,
+        frmt="json",
+        aligned=True,
+        compara="multi",
+        format=None,
+        sequence=None,
+        species=None,
+        target_species=None,
+        target_taxon=None,
+        type="all",
+    ):
         """Retrieves homology information (orthologs) by Ensembl gene id"""
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get("homology/id/{0}".format(identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'aligned':int(aligned), 'callback':self.callback,
-                    'compara':compara, 'format':format,'sequence':sequence,
-                    'species': species,
-                    'target_species':target_species, 'target_taxon':target_taxon,
-                    'type': type})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "homology/id/{0}".format(identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "aligned": int(aligned),
+                "callback": self.callback,
+                "compara": compara,
+                "format": format,
+                "sequence": sequence,
+                "species": species,
+                "target_species": target_species,
+                "target_taxon": target_taxon,
+                "type": type,
+            },
+        )
         return res
 
-    def get_homology_by_symbol(self, species, symbol, frmt='json',
-            aligned=True, compara=None):
+    def get_homology_by_symbol(
+        self, species, symbol, frmt="json", aligned=True, compara=None
+    ):
         """Retrieves homology information (orthologs) by symbol"""
-        raise NotImplementedError("Please fill an issue her https://github.com/cokelaer/bioservices")
+        raise NotImplementedError(
+            "Please fill an issue her https://github.com/cokelaer/bioservices"
+        )
         # species='human', symbol='BRCA2'
-
 
     # CROSS REFERENCES
     # -------------------------------
 
-    def get_xrefs_by_id(self, identifier, frmt='json', all_levels=False,
-            db_type='core', external_db=None, object_type=None,
-            species=None):
+    def get_xrefs_by_id(
+        self,
+        identifier,
+        frmt="json",
+        all_levels=False,
+        db_type="core",
+        external_db=None,
+        object_type=None,
+        species=None,
+    ):
         """Perform lookups of Ensembl Identifiers and retrieve their external
         references in other databases
 
@@ -331,17 +430,25 @@ class Ensembl():
 
         """
         self._check_frmt(frmt)
-        res = self.services.http_get('xrefs/id/{0}'.format(identifier), frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'db_type': db_type, 'callback':self.callback,
-                    'db_type':db_type, 'all_levels': int(all_levels),
-                    'external_db':external_db, 'object_type':object_type,
-                    'species':species})
+        res = self.services.http_get(
+            "xrefs/id/{0}".format(identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "db_type": db_type,
+                "callback": self.callback,
+                "db_type": db_type,
+                "all_levels": int(all_levels),
+                "external_db": external_db,
+                "object_type": object_type,
+                "species": species,
+            },
+        )
         return res
 
-    def get_xrefs_by_name(self, name, species, frmt='json',
-            db_type='core',
-            external_db=None):
+    def get_xrefs_by_name(
+        self, name, species, frmt="json", db_type="core", external_db=None
+    ):
         """Performs a lookup based upon the primary accession or display label
         of an external reference and returning the information we hold about the
         entry
@@ -355,17 +462,28 @@ class Ensembl():
 
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('xrefs/name/{0}/{1}'.format(species, name), frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'db_type': db_type, 'callback':self.callback,
-                    'external_db': external_db})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "xrefs/name/{0}/{1}".format(species, name),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "db_type": db_type,
+                "callback": self.callback,
+                "external_db": external_db,
+            },
+        )
         return res
 
-    def get_xrefs_by_symbol(self, symbol, species, frmt='json',
-            db_type='core',
-            external_db=None, object_type=None
-            ):
+    def get_xrefs_by_symbol(
+        self,
+        symbol,
+        species,
+        frmt="json",
+        db_type="core",
+        external_db=None,
+        object_type=None,
+    ):
         """Looks up an external symbol and returns all Ensembl objects linked to
         it. This can be a display name for a gene/transcript/translation, a
         synonym or an externally linked reference. If a gene's transcript is
@@ -381,31 +499,35 @@ class Ensembl():
         :param str object_type: filter by feature type (e.g., gene, transcript)
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('xrefs/symbol/{0}/{1}'.format(species, symbol), frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-        #      params = {'db_type': db_type, 'callback':self.callback,
-        #           'object_type':object_type, 'external_db': external_db}
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "xrefs/symbol/{0}/{1}".format(species, symbol),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            #      params = {'db_type': db_type, 'callback':self.callback,
+            #           'object_type':object_type, 'external_db': external_db}
         )
         return res
 
-
     # INFORMATION
     # ---------------------------------------------------------------------------
-    def get_info_analysis(self, species, frmt='json'):
+    def get_info_analysis(self, species, frmt="json"):
         """List the names of analyses involved in generating Ensembl data.
 
         :param str species: Species name/alias (e.g., homo_sapiens)
         :param str frmt: response formats: json, jsonp,xml
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('info/analysis/{0}'.format(species), frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'callback':self.callback})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "info/analysis/{0}".format(species),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback},
+        )
         return res
 
-    def get_info_assembly(self, species, frmt='json', bands=False):
+    def get_info_assembly(self, species, frmt="json", bands=False):
         """List the currently available assemblies for a species.
 
         :param str species: Species name/alias (e.g., homo_sapiens)
@@ -414,25 +536,28 @@ class Ensembl():
             Only display if band information is available
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('info/assembly/{0}'.format(species), frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'bands': bands,'callback':self.callback})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "info/assembly/{0}".format(species),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"bands": bands, "callback": self.callback},
+        )
         return res
 
-    def get_info_assembly_by_region(self, species, region, frmt='json',
-            bands=0 ):
+    def get_info_assembly_by_region(self, species, region, frmt="json", bands=0):
         """Returns information about the specified toplevel sequence region for the
-            given species."""
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('info/assembly/{0}/{1}'.format(species,region),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'bands': bands, 'callback':self.callback
-                    })
+        given species."""
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "info/assembly/{0}/{1}".format(species, region),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"bands": bands, "callback": self.callback},
+        )
         return res
 
-    def get_info_biotypes(self, species, frmt='json'):
+    def get_info_biotypes(self, species, frmt="json"):
         """List the functional classifications of gene models that Ensembl associates
         with a particular species. Useful for restricting the type of genes/transcripts
         retrieved by other endpoints.
@@ -441,14 +566,16 @@ class Ensembl():
         :param str frmt: response formats: json, jsonp,xml
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('info/biotypes/{0}'.format(species), frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'callback':self.callback})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "info/biotypes/{0}".format(species),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback},
+        )
         return res
 
-    def get_info_compara_methods(self, frmt='json', compara='multi',
-            method_class=None):
+    def get_info_compara_methods(self, frmt="json", compara="multi", method_class=None):
         """List all compara analyses available (an analysis defines the type of
         comparative data).
 
@@ -462,15 +589,25 @@ class Ensembl():
         .. note:: API argument is class, renamed in method_class
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('info/compara/methods', frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'class':method_class, 'compara':compara,
-                    'callback':self.callback})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "info/compara/methods",
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "class": method_class,
+                "compara": compara,
+                "callback": self.callback,
+            },
+        )
         return res
 
-    def get_info_compara_by_method(self, method, frmt='json', compara='multi',
-            ):
+    def get_info_compara_by_method(
+        self,
+        method,
+        frmt="json",
+        compara="multi",
+    ):
         """List all collections of species analysed with the specified compara
         method.
 
@@ -483,25 +620,30 @@ class Ensembl():
             defaults to 'multi'
 
         """
-        self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.services.http_get('info/compara/species_sets/{0}'.format(method),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'compara':compara, 'callback':self.callback})
+        self._check_frmt(frmt, ["xml", "yaml"])
+        res = self.services.http_get(
+            "info/compara/species_sets/{0}".format(method),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"compara": compara, "callback": self.callback},
+        )
         return res
 
-    def get_info_comparas(self, frmt='json' ):
+    def get_info_comparas(self, frmt="json"):
         """Lists all available comparative genomics databases and their data release.
 
         :param str frmt: response formats: json, jsonp,xml
         """
-        self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.services.http_get('info/comparas', frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'callback':self.callback})
+        self._check_frmt(frmt, ["xml", "yaml"])
+        res = self.services.http_get(
+            "info/comparas",
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback},
+        )
         return res
 
-    def get_info_data(self, frmt='json'):
+    def get_info_data(self, frmt="json"):
         """Shows the data releases available on this REST server. May return more than
         one release (unfrequent non-standard Ensembl configuration).
 
@@ -509,14 +651,16 @@ class Ensembl():
 
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('info/data', frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'callback':self.callback})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "info/data",
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback},
+        )
         return res
 
-    def get_info_external_dbs(self, species, frmt='json',
-            filter=None):
+    def get_info_external_dbs(self, species, frmt="json", filter=None):
         """Lists all available external sources for a species.
 
         :param str frmt: response formats: json, jsonp,xml
@@ -527,62 +671,82 @@ class Ensembl():
 
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('info/external_dbs/{0}'.format(species),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'callback':self.callback, 'filter':filter})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "info/external_dbs/{0}".format(species),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback, "filter": filter},
+        )
         return res
 
-    def get_info_ping(self, frmt='json'):
+    def get_info_ping(self, frmt="json"):
         """Checks if the service is alive."""
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('info/ping/', frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'callback':self.callback})
-        return res['ping']
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "info/ping/",
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback},
+        )
+        return res["ping"]
 
-    def get_info_rest(self, frmt='json'):
+    def get_info_rest(self, frmt="json"):
         """Shows the current version of the Ensembl REST API.
 
         :param str frmt: response formats: json, jsonp,xml
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('info/rest/', frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'callback':self.callback})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "info/rest/",
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback},
+        )
         return res
 
-    def get_info_software(self, frmt='json'):
+    def get_info_software(self, frmt="json"):
         """Shows the current version of the Ensembl API used by the REST server.
 
         :param str frmt: response formats: json, jsonp,xml
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('info/software/', frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'callback':self.callback})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "info/software/",
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback},
+        )
         return res
 
-    def get_info_species(self, frmt='json'):
+    def get_info_species(self, frmt="json"):
         """Lists all available species, their aliases, available adaptor groups and data
         release.
 
         :param str frmt: response formats: json, jsonp,xml
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('info/species/', frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params = {'callback':self.callback})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "info/species/",
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback},
+        )
         return res
 
     # LOOKUP
     # -------------------------------------------------------------------
-    def get_lookup_by_id(self, identifier, frmt='json',
-            db_type=None, expand=False,
-            format='full', species=None):
+    def get_lookup_by_id(
+        self,
+        identifier,
+        frmt="json",
+        db_type=None,
+        expand=False,
+        format="full",
+        species=None,
+    ):
         """Find the species and database for a single identifier
 
         :param str identifier: An ontology term identifier (e.g., GO:0005667)
@@ -601,16 +765,31 @@ class Ensembl():
             get_lookup_by_id('ENSG00000157764', expand=True)
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get("lookup/id/" + identifier, frmt=frmt,
-                headers = self.services.get_headers(content=frmt),
-                params = {'db_type': db_type, 'expand': int(expand), 'format': format,
-                    'callback': self.callback, 'species': species})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "lookup/id/" + identifier,
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "db_type": db_type,
+                "expand": int(expand),
+                "format": format,
+                "callback": self.callback,
+                "species": species,
+            },
+        )
         return res
 
-    def post_lookup_by_id(self, identifiers, frmt='json',
-            db_type=None, expand=False,
-            format='full', object_type=None, species=None):
+    def post_lookup_by_id(
+        self,
+        identifiers,
+        frmt="json",
+        db_type=None,
+        expand=False,
+        format="full",
+        object_type=None,
+        species=None,
+    ):
         """Find the species and database for a single identifier
 
         :param str identifier: An ontology term identifier (e.g., GO:0005667)
@@ -634,16 +813,29 @@ class Ensembl():
         self._check_frmt(frmt)
         identifiers = self.services.devtools.to_list(identifiers)
         expand = int(expand)
-        res = self.services.http_post("lookup/id/", frmt=frmt,
-                headers = self.services.get_headers(content=frmt),
-                data =self.services.devtools.to_json({'ids':identifiers}),
-                params={'db_type': db_type, 'expand': expand, 'format': format,
-                    'callback': self.callback, 'species': species})
+        res = self.services.http_post(
+            "lookup/id/",
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            data=self.services.devtools.to_json({"ids": identifiers}),
+            params={
+                "db_type": db_type,
+                "expand": expand,
+                "format": format,
+                "callback": self.callback,
+                "species": species,
+            },
+        )
         return res
 
-    def get_lookup_by_symbol(self, species, symbol, frmt='json',
-            expand=False,
-            format='full',):
+    def get_lookup_by_symbol(
+        self,
+        species,
+        symbol,
+        frmt="json",
+        expand=False,
+        format="full",
+    ):
         """Find the species and database for a single identifier
 
         :param str species: Species name/alias (e.g., human)
@@ -660,18 +852,24 @@ class Ensembl():
             get_lookup_by_symbol('homo_sapiens', 'BRCA2', expand=True)
 
         """
-        self._check_frmt(frmt, ['xml'])
+        self._check_frmt(frmt, ["xml"])
         expand = int(expand)
-        res = self.services.http_get("lookup/symbol/{0}/{1}".format(species, symbol),
-                frmt=frmt,
-                headers = self.services.get_headers(content=frmt),
-                params = {'format': format,
-                    'callback': self.callback, 'expand':expand})
+        res = self.services.http_get(
+            "lookup/symbol/{0}/{1}".format(species, symbol),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"format": format, "callback": self.callback, "expand": expand},
+        )
         return res
 
-    def post_lookup_by_symbol(self, species, symbols, frmt='json',
-            expand=False,
-            format='full',):
+    def post_lookup_by_symbol(
+        self,
+        species,
+        symbols,
+        frmt="json",
+        expand=False,
+        format="full",
+    ):
         """Find the species and database for a set of symbols
 
         :param str species: Species name/alias (e.g., human)
@@ -688,22 +886,22 @@ class Ensembl():
             post_lookup_by_symbol('homo_sapiens', ['BRCA2', 'BRAF'], expand=True)
 
         """
-        self._check_frmt(frmt, ['xml'])
+        self._check_frmt(frmt, ["xml"])
         symbols = self.services.devtools.to_list(symbols)
         expand = int(expand)
-        res = self.services.http_post("lookup/symbol/{0}".format(species),
-                frmt=frmt,
-                headers = self.services.get_headers(content=frmt),
-                data = self.services.devtools.to_json({'symbols':symbols}),
-                params = {'format': format,
-                    'callback': self.callback, 'expand':expand})
+        res = self.services.http_post(
+            "lookup/symbol/{0}".format(species),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            data=self.services.devtools.to_json({"symbols": symbols}),
+            params={"format": format, "callback": self.callback, "expand": expand},
+        )
         return res
 
     # MAPPING
     # --------------------------------------------------------------------
 
-    def get_map_cds_to_region(self, identifier, region, frmt='json',
-            species=None):
+    def get_map_cds_to_region(self, identifier, region, frmt="json", species=None):
         """Convert from cDNA coordinates to genomic coordinates.
 
         :param identifier: Ensembl ID e.g. ENST00000288602
@@ -714,16 +912,18 @@ class Ensembl():
 
             get_map_cds_to_region('ENST00000288602', '1..1000')
         """
-        self._check_frmt(frmt, ['json'])
-        res = self.services.http_get("map/cds/{0}/{1}".format(identifier, region),
-                frmt=frmt,  headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback, 'species':species})
+        self._check_frmt(frmt, ["json"])
+        res = self.services.http_get(
+            "map/cds/{0}/{1}".format(identifier, region),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback, "species": species},
+        )
 
         return res
 
-    def get_map_cdna_to_region(self, identifier, region, frmt='json',
-            species=None):
-        """ Convert from cDNA coordinates to genomic coordinates.
+    def get_map_cdna_to_region(self, identifier, region, frmt="json", species=None):
+        """Convert from cDNA coordinates to genomic coordinates.
 
         :param str first: version of the input assembly
         :param str first: version of the output assembly
@@ -738,14 +938,18 @@ class Ensembl():
             get_map_cdna_to_region('ENST00000288602', '100..300')
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get("map/cdna/{0}/{1}".format(identifier, region),
-                frmt=frmt,  headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback, 'species':species})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "map/cdna/{0}/{1}".format(identifier, region),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback, "species": species},
+        )
         return res
 
-    def get_map_assembly_one_to_two(self, first, second, region, species='human',
-        frmt='json'):
+    def get_map_assembly_one_to_two(
+        self, first, second, region, species="human", frmt="json"
+    ):
         """Convert the co-ordinates of one assembly to another
 
 
@@ -760,14 +964,18 @@ class Ensembl():
                 first='GRCh37', region='X:1000000..1000100:1', second='GRCh38')
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get("map/{0}/{1}/{2}/{3}".format(species, first, region, second ),
-                frmt=frmt,  headers=self.services.get_headers(content=frmt),
-                params={})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "map/{0}/{1}/{2}/{3}".format(species, first, region, second),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={},
+        )
         return res
 
-    def get_map_translation_to_region(self, identifier, region, frmt='json',
-            species=None):
+    def get_map_translation_to_region(
+        self, identifier, region, frmt="json", species=None
+    ):
         """Convert from protein (translation) coordinates to genomic coordinates.
 
         Output reflects forward orientation coordinates as returned from the
@@ -781,18 +989,19 @@ class Ensembl():
 
             get_map_translation_to_region('ENSP00000288602', '100..300')
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get("map/translation/{0}/{1}".format(identifier, region),
-                frmt=frmt,  headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "map/translation/{0}/{1}".format(identifier, region),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback},
+        )
         return res
-
 
     # ONTOLOGY and Taxonomy
     # -------------------------------------------------------------------------
 
-    def get_ontology_by_id(self, identifier, frmt='json',
-            relation=None, simple=False):
+    def get_ontology_by_id(self, identifier, frmt="json", relation=None, simple=False):
         """Search for an ontological  term by its namespaced identifier
 
         :param str identifier: An ontology term identifier (e.g., GO:0005667)
@@ -809,17 +1018,23 @@ class Ensembl():
             >>> res = e.get_ontology('GO:0005667')
 
         """
-        self._check_frmt(frmt, ['xml', 'yaml'])
+        self._check_frmt(frmt, ["xml", "yaml"])
         identifier = str(identifier)
-        res = self.services.http_get("ontology/id/{0}".format(identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'simple': int(simple), 'relation':relation,
-                    'callback':self.callback})
+        res = self.services.http_get(
+            "ontology/id/{0}".format(identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "simple": int(simple),
+                "relation": relation,
+                "callback": self.callback,
+            },
+        )
         return res
 
-    def get_ontology_by_name(self, name, frmt='json',
-            ontology=None, relation=None, simple=False):
+    def get_ontology_by_name(
+        self, name, frmt="json", ontology=None, relation=None, simple=False
+    ):
         """Search for a list of ontological terms by their name
 
         :param str name: An ontology name. SQL wildcards See :class:`Ensembl` doc.
@@ -841,14 +1056,21 @@ class Ensembl():
             >>> res[0]['children']
 
         """
-        self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.services.http_get("ontology/name/{0}".format(name), frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'simple':int(simple), 'relation':relation,
-                    'callback':self.callback, 'ontology':ontology})
+        self._check_frmt(frmt, ["xml", "yaml"])
+        res = self.services.http_get(
+            "ontology/name/{0}".format(name),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "simple": int(simple),
+                "relation": relation,
+                "callback": self.callback,
+                "ontology": ontology,
+            },
+        )
         return res
 
-    def get_taxonomy_by_id(self, identifier, frmt='json', simple=False):
+    def get_taxonomy_by_id(self, identifier, frmt="json", simple=False):
         """Search for a taxonomic term by its identifier or name
 
         :param str identifier: A taxon identifier. Can be a NCBI taxon id or
@@ -856,14 +1078,16 @@ class Ensembl():
         :param bool simple: If set the API will avoid the fetching of parent and child terms
         :param str frmt: response formats in json, xml, yaml, jsonp
         """
-        self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.services.http_get("taxonomy/id/{0}".format(identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'simple':int(simple)})
+        self._check_frmt(frmt, ["xml", "yaml"])
+        res = self.services.http_get(
+            "taxonomy/id/{0}".format(identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"simple": int(simple)},
+        )
         return res
 
-    def get_taxonomy_by_name(self, name, frmt='json'):
+    def get_taxonomy_by_name(self, name, frmt="json"):
         """Search for a taxonomic id by a non-scientific name
 
         :param str name: A non-scientific species name. Can include SQL wildcards
@@ -877,15 +1101,20 @@ class Ensembl():
             >>> res = e.get_taxonomy_by_name('homo')
 
         """
-        self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.services.http_get("taxonomy/name/{0}".format(name),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback})
+        self._check_frmt(frmt, ["xml", "yaml"])
+        res = self.services.http_get(
+            "taxonomy/name/{0}".format(name),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback},
+        )
         return res
 
-    def get_taxonomy_classification_by_id(self, identifier, frmt='json',
-            ):
+    def get_taxonomy_classification_by_id(
+        self,
+        identifier,
+        frmt="json",
+    ):
         """Return the taxonomic classification of a taxon node
 
 
@@ -900,15 +1129,16 @@ class Ensembl():
             >>> res = e.get_taxonomy_classification_by_id('9606')
 
         """
-        self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.services.http_get("taxonomy/classification/{0}".format(identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback})
+        self._check_frmt(frmt, ["xml", "yaml"])
+        res = self.services.http_get(
+            "taxonomy/classification/{0}".format(identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback},
+        )
         return res
 
-    def get_ontology_ancestors_by_id(self, identifier, frmt='json',
-            ontology=None):
+    def get_ontology_ancestors_by_id(self, identifier, frmt="json", ontology=None):
         """Reconstruct the entire ancestry of a term from is_a and part_of
         relationships
 
@@ -920,15 +1150,18 @@ class Ensembl():
 
 
         """
-        self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.services.http_get("ontology/ancestors/{0}".format(identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback, 'ontology':ontology})
+        self._check_frmt(frmt, ["xml", "yaml"])
+        res = self.services.http_get(
+            "ontology/ancestors/{0}".format(identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback, "ontology": ontology},
+        )
         return res
 
-    def get_ontology_ancestors_chart_by_id(self, identifier, frmt='json',
-            ontology=None):
+    def get_ontology_ancestors_chart_by_id(
+        self, identifier, frmt="json", ontology=None
+    ):
         """Reconstruct the entire ancestry of a term from is_a and part_of
         relationships.
 
@@ -938,17 +1171,26 @@ class Ensembl():
             terms which are shared between ontologies such as GO and EFO
 
         """
-        self._check_frmt(frmt, ['xml', 'yaml'])
-        res = self.services.http_get("ontology/ancestors/chart/{0}".format(identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback, 'ontology':ontology})
+        self._check_frmt(frmt, ["xml", "yaml"])
+        res = self.services.http_get(
+            "ontology/ancestors/chart/{0}".format(identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback, "ontology": ontology},
+        )
         return res
         #'getAncestorsChartById': {'url': '/ontology/ancestors/chart/{{id}}',
 
-    def get_ontology_descendants_by_id(self, identifier, frmt='json',
-            closest_term=None, ontology=None, subset=None, zero_distance=None):
-        """ Find all the terms descended from a given term. By default searches
+    def get_ontology_descendants_by_id(
+        self,
+        identifier,
+        frmt="json",
+        closest_term=None,
+        ontology=None,
+        subset=None,
+        zero_distance=None,
+    ):
+        """Find all the terms descended from a given term. By default searches
         are conducted within the namespace of the given identifier
 
         :param str identifier: an ontology term identifier (GO:0005667)
@@ -961,21 +1203,37 @@ class Ensembl():
         :param bool zero_distance: Return terms with a distance of 0
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get("ontology/descendants/{0}".format(identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback, 'ontology':ontology,
-                    'closest_term': closest_term, 'subset':subset,
-                    'zero_distance': zero_distance})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "ontology/descendants/{0}".format(identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "callback": self.callback,
+                "ontology": ontology,
+                "closest_term": closest_term,
+                "subset": subset,
+                "zero_distance": zero_distance,
+            },
+        )
         return res
 
     # OVERLAP
     # -----------------------------------------------------
-    def get_overlap_by_id(self, identifier, feature=None, frmt='json',
-            biotype=None, db_type=None, logic_name=None,
-            misc_set=None, object_type=None, so_term=None, species=None,
-            species_set='mammals'):
+    def get_overlap_by_id(
+        self,
+        identifier,
+        feature=None,
+        frmt="json",
+        biotype=None,
+        db_type=None,
+        logic_name=None,
+        misc_set=None,
+        object_type=None,
+        so_term=None,
+        species=None,
+        species_set="mammals",
+    ):
         """Retrieves features (e.g. genes, transcripts, variations etc.)
         that overlap a region defined by the given identifier.
 
@@ -1002,22 +1260,43 @@ class Ensembl():
             retrieving constrained elements. (e.g. mammals)
 
         """
-        self._check_frmt(frmt, ['xml', 'gff3', 'bed'])
-        res = self.services.http_get("overlap/id/{0}".format(identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback, 'biotype':biotype,
-                    'db_type':  db_type, 'logic_name': logic_name,
-                    'misc_set': misc_set, 'object_type': object_type,
-                    'so_term': so_term, 'species': species,'feature':feature,
-                    'species_set': species_set})
+        self._check_frmt(frmt, ["xml", "gff3", "bed"])
+        res = self.services.http_get(
+            "overlap/id/{0}".format(identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "callback": self.callback,
+                "biotype": biotype,
+                "db_type": db_type,
+                "logic_name": logic_name,
+                "misc_set": misc_set,
+                "object_type": object_type,
+                "so_term": so_term,
+                "species": species,
+                "feature": feature,
+                "species_set": species_set,
+            },
+        )
         return res
 
-    def get_overlap_by_region(self, region, species, feature=None,
-            frmt='json', biotype=None, cell_type=None,
-            db_type=None, logic_name=None,
-            misc_set=None, object_type=None, so_term=None,
-            species_set=None, trim_downstream=False, trim_upstream=False):
+    def get_overlap_by_region(
+        self,
+        region,
+        species,
+        feature=None,
+        frmt="json",
+        biotype=None,
+        cell_type=None,
+        db_type=None,
+        logic_name=None,
+        misc_set=None,
+        object_type=None,
+        so_term=None,
+        species_set=None,
+        trim_downstream=False,
+        trim_upstream=False,
+    ):
         """Retrieves multiple types of features for a given region.
 
         :param str region: Query region. A maximum of 5Mb is allowed to
@@ -1052,23 +1331,37 @@ class Ensembl():
 
         .. todo:: feature can take several values. how can be do that.
         """
-        self._check_frmt(frmt, ['xml', 'gff3', 'bed'])
-        res = self.services.http_get("overlap/region/{0}/{1}".format(species, region),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback, 'biotype':biotype,
-                    'cell_type': cell_type, 'feature':feature,
-                    'db_type':  db_type, 'logic_name': logic_name,
-                    'misc_set': misc_set,
-                    'so_term': so_term, 'species_set': species_set,
-                    'trim_downstream': trim_downstream,
-                    'trim_upstream': trim_upstream
-                    })
+        self._check_frmt(frmt, ["xml", "gff3", "bed"])
+        res = self.services.http_get(
+            "overlap/region/{0}/{1}".format(species, region),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "callback": self.callback,
+                "biotype": biotype,
+                "cell_type": cell_type,
+                "feature": feature,
+                "db_type": db_type,
+                "logic_name": logic_name,
+                "misc_set": misc_set,
+                "so_term": so_term,
+                "species_set": species_set,
+                "trim_downstream": trim_downstream,
+                "trim_upstream": trim_upstream,
+            },
+        )
         return res
 
-    def get_overlap_by_translation(self, identifier, frmt='json',
-            db_type=None, feature='protein_feature',
-            so_term=None, species=None,type='none'):
+    def get_overlap_by_translation(
+        self,
+        identifier,
+        frmt="json",
+        db_type=None,
+        feature="protein_feature",
+        so_term=None,
+        species=None,
+        type="none",
+    ):
         """Retrieve features related to a specific Translation as
         described by its stable ID (e.g. domains, variations).
 
@@ -1087,20 +1380,30 @@ class Ensembl():
             features are returned. Can specify a domain or consequence
             type. (e.g.,  low_complexity)
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get("overlap/translation/{0}".format(identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback,
-                    'db_type':  db_type, 'feature': feature,
-                    'so_term': so_term, 'species': species,
-                    'type': type})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "overlap/translation/{0}".format(identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "callback": self.callback,
+                "db_type": db_type,
+                "feature": feature,
+                "so_term": so_term,
+                "species": species,
+                "type": type,
+            },
+        )
         return res
 
     # REGULATION
     # --------------------------------------
-    def get_regulatory_by_id(self, identifier, species, frmt='json',
-            ):
+    def get_regulatory_by_id(
+        self,
+        identifier,
+        species,
+        frmt="json",
+    ):
         """Returns a RegulatoryFeature given its stable ID
 
         :param str identifier:
@@ -1108,21 +1411,32 @@ class Ensembl():
 
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get("regulatory/{0}/{1}".format(species, identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "regulatory/{0}/{1}".format(species, identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={"callback": self.callback},
+        )
         return res
-
 
     # SEQUENCE
     # -----------------------------
-    def get_sequence_by_id(self, identifier, frmt='fasta',
-            db_type=None, expand_3prime=None,
-            expand_5prime=None, format=None, mask=None,
-            mask_feature=False, multiple_sequences=False,
-            object_type=None, species=None, type='genomic'):
+    def get_sequence_by_id(
+        self,
+        identifier,
+        frmt="fasta",
+        db_type=None,
+        expand_3prime=None,
+        expand_5prime=None,
+        format=None,
+        mask=None,
+        mask_feature=False,
+        multiple_sequences=False,
+        object_type=None,
+        species=None,
+        type="genomic",
+    ):
         """Request multiple types of sequence by stable identifier.
 
         :param str identifier:
@@ -1174,26 +1488,42 @@ class Ensembl():
 
 
         """
-        self._check_frmt(frmt, ['fasta', 'text', 'yaml', 'seqxml'])
+        self._check_frmt(frmt, ["fasta", "text", "yaml", "seqxml"])
         multiple_sequences = int(multiple_sequences)
-        res = self.services.http_get('sequence/id/{0}'.format(identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={
-                    'db_type': db_type, 'object_type':object_type,
-                    'multiple_sequences':multiple_sequences,  'species':species,
-                    'expand_3prime':expand_3prime,
-                    'expand_5prime':expand_5prime,'format':format,'mask':mask,
-                    'mask_feature':mask_feature, 'type':type,
-                    'multiple_sequences':multiple_sequences,'species':species}
-                )
+        res = self.services.http_get(
+            "sequence/id/{0}".format(identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "db_type": db_type,
+                "object_type": object_type,
+                "multiple_sequences": multiple_sequences,
+                "species": species,
+                "expand_3prime": expand_3prime,
+                "expand_5prime": expand_5prime,
+                "format": format,
+                "mask": mask,
+                "mask_feature": mask_feature,
+                "type": type,
+                "multiple_sequences": multiple_sequences,
+                "species": species,
+            },
+        )
         return res
 
-    def get_sequence_by_region(self, region, species, frmt='json',
-            coord_system=None, coord_system_version=None,
-            expand_3prime=None,
-            expand_5prime=None, format=None, mask=None,
-            mask_feature=False):
+    def get_sequence_by_region(
+        self,
+        region,
+        species,
+        frmt="json",
+        coord_system=None,
+        coord_system_version=None,
+        expand_3prime=None,
+        expand_5prime=None,
+        format=None,
+        mask=None,
+        mask_feature=False,
+    ):
         """Returns the genomic sequence of the specified region of the given species.
 
         :param str region: Query region. A maximum of 10Mb is allowed to be
@@ -1219,25 +1549,35 @@ class Ensembl():
             Incompatible with the 'mask' option
 
         """
-        self._check_frmt(frmt, ['fasta', 'text', 'yaml', 'seqxml'])
-        res = self.services.http_get('sequence/region/{0}/{1}'.format(species, region),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={
-                    'callback': self.callback, 'coord_system':coord_system,
-                    'coord_system_version': coord_system_version,
-                    'expand_3prime':expand_3prime,
-                    'expand_5prime':expand_5prime,'format':format,'mask':mask,
-                    'mask_feature':mask_feature}
-                )
+        self._check_frmt(frmt, ["fasta", "text", "yaml", "seqxml"])
+        res = self.services.http_get(
+            "sequence/region/{0}/{1}".format(species, region),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "callback": self.callback,
+                "coord_system": coord_system,
+                "coord_system_version": coord_system_version,
+                "expand_3prime": expand_3prime,
+                "expand_5prime": expand_5prime,
+                "format": format,
+                "mask": mask,
+                "mask_feature": mask_feature,
+            },
+        )
         return res
-
 
     # VARIATION
     # -----------------------------------------------------
-    def get_variation_by_id(self, identifier, species, frmt='json',
-            genotypes=False, phenotypes=False,
-            pops=False):
+    def get_variation_by_id(
+        self,
+        identifier,
+        species,
+        frmt="json",
+        genotypes=False,
+        phenotypes=False,
+        pops=False,
+    ):
         """
 
         :param str identifier: variation identifier (e.g., rs56116432)
@@ -1248,18 +1588,32 @@ class Ensembl():
         :param bool pops: Include populations
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('variation/{0}/{1}'.format(species, identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'genotypes':int(genotypes), 'phenotypes':int(phenotypes),
-                    'pops': int(pops)}
-                )
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "variation/{0}/{1}".format(species, identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "genotypes": int(genotypes),
+                "phenotypes": int(phenotypes),
+                "pops": int(pops),
+            },
+        )
         return res
 
-    def get_vep_by_id(self, identifier, species, frmt='json',
-            canonical=False, ccds=False, domains=False,
-            hgvs=False, numbers=False, protein=False, xref_refseq=False):
+    def get_vep_by_id(
+        self,
+        identifier,
+        species,
+        frmt="json",
+        canonical=False,
+        ccds=False,
+        domains=False,
+        hgvs=False,
+        numbers=False,
+        protein=False,
+        xref_refseq=False,
+    ):
         """Fetch variant consequences based on a variation identifier
 
         :param str identifier: Query ID. Supports dbSNP, COSMIC and
@@ -1276,32 +1630,54 @@ class Ensembl():
             way MAY NOT, AND FREQUENTLY WILL NOT, match exactly in sequence,
             exon structure and protein product
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('vep/{0}/id/{1}'.format(species, identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback, 'canonical':canonical,
-                    'ccds':ccds, 'domains':domains,
-                    'hgvs': hgvs, 'numbers':numbers, 'protein': protein,
-                    'xref_refseq': xref_refseq})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "vep/{0}/id/{1}".format(species, identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "callback": self.callback,
+                "canonical": canonical,
+                "ccds": ccds,
+                "domains": domains,
+                "hgvs": hgvs,
+                "numbers": numbers,
+                "protein": protein,
+                "xref_refseq": xref_refseq,
+            },
+        )
         return res
-
 
     def post_vep_by_id(self, species, identifiers):
         raise NotImplementedError
-        #POST vep/:species/id/   Fetch variant consequences for multiple ids
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('variation/{0}/{1}'.format(species, identifier),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'genotypes':int(genotypes), 'phenotypes':int(phenotypes),
-                    'pops': int(pops)}
-                )
+        # POST vep/:species/id/   Fetch variant consequences for multiple ids
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "variation/{0}/{1}".format(species, identifier),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "genotypes": int(genotypes),
+                "phenotypes": int(phenotypes),
+                "pops": int(pops),
+            },
+        )
         raise NotImplementeError
 
-    def get_vep_by_region(self, region, allele, species, frmt='json',
-            canonical=False, ccds=False, domains=False,
-            hgvs=False, numbers=False, protein=False, xref_refseq=False):
+    def get_vep_by_region(
+        self,
+        region,
+        allele,
+        species,
+        frmt="json",
+        canonical=False,
+        ccds=False,
+        domains=False,
+        hgvs=False,
+        numbers=False,
+        protein=False,
+        xref_refseq=False,
+    ):
         """Fetch variant consequences
 
         :param region: Query region e.g,  9:22125503-22125502:1
@@ -1319,32 +1695,40 @@ class Ensembl():
             exon structure and protein product
 
         """
-        self._check_frmt(frmt, ['xml'])
-        res = self.services.http_get('vep/{0}/region/{1}/{2}'.format(species, region, allele),
-                frmt=frmt,
-                headers=self.services.get_headers(content=frmt),
-                params={'callback':self.callback, 'canonical':canonical,
-                    'ccds':ccds, 'domains':domains,
-                    'hgvs': hgvs, 'numbers':numbers, 'protein': protein,
-                    'xref_refseq': xref_refseq})
+        self._check_frmt(frmt, ["xml"])
+        res = self.services.http_get(
+            "vep/{0}/region/{1}/{2}".format(species, region, allele),
+            frmt=frmt,
+            headers=self.services.get_headers(content=frmt),
+            params={
+                "callback": self.callback,
+                "canonical": canonical,
+                "ccds": ccds,
+                "domains": domains,
+                "hgvs": hgvs,
+                "numbers": numbers,
+                "protein": protein,
+                "xref_refseq": xref_refseq,
+            },
+        )
         return res
 
     def post_vep_by_region(self, species, region):
-        #POST vep/:species/region/   Fetch variant consequences for multiple regions
+        # POST vep/:species/region/   Fetch variant consequences for multiple regions
         raise NotImplementeError
 
 
-
 class EnsemblFTP(object):
-    """Draft to be completed. 
-    """
+    """Draft to be completed."""
+
     def __init__(self):
-       pass
+        pass
 
     def download(self, db="fungi", release="current"):
 
         import ftplib
-        f = ftplib.FTP('ftp.ensemblgenomes.org')
+
+        f = ftplib.FTP("ftp.ensemblgenomes.org")
         f.login("anonymous", "anonymous")
         f.cwd("pub/%s/%s" % (db, release))
         f.cwd("fasta")
@@ -1354,33 +1738,26 @@ class EnsemblFTP(object):
 
         for this in species:
             print(this)
-            if this.endswith('collection'):
+            if this.endswith("collection"):
                 f.cwd(this)
                 subdirs = f.nlst()
                 for thisdir in subdirs:
                     print(thisdir)
                     f.cwd(thisdir)
-                    f.cwd('dna')
+                    f.cwd("dna")
                     files = f.nlst()
-                    todownload = [x for x in files if x.endswith("dna.genome.fa.gz") ]
+                    todownload = [x for x in files if x.endswith("dna.genome.fa.gz")]
                     for filename in todownload:
-                        f.retrbinary('RETR %s'%filename ,open(filename, "wb").write)
+                        f.retrbinary("RETR %s" % filename, open(filename, "wb").write)
                     f.cwd("../../")
-                f.cwd('..')
+                f.cwd("..")
 
             else:
                 continue
                 f.cwd(this)
-                f.cwd('dna')
+                f.cwd("dna")
                 files = f.nlst()
-                todownload = [x for x in files if x.endswith("dna.genome.fa.gz") ]
+                todownload = [x for x in files if x.endswith("dna.genome.fa.gz")]
                 for filename in todownload:
-                    f.retrbinary('RETR %s'%filename ,open(filename, "wb").write)
+                    f.retrbinary("RETR %s" % filename, open(filename, "wb").write)
                 f.cwd("../../")
-
-
-
-
-
-
-

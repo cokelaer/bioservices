@@ -46,6 +46,7 @@ import sys
 
 from bioservices.services import REST
 from bioservices import logger
+
 logger.name = __name__
 
 try:
@@ -58,105 +59,107 @@ __all__ = ["UniProt"]
 # http://www.ebi.ac.uk/uniprot/database/download.html
 # grep sp uniprot_sprot.fasta  | grep HUMAN | awk '{print substr($1, 12, length($1))}'
 
-mapping = {"UniProtKB AC/ID": "ACC+ID",
-           "UniProtKB": "ACC",
-           "UniProtKB": "ID",
-           "UniParc": "UPARC",
-           "UniRef50": "NF50",
-           "UniRef90": "NF90",
-           "UniRef100": "NF100",
-           "EMBL/GenBank/DDBJ": "EMBL_ID",
-           "EMBL/GenBank/DDBJ CDS": "EMBL",
-           "PIR": "PIR",
-           "UniGene": "UNIGENE_ID",
-           "Entrez Gene (GeneID)": "P_ENTREZGENEID",
-           "GI number*": "P_GI",
-           "IPI": "P_IPI",
-           "RefSeq Protein": "P_REFSEQ_AC",
-           "RefSeq Nucleotide": "REFSEQ_NT_ID",
-           "PDB": "PDB_ID",
-           "DisProt": "DISPROT_ID",
-           "HSSP": "HSSP_ID",
-           "DIP": "DIP_ID",
-           "MINT": "MINT_ID",
-           "Allergome": "ALLERGOME_ID",
-           "MEROPS": "MEROPS_ID",
-           "mycoCLAP": "MYCOCLAP_ID",
-           "PeroxiBase": "PEROXIBASE_ID",
-           "PptaseDB": "PPTASEDB_ID",
-           "REBASE": "REBASE_ID",
-           "TCDB": "TCDB_ID",
-           "PhosSite": "PHOSSITE_ID",
-           "DMDM": "DMDM_ID",
-           "Aarhus/Ghent-2DPAGE": "AARHUS_GHENT_2DPAGE_ID",
-           "World-2DPAGE": "WORLD_2DPAGE_ID",
-           "DNASU": "DNASU_ID",
-           "Ensembl": "ENSEMBL_ID",
-           "Ensembl Protein": "ENSEMBL_PRO_ID",
-           "Ensembl Transcript": "ENSEMBL_TRS_ID",
-           "Ensembl Genomes": "ENSEMBLGENOME_ID",
-           "Ensembl Genomes Protein": "ENSEMBLGENOME_PRO_ID",
-           "Ensembl Genomes Transcript": "ENSEMBLGENOME_TRS_ID",
-           "GeneID": "P_ENTREZGENEID",
-           "GenomeReviews": "GENOMEREVIEWS_ID",
-           "KEGG": "KEGG_ID",
-           "PATRIC": "PATRIC_ID",
-           "UCSC": "UCSC_ID",
-           "VectorBase": "VECTORBASE_ID",
-           "AGD": "AGD_ID",
-           "ArachnoServer": "ARACHNOSERVER_ID",
-           "CGD": "CGD",
-           "ConoServer": "CONOSERVER_ID",
-           "CYGD": "CYGD_ID",
-           "dictyBase": "DICTYBASE_ID",
-           "EchoBASE": "ECHOBASE_ID",
-           "EcoGene": "ECOGENE_ID",
-           "euHCVdb": "EUHCVDB_ID",
-           "EuPathDB": "EUPATHDB_ID",
-           "FlyBase": "FLYBASE_ID",
-           "GeneCards": "GENECARDS_ID",
-           "GeneFarm": "GENEFARM_ID",
-           "GenoList": "GENOLIST_ID",
-           "H-InvDB": "H_INVDB_ID",
-           "HGNC": "HGNC_ID",
-           "HPA": "HPA_ID",
-           "LegioList": "LEGIOLIST_ID",
-           "Leproma": "LEPROMA_ID",
-           "MaizeGDB": "MAIZEGDB_ID",
-           "MIM": "MIM_ID",
-           "MGI": "MGI_ID",
-           "neXtProt": "NEXTPROT_ID",
-           "Orphanet": "ORPHANET_ID",
-           "PharmGKB": "PHARMGKB_ID",
-           "PomBase": "POMBASE_ID",
-           "PseudoCAP": "PSEUDOCAP_ID",
-           "RGD": "RGD_ID",
-           "SGD": "SGD_ID",
-           "TAIR": "TAIR_ID",
-           "TubercuList": "TUBERCULIST_ID",
-           "WormBase": "WORMBASE_ID",
-           "WormBase Transcript": "WORMBASE_TRS_ID",
-           "WormBase Protein": "WORMBASE_PRO_ID",
-           "Xenbase": "XENBASE_ID",
-           "ZFIN": "ZFIN_ID",
-           "eggNOG": "EGGNOG_ID",
-           "GeneTree": "GENETREE_ID",
-           "HOGENOM": "HOGENOM_ID",
-           "HOVERGEN": "HOVERGEN_ID",
-           "KO": "KO_ID",
-           "OMA": "OMA_ID",
-           "OrthoDB": "ORTHODB_ID",
-           "ProtClustDB": "PROTCLUSTDB_ID",
-           "BioCyc": "BIOCYC_ID",
-           "Reactome": "REACTOME_ID",
-           "UniPathWay": "UNIPATHWAY_ID",
-           "CleanEx": "CLEANEX_ID",
-           "GermOnline": "GERMONLINE_ID",
-           "ChEMBL": "CHEMBL_ID",
-           "ChiTaRS": "CHITARS_ID",
-           "DrugBank": "DRUGBANK_ID",
-           "GenomeRNAi": "GENOMERNAI_ID",
-           "NextBio": "NEXTBIO_ID"}
+mapping = {
+    "UniProtKB AC/ID": "ACC+ID",
+    "UniProtKB": "ACC",
+    "UniProtKB": "ID",
+    "UniParc": "UPARC",
+    "UniRef50": "NF50",
+    "UniRef90": "NF90",
+    "UniRef100": "NF100",
+    "EMBL/GenBank/DDBJ": "EMBL_ID",
+    "EMBL/GenBank/DDBJ CDS": "EMBL",
+    "PIR": "PIR",
+    "UniGene": "UNIGENE_ID",
+    "Entrez Gene (GeneID)": "P_ENTREZGENEID",
+    "GI number*": "P_GI",
+    "IPI": "P_IPI",
+    "RefSeq Protein": "P_REFSEQ_AC",
+    "RefSeq Nucleotide": "REFSEQ_NT_ID",
+    "PDB": "PDB_ID",
+    "DisProt": "DISPROT_ID",
+    "HSSP": "HSSP_ID",
+    "DIP": "DIP_ID",
+    "MINT": "MINT_ID",
+    "Allergome": "ALLERGOME_ID",
+    "MEROPS": "MEROPS_ID",
+    "mycoCLAP": "MYCOCLAP_ID",
+    "PeroxiBase": "PEROXIBASE_ID",
+    "PptaseDB": "PPTASEDB_ID",
+    "REBASE": "REBASE_ID",
+    "TCDB": "TCDB_ID",
+    "PhosSite": "PHOSSITE_ID",
+    "DMDM": "DMDM_ID",
+    "Aarhus/Ghent-2DPAGE": "AARHUS_GHENT_2DPAGE_ID",
+    "World-2DPAGE": "WORLD_2DPAGE_ID",
+    "DNASU": "DNASU_ID",
+    "Ensembl": "ENSEMBL_ID",
+    "Ensembl Protein": "ENSEMBL_PRO_ID",
+    "Ensembl Transcript": "ENSEMBL_TRS_ID",
+    "Ensembl Genomes": "ENSEMBLGENOME_ID",
+    "Ensembl Genomes Protein": "ENSEMBLGENOME_PRO_ID",
+    "Ensembl Genomes Transcript": "ENSEMBLGENOME_TRS_ID",
+    "GeneID": "P_ENTREZGENEID",
+    "GenomeReviews": "GENOMEREVIEWS_ID",
+    "KEGG": "KEGG_ID",
+    "PATRIC": "PATRIC_ID",
+    "UCSC": "UCSC_ID",
+    "VectorBase": "VECTORBASE_ID",
+    "AGD": "AGD_ID",
+    "ArachnoServer": "ARACHNOSERVER_ID",
+    "CGD": "CGD",
+    "ConoServer": "CONOSERVER_ID",
+    "CYGD": "CYGD_ID",
+    "dictyBase": "DICTYBASE_ID",
+    "EchoBASE": "ECHOBASE_ID",
+    "EcoGene": "ECOGENE_ID",
+    "euHCVdb": "EUHCVDB_ID",
+    "EuPathDB": "EUPATHDB_ID",
+    "FlyBase": "FLYBASE_ID",
+    "GeneCards": "GENECARDS_ID",
+    "GeneFarm": "GENEFARM_ID",
+    "GenoList": "GENOLIST_ID",
+    "H-InvDB": "H_INVDB_ID",
+    "HGNC": "HGNC_ID",
+    "HPA": "HPA_ID",
+    "LegioList": "LEGIOLIST_ID",
+    "Leproma": "LEPROMA_ID",
+    "MaizeGDB": "MAIZEGDB_ID",
+    "MIM": "MIM_ID",
+    "MGI": "MGI_ID",
+    "neXtProt": "NEXTPROT_ID",
+    "Orphanet": "ORPHANET_ID",
+    "PharmGKB": "PHARMGKB_ID",
+    "PomBase": "POMBASE_ID",
+    "PseudoCAP": "PSEUDOCAP_ID",
+    "RGD": "RGD_ID",
+    "SGD": "SGD_ID",
+    "TAIR": "TAIR_ID",
+    "TubercuList": "TUBERCULIST_ID",
+    "WormBase": "WORMBASE_ID",
+    "WormBase Transcript": "WORMBASE_TRS_ID",
+    "WormBase Protein": "WORMBASE_PRO_ID",
+    "Xenbase": "XENBASE_ID",
+    "ZFIN": "ZFIN_ID",
+    "eggNOG": "EGGNOG_ID",
+    "GeneTree": "GENETREE_ID",
+    "HOGENOM": "HOGENOM_ID",
+    "HOVERGEN": "HOVERGEN_ID",
+    "KO": "KO_ID",
+    "OMA": "OMA_ID",
+    "OrthoDB": "ORTHODB_ID",
+    "ProtClustDB": "PROTCLUSTDB_ID",
+    "BioCyc": "BIOCYC_ID",
+    "Reactome": "REACTOME_ID",
+    "UniPathWay": "UNIPATHWAY_ID",
+    "CleanEx": "CLEANEX_ID",
+    "GermOnline": "GERMONLINE_ID",
+    "ChEMBL": "CHEMBL_ID",
+    "ChiTaRS": "CHITARS_ID",
+    "DrugBank": "DRUGBANK_ID",
+    "GenomeRNAi": "GENOMERNAI_ID",
+    "NextBio": "NEXTBIO_ID",
+}
 
 
 class UniProt(REST):
@@ -176,6 +179,7 @@ class UniProt(REST):
         >>> sequence = u.search("ZAP70_HUMAN", columns="sequence")
 
     """
+
     _mapping = mapping.copy()
     _url = "https://www.uniprot.org"
     # _valid_columns = ['citation', 'clusters', 'comments', 'database',
@@ -188,94 +192,219 @@ class UniProt(REST):
     #                   'sequence-modified', 'proteome']
     _valid_columns = [
         # Names & Taxonomy
-        'id', 'entry name', 'genes', 'genes(PREFERRED)', 'genes(ALTERNATIVE)',
-        'genes(OLN)', 'genes(ORF)', 'organism', 'organism-id', 'protein names',
-        'proteome', 'lineage(ALL)', 'lineage-id', 'virus hosts',
+        "id",
+        "entry name",
+        "genes",
+        "genes(PREFERRED)",
+        "genes(ALTERNATIVE)",
+        "genes(OLN)",
+        "genes(ORF)",
+        "organism",
+        "organism-id",
+        "protein names",
+        "proteome",
+        "lineage(ALL)",
+        "lineage-id",
+        "virus hosts",
         # Sequences
-        'fragment', 'sequence', 'length', 'mass', 'encodedon',
-        'comment(ALTERNATIVE PRODUCTS)', 'comment(ERRONEOUS GENE MODEL PREDICTION)',
-        'comment(ERRONEOUS INITIATION)', 'comment(ERRONEOUS TERMINATION)',
-        'comment(ERRONEOUS TRANSLATION)', 'comment(FRAMESHIFT)',
-        'comment(MASS SPECTROMETRY)', 'comment(POLYMORPHISM)',
-        'comment(RNA EDITING)', 'comment(SEQUENCE CAUTION)',
-        'feature(ALTERNATIVE SEQUENCE)', 'feature(NATURAL VARIANT)',
-        'feature(NON ADJACENT RESIDUES)',
-        'feature(NON STANDARD RESIDUE)', 'feature(NON TERMINAL RESIDUE)',
-        'feature(SEQUENCE CONFLICT)', 'feature(SEQUENCE UNCERTAINTY)',
-        'version(sequence)',
+        "fragment",
+        "sequence",
+        "length",
+        "mass",
+        "encodedon",
+        "comment(ALTERNATIVE PRODUCTS)",
+        "comment(ERRONEOUS GENE MODEL PREDICTION)",
+        "comment(ERRONEOUS INITIATION)",
+        "comment(ERRONEOUS TERMINATION)",
+        "comment(ERRONEOUS TRANSLATION)",
+        "comment(FRAMESHIFT)",
+        "comment(MASS SPECTROMETRY)",
+        "comment(POLYMORPHISM)",
+        "comment(RNA EDITING)",
+        "comment(SEQUENCE CAUTION)",
+        "feature(ALTERNATIVE SEQUENCE)",
+        "feature(NATURAL VARIANT)",
+        "feature(NON ADJACENT RESIDUES)",
+        "feature(NON STANDARD RESIDUE)",
+        "feature(NON TERMINAL RESIDUE)",
+        "feature(SEQUENCE CONFLICT)",
+        "feature(SEQUENCE UNCERTAINTY)",
+        "version(sequence)",
         # Family and Domains
-        'domains', 'domain', 'comment(DOMAIN)', 'comment(SIMILARITY)',
-        'feature(COILED COIL)', 'feature(COMPOSITIONAL BIAS)',
-        'feature(DOMAIN EXTENT)', 'feature(MOTIF)', 'feature(REGION)',
-        'feature(REPEAT)', 'feature(ZINC FINGER)',
+        "domains",
+        "domain",
+        "comment(DOMAIN)",
+        "comment(SIMILARITY)",
+        "feature(COILED COIL)",
+        "feature(COMPOSITIONAL BIAS)",
+        "feature(DOMAIN EXTENT)",
+        "feature(MOTIF)",
+        "feature(REGION)",
+        "feature(REPEAT)",
+        "feature(ZINC FINGER)",
         # Function
-        'ec', 'comment(ABSORPTION)', 'comment(CATALYTIC ACTIVITY)',
-        'comment(COFACTOR)', 'comment(ENZYME REGULATION)', 'comment(FUNCTION)',
-        'comment(KINETICS)', 'comment(PATHWAY)', 'comment(REDOX POTENTIAL)',
-        'comment(TEMPERATURE DEPENDENCE)', 'comment(PH DEPENDENCE)',
-        'feature(ACTIVE SITE)', 'feature(BINDING SITE)', 'feature(DNA BINDING)',
-        'feature(METAL BINDING)', 'feature(NP BIND)', 'feature(SITE)',
+        "ec",
+        "comment(ABSORPTION)",
+        "comment(CATALYTIC ACTIVITY)",
+        "comment(COFACTOR)",
+        "comment(ENZYME REGULATION)",
+        "comment(FUNCTION)",
+        "comment(KINETICS)",
+        "comment(PATHWAY)",
+        "comment(REDOX POTENTIAL)",
+        "comment(TEMPERATURE DEPENDENCE)",
+        "comment(PH DEPENDENCE)",
+        "feature(ACTIVE SITE)",
+        "feature(BINDING SITE)",
+        "feature(DNA BINDING)",
+        "feature(METAL BINDING)",
+        "feature(NP BIND)",
+        "feature(SITE)",
         # Gene Ontologys
-        'go', 'go(biological process)', 'go(molecular function)',
-        'go(cellular component)', 'go-id',
+        "go",
+        "go(biological process)",
+        "go(molecular function)",
+        "go(cellular component)",
+        "go-id",
         # InterPro
-        'interpro',
+        "interpro",
         # Interaction
-        'interactor', 'comment(SUBUNIT)',
+        "interactor",
+        "comment(SUBUNIT)",
         # Publications
-        'citation', 'citationmapping',
+        "citation",
+        "citationmapping",
         # Date of
-        'created', 'last-modified', 'sequence-modified', 'version(entry)',
+        "created",
+        "last-modified",
+        "sequence-modified",
+        "version(entry)",
         # Structure
-        '3d', 'feature(BETA STRAND)', 'feature(HELIX)', 'feature(TURN)',
+        "3d",
+        "feature(BETA STRAND)",
+        "feature(HELIX)",
+        "feature(TURN)",
         # Subcellular location
-        'comment(SUBCELLULAR LOCATION)', 
-        'feature(INTRAMEMBRANE)',
-        'feature(TOPOLOGICAL DOMAIN)',
-        'feature(TRANSMEMBRANE)',
+        "comment(SUBCELLULAR LOCATION)",
+        "feature(INTRAMEMBRANE)",
+        "feature(TOPOLOGICAL DOMAIN)",
+        "feature(TRANSMEMBRANE)",
         # Miscellaneous
-        'annotation score', 'score', 'features', 'comment(CAUTION)',
-        'comment(TISSUE SPECIFICITY)',
-        'comment(GENERAL)', 'keywords', 'context', 'existence', 'tools',
-        'reviewed', 'feature', 'families', 'subcellular locations', 'taxonomy',
-        'version', 'clusters', 'comments', 'database', 'keyword-id', 'pathway',
-        'score',
+        "annotation score",
+        "score",
+        "features",
+        "comment(CAUTION)",
+        "comment(TISSUE SPECIFICITY)",
+        "comment(GENERAL)",
+        "keywords",
+        "context",
+        "existence",
+        "tools",
+        "reviewed",
+        "feature",
+        "families",
+        "subcellular locations",
+        "taxonomy",
+        "version",
+        "clusters",
+        "comments",
+        "database",
+        "keyword-id",
+        "pathway",
+        "score",
         # Pathology & Biotech
-        'comment(ALLERGEN)', 'comment(BIOTECHNOLOGY)', 'comment(DISRUPTION PHENOTYPE)',
-        'comment(DISEASE)', 'comment(PHARMACEUTICAL)', 'comment(TOXIC DOSE)',
+        "comment(ALLERGEN)",
+        "comment(BIOTECHNOLOGY)",
+        "comment(DISRUPTION PHENOTYPE)",
+        "comment(DISEASE)",
+        "comment(PHARMACEUTICAL)",
+        "comment(TOXIC DOSE)",
         # PTM / Processsing
-        'comment(PTM)', 'feature(CHAIN)', 'feature(CROSS LINK)', 'feature(DISULFIDE BOND)',
-        'feature(GLYCOSYLATION)', 'feature(INITIATOR METHIONINE)', 'feature(LIPIDATION)',
-        'feature(MODIFIED RESIDUE)', 'feature(PEPTIDE)', 'feature(PROPEPTIDE)',
-        'feature(SIGNAL)', 'feature(TRANSIT)',
+        "comment(PTM)",
+        "feature(CHAIN)",
+        "feature(CROSS LINK)",
+        "feature(DISULFIDE BOND)",
+        "feature(GLYCOSYLATION)",
+        "feature(INITIATOR METHIONINE)",
+        "feature(LIPIDATION)",
+        "feature(MODIFIED RESIDUE)",
+        "feature(PEPTIDE)",
+        "feature(PROPEPTIDE)",
+        "feature(SIGNAL)",
+        "feature(TRANSIT)",
         # Taxonomic lineage
-        'lineage(all)', 'lineage(SUPERKINGDOM)', 'lineage(KINGDOM)', 'lineage(SUBKINGDOM)',
-        'lineage(SUPERPHYLUM)', 'lineage(PHYLUM)', 'lineage(SUBPHYLUM)', 'lineage(SUPERCLASS)',
-        'lineage(CLASS)', 'lineage(SUBCLASS)', 'lineage(INFRACLASS)', 'lineage(SUPERORDER)',
-        'lineage(ORDER)', 'lineage(SUBORDER)', 'lineage(INFRAORDER)', 'lineage(PARVORDER)',
-        'lineage(SUPERFAMILY)', 'lineage(FAMILY)', 'lineage(SUBFAMILY)', 'lineage(TRIBE)',
-        'lineage(SUBTRIBE)', 'lineage(GENUS)', 'lineage(SUBGENUS)', 'lineage(SPECIES GROUP)',
-        'lineage(SPECIES SUBGROUP)', 'lineage(SPECIES)', 'lineage(SUBSPECIES)', 'lineage(VARIETAS)',
-        'lineage(FORMA)',
+        "lineage(all)",
+        "lineage(SUPERKINGDOM)",
+        "lineage(KINGDOM)",
+        "lineage(SUBKINGDOM)",
+        "lineage(SUPERPHYLUM)",
+        "lineage(PHYLUM)",
+        "lineage(SUBPHYLUM)",
+        "lineage(SUPERCLASS)",
+        "lineage(CLASS)",
+        "lineage(SUBCLASS)",
+        "lineage(INFRACLASS)",
+        "lineage(SUPERORDER)",
+        "lineage(ORDER)",
+        "lineage(SUBORDER)",
+        "lineage(INFRAORDER)",
+        "lineage(PARVORDER)",
+        "lineage(SUPERFAMILY)",
+        "lineage(FAMILY)",
+        "lineage(SUBFAMILY)",
+        "lineage(TRIBE)",
+        "lineage(SUBTRIBE)",
+        "lineage(GENUS)",
+        "lineage(SUBGENUS)",
+        "lineage(SPECIES GROUP)",
+        "lineage(SPECIES SUBGROUP)",
+        "lineage(SPECIES)",
+        "lineage(SUBSPECIES)",
+        "lineage(VARIETAS)",
+        "lineage(FORMA)",
         # Taxonomic identifier
-        'lineage-id(all)', 'lineage-id(SUPERKINGDOM)', 'lineage-id(KINGDOM)', 'lineage-id(SUBKINGDOM)',
-        'lineage-id(SUPERPHYLUM)', 'lineage-id(PHYLUM)', 'lineage-id(SUBPHYLUM)', 'lineage-id(SUPERCLASS)',
-        'lineage-id(CLASS)', 'lineage-id(SUBCLASS)', 'lineage-id(INFRACLASS)', 'lineage-id(SUPERORDER)',
-        'lineage-id(ORDER)', 'lineage-id(SUBORDER)', 'lineage-id(INFRAORDER)', 'lineage-id(PARVORDER)',
-        'lineage-id(SUPERFAMILY)', 'lineage-id(FAMILY)', 'lineage-id(SUBFAMILY)', 'lineage-id(TRIBE)',
-        'lineage-id(SUBTRIBE)', 'lineage-id(GENUS)', 'lineage-id(SUBGENUS)', 'lineage-id(SPECIES GROUP)',
-        'lineage-id(SPECIES SUBGROUP)', 'lineage-id(SPECIES)', 'lineage-id(SUBSPECIES)', 'lineage-id(VARIETAS)',
-        'lineage-id(FORMA)',
+        "lineage-id(all)",
+        "lineage-id(SUPERKINGDOM)",
+        "lineage-id(KINGDOM)",
+        "lineage-id(SUBKINGDOM)",
+        "lineage-id(SUPERPHYLUM)",
+        "lineage-id(PHYLUM)",
+        "lineage-id(SUBPHYLUM)",
+        "lineage-id(SUPERCLASS)",
+        "lineage-id(CLASS)",
+        "lineage-id(SUBCLASS)",
+        "lineage-id(INFRACLASS)",
+        "lineage-id(SUPERORDER)",
+        "lineage-id(ORDER)",
+        "lineage-id(SUBORDER)",
+        "lineage-id(INFRAORDER)",
+        "lineage-id(PARVORDER)",
+        "lineage-id(SUPERFAMILY)",
+        "lineage-id(FAMILY)",
+        "lineage-id(SUBFAMILY)",
+        "lineage-id(TRIBE)",
+        "lineage-id(SUBTRIBE)",
+        "lineage-id(GENUS)",
+        "lineage-id(SUBGENUS)",
+        "lineage-id(SPECIES GROUP)",
+        "lineage-id(SPECIES SUBGROUP)",
+        "lineage-id(SPECIES)",
+        "lineage-id(SUBSPECIES)",
+        "lineage-id(VARIETAS)",
+        "lineage-id(FORMA)",
         # Cross-references
-        'database(db_abbrev)', 'database(EMBL)']
+        "database(db_abbrev)",
+        "database(EMBL)",
+    ]
 
     def __init__(self, verbose=False, cache=False):
         """**Constructor**
 
         :param verbose: set to False to prevent informative messages
         """
-        super(UniProt, self).__init__(name="UniProt", url=UniProt._url,
-                                      verbose=verbose, cache=cache)
+        super(UniProt, self).__init__(
+            name="UniProt", url=UniProt._url, verbose=verbose, cache=cache
+        )
         self.TIMEOUT = 100
 
         self._database = "uniprot"
@@ -283,9 +412,10 @@ class UniProt(REST):
     def _download_flat_files(self):
         """could be used to get all data in flat files (about compressed 500Mb )"""
         url = "ftp://ftp.ebi.ac.uk/pub/databases/uniprot/knowledgebase/uniprot_sprot.dat.gz"
-        self.logging.info('Downloading uniprot file from the web. May take some time.:')
+        self.logging.info("Downloading uniprot file from the web. May take some time.:")
         import urllib
-        urllib.urlretrieve(url, 'uniprot_sprot.dat.gz')
+
+        urllib.urlretrieve(url, "uniprot_sprot.dat.gz")
 
     def mapping(self, fr="ID", to="KEGG_ID", query="P13368"):
         """This is an interface to the UniProt mapping service
@@ -326,12 +456,12 @@ class UniProt(REST):
         .. versionchanged:: 1.3.1:: use http_post instead of http_get. This is 3 times
             faster and allows queries with more than 600 entries in one go.
         """
-        url = 'mapping/'  # the slash matters
+        url = "mapping/"  # the slash matters
 
         query = self.devtools.list2string(query, sep=" ", space=False)
         # if isinstance(query, list):
         #    query = " ".join(query)
-        params = {'from': fr, 'to': to, 'format': "tab", 'query': query}
+        params = {"from": fr, "to": to, "format": "tab", "query": query}
         result = self.http_post(url, frmt="txt", data=params)
 
         # changes in version 1.1.1 returns a dictionary instead of list
@@ -349,6 +479,7 @@ class UniProt(REST):
             # bug fix based on ticket #19 version 1.1.2
             # the default dict set empty list for all keys by default
             from collections import defaultdict
+
             result_dict = defaultdict(list)
 
             keys = result[0::2]
@@ -377,12 +508,12 @@ class UniProt(REST):
             >>> print(fasta[0])
 
         """
-        _valid_formats = ['txt', 'xml', 'rdf', 'gff', 'fasta']
+        _valid_formats = ["txt", "xml", "rdf", "gff", "fasta"]
         self.devtools.check_param_in_list(frmt, _valid_formats)
 
         queries = self.devtools.to_list(uniprot_id)
 
-        url = [database + "/" + query + '.' + frmt for query in queries]
+        url = [database + "/" + query + "." + frmt for query in queries]
         res = self.http_get(url, frmt="txt")
         if frmt == "xml":
             res = [self.easyXML(x) for x in res]
@@ -398,6 +529,7 @@ class UniProt(REST):
             manipulate FASTA
         """
         from bioservices.apps.fasta import FASTA
+
         f = FASTA()
         f.load_fasta(id_)
         return f.fasta
@@ -414,13 +546,24 @@ class UniProt(REST):
 
         """
         from bioservices.apps.fasta import FASTA
+
         f = FASTA()
         f.load_fasta(id_)
         return f.sequence
 
-    def search(self, query, frmt="tab", columns=None,
-               include=False, sort="score", compress=False, limit=None,
-               offset=None, maxTrials=10, database="uniprot"):
+    def search(
+        self,
+        query,
+        frmt="tab",
+        columns=None,
+        include=False,
+        sort="score",
+        compress=False,
+        limit=None,
+        offset=None,
+        maxTrials=10,
+        database="uniprot",
+    ):
         """Provide some interface to the uniprot search interface.
 
         :param str query: query must be a valid uniprot query.
@@ -488,9 +631,20 @@ class UniProt(REST):
         params = {}
 
         if frmt is not None:
-            _valid_formats = ['tab', 'xls', 'fasta', 'gff', 'txt', 'xml', 'rss', 'list', 'rss', 'html']
+            _valid_formats = [
+                "tab",
+                "xls",
+                "fasta",
+                "gff",
+                "txt",
+                "xml",
+                "rss",
+                "list",
+                "rss",
+                "html",
+            ]
             self.devtools.check_param_in_list(frmt, _valid_formats)
-            params['format'] = frmt
+            params["format"] = frmt
 
         if columns is not None:
             self.devtools.check_param_in_list(frmt, ["tab", "xls"])
@@ -508,28 +662,28 @@ class UniProt(REST):
                     self.devtools.check_param_in_list(col, self._valid_columns)
 
             # convert back to a string as expected by uniprot
-            params['columns'] = ",".join([x.strip() for x in columns])
+            params["columns"] = ",".join([x.strip() for x in columns])
 
         if include is True and frmt in ["fasta", "rdf"]:
-            params['include'] = 'yes'
+            params["include"] = "yes"
 
         if compress is True:
-            params['compress'] = 'yes'
+            params["compress"] = "yes"
 
         if sort:
             self.devtools.check_param_in_list(sort, ["score"])
-            params['sort'] = sort
+            params["sort"] = sort
 
         if offset is not None:
             if isinstance(offset, int):
-                params['offset'] = offset
+                params["offset"] = offset
 
         if limit is not None:
             if isinstance(limit, int):
-                params['limit'] = limit
+                params["limit"] = limit
 
         # + are interpreted and have a meaning.
-        params['query'] = query.replace("+", " ")
+        params["query"] = query.replace("+", " ")
         # res = s.request("/uniprot/?query=zap70+AND+organism:9606&format=xml", params)
         res = self.http_get(database + "/", frmt="txt", params=params)
         return res
@@ -557,12 +711,14 @@ class UniProt(REST):
             # print line
             Entry, a, b, c, d, e, f = line.split("\t")
             # print Entry, a, b, c, d, e, f
-            newres[Entry] = {'Entry name': a,
-                             'Status': b,
-                             'Protein names': c,
-                             'Gene names': d,
-                             'Organism': e,
-                             'Length': f}
+            newres[Entry] = {
+                "Entry name": a,
+                "Status": b,
+                "Protein names": c,
+                "Gene names": d,
+                "Organism": e,
+                "Length": f,
+            }
         return newres
 
     def uniref(self, query):
@@ -587,7 +743,9 @@ class UniProt(REST):
         except:
             print("uniref method requires Pandas", file=sys.stderr)
             return
-        res = self.http_get("uniref/", params={"query": query, 'format': 'tab'}, frmt="txt")
+        res = self.http_get(
+            "uniref/", params={"query": query, "format": "tab"}, frmt="txt"
+        )
         try:
             # python 2.X
             res = pd.read_csv(io.StringIO(unicode(res)), sep="\t")
@@ -602,7 +760,7 @@ class UniProt(REST):
         :param entries: list of valid entry name. if list is too large (about
             >200), you need to split the list
         :param chunk:
-        :param limit: limit number of entries per identifier to 10. You can 
+        :param limit: limit number of entries per identifier to 10. You can
             set it to None to keep all entries but this will be very slow
         :return: dataframe with indices being the uniprot id (e.g. DIG1_YEAST)
 
@@ -617,20 +775,25 @@ class UniProt(REST):
             entries = list(set(entries))
         output = pd.DataFrame()
 
-        self.logging.info("fetching information from uniprot for {} entries".format(len(entries)))
+        self.logging.info(
+            "fetching information from uniprot for {} entries".format(len(entries))
+        )
 
         nChunk = min(nChunk, len(entries))
         N, rest = divmod(len(entries), nChunk)
         for i in range(0, N + 1):
-            this_entries = entries[i * nChunk:(i + 1) * nChunk]
+            this_entries = entries[i * nChunk : (i + 1) * nChunk]
             if len(this_entries):
                 self.logging.info("uniprot.get_df {}/{}".format(i + 1, N))
                 query = "+or+".join(this_entries)
                 if organism:
                     query += "+and+" + organism
-                res = self.search(query, frmt="tab",
-                                  columns=",".join(self._valid_columns),
-                                limit=limit)
+                res = self.search(
+                    query,
+                    frmt="tab",
+                    columns=",".join(self._valid_columns),
+                    limit=limit,
+                )
             else:
                 break
             if len(res) == 0:
@@ -651,19 +814,32 @@ class UniProt(REST):
         # you may have new entries...
         # output = output[output.Entry.apply(lambda x: x in entries)]
         # to transform into list:
-        columns = ['PubMed ID', 'Comments', u'Domains', 'Protein families',
-                   'Gene names', 'Gene ontology (GO)', 'Gene ontology IDs',
-                   'InterPro', 'Interacts with', 'Keywords']
-                   #'Subcellular location']
+        columns = [
+            "PubMed ID",
+            "Comments",
+            u"Domains",
+            "Protein families",
+            "Gene names",
+            "Gene ontology (GO)",
+            "Gene ontology IDs",
+            "InterPro",
+            "Interacts with",
+            "Keywords",
+        ]
+        #'Subcellular location']
         for col in columns:
             try:
-                res = output[col].apply(lambda x: [this.strip() for this in str(x).split(";") if this != "nan"])
+                res = output[col].apply(
+                    lambda x: [
+                        this.strip() for this in str(x).split(";") if this != "nan"
+                    ]
+                )
                 output[col] = res
             except:
                 self.logging.warning("column could not be parsed. %s" % col)
         # Sequences are splitted into chunks of 10 characters. let us rmeove
         # the spaces:
-        output['Sequence'].fillna("", inplace=True)
-        output.Sequence = output['Sequence'].apply(lambda x: x.replace(" ", ""))
+        output["Sequence"].fillna("", inplace=True)
+        output.Sequence = output["Sequence"].apply(lambda x: x.replace(" ", ""))
 
         return output

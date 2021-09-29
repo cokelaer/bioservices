@@ -40,8 +40,7 @@ from bioservices.services import REST
 __all__ = ["Seqret"]
 
 
-
-class Seqret():
+class Seqret:
     """Interface to the `Seqret <http://www.ebi.ac.uk/readseq>`_ service
 
     ::
@@ -65,7 +64,6 @@ class Seqret():
         self.services = REST(name="seqret", url=url, verbose=verbose)
         self._parameters = None
 
-
     def get_parameters(self):
         """Get a list of the parameter names.
 
@@ -74,7 +72,7 @@ class Seqret():
         """
         parameters = self.services.http_get("parameters", frmt="json")
 
-        return parameters['parameters']
+        return parameters["parameters"]
 
     def _get_parameters(self):
         if self._parameters:
@@ -83,6 +81,7 @@ class Seqret():
             res = self.get_parameters()
             self._parameters = res
         return self._parameters
+
     parameters = property(_get_parameters, doc="Get list of parameter names")
 
     def get_parameter_details(self, parameterId):
@@ -98,12 +97,14 @@ class Seqret():
 
         """
         if parameterId not in self.parameters:
-            raise ValueError("Invalid parameterId provided(%s). See parameters attribute" % parameterId)
+            raise ValueError(
+                "Invalid parameterId provided(%s). See parameters attribute"
+                % parameterId
+            )
 
         request = "parameterdetails/" + parameterId
         res = self.services.http_get(request, frmt="json")
         return res
-
 
     def run(self, email, title, **kargs):
         """Submit a job to the service.
@@ -155,21 +156,29 @@ class Seqret():
             self.services.devtools.check_param_in_list(k, self.parameters)
 
         assert "sequence" in kargs.keys()
-        params = {"email":email, "title":title}
+        params = {"email": email, "title": title}
 
-        for k in ['stype', 'inputformat','outputformat', "feature", "firstonly",
-                  "reverse", 'outputcase', 'seqrange']:
+        for k in [
+            "stype",
+            "inputformat",
+            "outputformat",
+            "feature",
+            "firstonly",
+            "reverse",
+            "outputcase",
+            "seqrange",
+        ]:
             if k in kargs.keys():
                 value = kargs.get(k)
                 details = self.get_parameter_details(k)
-                valid_values = [x['value'] for x in details['values']['values']]
+                valid_values = [x["value"] for x in details["values"]["values"]]
                 self.services.devtools.check_param_in_list(str(value), valid_values)
                 params[k] = value
-        #r = requests.post(url + "/run?", data={"sequence":fasta, "stype": "protein",
-        #"inputformat":"raw", "outputformat":"fasta", "email":"thomas.cokelaer@pasteur.fr",
-        #"title":"test"})
+        # r = requests.post(url + "/run?", data={"sequence":fasta, "stype": "protein",
+        # "inputformat":"raw", "outputformat":"fasta", "email":"thomas.cokelaer@pasteur.fr",
+        # "title":"test"})
 
-        params['sequence'] = kargs['sequence']
+        params["sequence"] = kargs["sequence"]
 
         jobid = self.services.http_post("run", frmt="txt", data=params)
         self._jobid = jobid
@@ -200,8 +209,7 @@ class Seqret():
         :return: a list of wsResultType data structures describing the available result types.
         """
         res = self.services.http_get("resulttypes/{}".format(jobid), frmt="json")
-        return [x['identifier'] for x in res["types"]]
-
+        return [x["identifier"] for x in res["types"]]
 
     def get_result(self, jobid, result_type="out"):
         """Get the result of a job of the specified type.
@@ -210,13 +218,16 @@ class Seqret():
         :param parameters: optional list of wsRawOutputParameter used to
             provide additional parameters for derived result types.
         """
-        if self.get_status(jobid) != 'FINISHED':
-            self.services.logging.warning("Your job is not finished yet. Try again later.")
+        if self.get_status(jobid) != "FINISHED":
+            self.services.logging.warning(
+                "Your job is not finished yet. Try again later."
+            )
             return
 
-        #result_types = self.get_result_types(jobid)
-        #assert parameters in result_types
-        res = self.services.http_get("result/{}/{}".format(jobid, result_type),
-            frmt="txt")
+        # result_types = self.get_result_types(jobid)
+        # assert parameters in result_types
+        res = self.services.http_get(
+            "result/{}/{}".format(jobid, result_type), frmt="txt"
+        )
 
         return res

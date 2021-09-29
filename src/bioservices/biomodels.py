@@ -1,12 +1,6 @@
-#!/usr/bin/python
-# -*- coding: latin-1 -*-
-#
 #  This file is part of bioservices software
 #
 #  Copyright (c) 2013-2014 - EBI-EMBL
-#
-#  File author(s):
-#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -16,7 +10,6 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
 """This module provides a class :class:`~BioModels` to access to BioModels WS.
 
 
@@ -43,18 +36,18 @@ import copy
 import webbrowser
 from functools import wraps
 from bioservices import logger
+
 logger.name = __name__
 
 from bioservices.services import REST
 
 try:
-    #python 3
+    # python 3
     from urllib.request import urlopen
 except:
-    from urllib2  import urlopen
+    from urllib2 import urlopen
 
 __all__ = ["BioModels"]
-
 
 
 class BioModels(REST):
@@ -75,8 +68,8 @@ class BioModels(REST):
         [x['submitter'] for x in res if x[] == "MODEL1204280003"][0]
 
     This is also true for *getDateLastModifByModelId* and *getModelNameById* if
-    one use the field *lastModified* or *name*. There was the ability to 
-    search for models based on their CHEBI identifiers, which is not 
+    one use the field *lastModified* or *name*. There was the ability to
+    search for models based on their CHEBI identifiers, which is not
     supported anymore; this concerns functions
     *getModelsIdByChEBI*, *getModelsIdByChEBIId*, *getSimpleModelsByChEBIIds*,
     *getSimpleModelsRelatedWithChEBI*. For other searches related to Reactome,
@@ -87,6 +80,7 @@ class BioModels(REST):
         bm.search("GO:0006919")
 
     """
+
     _url = "https://www.ebi.ac.uk/biomodels"
     _id_example = "BIOMD0000000100"
 
@@ -97,21 +91,25 @@ class BioModels(REST):
 
 
         """
-        super(BioModels, self).__init__(name="BioModels", url=BioModels._url, 
-                                        verbose=verbose)
+        super(BioModels, self).__init__(
+            name="BioModels", url=BioModels._url, verbose=verbose
+        )
 
-    def _check_format(self, frmt, supported=['json', 'xml', 'html']):
+    def _check_format(self, frmt, supported=["json", "xml", "html"]):
         if frmt not in supported:
-            raise ValueError("Supported format for this function are {}. You provided {}".format(
-                supported, frmt))
+            raise ValueError(
+                "Supported format for this function are {}. You provided {}".format(
+                    supported, frmt
+                )
+            )
 
     def get_all_models(self, chunk=100):
         """Return all models"""
         models = []
         offset = 0
         res = self.search("*.*", numResults=chunk)
-        while type(res) is dict and 'models' in res:
-            models.extend(res['models'])
+        while type(res) is dict and "models" in res:
+            models.extend(res["models"])
             offset += chunk
             res = self.search("*.*", offset=offset, numResults=chunk)
         return models
@@ -119,7 +117,7 @@ class BioModels(REST):
     def get_model(self, model_id, frmt="json"):
         """Fetch information about a given model at a particular revision."""
         self._check_format(frmt)
-        res = self.http_get(model_id, frmt=frmt, params={'format': frmt})
+        res = self.http_get(model_id, frmt=frmt, params={"format": frmt})
         return res
 
     def get_model_files(self, model_id, frmt="json"):
@@ -127,14 +125,14 @@ class BioModels(REST):
 
         :param model_id: a valid BioModels identifier
         :param frmt: format of the output (json, xml)
-        """ 
+        """
         self._check_format(frmt, ["xml", "json"])
-        res = self.http_get("model/files/{}".format(model_id), frmt=frmt, 
-            params={'format': frmt})
+        res = self.http_get(
+            "model/files/{}".format(model_id), frmt=frmt, params={"format": frmt}
+        )
         return res
 
-    def get_model_download(self, model_id, filename=None,
-        output_filename=None):
+    def get_model_download(self, model_id, filename=None, output_filename=None):
         """Download a particular file associated with a given model or all its
         files as a COMBINE archive.
 
@@ -145,7 +143,7 @@ class BioModels(REST):
             use this parameter
         :param frmt: format of the output (json, xml, html)
         :return:  nothing. This function save the model into a ZIP file called
-            after the model identifier. If parameter *filename* is specified, 
+            after the model identifier. If parameter *filename* is specified,
             then the output file is the requested filename (if found)
 
         ::
@@ -176,8 +174,7 @@ class BioModels(REST):
         if filename:
             params["filename"] = filename
 
-        res = self.http_get("model/download/{}".format(model_id),  
-            params=params)
+        res = self.http_get("model/download/{}".format(model_id), params=params)
 
         if filename:
             self.logging.info("Saving {}".format(filename))
@@ -186,17 +183,17 @@ class BioModels(REST):
             with open(output_filename, "wb") as fout:
                 fout.write(res.content)
         else:
-            self.logging.info("Saving file {}.zip".format(model_id) )
+            self.logging.info("Saving file {}.zip".format(model_id))
             if output_filename is None:
                 output_filename = "{}.zip".format(model_id)
             with open(output_filename, "wb") as fout:
                 fout.write(res.content)
 
     def search(self, query, offset=None, numResults=None, sort=None, frmt="json"):
-        """Search models of interest via keywords. 
+        """Search models of interest via keywords.
 
-        Examples: PUBMED:"27869123" to search models associated with the PubMed 
-        record identified by 27869123. 
+        Examples: PUBMED:"27869123" to search models associated with the PubMed
+        record identified by 27869123.
 
         :param str query: search query. colon character must be escaped
         :param int offset: number of items to skip before starting to collect the
@@ -217,17 +214,26 @@ class BioModels(REST):
         if sort:
             params["sort"] = sort
 
-        sort_options = ["id-asc", "relevance-asc", "relevance-desc",
-            "first_author-asc", "first_author", "name-asc", "name-desc",
-            "publication_year-asc", "publication_year-desc"]
+        sort_options = [
+            "id-asc",
+            "relevance-asc",
+            "relevance-desc",
+            "first_author-asc",
+            "first_author",
+            "name-asc",
+            "name-desc",
+            "publication_year-asc",
+            "publication_year-desc",
+        ]
         if sort and sort not in sort_options:
-            raise ValueError("sort must be in {}. You provided {}".format(
-                sort_options, sort))
+            raise ValueError(
+                "sort must be in {}. You provided {}".format(sort_options, sort)
+            )
         res = self.http_get("search", params=params)
         return res
 
     def search_download(self, models, output_filename="models.zip", force=False):
-        """Returns models (XML) corresponding to a list of model identifiers. 
+        """Returns models (XML) corresponding to a list of model identifiers.
 
         :param str models: list of model identifiers using comma to separate
             them. Could be a list of string (e.g 'BIOMD1,BIOMD2' or ['BIOMD1',
@@ -250,7 +256,11 @@ class BioModels(REST):
 
         self.logging.info(output_filename)
         if os.path.exists(output_filename) and force is False:
-            raise IOError("{} exists already. Set force to True or change the output_filename argument".format(output_filename))
+            raise IOError(
+                "{} exists already. Set force to True or change the output_filename argument".format(
+                    output_filename
+                )
+            )
 
         with open(output_filename, "wb") as fout:
             fout.write(res.content)
@@ -282,14 +292,12 @@ class BioModels(REST):
 
         """
         self._check_format(frmt, ["xml", "json", "csv"])
-        params = {"format": frmt,
-                    "size": size,
-                    "start": start,
-                    "query":query}
+        params = {"format": frmt, "size": size, "start": start, "query": query}
         sort_options = ["model", "entity", None]
         if sort not in sort_options:
-            raise ValueError("sort must be in {}. You provided {}".format(
-                sort_options, sort))
+            raise ValueError(
+                "sort must be in {}. You provided {}".format(sort_options, sort)
+            )
         if sort:
             params["sort"] = sort
 
@@ -298,7 +306,7 @@ class BioModels(REST):
         return res
 
     def get_p2m_missing(self, frmt="json"):
-        """Retrieve all models in Path2Models that are now only available indirectly, 
+        """Retrieve all models in Path2Models that are now only available indirectly,
         through the representative model for the corresponding genus
 
         :param str frmt: the format of the result (xml, csv, json)
@@ -307,15 +315,15 @@ class BioModels(REST):
         """
         self._check_format(frmt)
         res = self.http_get("p2m/missing", params={"format": frmt})
-        res = res['missing']
+        res = res["missing"]
         self.logging.info("Found {} missing model".format(len(res)))
         return res
 
     def get_p2m_representative(self, model, frmt="json"):
         """Retrieve a representative model in Path2Models
 
-        Get the representative model identifier for a given missing model in Path2Models. 
-        This endpoint accepts as parameters a mandatory model identifier and an 
+        Get the representative model identifier for a given missing model in Path2Models.
+        This endpoint accepts as parameters a mandatory model identifier and an
         optional response format
 
         :param str model: The identifier of a model of interest
@@ -323,8 +331,9 @@ class BioModels(REST):
 
         """
         self._check_format(frmt)
-        res = self.http_get("p2m/representative",
-            params={"format": frmt, "model": model})
+        res = self.http_get(
+            "p2m/representative", params={"format": frmt, "model": model}
+        )
         return res
 
     def get_p2m_representatives(self, models, frmt="json"):
@@ -354,8 +363,9 @@ class BioModels(REST):
             models = ",".join([x.strip() for x in models.split(",")])
 
         self._check_format(frmt)
-        res = self.http_get("p2m/representatives", 
-            params={"format": frmt, "modelIds": models})
+        res = self.http_get(
+            "p2m/representatives", params={"format": frmt, "modelIds": models}
+        )
         return res
 
     def get_pdgsmm_missing(self, frmt="json"):
@@ -366,7 +376,7 @@ class BioModels(REST):
         """
         self._check_format(frmt)
         res = self.http_get("pdgsmm/missing", params={"format": frmt})
-        res = res['missing']
+        res = res["missing"]
         self.logging.info("Found {} missing model".format(len(res)))
         return res
 
@@ -382,8 +392,9 @@ class BioModels(REST):
 
         """
         self._check_format(frmt)
-        res = self.http_get("pdgsmm/representative",
-            params={"format": frmt, "model": model})
+        res = self.http_get(
+            "pdgsmm/representative", params={"format": frmt, "model": model}
+        )
         return res
 
     def get_pdgsmm_representatives(self, models, frmt="json"):
@@ -406,6 +417,7 @@ class BioModels(REST):
             models = ",".join([x.strip() for x in models.split(",")])
 
         self._check_format(frmt)
-        res = self.http_get("pdgsmm/representatives", 
-            params={"format": frmt, "modelIds": models})
+        res = self.http_get(
+            "pdgsmm/representatives", params={"format": frmt, "modelIds": models}
+        )
         return res

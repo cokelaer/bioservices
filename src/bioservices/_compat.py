@@ -3,10 +3,11 @@ import sys
 
 PYTHON_VERSION = sys.version_info
 
+
 def _is_python_version(*args, **kwargs):
-    major  = kwargs.get("major", None)
-    minor  = kwargs.get("minor", None)
-    patch  = kwargs.get("patch", None)
+    major = kwargs.get("major", None)
+    minor = kwargs.get("minor", None)
+    patch = kwargs.get("patch", None)
 
     result = True
 
@@ -16,10 +17,12 @@ def _is_python_version(*args, **kwargs):
         result = result and minor == PYTHON_VERSION.minor
     if patch:
         result = result and patch == PYTHON_VERSION.micro
-        
+
     return result
 
-PY2 = _is_python_version(major = 2)
+
+PY2 = _is_python_version(major=2)
+
 
 def iteritems(dict_, **kwargs):
     if PY2:
@@ -27,6 +30,7 @@ def iteritems(dict_, **kwargs):
     else:
         iterator = iter(dict_.items(), **kwargs)
     return iterator
+
 
 if PY2:
     string_types = basestring

@@ -15,7 +15,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
+# $Id$
 """Interface to some part of the Panther web service
 
 .. topic:: What is Panther ?
@@ -46,13 +46,14 @@
 """
 from bioservices.services import REST
 from bioservices import logger
+
 logger.name = __name__
 
 
 __all__ = ["Panther"]
 
 
-class Panther():
+class Panther:
     """Interface to `Panther <http://www.pantherdb.org/services/oai/pantherdb>`_ pages
 
 
@@ -89,18 +90,25 @@ class Panther():
 
 
     """
+
     _url = "http://www.pantherdb.org/services/oai/pantherdb"
+
     def __init__(self, verbose=True, cache=False):
         """**Constructor**
 
         :param verbose: set to False to prevent informative messages
         """
-        #super(Panther, self).__init__(name="Panther", url=Panther._url,
+        # super(Panther, self).__init__(name="Panther", url=Panther._url,
         #       verbose=verbose, cache=cache)
-        self.services = REST(name="Panther", url=Panther._url, verbose=verbose,
-            cache=cache, url_defined_later=True)
+        self.services = REST(
+            name="Panther",
+            url=Panther._url,
+            verbose=verbose,
+            cache=cache,
+            url_defined_later=True,
+        )
 
-        self._allPathwaysURL =  "http://www.pantherdb.org/pathway/pathwayList.jsp"
+        self._allPathwaysURL = "http://www.pantherdb.org/pathway/pathwayList.jsp"
 
     def get_pathways(self):
         """Returns all pathways from pantherdb"""
@@ -114,11 +122,11 @@ class Panther():
 
         """
         if type is not None:
-            params = {'type': type}
+            params = {"type": type}
         else:
             params = {}
         res = self.services.http_get("supportedgenomes", params=params)
-        res = [x for x in res["search"]["output"]["genomes"]['genome']]
+        res = [x for x in res["search"]["output"]["genomes"]["genome"]]
         return res
 
     def get_taxon_id(self, pattern=None):
@@ -131,7 +139,7 @@ class Panther():
         """
         res = self.get_supported_genomes()
         if pattern:
-            taxon = [x['taxon_id'] for x in res if pattern.lower() in x['name'].lower()]
+            taxon = [x["taxon_id"] for x in res if pattern.lower() in x["name"].lower()]
             if len(taxon) == 1:
                 return taxon[0]
             else:
@@ -163,12 +171,11 @@ class Panther():
             Developpers should be aware of that feature.
 
         """
-        params = {"geneInputList": gene_list,
-                    "organism": taxon}
-        res = self.services.http_post("geneinfo", params=params, frmt='json')
+        params = {"geneInputList": gene_list, "organism": taxon}
+        res = self.services.http_post("geneinfo", params=params, frmt="json")
 
-        if "mapped_genes" in res['search']:
-            mapped_genes = res['search']['mapped_genes']['gene']
+        if "mapped_genes" in res["search"]:
+            mapped_genes = res["search"]["mapped_genes"]["gene"]
             # if only one identifier, retuns a dictionary.
             # if several identifiers, returns a list of dictionary.
             # We will be consistent and return a list
@@ -177,8 +184,8 @@ class Panther():
         else:
             mapped_genes = [{}]
 
-        if "unmapped_list" in res['search']:
-            unmapped_genes = res['search']['unmapped_list']["unmapped"]
+        if "unmapped_list" in res["search"]:
+            unmapped_genes = res["search"]["unmapped_list"]["unmapped"]
             if isinstance(unmapped_genes, list):
                 pass
             else:
@@ -187,11 +194,17 @@ class Panther():
             unmapped_genes = []
 
         logger.warning("Some identifiers were not found")
-        return {"unmapped": unmapped_genes,
-                "mapped": mapped_genes}
+        return {"unmapped": unmapped_genes, "mapped": mapped_genes}
 
-    def get_enrichment(self, gene_list, organism, annotation,
-        enrichment_test="Fisher", correction="FDR", ref_gene_list=None):
+    def get_enrichment(
+        self,
+        gene_list,
+        organism,
+        annotation,
+        enrichment_test="Fisher",
+        correction="FDR",
+        ref_gene_list=None,
+    ):
         """Returns over represented genes
 
         Compares a test gene list to a reference gene list,
@@ -216,8 +229,8 @@ class Panther():
             NCBI UniGene id, UniProt accession andUniProt id.
 
         :return: a dictionary with the following keys. 'reference' contains the
-            orgnaism, 'input_list' is the input gene list with unmapped genes. 
-            'result' contains the list of candidates. 
+            orgnaism, 'input_list' is the input gene list with unmapped genes.
+            'result' contains the list of candidates.
 
         ::
 
@@ -229,30 +242,30 @@ class Panther():
                     "ANNOT_TYPE_ID_PANTHER_GO_SLIM_MF")
 
         """
-        assert enrichment_test.lower() in ['fisher', 'binomial']
+        assert enrichment_test.lower() in ["fisher", "binomial"]
         if correction is None:
-            correction = 'none'
+            correction = "none"
 
-        assert correction.lower() in ['fdr', 'bonferroni', 'none']
+        assert correction.lower() in ["fdr", "bonferroni", "none"]
 
         # This is a bug in panther DB where they used bonferonni . should be
         # bonferroni...
         if correction.lower() == "bonferroni":
             correction = "bonferonni"
-        assert annotation in [x['id'] for x in self.get_annotation_datasets()]
+        assert annotation in [x["id"] for x in self.get_annotation_datasets()]
 
-        params = {'enrichmentTestType': enrichment_test.upper()}
-        params['organism'] = organism
+        params = {"enrichmentTestType": enrichment_test.upper()}
+        params["organism"] = organism
         if gene_list:
-                params['geneInputList'] = gene_list
+            params["geneInputList"] = gene_list
         if ref_gene_list:
-            params['refInputList'] = ref_gene_list
-        params['annotDataSet'] = annotation
-        params['correction'] = correction.upper()
+            params["refInputList"] = ref_gene_list
+        params["annotDataSet"] = annotation
+        params["correction"] = correction.upper()
         try:
             res = self.services.http_post("enrich/overrep", params=params, frmt="json")
             try:
-                return res['results']
+                return res["results"]
             except:
                 return res
         except:
@@ -264,8 +277,9 @@ class Panther():
         res = res["search"]["annotation_data_sets"]["annotation_data_type"]
         return res
 
-    def get_ortholog(self, gene_list, organism, target_organism=None,
-        ortholog_type="all"):
+    def get_ortholog(
+        self, gene_list, organism, target_organism=None, ortholog_type="all"
+    ):
         """search for matching orthologs in target organisms.
 
         Searches for matching orthologs in the gene family that contains
@@ -284,20 +298,21 @@ class Panther():
             returned.
 
         """
-        assert ortholog_type in ['LDO', 'all']
+        assert ortholog_type in ["LDO", "all"]
         params = {
             "geneInputList": gene_list,
             "organism": organism,
             "targetOrganism": target_organism,
-            "orthologType": ortholog_type}
-        if params['targetOrganism'] is None:
-            del params['targetOrganism']
-        res = self.services.http_get("ortholog/matchortho", frmt='json', params=params)
-        res = res['search']['mapping']
-        mapped = res['mapped']
+            "orthologType": ortholog_type,
+        }
+        if params["targetOrganism"] is None:
+            del params["targetOrganism"]
+        res = self.services.http_get("ortholog/matchortho", frmt="json", params=params)
+        res = res["search"]["mapping"]
+        mapped = res["mapped"]
 
         try:
-            unmapped = res['unmapped_ids']['unmapped']
+            unmapped = res["unmapped_ids"]["unmapped"]
             # make sure we always have a list
             if isinstance(unmapped, dict):
                 unmapped = [unmapped]
@@ -319,18 +334,18 @@ class Panther():
         """
         if "," in gene:
             logger.warning("did not expect a comma. Please provide only one gene name")
-        assert ortholog_type in ['LDO', 'all']
-        assert position>=1
+        assert ortholog_type in ["LDO", "all"]
+        assert position >= 1
         params = {
             "gene": gene,
             "organism": organism,
             "pos": position,
-            "orthologType": ortholog_type
+            "orthologType": ortholog_type,
         }
         res = self.services.http_get("ortholog/homologpos", params=params, frmt="json")
-        res = res['search']['mapping']
+        res = res["search"]["mapping"]
         if "mapped" in res.keys():
-            res = res['mapped']
+            res = res["mapped"]
             return res
         elif "unmapped_ids" in res.keys():
             logger.warning("did not find any match for {}".format(gene))
@@ -349,21 +364,22 @@ class Panther():
 
         """
         from easydev import Progress
-        params = {'startIndex': 1}
+
+        params = {"startIndex": 1}
         res = self.services.http_get("supportedpantherfamilies", params=params)
-        results = res['search']['panther_family_subfam_list']['family']
+        results = res["search"]["panther_family_subfam_list"]["family"]
         if len(results) != N:
             msg = "looks like the services changed. Call this function with N={}"
             msg = msg.format(len(results))
             raise ValueError(msg)
 
-        number_of_families = res['search']['number_of_families']
+        number_of_families = res["search"]["number_of_families"]
         pb = Progress(int(number_of_families / N))
         pb.animate(1)
-        for i in range(1, int(number_of_families / N)+1):
-            params = {'startIndex': i * N+1}
+        for i in range(1, int(number_of_families / N) + 1):
+            params = {"startIndex": i * N + 1}
             res = self.services.http_get("supportedpantherfamilies", params=params)
-            data = res['search']['panther_family_subfam_list']['family']
+            data = res["search"]["panther_family_subfam_list"]["family"]
             results.extend(data)
             if progress:
                 pb.animate(i)
@@ -383,9 +399,9 @@ class Panther():
 
         params = {"family": family}
         if taxon_list:
-            params['taxonFltr'] = taxon_list
+            params["taxonFltr"] = taxon_list
         res = self.services.http_get("familyortholog", params=params, frmt="json")
-        return res['search']['ortholog_list']['ortholog']
+        return res["search"]["ortholog_list"]["ortholog"]
 
     def get_family_msa(self, family, taxon_list=None):
         """Returns MSA information for the specified family.
@@ -396,9 +412,9 @@ class Panther():
         """
         params = {"family": family}
         if taxon_list:
-            params['taxonFltr'] = taxon_list
+            params["taxonFltr"] = taxon_list
         res = self.services.http_get("familymsa", params=params, frmt="json")
-        return res['search']['MSA_list']['sequence_info']
+        return res["search"]["MSA_list"]["sequence_info"]
 
     def get_tree_info(self, family, taxon_list=None):
         """Returns tree topology information and node attributes for the specified family.
@@ -408,7 +424,6 @@ class Panther():
         """
         params = {"family": family}
         if taxon_list:
-            params['taxonFltr'] = taxon_list
+            params["taxonFltr"] = taxon_list
         res = self.services.http_get("treeinfo", params=params, frmt="json")
-        return res['search']#['tree_topology']['annotation_node']
-
+        return res["search"]  # ['tree_topology']['annotation_node']

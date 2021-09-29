@@ -36,6 +36,7 @@ import sys
 
 from bioservices.services import REST
 from bioservices import logger
+
 logger.name = __name__
 
 try:
@@ -47,9 +48,7 @@ except:
 __all__ = ["COG"]
 
 
-
-
-class COG():
+class COG:
     """Interface to the COG service
 
 
@@ -62,9 +61,7 @@ class COG():
     _url = "https://www.ncbi.nlm.nih.gov/research/cog/api"
 
     def __init__(self, verbose=False, cache=False):
-        """**Constructor**
-
-        """
+        """**Constructor**"""
         self.services = REST(name="cog", url=COG._url, verbose=verbose, cache=cache)
 
     def get_cogs(self, page=1):
@@ -74,7 +71,7 @@ class COG():
         The dictionary returned contains the results, count, previous and next
         page.
         """
-        res = self.services.http_get("cog", frmt="json", params={"page":page})
+        res = self.services.http_get("cog", frmt="json", params={"page": page})
         return res
 
     def get_cogs_by_gene(self, gene):
@@ -89,7 +86,9 @@ class COG():
 
     def get_cogs_by_assembly_id(self, assembly_id):
         """Filter COGs by assembly ID: GCA_000007185.1"""
-        res = self.services.http_get("cog", frmt="json", params={"assembly": assembly_id})
+        res = self.services.http_get(
+            "cog", frmt="json", params={"assembly": assembly_id}
+        )
         return res
 
     def get_cogs_by_orgnanism(self, name):
@@ -101,7 +100,7 @@ class COG():
         """Filter COGs by taxid: 1229908"""
         res = self.services.http_get("cog", frmt="json", params={"taxid": taxon_id})
         return res
-    
+
     def get_cogs_by_category(self, category):
         """Filter COGs by Taxonomic Category: ACTINOBACTERIA"""
         res = self.services.http_get("cog", frmt="json", params={"category": category})
@@ -117,20 +116,21 @@ class COG():
         res = self.services.http_get("cog", frmt="json", params={"protein": protein})
         return res
 
-    # The search keywords (cog, assembly, organism, taxid, category, cat_taxid and protein) 
-    #can be combined to filter the COG lists.
-
+    # The search keywords (cog, assembly, organism, taxid, category, cat_taxid and protein)
+    # can be combined to filter the COG lists.
 
     def get_cogs_by_id_and_category(self, cog_id, category):
         """Filter COGs by COG id and Taxonomy Categories: COG0004 and CYANOBACTERIA"""
-        res = self.services.http_get("cog", frmt="json",
-            params={"cog": cog_id, "category": category})
+        res = self.services.http_get(
+            "cog", frmt="json", params={"cog": cog_id, "category": category}
+        )
         return res
 
     def get_cogs_by_id_and_organism(self, cog_id, organism):
         """Filter COGs by COG id and organism: COG0004 and Escherichia_coli_K-12_sub_MG1655"""
-        res = self.services.http_get("cog", frmt="json",
-            params={"cog": cog_id, "organism,": organism})
+        res = self.services.http_get(
+            "cog", frmt="json", params={"cog": cog_id, "organism,": organism}
+        )
         return res
 
     def get_all_cogs_definition(self):
@@ -157,9 +157,3 @@ class COG():
         """Get specific Taxonomic Category by name: ALPHAPROTEOBACTERIA"""
         res = self.services.http_get("taxonomy", frmt="json", params={"name": name})
         return res
-
-
-
-
-
-

@@ -3,10 +3,6 @@
 #
 #  Copyright (c) 2013-2014 - EBI-EMBL
 #
-#  File author(s): 
-#      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
-#
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
 #      http://www.gnu.org/licenses/gpl-3.0.html
@@ -35,10 +31,11 @@
 """
 from bioservices.services import REST
 from bioservices import logger
+
 logger.name = __name__
 
 
-__all__ = ['DBFetch']
+__all__ = ["DBFetch"]
 
 
 class DBFetch(REST):
@@ -50,28 +47,30 @@ class DBFetch(REST):
         >>> w = DBFetch()
         >>> data = w.fetchBatch("uniprot" ,"zap70_human", "xml", "raw")
 
-    For more information about the API, check this page: 
+    For more information about the API, check this page:
     http://www.ebi.ac.uk/Tools/dbfetch/syntax.jsp
 
     """
-    _url = 'http://www.ebi.ac.uk/Tools/dbfetch'
-    def __init__(self,  verbose=False):
+
+    _url = "http://www.ebi.ac.uk/Tools/dbfetch"
+
+    def __init__(self, verbose=False):
         """.. rubric:: Constructor
 
         :param bool verbose: print informative messages
         """
-        super(DBFetch, self).__init__(name="DBfetch", url=DBFetch._url, 
-            verbose=verbose)
+        super(DBFetch, self).__init__(name="DBfetch", url=DBFetch._url, verbose=verbose)
         self._supportedDBs = None
         self._supportedFormats = None
         self._supportedStyles = None
 
     def _check_db(self, db):
         if db not in self.supported_databases:
-            raise Exception("%s not a supportedDB. " %db)
+            raise Exception("%s not a supportedDB. " % db)
 
-    def fetch(self, query, db="ena_sequence", format="default", style="raw", 
-                pageHtml=False):
+    def fetch(
+        self, query, db="ena_sequence", format="default", style="raw", pageHtml=False
+    ):
         """Fetch an entry in a defined format and style.
 
         :param str query: the entry identifier in db:id format (e.g. 'UniProtKB:WAP_RAT').
@@ -92,27 +91,33 @@ class DBFetch(REST):
 
         If db is ommited, the default is ena_sequence.
         If formatare ommited, the default is EMBL format
-        The default style is raw data. 
+        The default style is raw data.
 
         """
         self._check_db(db)
-        res = self.http_get("dbfetch", 
-                params={"db": db, "format":format, "style":style, "id":query,
-                        "pageHtml":pageHtml})
+        res = self.http_get(
+            "dbfetch",
+            params={
+                "db": db,
+                "format": format,
+                "style": style,
+                "id": query,
+                "pageHtml": pageHtml,
+            },
+        )
         try:
             res = res.content.decode()
         except:
             pass
         return res
 
-
     def get_database_info(self, db=None):
         """Get details describing specific database (data formats, styles)
 
-        :param str db: a valid database. 
+        :param str db: a valid database.
         :return: The output can be introspected and contains several attributes
 
-        :: 
+        ::
 
             >>> res = u.get_database_info('uniprotkb')
             >>> print(res['description'])
@@ -136,7 +141,7 @@ class DBFetch(REST):
     def get_database_formats(self, db):
         """Get list of format names for a given database.
 
-        :param str db: valid database name 
+        :param str db: valid database name
 
         ::
 
@@ -165,7 +170,7 @@ class DBFetch(REST):
         :param str db: database name to get available styles for (e.g. uniprotkb).
         :param str format: the data format to get available styles for (e.g. fasta).
 
-        :Returns: An array of strings containing the style names. 
+        :Returns: An array of strings containing the style names.
 
         ::
 
@@ -174,12 +179,14 @@ class DBFetch(REST):
 
         """
         self._check_db(db)
-        res = self.http_get("dbfetch?info=styles&format={}&db={}".format(format, db)).content
+        res = self.http_get(
+            "dbfetch?info=styles&format={}&db={}".format(format, db)
+        ).content
         res = res.decode().split()
         return res
 
     def _getSupportedDBs(self):
-        """Get a list of database names usable with DBFetch. 
+        """Get a list of database names usable with DBFetch.
 
         Buffered in _supportedDB.
         """
@@ -189,9 +196,5 @@ class DBFetch(REST):
             res = self.http_get("dbfetch?info=dbs").content
             self._supportedDBs = res.decode().split() + ["default"]
         return self._supportedDBs
+
     supported_databases = property(_getSupportedDBs, doc="Alias to getSupportedDBs.")
-
-
-
-
-

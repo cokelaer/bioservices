@@ -3,8 +3,8 @@
 #
 #  Copyright (c) 2013-2014 - EMBL-EBI
 #
-#  File author(s): 
-#      
+#  File author(s):
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -38,13 +38,14 @@ import time
 
 from bioservices.services import REST
 from bioservices import logger
+
 logger.name = __name__
 
 
 __all__ = ["NCBIblast"]
 
 
-class NCBIblast():
+class NCBIblast:
     """Interface to the `NCBIblast <http://blast.ncbi.nlm.nih.gov/>`_ service.
 
     ::
@@ -73,7 +74,10 @@ class NCBIblast():
 
     """
 
-    _sequence_example = "MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS"
+    _sequence_example = (
+        "MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS"
+    )
+
     def __init__(self, verbose=False):
         """.. rubric:: NCBIblast constructor
 
@@ -93,7 +97,7 @@ class NCBIblast():
 
         ::
 
-            >>> from bioservices import ncbiblast 
+            >>> from bioservices import ncbiblast
             >>> n = ncbiblast.NCBIblast()
             >>> res = n.get_parameters()
             >>> [x.text for x in res.findAll("id")]
@@ -102,11 +106,15 @@ class NCBIblast():
             need to process the XML output.
         """
 
-        res = self.services.http_get("parameters", frmt="json", 
-                 headers={
-                    "User-Agent": self.services.getUserAgent(), 
-                    "Accept": "application/json"})
-        return res['parameters']
+        res = self.services.http_get(
+            "parameters",
+            frmt="json",
+            headers={
+                "User-Agent": self.services.getUserAgent(),
+                "Accept": "application/json",
+            },
+        )
+        return res["parameters"]
 
     def _get_parameters(self):
         if self._parameters:
@@ -116,6 +124,7 @@ class NCBIblast():
             res = self.get_parameters()
             self._parameters = res
         return self._parameters
+
     parameters = property(_get_parameters)
 
     def get_parameter_details(self, parameterId):
@@ -138,24 +147,39 @@ class NCBIblast():
 
         """
         if parameterId not in self.parameters:
-            raise ValueError("Invalid parameterId provided(%s). See parameters attribute" % parameterId)
+            raise ValueError(
+                "Invalid parameterId provided(%s). See parameters attribute"
+                % parameterId
+            )
 
         if parameterId not in self._parametersDetails.keys():
             request = "parameterdetails/" + parameterId
-            res = self.services.http_get(request, frmt="json",
-                 headers={
-                    "User-Agent": self.services.getUserAgent(), 
-                    "Accept": "application/json"})
+            res = self.services.http_get(
+                request,
+                frmt="json",
+                headers={
+                    "User-Agent": self.services.getUserAgent(),
+                    "Accept": "application/json",
+                },
+            )
 
             try:
-                data = [x['value'] for x in res["values"]["values"]]
+                data = [x["value"] for x in res["values"]["values"]]
             except:
                 data = res
             self._parametersDetails[parameterId] = data
         return self._parametersDetails[parameterId]
 
-    def run(self, program=None, database=None, sequence=None,stype="protein", email=None, **kargs):
-        """ Submit a job with the specified parameters.
+    def run(
+        self,
+        program=None,
+        database=None,
+        sequence=None,
+        stype="protein",
+        email=None,
+        **kargs
+    ):
+        """Submit a job with the specified parameters.
 
         .. python ncbiblast_urllib2.py -D ENSEMBL --email "test@yahoo.com" --sequence
         .. MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS
@@ -183,11 +207,11 @@ class NCBIblast():
             sequence before performing the search.
         :param int scores:     maximum number of scores displayed in the output.
         :param int dropoff:     amount score must drop before extension of hits is halted.
-        :param match_scores:     match/miss-match scores to generate a scoring matrix 
+        :param match_scores:     match/miss-match scores to generate a scoring matrix
             for nucleotide searches.
         :param int gapopen:     penalty for the initiation of a gap.
         :param int gapext:     penalty for each base/residue in a gap.
-        :param seqrange: region of the query sequence to use for the search. 
+        :param seqrange: region of the query sequence to use for the search.
             Default: whole sequence.
         :return: A jobid that can be analysed with :meth:`getResult`,
             :meth:`getStatus`, ...
@@ -218,11 +242,11 @@ class NCBIblast():
 
         .. seealso:: :meth:`getResult`
 
-        .. warning:: Cases are not important. Spaces in the database case should 
+        .. warning:: Cases are not important. Spaces in the database case should
             be replaced by underscore.
 
         .. note:: database returned by the server have meaningless names since
-            they do not map to the expected names. An example is "ENA Sequence Release" 
+            they do not map to the expected names. An example is "ENA Sequence Release"
             that should be provided as em_rel
 
         http://www.ebi.ac.uk/Tools/sss/ncbiblast/help/index-nucleotide.html
@@ -242,10 +266,11 @@ class NCBIblast():
 
         # So far, we have these parameters
         params = {
-            'program': program,
-            'sequence': sequence,
-            'email': email,
-            'stype': stype}
+            "program": program,
+            "sequence": sequence,
+            "email": email,
+            "stype": stype,
+        }
 
         # all others are optional (actually type is also optional)
         # We can check all of the optional argument provided automatically.
@@ -253,13 +278,13 @@ class NCBIblast():
         # here because what is returned by parametersDetails is not exactly what
         # is expected.
         for k, v in kargs.items():
-            #print(k, v)
-            checkParam(v,self.get_parameter_details(k))
+            # print(k, v)
+            checkParam(v, self.get_parameter_details(k))
             params[k] = v
 
         # similarly for the database, we must process it by hand because ther
         # can be more than one database
-        #checkParam(database.lower(), [str(x.replace(" ", "_").lower())
+        # checkParam(database.lower(), [str(x.replace(" ", "_").lower())
         #    for x in self.parametersDetails("database")])
         if isinstance(database, list):
             databases = database[:]
@@ -267,7 +292,7 @@ class NCBIblast():
             databases = [database]
         else:
             raise TypeError("database must be a string or a list of strings")
-        params['database'] = databases
+        params["database"] = databases
 
         """
 parser.add_option('--seqrange', help='region within input to use as query')
@@ -282,10 +307,15 @@ parser.add_option('--status', action="store_true", help='get job status')
 parser.add_option('--resultTypes', action='store_true', help='get result types')
     """
         # IMPORTANT: use data parameter, not params !!!
-        res = self.services.http_post("run", frmt=None, data=params,
+        res = self.services.http_post(
+            "run",
+            frmt=None,
+            data=params,
             headers={
-                 "User-Agent": self.services.getUserAgent(), 
-                "accept": "text/plain"})
+                "User-Agent": self.services.getUserAgent(),
+                "accept": "text/plain",
+            },
+        )
 
         return res
 
@@ -306,14 +336,18 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
 
 
         """
-        res = self.services.http_get("status/{}".format(jobid), frmt="txt", 
+        res = self.services.http_get(
+            "status/{}".format(jobid),
+            frmt="txt",
             headers={
-                "User-Agent": self.services.getUserAgent(), 
-                "accept": "text/plain"})
+                "User-Agent": self.services.getUserAgent(),
+                "accept": "text/plain",
+            },
+        )
         return res
 
     def get_result_types(self, jobid):
-        """ Get available result types for a finished job.
+        """Get available result types for a finished job.
 
         :param str jobid: a job identifier returned by :meth:`run`.
         :param bool verbose: print the identifiers together with their label,
@@ -323,64 +357,80 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
             identifier is itself a dictionary containing the label, description,
             file suffix and mediaType of the identifier.
         """
-        if self.get_status(jobid) != 'FINISHED':
-            self.services.logging.warning("waiting for the job to be finished. May take a while")
+        if self.get_status(jobid) != "FINISHED":
+            self.services.logging.warning(
+                "waiting for the job to be finished. May take a while"
+            )
             self.wait(jobid, verbose=False)
-        url = 'resulttypes/' + jobid
-        res = self.services.http_get(url, frmt="json", 
+        url = "resulttypes/" + jobid
+        res = self.services.http_get(
+            url,
+            frmt="json",
             headers={
-                "User-Agent": self.services.getUserAgent(), 
-                "accept": "application/json"})
-        return [x["identifier"] for x in res['types']]
+                "User-Agent": self.services.getUserAgent(),
+                "accept": "application/json",
+            },
+        )
+        return [x["identifier"] for x in res["types"]]
 
     def get_result(self, jobid, result_type):
-        """ Get the job result of the specified type.
+        """Get the job result of the specified type.
 
 
-        :param str jobid: a job identifier returned by :meth:`run`.
-        :param str  result_type: type of result to retrieve. See :meth:`getResultTypes`.
+          :param str jobid: a job identifier returned by :meth:`run`.
+          :param str  result_type: type of result to retrieve. See :meth:`getResultTypes`.
 
-        The output from the tool itself.
-        Use the 'format' parameter to retireve the output in different formats,
-        the 'compressed' parameter to retrieve the xml output in compressed form.
-        Format options::
+          The output from the tool itself.
+          Use the 'format' parameter to retireve the output in different formats,
+          the 'compressed' parameter to retrieve the xml output in compressed form.
+          Format options::
 
-           0 = pairwise,
-           1 = query-anchored showing identities,
-           2 = query-anchored no identities,
-           3 = flat query-anchored showing identities,
-           4 = flat query-anchored no identities,
-           5 = XML Blast output,
-           6 = tabular,
-           7 = tabular with comment lines,
-           8 = Text ASN.1,
-           9 = Binary ASN.1,
-           10 = Comma-separated values,
-           11 = BLAST archive format (ASN.1).
+             0 = pairwise,
+             1 = query-anchored showing identities,
+             2 = query-anchored no identities,
+             3 = flat query-anchored showing identities,
+             4 = flat query-anchored no identities,
+             5 = XML Blast output,
+             6 = tabular,
+             7 = tabular with comment lines,
+             8 = Text ASN.1,
+             9 = Binary ASN.1,
+             10 = Comma-separated values,
+             11 = BLAST archive format (ASN.1).
 
-      See NCBI Blast documentation for details.
-      Use the 'compressed' parameter to return the XML output in compressed form.
-      e.g. '?format=5&compressed=true'.
+        See NCBI Blast documentation for details.
+        Use the 'compressed' parameter to return the XML output in compressed form.
+        e.g. '?format=5&compressed=true'.
 
 
         """
-        if self.get_status(jobid)!='FINISHED':
-            self.services.logging.warning("waiting for the job to be finished. May take a while")
+        if self.get_status(jobid) != "FINISHED":
+            self.services.logging.warning(
+                "waiting for the job to be finished. May take a while"
+            )
             self.wait(jobid)
         if self.get_status(jobid) != "FINISHED":
             raise ValueError("job is not finished")
-        url = 'result/' + jobid + '/' + result_type
+        url = "result/" + jobid + "/" + result_type
 
-        if result_type in ['out', "error", "sequence", "ids"]:
-            res = self.services.http_get(url, frmt="txt",
-                 headers={
-                     "User-Agent": self.services.getUserAgent(),
-                     "accept": "text/plain"})
-        elif result_type in ['xml']:
-            res = self.services.http_get(url, frmt="xml",
-                 headers={
-                     "User-Agent": self.services.getUserAgent(),
-                     "accept": "text/plain"})
+        if result_type in ["out", "error", "sequence", "ids"]:
+            res = self.services.http_get(
+                url,
+                frmt="txt",
+                headers={
+                    "User-Agent": self.services.getUserAgent(),
+                    "accept": "text/plain",
+                },
+            )
+        elif result_type in ["xml"]:
+            res = self.services.http_get(
+                url,
+                frmt="xml",
+                headers={
+                    "User-Agent": self.services.getUserAgent(),
+                    "accept": "text/plain",
+                },
+            )
         return res
 
     def wait(self, jobId):
@@ -391,17 +441,16 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
 
         """
 
-        if self.checkInterval<1:
+        if self.checkInterval < 1:
             raise ValueError("checkInterval must be positive and less than a second")
-        result = 'PENDING'
-        while result == 'RUNNING' or result == 'PENDING':
+        result = "PENDING"
+        while result == "RUNNING" or result == "PENDING":
             result = self.get_status(jobId)
-            if result == 'RUNNING' or result == 'PENDING':
+            if result == "RUNNING" or result == "PENDING":
                 time.sleep(self.checkInterval)
         return result
 
     def _get_database(self):
         return self.get_parameter_details("database")
-    databases = property(_get_database,
-        doc=r"""Returns accepted databases.""")
 
+    databases = property(_get_database, doc=r"""Returns accepted databases.""")

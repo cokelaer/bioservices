@@ -14,7 +14,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-#$Id$
+# $Id$
 """Interface to the PDB web Service (New API Jan 2021).
 
 .. topic:: What is PDB ?
@@ -36,7 +36,7 @@ from bioservices.services import REST
 __all__ = ["PDB"]
 
 
-class PDB():
+class PDB:
     """Interface to `PDB <http://search.rcsb.org/>`_ service (new API Jan 2021)
 
     With the new API, one method called :meth:`~bioservices.pdb.PDB.search` is
@@ -47,10 +47,10 @@ class PDB():
 
         >>> from bioservices import PDB
         >>> s = PDB()
-        >>> query = {"query": 
-        ...              {"type": "terminal", 
-        ...               "service": "text", 
-        ...               "parameters": { 
+        >>> query = {"query":
+        ...              {"type": "terminal",
+        ...               "service": "text",
+        ...               "parameters": {
         ...                 "value": "thymidine kinase"
         ...                 }
         ...             },
@@ -58,7 +58,7 @@ class PDB():
         >>> res = s.search(query, return_type=return_type)
 
 
-    .. note:: as of December 2020, a new API has be set up by PDB. 
+    .. note:: as of December 2020, a new API has be set up by PDB.
         some prevous functionalities such as return list of Ligand are not
         supported anymore (Jan 2021). However, many more powerful searches as
         available. I encourage everyone to look at the PDB page for complex
@@ -67,11 +67,11 @@ class PDB():
     As mentionnaed above, the PDB service provide one method called search available in
     :meth:`~bioservices.pdb.PDB.search`. We will not cover all the power and
     capability of this search function. User should refer to the official PDB help
-    for that. Yet, given examples from PDB should all work with this method. 
+    for that. Yet, given examples from PDB should all work with this method.
 
     When possible, we will add convenient aliases function in this class. For
     now we have for example the :meth:`~bioservices.pdb.PDB.get_current_ids` and
-    :meth:`~bioservices.pdb.PDB.get_similarity_sequence` that users may find useful. 
+    :meth:`~bioservices.pdb.PDB.get_similarity_sequence` that users may find useful.
 
     The main idea behind the PDB API is to create queries that can access to
     different type of services. A query will need to at least two keys:
@@ -101,19 +101,19 @@ class PDB():
 
     - **type**: the clause type can be either **terminal** or **group**
 
-        - **terminal**: performs an atomic search operation, e.g. searches 
-          for a particular value in a particular field. 
-        - **group**: wraps other terminal or group nodes and is 
+        - **terminal**: performs an atomic search operation, e.g. searches
+          for a particular value in a particular field.
+        - **group**: wraps other terminal or group nodes and is
           used to combine multiple queries in a logical fashion.
 
     - **service**:
 
         - **text**: linguistic searches against textual annotations.
         - **sequence**: uses MMSeq2 to perform sequence matching searches (blast-like).
-          following targets that are available: 
+          following targets that are available:
 
-          - pdb_protein_sequence, 
-          - pdb_dna_sequence, 
+          - pdb_protein_sequence,
+          - pdb_dna_sequence,
           - pdb_na_sequence
         - **seqmotif**: performs short motif searches against nucleotide or protein
           sequences using 3 different inputs:
@@ -125,36 +125,36 @@ class PDB():
           or chains of a given entry (identified by PDB ID), in either strict
           (strict_shape_match) or relaxed (relaxed_shape_match) modes
         - strucmotif: Performs structural motif searches on all available PDB structures.
-        - chemical: queries of small-molecule constituents of PDB structures, 
+        - chemical: queries of small-molecule constituents of PDB structures,
           based on chemical formula and chemical structure. Queries for matching and similar
           chemical structures can be performed using SMILES and InChI descriptors
           as search targets.
 
-          - graph-strict: atom type, formal charge, bond order, atom and bond chirality, 
-            aromatic assignment are used as matching criteria for this search type. 
+          - graph-strict: atom type, formal charge, bond order, atom and bond chirality,
+            aromatic assignment are used as matching criteria for this search type.
           - graph-relaxed: atom type, formal charge and bond order are used as
-            matching criteria for this search type. 
+            matching criteria for this search type.
           - graph-relaxed-stereo: atom type, formal charge, bond order, atom
             and bond chirality are used as matching criteria for this search
             type.
-          - fingerprint-similarity: Tanimoto similarity is used as the matching criteria 
+          - fingerprint-similarity: Tanimoto similarity is used as the matching criteria
 
     Concerning the **return_type** key, it can be one of :
 
     - entry: a list of PDB IDs.
-    - assembly: list of PDB IDs appended with assembly IDs in the format of 
+    - assembly: list of PDB IDs appended with assembly IDs in the format of
       a [pdb_id]-[assembly_id], corresponding to biological assemblies.
-    - polymer_entity: list of PDB IDs appended with entity IDs in the format 
+    - polymer_entity: list of PDB IDs appended with entity IDs in the format
       of a [pdb_id]_[entity_id], corresponding to polymeric molecular entities.
-    - non_polymer_entity: list of PDB IDs appended with entity IDs in the 
+    - non_polymer_entity: list of PDB IDs appended with entity IDs in the
       format of a [pdb_id]_[entity_id], corresponding to non-polymeric entities (or ligands).
-    - polymer_instance: list of PDB IDs appended with asym IDs in the format 
-      of a [pdb_id].[asym_id], corresponding to instances of certain polymeric 
+    - polymer_instance: list of PDB IDs appended with asym IDs in the format
+      of a [pdb_id].[asym_id], corresponding to instances of certain polymeric
       molecular entities, also known as chains.
 
     **Optional arguments**
 
-    There are many optional arguments. Let us see a couple of them. Pagination can be 
+    There are many optional arguments. Let us see a couple of them. Pagination can be
     set (default is 10 entries) using the **request_options** (optional) key.
     Consider this query example::
 
@@ -179,7 +179,7 @@ class PDB():
 
     Here, the query searches for the polymer_entity that have a formula weight
     above 500. Withe request_options pager set to 100, we will get the first 100
-    hits. 
+    hits.
 
     To return all hits, set this field in the request_options::
 
@@ -207,7 +207,7 @@ class PDB():
     For instance, in the example above only in, exact_match and exists can be
     used with exptl.method attribute. This is not checked in bioservices.
 
-    Sorting is determined by the sort object in the request_options context. 
+    Sorting is determined by the sort object in the request_options context.
     It allows you to add one or more sorting conditions to control the order of
     the search result hits. The sort operation is defined on a per field level, with
     special field name for score to sort by score (the default)<
@@ -236,10 +236,11 @@ class PDB():
           },
           "return_type": "entry"
         }
-    
-    Again, many more complex examples can be found on PDB page. 
+
+    Again, many more complex examples can be found on PDB page.
     """
-    _url="http://search.rcsb.org/rcsbsearch/v1/"
+
+    _url = "http://search.rcsb.org/rcsbsearch/v1/"
 
     def __init__(self, verbose=False, cache=False):
         """.. rubric:: Constructor
@@ -247,12 +248,12 @@ class PDB():
         :param bool verbose: prints informative messages (default is off)
 
         """
-        self.services = REST(name="PDB", verbose=verbose,
-            cache=cache, url_defined_later=True)
+        self.services = REST(
+            name="PDB", verbose=verbose, cache=cache, url_defined_later=True
+        )
         self.services.url = PDB._url
 
-    def search(self, query, request_options=None, request_info=None,
-        return_type=None):
+    def search(self, query, request_options=None, request_info=None, return_type=None):
         """search request represented as a JSON object.
 
         This is the only function in PDB API. You should be able
@@ -333,12 +334,12 @@ class PDB():
         else:
             query = {"query": query}
             if request_options:
-                query['request_options'] = request_options
+                query["request_options"] = request_options
             if request_info:
-                query['request_info'] = request_info
+                query["request_info"] = request_info
             if return_type:
-                query['return_type'] = return_type
-        if 'return_type' not in query: #pragma: no cover
+                query["return_type"] = return_type
+        if "return_type" not in query:  # pragma: no cover
             raise ValueError("Yourr query must have a return_type key")
         print(query)
         res = self.services.http_post("query", frmt="json", json=query)
@@ -353,30 +354,29 @@ class PDB():
 
         # second requests all entries
         res = self.search(
-            query={'type': 'terminal', 'service':'text'},
+            query={"type": "terminal", "service": "text"},
             request_options=request_options,
-            return_type="entry")
+            return_type="entry",
+        )
 
-        identifiers = [x['identifier'] for x in res['result_set']]
+        identifiers = [x["identifier"] for x in res["result_set"]]
         return identifiers
 
     def get_similarity_sequence(self, seq):
         """Search of seauence similarity search with protein sequence
 
-            seq = "VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTAVAHVDDMPNAL"
-            results = p.get_similarity_sequence(seq)
+        seq = "VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTAVAHVDDMPNAL"
+        results = p.get_similarity_sequence(seq)
 
         """
-        res = self.search({
-           "query": {
-             "type": "terminal",
-             "service": "sequence",
-             "parameters": {
-              "target": "pdb_protein_sequence",
-               "value": seq
-             }
-           },
-           "return_type": "polymer_entity"})
+        res = self.search(
+            {
+                "query": {
+                    "type": "terminal",
+                    "service": "sequence",
+                    "parameters": {"target": "pdb_protein_sequence", "value": seq},
+                },
+                "return_type": "polymer_entity",
+            }
+        )
         return res
-
-

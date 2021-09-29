@@ -3,8 +3,6 @@
 #
 #  Copyright (c) 2013-2014 - EBI-EMBL
 #
-#  File author(s):
-#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -37,13 +35,14 @@ import os
 from bioservices.services import REST
 import webbrowser
 from bioservices import logger
+
 logger.name = __name__
 
 
 __all__ = ["ENA"]
 
 
-class ENA():
+class ENA:
     """Interface to `ChEMBL <http://www.ebi.ac.uk/ena/index.php>`_
 
     Here is a quick example to retrieve a target given its ChEMBL Id
@@ -103,23 +102,29 @@ class ENA():
 
 
     """
-    url = "http://www.ebi.ac.uk/ena/browser/api"
 
+    url = "http://www.ebi.ac.uk/ena/browser/api"
 
     def __init__(self, verbose=False, cache=False):
         """**Constructor**
 
         :param verbose: set to False to prevent informative messages
         """
-        self.services = REST(name="ENA", url=ENA.url,
-                verbose=verbose, cache=cache)
+        self.services = REST(name="ENA", url=ENA.url, verbose=verbose, cache=cache)
         self.services.TIMEOUT = 100
 
-    def get_data(self, identifier, frmt, fasta_range=None, expanded=None,
-            header=None, download=None):
+    def get_data(
+        self,
+        identifier,
+        frmt,
+        fasta_range=None,
+        expanded=None,
+        header=None,
+        download=None,
+    ):
         """
 
-        :param frmt : xml, text, fasta, fastq, html, embl but does depend on the    
+        :param frmt : xml, text, fasta, fastq, html, embl but does depend on the
             entry
 
         Example:
@@ -132,19 +137,17 @@ class ENA():
 
         url = f"{self.url}/{frmt}/{identifier}"
 
-
-        if frmt in ['text', 'fasta', 'fastq']:
+        if frmt in ["text", "fasta", "fastq"]:
             res = self.services.http_get(url, frmt="txt")
-        elif frmt in ['html']:
+        elif frmt in ["html"]:
             res = self.services.http_get(url, frmt="default")
-        elif frmt in ['xml']:
+        elif frmt in ["xml"]:
             res = self.services.http_get(url, frmt="xml")
         return res
 
     def data_warehouse(self):
-        #http://www.ebi.ac.uk/ena/data/warehouse/search?query="geo_circ(-0.587,-90.5713,170)"&result=sequence_release&display=text&download=gzip
+        # http://www.ebi.ac.uk/ena/data/warehouse/search?query="geo_circ(-0.587,-90.5713,170)"&result=sequence_release&display=text&download=gzip
         pass
 
     def get_taxon(self, taxon):
         print("deprecated since v.7.8 due to ENA update")
-

@@ -10,7 +10,7 @@ def download_fasta(accession, output_filename=None, method="EUtils", service=Non
     :param output_filename: if none, use accession + fa extension (replaces dot
         with underscore)
     :param method: either EUtils or ENA
-    :param service: an existing instance of ENA or EUtils. This is useful to 
+    :param service: an existing instance of ENA or EUtils. This is useful to
         call this functions many times. The creation of the service is indeed
         time consuming. If used, then **method** is ignored.
 
@@ -37,16 +37,17 @@ def _download_fasta_ena(accession, output_filename, service=None):
     if service is None:
         service = ENA()
     data = service.get_data(accession, "fasta")
-    #data = data.decode()
+    # data = data.decode()
     return _data_to_file(data, output_filename)
 
 
 def _download_fasta_ncbi(accession, output_filename, service=None):
     if service is None:
         service = EUtils()
-    data = service.EFetch('nucleotide', accession, rettype='fasta')
+    data = service.EFetch("nucleotide", accession, rettype="fasta")
     data = data.decode()
     return _data_to_file(data, output_filename)
+
 
 def _data_to_file(data, output_filename):
     # Split header and Fasta
@@ -61,5 +62,4 @@ def _data_to_file(data, output_filename):
 
     # Save to local file
     with open(output_filename, "w") as fout:
-        fout.write(header+"\n"+others)
-
+        fout.write(header + "\n" + others)

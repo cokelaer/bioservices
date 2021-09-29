@@ -133,14 +133,14 @@ param           Interaction parameters. Only true or
 from bioservices import REST, UniProt
 
 
-#http://code.google.com/p/psicquic/wiki/PsicquicSpec_1_3_Rest
+# http://code.google.com/p/psicquic/wiki/PsicquicSpec_1_3_Rest
 
-#http://www.biocatalogue.org/services/2078#operations
+# http://www.biocatalogue.org/services/2078#operations
 
 __all__ = ["PSICQUIC"]
 
 
-class PSICQUIC():
+class PSICQUIC:
     """Interface to the `PSICQUIC <http://code.google.com/p/psicquic/>`_ service
 
     There are 2 interfaces to the PSICQUIC service (REST and WSDL) but we used
@@ -200,29 +200,40 @@ class PSICQUIC():
     .. seealso:: :class:`bioservices.biogrid.BioGRID`
     """
 
-    _formats = ["tab25", "tab26", "tab27", "xml25", "count", "biopax", "xgmml",
-        "rdf-xml", "rdf-xml-abbrev", "rdf-n3", "rdf-turtle"]
-
+    _formats = [
+        "tab25",
+        "tab26",
+        "tab27",
+        "xml25",
+        "count",
+        "biopax",
+        "xgmml",
+        "rdf-xml",
+        "rdf-xml-abbrev",
+        "rdf-n3",
+        "rdf-turtle",
+    ]
 
     # note the typo in "genbank indentifier from bind DB
-    _mapping_uniprot = {"genbank indentifier": "P_GI",
-        'entrezgene/locuslink':"P_ENTREZGENEID",
-        'uniprotkb': "ACC+ID",
-        'rcsb pdb':"PDB_ID",
-        'ensembl':"ENSEMBL_ID",
-        'refseq':"P_REFSEQ_AC",
-        'hgnc':'HGNC_ID',
+    _mapping_uniprot = {
+        "genbank indentifier": "P_GI",
+        "entrezgene/locuslink": "P_ENTREZGENEID",
+        "uniprotkb": "ACC+ID",
+        "rcsb pdb": "PDB_ID",
+        "ensembl": "ENSEMBL_ID",
+        "refseq": "P_REFSEQ_AC",
+        "hgnc": "HGNC_ID",
         "kegg": "KEGG_ID",
         "entrez gene/locuslink": "P_ENTREZGENEID",
         "chembl": "CHEMBL_ID",
         "ddbj/embl/genbank": "EMBL_ID",
         "dip": "DIP_ID",
         "ensemblgenomes": "ENSEMBLGENOME_ID",
-        "omim":"MIM_ID",
+        "omim": "MIM_ID",
         "chebi": None,
         "chembl": None,
         #        "intact": None
-        }
+    }
 
     # unknown: hprd, omim, bind, bind complexid, mdl,
 
@@ -237,9 +248,12 @@ class PSICQUIC():
             >>> s = PSICQUIC()
 
         """
-        self.services = REST("PSICQUIC", verbose=verbose, 
+        self.services = REST(
+            "PSICQUIC",
+            verbose=verbose,
             url="https://www.ebi.ac.uk/Tools/webservices/psicquic",
-            url_defined_later=True) # this prevent annoying warning
+            url_defined_later=True,
+        )  # this prevent annoying warning
 
         self._registry = None
 
@@ -251,21 +265,21 @@ class PSICQUIC():
 
     def _get_formats(self):
         return PSICQUIC._formats
+
     formats = property(_get_formats, doc="Returns the possible output formats")
 
     def _get_active_db(self):
         names = self.registry_names[:]
         actives = self.registry_actives[:]
-        names = [x.lower() for x,y in zip(names, actives) if y=="true"]
+        names = [x.lower() for x, y in zip(names, actives) if y == "true"]
         return names
+
     activeDBs = property(_get_active_db, doc="returns the active DBs only")
 
     def read_registry(self):
-        """Reads and returns the active registry
-
-        """
-        url = 'registry/registry?action=ACTIVE&format=txt'
-        res = self.services.http_get(url, frmt='txt')
+        """Reads and returns the active registry"""
+        url = "registry/registry?action=ACTIVE&format=txt"
+        res = self.services.http_get(url, frmt="txt")
         return res.split()
 
     def print_status(self):
@@ -287,7 +301,7 @@ class PSICQUIC():
         .. seealso:: If you want the data into lists, see all attributes
             starting with registry such as :meth:`registry_names`
         """
-        url = 'registry/registry?action=STATUS&format=xml'
+        url = "registry/registry?action=STATUS&format=xml"
         res = self.services.http_get(url, frmt="txt")
 
         names = self.registry_names
@@ -300,84 +314,119 @@ class PSICQUIC():
         restricted = self.registry_restricted
         N = len(names)
 
-        indices = sorted(range(0,N), key=lambda k: names[k])
+        indices = sorted(range(0, N), key=lambda k: names[k])
 
-        for i in range(0,N):
-            print("%s\t %s\t %s\t %s\t %s %s %s %s\n" % (names[i], actives[i],
-                counts[i], versions[i], resturls[i], soapurls[i], restexs[i], restricted[i]))
-
+        for i in range(0, N):
+            print(
+                "%s\t %s\t %s\t %s\t %s %s %s %s\n"
+                % (
+                    names[i],
+                    actives[i],
+                    counts[i],
+                    versions[i],
+                    resturls[i],
+                    soapurls[i],
+                    restexs[i],
+                    restricted[i],
+                )
+            )
 
     # todo a property for the version of PISCQUIC
 
     def _get_registry(self):
         if self._registry is None:
-            url = 'registry/registry?action=STATUS&format=xml'
+            url = "registry/registry?action=STATUS&format=xml"
             res = self.services.http_get(url, frmt="xml")
             res = self.services.easyXML(res)
             self._registry = res
         return self._registry
+
     registry = property(_get_registry, doc="returns the registry of psicquic")
 
     def _get_registry_names(self):
         res = self.registry
-        return [x.findAll('name')[0].text for x in res.findAll("service")]
-    registry_names = property(_get_registry_names,
-            doc="returns all services available (names)")
+        return [x.findAll("name")[0].text for x in res.findAll("service")]
+
+    registry_names = property(
+        _get_registry_names, doc="returns all services available (names)"
+    )
 
     def _get_registry_restricted(self):
         res = self.registry
-        return [x.findAll('restricted')[0].text for x in res.findAll("service")]
-    registry_restricted = property(_get_registry_restricted,
-            doc="returns restricted status of services")
+        return [x.findAll("restricted")[0].text for x in res.findAll("service")]
+
+    registry_restricted = property(
+        _get_registry_restricted, doc="returns restricted status of services"
+    )
 
     def _get_registry_resturl(self):
         res = self.registry
-        data = [x.findAll('resturl')[0].text for x in res.findAll("service")]
+        data = [x.findAll("resturl")[0].text for x in res.findAll("service")]
         return data
-    registry_resturls = property(_get_registry_resturl,
-            doc="returns URL of REST services")
+
+    registry_resturls = property(
+        _get_registry_resturl, doc="returns URL of REST services"
+    )
 
     def _get_registry_restex(self):
         res = self.registry
-        data = [x.findAll('restexample')[0].text for x in res.findAll("service")]
+        data = [x.findAll("restexample")[0].text for x in res.findAll("service")]
         return data
-    registry_restexamples = property(_get_registry_restex,
-            doc="retuns REST example for each service")
+
+    registry_restexamples = property(
+        _get_registry_restex, doc="retuns REST example for each service"
+    )
 
     def _get_registry_soapurl(self):
         res = self.registry
-        return  [x.findAll('soapurl')[0].text for x in res.findAll("service")]
-    registry_soapurls = property(_get_registry_soapurl,
-            doc="returns URL of WSDL service")
+        return [x.findAll("soapurl")[0].text for x in res.findAll("service")]
+
+    registry_soapurls = property(
+        _get_registry_soapurl, doc="returns URL of WSDL service"
+    )
 
     def _get_registry_active(self):
         res = self.registry
-        return  [x.findAll('active')[0].text for x in res.findAll("service")]
-    registry_actives = property(_get_registry_active,
-            doc="returns active state of each service")
+        return [x.findAll("active")[0].text for x in res.findAll("service")]
+
+    registry_actives = property(
+        _get_registry_active, doc="returns active state of each service"
+    )
 
     def _get_registry_count(self):
         res = self.registry
-        return  [x.findAll('count')[0].text for x in res.findAll("service")]
-    registry_counts = property(_get_registry_count,
-            doc="returns number of entries in each service")
+        return [x.findAll("count")[0].text for x in res.findAll("service")]
+
+    registry_counts = property(
+        _get_registry_count, doc="returns number of entries in each service"
+    )
 
     def _get_registry_version(self):
         res = self.registry
-        names = [x.findAll('name')[0].text for x in res.findAll("service")]
+        names = [x.findAll("name")[0].text for x in res.findAll("service")]
         N = len(names)
         version = [0] * N
-        for i in range(0,N):
+        for i in range(0, N):
             x = res.findAll("service")[i]
             if x.findAll("version"):
                 version[i] = x.findAll("version")[0].text
             else:
                 version[i] = None
-        return  version
-    registry_versions = property(_get_registry_version,
-            doc="returns version of each service")
+        return version
 
-    def query(self, service, query, output="tab25", version="current", firstResult=None, maxResults=None):
+    registry_versions = property(
+        _get_registry_version, doc="returns version of each service"
+    )
+
+    def query(
+        self,
+        service,
+        query,
+        output="tab25",
+        version="current",
+        firstResult=None,
+        maxResults=None,
+    ):
         """Send a query to a specific database
 
         :param str service: a registered service. See :attr:`registry_names`.
@@ -421,25 +470,29 @@ class PSICQUIC():
         params = {}
         if output is not None:
             self.services.devtools.check_param_in_list(output, self.formats)
-            params['format'] = output
-        else: output="none"
+            params["format"] = output
+        else:
+            output = "none"
 
         names = [x.lower() for x in self.registry_names]
         try:
             index = names.index(service)
         except ValueError:
-            self.logging.error("The service you gave (%s) is not registered. See self.registery_names" % service)
+            self.logging.error(
+                "The service you gave (%s) is not registered. See self.registery_names"
+                % service
+            )
             raise ValueError
 
         # get the base url according to the service requested
         resturl = self.registry_resturls[index]
 
         if firstResult is not None:
-            params['firstResult'] = firstResult
+            params["firstResult"] = firstResult
         if maxResults is not None:
-            params['maxResults'] = maxResults
+            params["maxResults"] = maxResults
 
-        url = resturl  + 'query/' + query
+        url = resturl + "query/" + query
 
         if "xml" in output:
             res = self.services.http_get(url, frmt="xml", params=params)
@@ -463,7 +516,15 @@ class PSICQUIC():
 
         return results
 
-    def queryAll(self, query, databases=None, output="tab25", version="current", firstResult=None, maxResults=None):
+    def queryAll(
+        self,
+        query,
+        databases=None,
+        output="tab25",
+        version="current",
+        firstResult=None,
+        maxResults=None,
+    ):
         """Same as query but runs on all active database
 
         :param list databases: database to query. Queries all active DB if not provided
@@ -482,14 +543,21 @@ class PSICQUIC():
             if x not in self.activeDBs:
                 raise ValueError("database %s not in active databases" % x)
 
-
         for name in databases:
             self.logging.warning("Querying %s" % name),
-            res = self.query(name, query, output=output, version=version, firstResult=firstResult, maxResults=maxResults)
+            res = self.query(
+                name,
+                query,
+                output=output,
+                version=version,
+                firstResult=firstResult,
+                maxResults=maxResults,
+            )
             if output.startswith("tab25"):
-                results[name] = [x for x in res if x!=[""]]
+                results[name] = [x for x in res if x != [""]]
             else:
                 import copy
+
                 results[name] = copy.copy(res)
         for name in databases:
             self.logging.info("Found %s in %s" % (len(results[name]), name))
@@ -506,7 +574,10 @@ class PSICQUIC():
         """
         # get the active names only
         activeDBs = self.activeDBs[:]
-        res = [(str(name), int(self.query(name, query, output="count")[0])) for name in activeDBs]
+        res = [
+            (str(name), int(self.query(name, query, output="count")[0]))
+            for name in activeDBs
+        ]
         return dict(res)
 
     def getName(self, data):
@@ -539,48 +610,61 @@ class PSICQUIC():
 
         """
         self.logging.info("converting data into known names")
-        idsA = [x[0].replace("\"","") for x in data]
-        idsB = [x[1].replace("\"", "") for x in data]
+        idsA = [x[0].replace('"', "") for x in data]
+        idsB = [x[1].replace('"', "") for x in data]
         # extract the first and second ID but let us check if it is part of a
         # known uniprot mapping.Otherwise no conversion will be possible.
         # If so, we set the ID to "unknown"
         # remove the " character that can be found in a few cases (e.g,
         # chebi:"CHEBI:29036")
-        #idsA = [x.replace("chebi:CHEBI:","chebi:") for x in idsA]
-        #idsB = [x.replace("chebi:CHEBI:", "chebi:") for x in idsB]
+        # idsA = [x.replace("chebi:CHEBI:","chebi:") for x in idsA]
+        # idsB = [x.replace("chebi:CHEBI:", "chebi:") for x in idsB]
 
         # special case:
         # in mint, there is an entry that ends with a | uniprotkb:P17844|
         idsA = [x.strip("|") for x in idsA]
         idsB = [x.strip("|") for x in idsB]
 
-
         # the first ID
         for i, entry in enumerate(idsA):
             try:
                 dbs = [x.split(":")[0] for x in entry.split("|")]
                 IDs = [x.split(":")[1] for x in entry.split("|")]
-                valid_dbs = [(db,ID) for db,ID in zip(dbs,IDs) if db in self._mapping_uniprot.keys()]
+                valid_dbs = [
+                    (db, ID)
+                    for db, ID in zip(dbs, IDs)
+                    if db in self._mapping_uniprot.keys()
+                ]
                 # search for an existing DB
-                if len(valid_dbs)>=1:
+                if len(valid_dbs) >= 1:
                     idsA[i] = valid_dbs[0][0] + ":" + valid_dbs[0][1]
                 else:
-                    self.logging.debug("none of the DB for this entry (%s) are available" % (entry))
+                    self.logging.debug(
+                        "none of the DB for this entry (%s) are available" % (entry)
+                    )
                     idsA[i] = "?" + dbs[0] + ":" + IDs[0]
             except:
                 self.logging.info("Could not extract name from %s" % entry)
-                idsA[i] = "??:" + entry  # we add a : so that we are sure that a split(":") will work
+                idsA[i] = (
+                    "??:" + entry
+                )  # we add a : so that we are sure that a split(":") will work
         # the second ID
         for i, entry in enumerate(idsB):
             try:
                 dbs = [x.split(":")[0] for x in entry.split("|")]
                 IDs = [x.split(":")[1] for x in entry.split("|")]
-                valid_dbs = [(db,ID) for db,ID in zip(dbs,IDs) if db in self._mapping_uniprot.keys()]
+                valid_dbs = [
+                    (db, ID)
+                    for db, ID in zip(dbs, IDs)
+                    if db in self._mapping_uniprot.keys()
+                ]
                 # search for an existing DB
-                if len(valid_dbs)>=1:
+                if len(valid_dbs) >= 1:
                     idsB[i] = valid_dbs[0][0] + ":" + valid_dbs[0][1]
                 else:
-                    self.logging.debug("none of the DB (%s) for this entry are available" % (entry))
+                    self.logging.debug(
+                        "none of the DB (%s) for this entry are available" % (entry)
+                    )
                     idsB[i] = "?" + dbs[0] + ":" + IDs[0]
             except:
                 self.logging.info("Could not extract name from %s" % entry)
@@ -588,21 +672,22 @@ class PSICQUIC():
 
         countA = len([x for x in idsA if x.startswith("?")])
         countB = len([x for x in idsB if x.startswith("?")])
-        if countA+countB > 0:
-            self.logging.warning("%s ids out of %s were not identified" % (countA+countB, len(idsA)*2))
+        if countA + countB > 0:
+            self.logging.warning(
+                "%s ids out of %s were not identified"
+                % (countA + countB, len(idsA) * 2)
+            )
             print(set([x.split(":")[0] for x in idsA if x.startswith("?")]))
             print(set([x.split(":")[0] for x in idsB if x.startswith("?")]))
         self.logging.info("knownName done")
         return idsA, idsB
 
     def preCleaning(self, data):
-        """remove entries ehre IdA or IdB is set to "-"
-
-        """
-        ret = [x for x in data if x[0] !="-" and x[1]!="-"]
+        """remove entries ehre IdA or IdB is set to "-" """
+        ret = [x for x in data if x[0] != "-" and x[1] != "-"]
         return ret
 
-    def postCleaningAll(self,data, keep_only="HUMAN", flatten=True, verbose=True):
+    def postCleaningAll(self, data, keep_only="HUMAN", flatten=True, verbose=True):
         """
 
         even more cleaing by ignoring score, db and interaction
@@ -618,34 +703,50 @@ class PSICQUIC():
             results = [x for k in results.keys() for x in results[k]]
         return results
 
-    def postCleaning(self, data, keep_only="HUMAN", remove_db=["chebi","chembl"],
-        keep_self_loop=False, verbose=True):
-        """Remove entries with a None and keep only those with the keep pattern
-
-        """
-        if verbose:print("Before removing anything: ", len(data))
+    def postCleaning(
+        self,
+        data,
+        keep_only="HUMAN",
+        remove_db=["chebi", "chembl"],
+        keep_self_loop=False,
+        verbose=True,
+    ):
+        """Remove entries with a None and keep only those with the keep pattern"""
+        if verbose:
+            print("Before removing anything: ", len(data))
 
         data = [x for x in data if x[0] is not None and x[1] is not None]
-        if verbose:print("After removing the None: ", len(data))
+        if verbose:
+            print("After removing the None: ", len(data))
 
-        data = [x for x in data if x[0].startswith("!")is False and x[1].startswith("!")is False]
-        if verbose:print("After removing the !: ", len(data))
-
+        data = [
+            x
+            for x in data
+            if x[0].startswith("!") is False and x[1].startswith("!") is False
+        ]
+        if verbose:
+            print("After removing the !: ", len(data))
 
         for db in remove_db:
-            data = [x for x in data if x[0].startswith(db)is False]
-            data = [x for x in data if x[1].startswith(db)is False]
-            if verbose:print("After removing entries that match %s : " % db, len(data))
+            data = [x for x in data if x[0].startswith(db) is False]
+            data = [x for x in data if x[1].startswith(db) is False]
+            if verbose:
+                print("After removing entries that match %s : " % db, len(data))
 
         data = [x for x in data if keep_only in x[0] and keep_only in x[1]]
-        if verbose:print("After removing entries that don't match %s : " % keep_only, len(data))
+        if verbose:
+            print(
+                "After removing entries that don't match %s : " % keep_only, len(data)
+            )
 
         if keep_self_loop is False:
-            data = [x for x in data if x[0]!=x[1]]
-            if verbose:print("After removing self loop : ", len(data))
+            data = [x for x in data if x[0] != x[1]]
+            if verbose:
+                print("After removing self loop : ", len(data))
 
         data = list(set(data))
-        if verbose:print("After removing identical entries", len(data))
+        if verbose:
+            print("After removing identical entries", len(data))
 
         return data
 
@@ -662,23 +763,31 @@ class PSICQUIC():
         mapping = self.mappingOneDB(data)
         results = []
         for i, entry in enumerate(data):
-            x = idsA[i].split(":",1)[1]
-            y = idsB[i].split(":",1)[1]
+            x = idsA[i].split(":", 1)[1]
+            y = idsB[i].split(":", 1)[1]
             xp = mapping[x]
             yp = mapping[y]
-            try:ref = entry[8]
-            except:ref="?"
-            try:score = entry[14]
-            except:score = "?"
-            try:interaction = entry[11]
-            except:interaction="?"
+            try:
+                ref = entry[8]
+            except:
+                ref = "?"
+            try:
+                score = entry[14]
+            except:
+                score = "?"
+            try:
+                interaction = entry[11]
+            except:
+                interaction = "?"
             results.append((xp, yp, score, interaction, ref, db))
         return results
 
     def mappingOneDB(self, data):
         query = {}
         self.logging.debug("converting IDs with proper DB name (knownName function)")
-        entriesA, entriesB = self.knownName(data) # idsA and B contains list of a single identifier of the form db:id
+        entriesA, entriesB = self.knownName(
+            data
+        )  # idsA and B contains list of a single identifier of the form db:id
         # the db is known from _mapping.uniprot otherwise it is called "unknown"
 
         # get unique DBs to build the query dictionary
@@ -690,7 +799,7 @@ class PSICQUIC():
         for x in set(dbsB):
             query[x] = set()
 
-        # 
+        #
         query_copy = query.copy()
         for k in query_copy.keys():
             if k.startswith("?"):
@@ -721,25 +830,32 @@ class PSICQUIC():
                     query[dbB].add(idB)
 
             for k in query.keys():
-                if len(query[k])>2000 or counter == N:
+                if len(query[k]) > 2000 or counter == N:
                     this_query = list(query[k])
                     DBname = self._mapping_uniprot[k]
 
                     if DBname is not None:
-                        self.logging.warning("Request sent to uniprot for %s database (%s/%s)" % (DBname, counter, N))
-                        res = self.uniprot.mapping(fr=DBname, to="ID", query=" ".join(this_query))
+                        self.logging.warning(
+                            "Request sent to uniprot for %s database (%s/%s)"
+                            % (DBname, counter, N)
+                        )
+                        res = self.uniprot.mapping(
+                            fr=DBname, to="ID", query=" ".join(this_query)
+                        )
                         for x in this_query:
-                            if x not in res: #was not found
-                                mapping[x] = "!" + k+":"+x
+                            if x not in res:  # was not found
+                                mapping[x] = "!" + k + ":" + x
                             else:
                                 # we should be here since the queries are populated
                                 # if not already in the mapping dictionary
                                 if x not in res.keys():
                                     raise ValueError(x)
-                                if len(res[x])==1:
+                                if len(res[x]) == 1:
                                     mapping[x] = res[x][0]
                                 else:
-                                    self.logging.warning("psicquic mapping found more than 1 id. keep first one")
+                                    self.logging.warning(
+                                        "psicquic mapping found more than 1 id. keep first one"
+                                    )
                                     mapping[x] = res[x][0]
                     else:
                         for x in this_query:
@@ -747,10 +863,8 @@ class PSICQUIC():
                     query[k] = set()
 
         for k in query.keys():
-            assert len(query[k])==0
+            assert len(query[k]) == 0
         return mapping
-
-
 
 
 class AppsPPI(object):
@@ -788,6 +902,7 @@ class AppsPPI(object):
     So, there was 1 interaction found in all databases.
 
     """
+
     def __init__(self, verbose=False):
         """.. rubric:: constructor"""
         self.psicquic = PSICQUIC(verbose=False)
@@ -808,12 +923,13 @@ class AppsPPI(object):
 
 
         """
-        #self.results_query = self.psicquic.queryAll("ZAP70 AND species:9606")
+        # self.results_query = self.psicquic.queryAll("ZAP70 AND species:9606")
         print("Requests sent to psicquic. Can take a while, please be patient...")
         self.results_query = self.psicquic.queryAll(query, databases)
         self.interactions = self.psicquic.convertAll(self.results_query)
-        self.interactions = self.psicquic.postCleaningAll(self.interactions,
-            flatten=False, verbose=self.verbose)
+        self.interactions = self.psicquic.postCleaningAll(
+            self.interactions, flatten=False, verbose=self.verbose
+        )
         self.N = len(self.interactions.keys())
         self.counter = {}
         self.relevant_interactions = {}
@@ -828,7 +944,7 @@ class AppsPPI(object):
             p.summary()
 
         """
-        for k,v in self.interactions.items():
+        for k, v in self.interactions.items():
             print("Found %s interactions within %s database" % (len(v), k))
 
         counter = {}
@@ -848,8 +964,12 @@ class AppsPPI(object):
 
         print("-------------")
         summ = {}
-        for i in range(1, N+1):
-            res = [(x.split("++"),counter[x]) for x in counter.keys() if len(counter[x]) == i]
+        for i in range(1, N + 1):
+            res = [
+                (x.split("++"), counter[x])
+                for x in counter.keys()
+                if len(counter[x]) == i
+            ]
             print("Found %s interactions in %s common databases" % (len(res), i))
             res = [x.split("++") for x in counter.keys() if len(counter[x]) == i]
             if len(res):
@@ -861,12 +981,19 @@ class AppsPPI(object):
         self.relevant_interactions = summ.copy()
 
     def get_reference(self, idA, idB):
-        key = idA+"++"+idB
+        key = idA + "++" + idB
         uniq = len(self.counter[key])
-        ret = [x for k in self.interactions.keys() for x in self.interactions[k] if x[0]==idA and x[1]==idB]
+        ret = [
+            x
+            for k in self.interactions.keys()
+            for x in self.interactions[k]
+            if x[0] == idA and x[1] == idB
+        ]
         N = len(ret)
-        print("Interactions %s -- %s has %s entries in %s databases (%s):" %
-                (idA, idB, N, uniq, self.counter[key]))
+        print(
+            "Interactions %s -- %s has %s entries in %s databases (%s):"
+            % (idA, idB, N, uniq, self.counter[key])
+        )
         for r in ret:
             print(r[5], " reference", r[4])
 
@@ -879,13 +1006,16 @@ class AppsPPI(object):
             from pylab import pie, clf, title, show, legend
         except ImportError:
             from bioservices import BioServicesError
-            raise BioServicesError("You must install pylab/matplotlib to use this functionality")
+
+            raise BioServicesError(
+                "You must install pylab/matplotlib to use this functionality"
+            )
         labels = range(1, self.N + 1)
         print(labels)
         counting = [len(self.relevant_interactions[i]) for i in labels]
 
         clf()
-        #pie(counting, labels=[str(int(x)) for x in labels], shadow=True)
+        # pie(counting, labels=[str(int(x)) for x in labels], shadow=True)
         pie(counting, labels=[str(x) for x in counting], shadow=True)
         title("Number of interactions found in N databases")
         legend([str(x) + " database(s)" for x in labels])

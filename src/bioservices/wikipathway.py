@@ -31,7 +31,7 @@
 
 """
 from bioservices.services import REST
-import copy, webbrowser,  base64
+import copy, webbrowser, base64
 
 import pandas as pd
 
@@ -64,34 +64,45 @@ class WikiPathways(REST):
       * u'getCurationTagHistory': No API found in Wikipathway web page
       * u'getRelations': No API found in Wikipathway web page
     """
-    _url = 'http://webservice.wikipathways.org/'
+
+    _url = "http://webservice.wikipathways.org/"
+
     def __init__(self, verbose=True, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose:
 
         """
-        super(WikiPathways, self).__init__(name="WikiPathways",
-                url=WikiPathways._url, verbose=verbose, cache=cache)
-        self._organism = 'Homo sapiens' # This function is redundant (see class service)
+        super(WikiPathways, self).__init__(
+            name="WikiPathways", url=WikiPathways._url, verbose=verbose, cache=cache
+        )
+        self._organism = (
+            "Homo sapiens"  # This function is redundant (see class service)
+        )
         self.logging.info("Fetching organisms...")
 
         #: Get a list of all available organisms.
         self.organisms = self.listOrganisms()
 
     def listOrganisms(self):
-        res = self.http_get(self.url + '/listOrganisms?format=json')
-        return res['organisms']
+        res = self.http_get(self.url + "/listOrganisms?format=json")
+        return res["organisms"]
 
     def _set_organism(self, organism):
         if organism in self.organisms:
             self._organism = organism
         else:
-            raise ValueError("'%s' is not supported in WikiPathways. See :attr:`organisms`" % organism)
+            raise ValueError(
+                "'%s' is not supported in WikiPathways. See :attr:`organisms`"
+                % organism
+            )
 
     def _get_organism(self):
         return self._organism
-    organism = property(_get_organism, _set_organism, doc = "Read/write attribute for the organism")
+
+    organism = property(
+        _get_organism, _set_organism, doc="Read/write attribute for the organism"
+    )
 
     def findPathwaysByLiterature(self, query):
         """Find pathways by their literature references.
@@ -105,11 +116,10 @@ class WikiPathways(REST):
             res = s.findPathwaysByLiterature(18651794)
 
         """
-        params = {'format': 'json', 'query': query}
-        res = self.http_get(self.url + "findPathwaysByLiterature",
-                params=params)
+        params = {"format": "json", "query": query}
+        res = self.http_get(self.url + "findPathwaysByLiterature", params=params)
 
-        return res['result']
+        return res["result"]
 
     def findPathwaysByXref(self, ids, codes=None):
         """Find pathways by searching on the external references of DataNodes.
@@ -145,9 +155,9 @@ class WikiPathways(REST):
         elif isinstance(ids, list):
             if len(ids) == 0:
                 raise ValueError("ids must be a non-empty list")
-            if len(ids)>=1:
+            if len(ids) >= 1:
                 url += "{}".format(ids[0])
-            if len(ids)>1:
+            if len(ids) > 1:
                 for this in ids[1:]:
                     url += "&ids={}".format(this)
         else:
@@ -160,7 +170,7 @@ class WikiPathways(REST):
                 url += "&codes={}".format(code)
         res = self.http_get(url + "&format=json")
 
-        #results = pd.DataFrame(results)
+        # results = pd.DataFrame(results)
 
         return res
 
@@ -176,8 +186,8 @@ class WikiPathways(REST):
             res = w.findInteractions("P53")
 
         """
-        url = self.url + 'findInteractions?query={}&format=json'.format(query)
-        res = self.http_get(url)['result']
+        url = self.url + "findInteractions?query={}&format=json".format(query)
+        res = self.http_get(url)["result"]
 
     def listPathways(self, organism=None):
         """Get a list of all available pathways.
@@ -199,7 +209,7 @@ class WikiPathways(REST):
             request = self.http_get("/listPathways?%s&format=json" % organism)
         else:
             request = self.http_get("/listPathways?format=json")
-        pathways = request['pathways']
+        pathways = request["pathways"]
 
         pathways = pd.DataFrame(pathways).set_index("id")
         return pathways
@@ -221,7 +231,7 @@ class WikiPathways(REST):
         url += "&revision=%s&format=json" % revision
         request = self.http_get(url)
 
-        return request['pathway']
+        return request["pathway"]
 
     def getPathwayInfo(self, pathwayId):
         """Get some general info about the pathway.
@@ -241,7 +251,7 @@ class WikiPathways(REST):
         data = data.findAll("ns1:pathwayinfo")
         pathway = {}
         for this in data:
-            for tag in [ 'id', 'url', 'name', 'species', 'revision']:
+            for tag in ["id", "url", "name", "species", "revision"]:
                 text = this.find("ns2:%s" % tag).getText()
                 pathway[tag] = text
         return pathway
@@ -263,7 +273,10 @@ class WikiPathways(REST):
 
         """
 
-        query = self.url + "/getPathwayHistory?pwId=%s&timestamp=%s" % (pathwayId, str(date))
+        query = self.url + "/getPathwayHistory?pwId=%s&timestamp=%s" % (
+            pathwayId,
+            str(date),
+        )
         query += "&format=json"
         return self.http_get(query)
 
@@ -280,8 +293,9 @@ class WikiPathways(REST):
 
         .. todo:: interpret XML
         """
-        res = self.http_get(self.url +
-                "/getRecentChanges?timestamp=%s&format=json" % timestamp)
+        res = self.http_get(
+            self.url + "/getRecentChanges?timestamp=%s&format=json" % timestamp
+        )
         return res
 
     def login(self, usrname, password):
@@ -302,10 +316,10 @@ class WikiPathways(REST):
         """
         raise NotImplementedError
         # for future usage. pass is a python keyword so we must use a dictionary
-        #d = {"name":usrname, "pass":password}
-        #return self.serv.login(**d)
+        # d = {"name":usrname, "pass":password}
+        # return self.serv.login(**d)
 
-    def getPathwayAs(self, pathwayId, filetype='png', revision=0):
+    def getPathwayAs(self, pathwayId, filetype="png", revision=0):
         """Download a pathway in the specified file format.
 
         :param str pathwayId: the pathway identifier.
@@ -317,14 +331,15 @@ class WikiPathways(REST):
 
         .. note:: use :meth:`savePathwayAs` to save into a file.
         """
-        self.devtools.check_param_in_list(filetype, ['gpml', 'png', 'svg',
-            'pdf', 'txt', 'pwf', 'owl'])
+        self.devtools.check_param_in_list(
+            filetype, ["gpml", "png", "svg", "pdf", "txt", "pwf", "owl"]
+        )
 
         url = self.url + "/getPathwayAs?fileType=%s" % filetype
         url += "&pwId=%s " % pathwayId
-        url += "&revision=%s&format=json" %  revision
+        url += "&revision=%s&format=json" % revision
         res = self.http_get(url)
-        return res['data']
+        return res["data"]
 
     def savePathwayAs(self, pathwayId, filename, revision=0, display=True):
         """Save a pathway.
@@ -341,17 +356,17 @@ class WikiPathways(REST):
         .. versionchanged:: 1.7 return PNG by default instead of PDF. PDF
             not working as of 20 Feb 2020 even on wikipathway website.
         """
-        if filename.find('.') == -1:
-            filename = "%s.%s" %(filename,'pdf')
-        filetype = filename.split('.')[-1]
+        if filename.find(".") == -1:
+            filename = "%s.%s" % (filename, "pdf")
+        filetype = filename.split(".")[-1]
 
-        res = self.getPathwayAs(pathwayId, filetype=filetype,
-            revision=revision)
+        res = self.getPathwayAs(pathwayId, filetype=filetype, revision=revision)
 
-        with open(filename,'wb') as f:
+        with open(filename, "wb") as f:
             import binascii
+
             try:
-                #python3
+                # python3
                 newres = binascii.a2b_base64(bytes(res, "utf-8"))
             except:
                 newres = binascii.a2b_base64(res)
@@ -381,8 +396,8 @@ class WikiPathways(REST):
         :returns: Boolean. True if the pathway was updated successfully.
         """
         raise NotImplementedError
-        #return self.serv.updatePathway(pwId = pathwayId,
-        #description = describeChanges, gpml = gpmlCode, revision = revisionNumb, auth = authInfo)
+        # return self.serv.updatePathway(pwId = pathwayId,
+        # description = describeChanges, gpml = gpmlCode, revision = revisionNumb, auth = authInfo)
 
     def createPathway(self, gpmlCode, authInfo):
         """Create a new pathway on the WikiPathways website with a given GPML code.
@@ -400,7 +415,7 @@ class WikiPathways(REST):
 
         """
         raise NotImplementedError
-        #return self.serv.createPathway(gpml = gpmlCode, auth = authInfo)
+        # return self.serv.createPathway(gpml = gpmlCode, auth = authInfo)
 
     def saveCurationTag(self, pathwayId, name, revision):
         """Apply a curation tag to a pathway. This operation will overwrite any existing tag with the same name.
@@ -446,8 +461,9 @@ class WikiPathways(REST):
         """
         raise NotImplementedError
 
-    def getColoredPathway(self, pathwayId, filetype="svg", revision=0,
-            color=None, graphId=None):
+    def getColoredPathway(
+        self, pathwayId, filetype="svg", revision=0, color=None, graphId=None
+    ):
         """Get a colored image version of the pathway.
 
         :param str pwId: The pathway identifier.
@@ -465,7 +481,7 @@ class WikiPathways(REST):
         url += "&format=json"
         request = self.http_get(url)
         try:
-            data = request['data']  
+            data = request["data"]
             return base64.b64decode(data)
         except:
             return request
@@ -501,7 +517,7 @@ class WikiPathways(REST):
             url += "&species=%s" % species
         url += "&format=json"
         request = self.http_get(url)
-        data = request['result']
+        data = request["result"]
 
         try:
             data = pd.DataFrame(data).set_index("id")
@@ -523,7 +539,7 @@ class WikiPathways(REST):
         url = self.url + "getOntologyTermsByPathway?pwId={}".format(pathwayId)
         url += "&format=json"
         request = self.http_get(url)
-        results = request['terms']
+        results = request["terms"]
 
         return results
 
@@ -543,7 +559,7 @@ class WikiPathways(REST):
         url = self.url + "getPathwaysByOntologyTerm?term={}".format(terms)
         url += "&format=json"
         request = self.http_get(url)
-        return request['pathways']
+        return request["pathways"]
 
     def getPathwaysByParentOntologyTerm(self, term):
         """Get a list of pathways tagged with any ontology term that is the child of the given Ontology term.
@@ -555,7 +571,7 @@ class WikiPathways(REST):
         url = self.url + "getPathwaysByParentOntologyTerm?term={}".format(term)
         url += "&format=json"
         request = self.http_get(url)
-        return request['pathways']
+        return request["pathways"]
 
     def showPathwayInBrowser(self, pathwayId):
         """Show a given Pathway into your favorite browser.
@@ -566,6 +582,5 @@ class WikiPathways(REST):
             wikipathway one) showing a wikipathway URL.
 
         """
-        url = self.getPathwayInfo(pathwayId)['url']
+        url = self.getPathwayInfo(pathwayId)["url"]
         webbrowser.open(url)
-

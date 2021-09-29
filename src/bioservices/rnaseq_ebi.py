@@ -39,18 +39,24 @@ except ImportError:
 
 try:
     import pandas as pd
+
     def tsv_parser(data):
-        return pd.read_csv(StringIO(data), sep='\t')
+        return pd.read_csv(StringIO(data), sep="\t")
+
+
 except:
+
     def tsv_parser(data):
         """return a list of list"""
         print("pandas library is not installed. ")
         print("TSV results will not be interpreted  with Pandas.")
         try:
-            data = data.split('\n')
-            data = [this.split('\t') for this in data]
-        except:pass
+            data = data.split("\n")
+            data = [this.split("\t") for this in data]
+        except:
+            pass
         return data
+
 
 __all__ = ["RNASEQ_EBI"]
 
@@ -69,6 +75,7 @@ class RNASEQ_EBI(REST):
     documentation
 
     """
+
     def __init__(self, verbose=False, cache=False):
         """**Constructor**
 
@@ -76,10 +83,11 @@ class RNASEQ_EBI(REST):
         """
         print("This service is deprecated")
 
-        #super(RNASEQ_EBI, self).__init__(name="UniProt",
+        # super(RNASEQ_EBI, self).__init__(name="UniProt",
         #        url="http://www.ebi.ac.uk/fg/rnaseq/api",
         #        verbose=verbose, cache=cache)
-        #self._organisms = None
+        # self._organisms = None
+
 
 '''
     def get_run_by_organism(self, organism, frmt="json", mapping_quality=70,

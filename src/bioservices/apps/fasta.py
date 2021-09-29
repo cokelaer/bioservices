@@ -53,6 +53,7 @@ class MultiFASTA(object):
         >>> f.df.Size.hist()
 
     """
+
     def __init__(self):
         # fetch the sequence using this attribute
         self._fasta_fetcher = FASTA()
@@ -66,17 +67,16 @@ class MultiFASTA(object):
 
     def _get_fasta(self):
         return self._fasta
+
     fasta = property(_get_fasta, doc="Returns all FASTA instances ")
 
     def _get_ids(self):
         return [f for f in self._fasta.keys()]
+
     ids = property(_get_ids, doc="returns list of keys/accession identifiers")
 
-
     def load_fasta(self, ids):
-        """Loads a single FASTA file into the dictionary
-
-        """
+        """Loads a single FASTA file into the dictionary"""
         if isinstance(ids, str):
             ids = [ids]
 
@@ -110,19 +110,25 @@ class MultiFASTA(object):
             if f.accession != None and f.accession not in self.ids:
                 self._fasta[f.accession] = f
             else:
-                print("Accession %s is already in the ids list or could not be interpreted. skipped" % str(f.accession))
+                print(
+                    "Accession %s is already in the ids list or could not be interpreted. skipped"
+                    % str(f.accession)
+                )
 
     @ifpandas
     def _get_df(self):
         import pandas as pd
-        df =  pd.concat([self.fasta[id_].df for id_ in self.fasta.keys()])
+
+        df = pd.concat([self.fasta[id_].df for id_ in self.fasta.keys()])
         df.reset_index(inplace=True)
         return df
+
     df = property(_get_df)
 
     @ifpylab
     def hist_size(self, **kargs):
         import pylab
+
         self.df.Size.hist(**kargs)
         pylab.title("Histogram length of the sequences")
         pylab.xlabel("Length")
@@ -199,11 +205,13 @@ class FASTA(object):
     """
 
     known_dbtypes = ["sp", "gi"]
+
     def __init__(self):
         self._fasta = None
 
     def _get_fasta(self):
         return self._fasta
+
     fasta = property(_get_fasta, doc="returns FASTA content")
 
     # for all types
@@ -211,7 +219,10 @@ class FASTA(object):
         if self.fasta:
             return "".join(self.fasta.split("\n")[1:])
         else:
-            raise ValueError("You need to load a fasta sequence first using get_fasta or read_fasta")
+            raise ValueError(
+                "You need to load a fasta sequence first using get_fasta or read_fasta"
+            )
+
     sequence = property(_get_sequence, doc="returns the sequence only")
 
     # for all types
@@ -219,27 +230,33 @@ class FASTA(object):
         if self.fasta:
             return self.fasta.split("\n")[0]
         else:
-            raise ValueError("You need to load a fasta sequence first using get_fasta or read_fasta")
+            raise ValueError(
+                "You need to load a fasta sequence first using get_fasta or read_fasta"
+            )
+
     header = property(_get_header, doc="returns header only")
 
     def _get_dbtype(self):
         dbtype = self.header.split("|")[0].replace(">", "")
         return dbtype
+
     dbtype = property(_get_dbtype)
 
     # for all types
     def _get_identifier(self):
         return self.header.split(" ")[0]
+
     identifier = property(_get_identifier)
 
     def _get_entry(self):
         return self.header.split("|")[2].split(" ")[0]
+
     entry = property(_get_entry, doc="returns entry only")
 
     # swiss prot only
     def _get_accession(self):
         if self.dbtype == "sp":
-            #header = self.header
+            # header = self.header
             return self.identifier.split("|")[1]
         elif self.dbtype == "gi":
             return self.identifier.split("|")[1]
@@ -251,30 +268,36 @@ class FASTA(object):
         if self.dbtype == "sp":
             header = self.header
             return header.split(" ")[0].split("|")[2]
+
     name = property(_get_name_sp)
 
     @ifpandas
     def _get_df(self):
         import pandas as pd
-        df = pd.DataFrame({
-            "Identifiers": [self.identifier],
-            "Accession": [self.accession],
-            "Entry": [self.entry],
-            "Database": [self.dbtype],
-            "Organism": [self.organism],
-            "PE": [self.PE],
-            "SV": [self.SV],
-            "Sequence": [self.sequence],
-            "Header": [self.header],
-            "Size": [len(self.sequence)]})
+
+        df = pd.DataFrame(
+            {
+                "Identifiers": [self.identifier],
+                "Accession": [self.accession],
+                "Entry": [self.entry],
+                "Database": [self.dbtype],
+                "Organism": [self.organism],
+                "PE": [self.PE],
+                "SV": [self.SV],
+                "Sequence": [self.sequence],
+                "Header": [self.header],
+                "Size": [len(self.sequence)],
+            }
+        )
         return df
+
     df = property(_get_df)
 
     def _get_info_from_header(self, prefix):
         if prefix not in self.header:
             return None
         # finds the prefix
-        index = self.header.index(prefix+"=")
+        index = self.header.index(prefix + "=")
         # remove it
         name = self.header[index:][3:]
         # figure out if there is anothe = sign to split the string
@@ -290,32 +313,36 @@ class FASTA(object):
 
     def _get_gene_name(self):
         return self._get_info_from_header("GN")
-    gene_name = property(_get_gene_name,
-        doc="returns gene name from GN keyword found in the header if any")
+
+    gene_name = property(
+        _get_gene_name,
+        doc="returns gene name from GN keyword found in the header if any",
+    )
 
     def _get_organism(self):
         return self._get_info_from_header("OS")
-    organism = property(_get_organism,
-        doc="returns organism from OS keyword found in the header if any")
+
+    organism = property(
+        _get_organism, doc="returns organism from OS keyword found in the header if any"
+    )
 
     def _get_PE(self):
         pe = self._get_info_from_header("PE")
         if pe is not None:
             return int(pe)
-    PE = property(_get_PE,
-        doc="returns PE keyword found in the header if any")
+
+    PE = property(_get_PE, doc="returns PE keyword found in the header if any")
 
     def _get_SV(self):
         sv = self._get_info_from_header("SV")
         if sv is not None:
             return int(sv)
-    SV = property(_get_SV,
-        doc="returns SV keyword found in the header if any")
+
+    SV = property(_get_SV, doc="returns SV keyword found in the header if any")
 
     def __str__(self):
         str_ = self.fasta
         return str_
-
 
     def get_fasta(self, id_):
         """Fetches FASTA from uniprot and loads into attrbiute :attr:`fasta`
@@ -326,6 +353,7 @@ class FASTA(object):
         """
         print("get_fasta is deprecated. Use load_fasta instead")
         from bioservices import UniProt
+
         u = UniProt(verbose=False)
         res = u.retrieve(id_, frmt="fasta")
         self._fasta = res[:]
@@ -344,6 +372,7 @@ class FASTA(object):
         """
         # save fasta into attributes fasta
         from bioservices import UniProt
+
         u = UniProt(verbose=False)
         try:
             res = u.retrieve(id_, frmt="fasta")
@@ -353,7 +382,6 @@ class FASTA(object):
             self._fasta = res[:]
         except:
             pass
-
 
     def save_fasta(self, filename):
         """Save FASTA file into a filename
@@ -387,30 +415,25 @@ class FASTA(object):
 
         # Is there more than one sequence ?
         data = data.split(">")[1:]
-        if len(data)>1 or len(data)==0:
-            raise ValueError("""Only one sequence expected to be found. Found %s. Please use MultiFASTA class instead""" % len(data))
+        if len(data) > 1 or len(data) == 0:
+            raise ValueError(
+                """Only one sequence expected to be found. Found %s. Please use MultiFASTA class instead"""
+                % len(data)
+            )
 
         self._data = data
-        if data.count(">sp|")>1:
-            raise ValueError("""It looks like your FASTA file contains more than
-            one FASTA. You must use MultiFASTA class instead""")
+        if data.count(">sp|") > 1:
+            raise ValueError(
+                """It looks like your FASTA file contains more than
+            one FASTA. You must use MultiFASTA class instead"""
+            )
         self._fasta = data[:]
         self._fasta = self._fasta[0]
         if self.dbtype not in self.known_dbtypes:
-            print("Only sp and gi header are recognised so far but sequence and header are loaded")
-
+            print(
+                "Only sp and gi header are recognised so far but sequence and header are loaded"
+            )
 
     def _interpret(self, data):
         # cleanup the data in case of empty spaces or \n characters
         return data
-
-
-
-
-
-
-
-
-
-
-

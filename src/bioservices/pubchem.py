@@ -37,9 +37,8 @@ __all__ = ["PubChem"]
 
 
 class PubChem(REST):
-    """Interface to the `PubChem <todo>`_ service
+    """Interface to the `PubChem <todo>`_ service"""
 
-    """
     _url = "http://pubchem.ncbi.nlm.nih.gov/rest/pug"
 
     def __init__(self, verbose=False, cache=False):
@@ -47,15 +46,19 @@ class PubChem(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        print("PubChem is not finalised yet. This is currently only a draft version", 
-            file=sys.stderr)
-        super(PubChem, self).__init__(name="PubChem", url=PubChem._url,
-                verbose=verbose, cache=cache)
+        print(
+            "PubChem is not finalised yet. This is currently only a draft version",
+            file=sys.stderr,
+        )
+        super(PubChem, self).__init__(
+            name="PubChem", url=PubChem._url, verbose=verbose, cache=cache
+        )
 
-    def get_compound_by_smiles(self, identifier, frmt='json'):
+    def get_compound_by_smiles(self, identifier, frmt="json"):
 
-        res = self.http_get("compound/smiles/" + identifier 
-                + '/cids/%s' % frmt, frmt=frmt,
-                headers=self.get_headers(content=frmt))
+        res = self.http_get(
+            "compound/smiles/" + identifier + "/cids/%s" % frmt,
+            frmt=frmt,
+            headers=self.get_headers(content=frmt),
+        )
         return res
-

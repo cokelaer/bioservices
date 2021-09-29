@@ -5,7 +5,6 @@
 #
 #  File author(s): Nick Weiner and others
 #
-#
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
 #      http://www.gnu.org/licenses/gpl-3.0.html
@@ -38,6 +37,7 @@ from io import StringIO
 from bioservices import REST, BioServicesError
 from functools import wraps
 from bioservices import logger
+
 logger.name = __name__
 import pandas as pd
 
@@ -51,6 +51,7 @@ def require_host(f):
             print("You must set the host (e.g. f.host='www.ensembl.org' ")
             return
         return f(*args, **kargs)
+
     return wrapper
 
 
@@ -204,8 +205,9 @@ class BioMart(REST):
 
         """
         url = "undefined"
-        super(BioMart, self).__init__("BioMart", url=url, verbose=verbose,
-            cache=cache, url_defined_later=True)
+        super(BioMart, self).__init__(
+            "BioMart", url=url, verbose=verbose, cache=cache, url_defined_later=True
+        )
 
         self._names = None
         self._marts = None
@@ -219,11 +221,15 @@ class BioMart(REST):
         if host is None:
             i = 0
             hosts = ["www.ensembl.org", "asia.ensembl.org", "useast.ensembl.org"]
-            while self.host is None and (i<3):
+            while self.host is None and (i < 3):
                 self.host = hosts[i]
                 i += 1
             if self.host is None:
-                raise IOError("no host provided and no default hosts {} not reachable".format(hosts))
+                raise IOError(
+                    "no host provided and no default hosts {} not reachable".format(
+                        hosts
+                    )
+                )
         else:
             self.host = host
         self._biomartQuery = BioMartQuery()
@@ -236,9 +242,10 @@ class BioMart(REST):
 
     def _set_host(self, host):
         import requests
-        secure = ''
+
+        secure = ""
         if self._secure:
-            secure = 's'
+            secure = "s"
         url = "http{}://{}/biomart/martservice".format(secure, host)
         request = requests.head(url)
         if request.status_code in [200]:
@@ -247,6 +254,7 @@ class BioMart(REST):
             self._init()
         else:
             self.logging.warning("host {} is not reachable ".format(host))
+
     host = property(_get_host, _set_host)
 
     def _set_format(self, format):
@@ -292,8 +300,10 @@ class BioMart(REST):
 
         """
         if mart not in self.names:
-            raise BioServicesError("Provided mart name (%s) is not valid. see 'names' attribute" % mart)
-        ret = self.http_get("?type=datasets&mart=%s" %mart, frmt="txt")
+            raise BioServicesError(
+                "Provided mart name (%s) is not valid. see 'names' attribute" % mart
+            )
+        ret = self.http_get("?type=datasets&mart=%s" % mart, frmt="txt")
 
         if raw is False:
             try:
@@ -303,17 +313,24 @@ class BioMart(REST):
                 ret = ["?"]
         return ret
 
-    def get_datasets(self, mart): 
+    def get_datasets(self, mart):
         """Retrieve datasets with description"""
         if mart not in self.names:
-            raise BioServicesError("Provided mart name (%s) is not valid. see 'names' attribute" % mart)
+            raise BioServicesError(
+                "Provided mart name (%s) is not valid. see 'names' attribute" % mart
+            )
 
-        ret = self.http_get("?type=datasets&mart=%s" %mart, frmt="txt")
+        ret = self.http_get("?type=datasets&mart=%s" % mart, frmt="txt")
         import pandas as pd
-        df = pd.read_csv(StringIO(ret), sep='\t', 
-            header=None, usecols=[1,2], names=['name', 'description']) 
-        return df
 
+        df = pd.read_csv(
+            StringIO(ret),
+            sep="\t",
+            header=None,
+            usecols=[1, 2],
+            names=["name", "description"],
+        )
+        return df
 
     @require_host
     def attributes(self, dataset):
@@ -322,10 +339,14 @@ class BioMart(REST):
         :param str dataset: e.g. oanatinus_gene_ensembl
 
         """
-        #assert dataset in self.names
-        if dataset not in [x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]]:
-            raise ValueError("provided dataset (%s) is not found. see valid_attributes" % dataset)
-        ret = self.http_get("?type=attributes&dataset=%s" %dataset, frmt='txt')
+        # assert dataset in self.names
+        if dataset not in [
+            x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]
+        ]:
+            raise ValueError(
+                "provided dataset (%s) is not found. see valid_attributes" % dataset
+            )
+        ret = self.http_get("?type=attributes&dataset=%s" % dataset, frmt="txt")
 
         ret = [x for x in ret.split("\n") if len(x)]
         results = {}
@@ -352,9 +373,13 @@ class BioMart(REST):
             scrofa,Taeniopygia guttata ,Xenopus tropicalis]
 
         """
-        if dataset not in [x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]]:
-            raise ValueError("provided dataset (%s) is not found. see valid_attributes" % dataset)
-        ret = self.http_get("?type=filters&dataset=%s" %dataset, frmt="txt")
+        if dataset not in [
+            x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]
+        ]:
+            raise ValueError(
+                "provided dataset (%s) is not found. see valid_attributes" % dataset
+            )
+        ret = self.http_get("?type=filters&dataset=%s" % dataset, frmt="txt")
         ret = [x for x in ret.split("\n") if len(x)]
         results = {}
         for line in ret:
@@ -369,7 +394,7 @@ class BioMart(REST):
         :param str dataset: e.g. oanatinus_gene_ensembl
 
         """
-        ret = self.http_get("?type=configuration&dataset=%s" %dataset, frmt="xml")
+        ret = self.http_get("?type=configuration&dataset=%s" % dataset, frmt="xml")
         ret = self.easyXML(ret)
         return ret
 
@@ -412,8 +437,7 @@ class BioMart(REST):
         .. warning:: the input XML must be valid. THere is no validation made
             in thiss method.
         """
-        ret = self.http_post(None, frmt=None,
-                data={'query':xmlq.strip()}, headers={})
+        ret = self.http_post(None, frmt=None, data={"query": xmlq.strip()}, headers={})
         return ret
 
     @require_host
@@ -442,8 +466,8 @@ class BioMart(REST):
             valid_filters = self.filters(dataset).keys()
             if name not in valid_filters:
                 raise BioServicesError("Invalid filter name. ")
-        _filter = ''
-        if '=' in value:
+        _filter = ""
+        if "=" in value:
             _filter = """        <Filter name = "%s" %s/>""" % (name, value)
         else:
             _filter = """        <Filter name = "%s" value = "%s"/>""" % (name, value)
@@ -451,7 +475,7 @@ class BioMart(REST):
 
     @require_host
     def create_attribute(self, name, dataset=None):
-        #s.attributes(dataset)
+        # s.attributes(dataset)
         # valid dataset
         if dataset:
             valid_attributes = self.attributes(dataset).keys()
@@ -467,6 +491,7 @@ class BioMart(REST):
             names = [x["name"] for x in ret]
             self._names = names[:]
         return self._names
+
     names = property(_get_names, doc="list of valid datasets")
 
     @require_host
@@ -476,6 +501,7 @@ class BioMart(REST):
             names = [x["displayName"] for x in ret]
             self._display_names = names[:]
         return self._display_names
+
     displayNames = property(_get_displayNames, doc="list of valid datasets")
 
     @require_host
@@ -485,6 +511,7 @@ class BioMart(REST):
             names = [x.get("database", "?") for x in ret]
             self._databases = names
         return self._databases
+
     databases = property(_get_databases, doc="list of valid datasets")
 
     @require_host
@@ -494,6 +521,7 @@ class BioMart(REST):
             df = pd.DataFrame(ret)[["database", "displayName", "name"]]
             self._marts = df
         return self._marts
+
     marts = property(_get_marts, doc="list of marts")
 
     @require_host
@@ -503,41 +531,50 @@ class BioMart(REST):
             names = [x.get("host", "?") for x in ret]
             self._hosts = names[:]
         return self._hosts
+
     hosts = property(_get_hosts, doc="list of valid hosts")
 
     @require_host
-    def _get_valid_attributes(self,):
+    def _get_valid_attributes(
+        self,
+    ):
         res = {}
         if self._valid_attributes is None:
             # we could use a loop and call self.datasets(name, raw=False) but it
             # can be a bit longish, so we use the asynchronous call using
             # requests
-            saveme = self.settings.params['general.async_threshold']
+            saveme = self.settings.params["general.async_threshold"]
             # TODO: not python3 compatible for now. Waiting for gevent package
             # to be available.
-            self.settings.params['general.async_threshold'][0] = 10000 #
+            self.settings.params["general.async_threshold"][0] = 10000  #
 
-            queries = ["?type=datasets&mart=%s" % name for name in
-                    self.names]
+            queries = ["?type=datasets&mart=%s" % name for name in self.names]
             results = self.http_get(queries, frmt="txt")
 
-            self.settings.params['general.async_threshold'] = saveme
-            #requests.start()
-            #requests.wait()
-            #results = requests.get_results()
+            self.settings.params["general.async_threshold"] = saveme
+            # requests.start()
+            # requests.wait()
+            # results = requests.get_results()
 
             for i, name in enumerate(self.names):
                 try:
-                    res[name] = [x.split("\t")[1] for x in results[i].split("\n") if len(x.strip())>1]
+                    res[name] = [
+                        x.split("\t")[1]
+                        for x in results[i].split("\n")
+                        if len(x.strip()) > 1
+                    ]
                 except:
                     res[name] = "?"
             self._valid_attributes = res.copy()
         return self._valid_attributes
+
     valid_attributes = property(_get_valid_attributes, doc="list of valid datasets")
 
     @require_host
     def lookfor(self, pattern, verbose=True):
-        for a,x,y,z in zip(self.hosts, self.databases, self.names, self.displayNames):
+        for a, x, y, z in zip(
+            self.hosts, self.databases, self.names, self.displayNames
+        ):
             found = False
             if pattern.lower() in x.lower():
                 found = True
@@ -547,31 +584,39 @@ class BioMart(REST):
                 found = True
             if found is True and verbose is True:
                 print("Candidate:")
-                print("     database: %s " %x)
-                print("    MART name: %s " %y)
-                print("  displayName: %s " %z)
-                print("        hosts: %s " %a)
+                print("     database: %s " % x)
+                print("    MART name: %s " % y)
+                print("  displayName: %s " % z)
+                print("        hosts: %s " % a)
 
 
 class BioMartQuery(object):
-    def __init__(self, version="1.0", virtualScheme="default",
-                 formatter="TSV", header=0, unique=0, configVer="0.6"):
+    def __init__(
+        self,
+        version="1.0",
+        virtualScheme="default",
+        formatter="TSV",
+        header=0,
+        unique=0,
+        configVer="0.6",
+    ):
         params = {
             "version": version,
             "virtualSchemaName": virtualScheme,
             "formatter": formatter,
             "header": header,
             "uniqueRows": unique,
-            "configVersion": configVer
-
+            "configVersion": configVer,
         }
 
-        self.header = """<?xml version="%(version)s" encoding="UTF-8"?>
+        self.header = (
+            """<?xml version="%(version)s" encoding="UTF-8"?>
 <!DOCTYPE Query>
 <Query  virtualSchemaName = "%(virtualSchemaName)s" formatter = "%(formatter)s"
 header = "%(header)s" uniqueRows = "%(uniqueRows)s" count = ""
-datasetConfigVersion = "%(configVersion)s" >\n""" % params
-
+datasetConfigVersion = "%(configVersion)s" >\n"""
+            % params
+        )
 
         self.footer = "    </Dataset>\n</Query>"
         self.reset()
@@ -596,10 +641,8 @@ datasetConfigVersion = "%(configVersion)s" >\n""" % params
         xml = self.header
         xml += self.dataset + "\n\n"
         for line in self.filters:
-            xml += line +"\n"
+            xml += line + "\n"
         for line in self.attributes:
             xml += line + "\n"
         xml += self.footer
         return xml
-
-

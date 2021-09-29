@@ -1,6 +1,7 @@
 from bioservices import UniProt
 import re
 
+
 class Peptides(object):
     """
 
@@ -18,6 +19,7 @@ class Peptides(object):
         >>>
 
     """
+
     def __init__(self, verbose=False):
         self.u = UniProt(verbose=verbose)
         self.sequences = {}
@@ -34,8 +36,3 @@ class Peptides(object):
             seq = self.sequences[uniprot_name][:]
         positions = [x.start() for x in re.finditer("PQS", seq)]
         return positions
-
-
-
-
-

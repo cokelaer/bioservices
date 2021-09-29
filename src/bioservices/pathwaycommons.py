@@ -5,7 +5,7 @@
 #
 #  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#      
+#
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -41,7 +41,7 @@ from bioservices.services import REST, BioServicesError
 __all__ = ["PathwayCommons"]
 
 
-class PathwayCommons():
+class PathwayCommons:
     """Interface to the `PathwayCommons <http://www.pathwaycommons.org/about>`_ service
 
 
@@ -51,20 +51,30 @@ class PathwayCommons():
 
 
 
-    .. todo:: traverse() method not implemented. 
+    .. todo:: traverse() method not implemented.
     """
 
     #: valid formats
     _valid_format = ["GSEA", "SBGN", "BIOPAX", "SIF", "TXT", "JSONLD"]
     _valid_directions = ["BOTHSTREAM", "UPSTREAM", "DOWNSTREAM", "UNDIRECTED"]
     _valid_patterns = [
-            "CONTROLS_STATE_CHANGE_OF", "CONTROLS_PHOSPHORYLATION_OF", 
-            "CONTROLS_TRANSPORT_OF", "CONTROLS_EXPRESSION_OF",
-            "IN_COMPLEX_WITH", "INTERACTS_WITH", "CATALYSIS_PRECEDES", "NEIGHBOR_OF",
-            "CONSUMPTION_CONTROLLED_BY", "CONTROLS_TRANSPORT_OF_CHEMICAL",
-            "CONTROLS_PRODUCTION_OF",
-            "CHEMICAL_AFFECTS", "REACTS_WITH", "USED_TO_PRODUCE"]
+        "CONTROLS_STATE_CHANGE_OF",
+        "CONTROLS_PHOSPHORYLATION_OF",
+        "CONTROLS_TRANSPORT_OF",
+        "CONTROLS_EXPRESSION_OF",
+        "IN_COMPLEX_WITH",
+        "INTERACTS_WITH",
+        "CATALYSIS_PRECEDES",
+        "NEIGHBOR_OF",
+        "CONSUMPTION_CONTROLLED_BY",
+        "CONTROLS_TRANSPORT_OF_CHEMICAL",
+        "CONTROLS_PRODUCTION_OF",
+        "CHEMICAL_AFFECTS",
+        "REACTS_WITH",
+        "USED_TO_PRODUCE",
+    ]
     _url = "https://www.pathwaycommons.org"
+
     def __init__(self, verbose=True, cache=False):
         """.. rubric:: Constructor
 
@@ -74,17 +84,23 @@ class PathwayCommons():
         self.easyXMLConversion = False
         self._default_extension = "json"
 
-        self.services = REST(name='PathwayCommons', url=PathwayCommons._url,
-            verbose=verbose, cache=cache)
+        self.services = REST(
+            name="PathwayCommons", url=PathwayCommons._url, verbose=verbose, cache=cache
+        )
 
     # just a get/set to the default extension
     def _set_default_ext(self, ext):
         self.services.devtools.check_param_in_list(ext, ["json", "xml"])
         self._default_extension = ext
+
     def _get_default_ext(self):
         return self._default_extension
-    default_extension = property(_get_default_ext, _set_default_ext,
-             doc="set extension of the requests (default is json). Can be 'json' or 'xml'")
+
+    default_extension = property(
+        _get_default_ext,
+        _set_default_ext,
+        doc="set extension of the requests (default is json). Can be 'json' or 'xml'",
+    )
 
     def search(self, q, page=0, datasource=None, organism=None, type=None):
         """Text search in PathwayCommons using Lucene query syntax
@@ -163,29 +179,28 @@ class PathwayCommons():
 
         """
         if self.default_extension == "xml":
-            url = "pc2/search.xml?q=%s"  % q
+            url = "pc2/search.xml?q=%s" % q
         elif self.default_extension == "json":
-            url = "pc2/search.json?q=%s"  % q
+            url = "pc2/search.json?q=%s" % q
 
         params = {}
-        if page>=0:
-            params['page'] = page
+        if page >= 0:
+            params["page"] = page
         else:
             self.services.logging.warning("page should be >=0")
 
         if datasource:
-            params['datasource'] = datasource
+            params["datasource"] = datasource
 
         if type:
-            params['type'] = type
+            params["type"] = type
 
         if organism:
-            params['organism'] = organism
+            params["organism"] = organism
 
-        res = self.services.http_get(url, frmt=self.default_extension,
-                params=params)
+        res = self.services.http_get(url, frmt=self.default_extension, params=params)
 
-        #if self.default_extension == "json":
+        # if self.default_extension == "json":
         #    res = json.loads(res)
         if self.default_extension == "xml":
             res = self.easyXML(res)
@@ -232,16 +247,14 @@ class PathwayCommons():
 
         """
 
-
-
         self.services.devtools.check_param_in_list(frmt, self._valid_format)
 
         # validates the URIs
         if isinstance(uri, str):
-            url = "pc2/get?uri=" +uri
+            url = "pc2/get?uri=" + uri
         elif instance(uri, list):
-            url = "pc2/get?uri=" +uri[0]
-            if len(uri)>1:
+            url = "pc2/get?uri=" + uri[0]
+            if len(uri) > 1:
                 for u in uri[1:]:
                     url += "&uri=" + u
 
@@ -251,7 +264,7 @@ class PathwayCommons():
         if frmt != "BIOPAX":
             url += "&format=%s" % frmt
 
-        if frmt.lower() in ["biopax", "sbgn"]: 
+        if frmt.lower() in ["biopax", "sbgn"]:
             frmt = "xml"
         else:
             frmt = "txt"
@@ -262,26 +275,26 @@ class PathwayCommons():
     def top_pathways(self, query="*", datasource=None, organism=None):
         """This command returns all *top* pathways
 
-        Pathways can be top or pathways that are neither
-        'controlled' nor 'pathwayComponent' of another process.
+                Pathways can be top or pathways that are neither
+                'controlled' nor 'pathwayComponent' of another process.
 
-        :param query: a keyword, name, external identifier or lucene query
-            string like in 'search'. Default is "*"
-        :param str datasource: filter by data source (same as search)
-        :param str organism: organism filter. 9606 for human.
+                :param query: a keyword, name, external identifier or lucene query
+                    string like in 'search'. Default is "*"
+                :param str datasource: filter by data source (same as search)
+                :param str organism: organism filter. 9606 for human.
 
-        :return: dictionary with information about top pathways. Check the
-            "searchHit" key for information about "dataSource" for instance
-
-
-        .. doctest::
-
-            >>> from bioservices import PathwayCommons
-            >>> pc2 = PathwayCommons(verbose=False)
-            >>> res = pc2.top_pathways()
+                :return: dictionary with information about top pathways. Check the
+                    "searchHit" key for information about "dataSource" for instance
 
 
-https://www.pathwaycommons.org/pc2/top_pathways?q=TP53
+                .. doctest::
+
+                    >>> from bioservices import PathwayCommons
+                    >>> pc2 = PathwayCommons(verbose=False)
+                    >>> res = pc2.top_pathways()
+
+
+        https://www.pathwaycommons.org/pc2/top_pathways?q=TP53
 
         """
         if self.default_extension == "json":
@@ -291,21 +304,28 @@ https://www.pathwaycommons.org/pc2/top_pathways?q=TP53
 
         params = {}
         if datasource:
-            params['datasource'] = datasource
+            params["datasource"] = datasource
         if organism:
-            params['organism'] = organism
-        params['q'] = query
+            params["organism"] = organism
+        params["q"] = query
 
-
-        res = self.services.http_get(url, frmt=self.default_extension,
-                params=params)
+        res = self.services.http_get(url, frmt=self.default_extension, params=params)
 
         if self.default_extension == "xml":
             res = self.easyXML(res)
         return res
 
-    def graph(self, kind, source, target=None, direction=None, limit=1,
-            frmt=None, datasource=None, organism=None):
+    def graph(
+        self,
+        kind,
+        source,
+        target=None,
+        direction=None,
+        limit=1,
+        frmt=None,
+        datasource=None,
+        organism=None,
+    ):
         """Finds connections and neighborhoods of elements
 
         Connections can be for example the shortest path between two proteins
@@ -368,19 +388,19 @@ https://www.pathwaycommons.org/pc2/top_pathways?q=TP53
         """
         url = "pc2/graph"
         params = {}
-        params['source'] = source
-        params['kind'] = kind
-        params['limit'] = limit
+        params["source"] = source
+        params["kind"] = kind
+        params["limit"] = limit
 
         params = {}
         if target:
-            params['target'] = target
+            params["target"] = target
         if frmt:
-            params['format'] = frmt
+            params["format"] = frmt
         if datasource:
-            params['datasource'] = datasource
+            params["datasource"] = datasource
         if organism:
-            params['organism'] = organism
+            params["organism"] = organism
 
         res = self.services.http_get(url, frmt="txt", params=params)
         return res
@@ -444,7 +464,7 @@ https://www.pathwaycommons.org/pc2/top_pathways?q=TP53
 
 
         """
-        url =  "pc2/traverse?"
+        url = "pc2/traverse?"
 
         if isinstance(uri, str):
             url += "?uri=" + uri
@@ -458,8 +478,10 @@ https://www.pathwaycommons.org/pc2/top_pathways?q=TP53
         res = self.services.http_get(url, frmt="json")
         return res
 
-    def get_sifgraph_neighborhood(self, source, limit=1, direction="BOTHSTREAM", pattern=None):
-        """finds the neighborhood sub-network in the Pathway Commons Simple Interaction 
+    def get_sifgraph_neighborhood(
+        self, source, limit=1, direction="BOTHSTREAM", pattern=None
+    ):
+        """finds the neighborhood sub-network in the Pathway Commons Simple Interaction
         Format (extented SIF) graph (see http://www.pathwaycommons.org/pc2/formats#sif)
 
 
@@ -467,7 +489,7 @@ https://www.pathwaycommons.org/pc2/top_pathways?q=TP53
             identifiers or just one string(if only one identifier)
         :param int limit: Graph traversal depth. Limit > 1 value can result
             in very large data or error.
-        :param str direction: Graph traversal direction. Use UNDIRECTED if you want 
+        :param str direction: Graph traversal direction. Use UNDIRECTED if you want
             to see interacts-with relationships too.
         :param str pattern: Filter by binary relationship (SIF edge) type(s).
             one of "BOTHSTREAM", "UPSTREAM", "DOWNSTREAM", "UNDIRECTED".
@@ -485,35 +507,37 @@ https://www.pathwaycommons.org/pc2/top_pathways?q=TP53
         self.services.devtools.check_param_in_list(direction, self._valid_directions)
         if pattern:
             self.services.devtools.check_param_in_list(pattern, self._valid_patterns)
-        assert limit>=1
+        assert limit >= 1
 
         if isinstance(source, str):
             source = [source]
         assert isinstance(source, list)
         source = ",".join(source)
 
-        params = {  "source": source,
-                    "limit": limit,
-                    "direction": direction}
+        params = {"source": source, "limit": limit, "direction": direction}
 
         if pattern:
-            params['pattern'] = pattern
+            params["pattern"] = pattern
 
-        res = self.services.http_get("sifgraph/v1/neighborhood", params=params,
-            headers=self.services.get_headers(content="text"))
+        res = self.services.http_get(
+            "sifgraph/v1/neighborhood",
+            params=params,
+            headers=self.services.get_headers(content="text"),
+        )
 
         return res.content
 
-
-    def get_sifgraph_common_stream(self, source, limit=1, direction="DOWNSTREAM", pattern=None):
-        """finds the common stream for them; extracts a sub-network from the loaded 
+    def get_sifgraph_common_stream(
+        self, source, limit=1, direction="DOWNSTREAM", pattern=None
+    ):
+        """finds the common stream for them; extracts a sub-network from the loaded
         Pathway Commons SIF model.
 
         :param source: set of gene identifiers (HGNC symbol). Can be a list of
             identifiers or just one string(if only one identifier)
         :param int limit: Graph traversal depth. Limit > 1 value can result
             in very large data or error.
-        :param str direction: Graph traversal direction. Use UNDIRECTED if you want 
+        :param str direction: Graph traversal direction. Use UNDIRECTED if you want
             to see interacts-with relationships too.
         :param str pattern: Filter by binary relationship (SIF edge) type(s).
             one of "BOTHSTREAM", "UPSTREAM", "DOWNSTREAM", "UNDIRECTED".
@@ -530,28 +554,28 @@ https://www.pathwaycommons.org/pc2/top_pathways?q=TP53
         self.services.devtools.check_param_in_list(direction, self._valid_directions)
         if pattern:
             self.services.devtools.check_param_in_list(pattern, self._valid_patterns)
-        assert limit>=1
+        assert limit >= 1
 
         if isinstance(source, str):
             source = [source]
         assert isinstance(source, list)
         source = ",".join(source)
 
-        params = {  "source": source,
-                    "limit": limit,
-                    "direction": direction}
+        params = {"source": source, "limit": limit, "direction": direction}
 
         if pattern:
-            params['pattern'] = pattern
+            params["pattern"] = pattern
 
-        res = self.services.http_get("sifgraph/v1/commonstream", params=params,
-            headers=self.services.get_headers(content="text"))
+        res = self.services.http_get(
+            "sifgraph/v1/commonstream",
+            params=params,
+            headers=self.services.get_headers(content="text"),
+        )
         try:
             return res.content
         except:
             # if no match, returns code 406 and ""
             return None
-
 
     def get_sifgraph_pathsbetween(self, source, limit=1, directed=False, pattern=None):
         """finds the paths between them; extracts a sub-network from the Pathway Commons SIF graph.
@@ -571,25 +595,25 @@ https://www.pathwaycommons.org/pc2/top_pathways?q=TP53
         """
         if pattern:
             self.services.devtools.check_param_in_list(pattern, self._valid_patterns)
-        assert limit>=1
+        assert limit >= 1
 
         if isinstance(source, str):
             source = [source]
         assert isinstance(source, list)
         source = ",".join(source)
 
-        params = {  "source": source,
-                    "limit": limit,
-                    "directed": directed}
+        params = {"source": source, "limit": limit, "directed": directed}
 
         if pattern:
-            params['pattern'] = pattern
+            params["pattern"] = pattern
 
-        res = self.services.http_get("sifgraph/v1/pathsbetween", params=params,
-            headers=self.services.get_headers(content="text"))
+        res = self.services.http_get(
+            "sifgraph/v1/pathsbetween",
+            params=params,
+            headers=self.services.get_headers(content="text"),
+        )
 
         return res.content
-
 
     def get_sifgraph_pathsfromto(self, source, target, limit=1, pattern=None):
         """finds the paths between them; extracts a sub-network from the Pathway Commons SIF graph.
@@ -609,7 +633,7 @@ https://www.pathwaycommons.org/pc2/top_pathways?q=TP53
         """
         if pattern:
             self.services.devtools.check_param_in_list(pattern, self._valid_patterns)
-        assert limit>=1
+        assert limit >= 1
 
         if isinstance(source, str):
             source = [source]
@@ -620,16 +644,15 @@ https://www.pathwaycommons.org/pc2/top_pathways?q=TP53
         assert isinstance(target, list)
         target = ",".join(target)
 
-        params = {  "source": source,
-                    "target": target,
-                    "limit": limit}
+        params = {"source": source, "target": target, "limit": limit}
 
         if pattern:
-            params['pattern'] = pattern
+            params["pattern"] = pattern
 
-        res = self.services.http_get("sifgraph/v1/pathsfromto", params=params,
-            headers=self.services.get_headers(content="text"))
+        res = self.services.http_get(
+            "sifgraph/v1/pathsfromto",
+            params=params,
+            headers=self.services.get_headers(content="text"),
+        )
 
         return res.content
-
-

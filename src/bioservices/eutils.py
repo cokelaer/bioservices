@@ -33,6 +33,7 @@ import json
 from bioservices import REST
 from bioservices import __version__
 from bioservices import logger
+
 logger.name = __name__
 
 
@@ -96,11 +97,14 @@ class EUtils(REST):
 
 
     """
-    def __init__(self, verbose=False, email="unknown", cache=False,
-                xmlparser="EUtilsParser"):
+
+    def __init__(
+        self, verbose=False, email="unknown", cache=False, xmlparser="EUtilsParser"
+    ):
         url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
-        super(EUtils, self).__init__(name="EUtils", verbose=verbose, url=url,
-            cache=cache, requests_per_sec=3)
+        super(EUtils, self).__init__(
+            name="EUtils", verbose=verbose, url=url, cache=cache, requests_per_sec=3
+        )
 
         warning = """
 
@@ -141,25 +145,26 @@ class EUtils(REST):
         self.email = email
         if self.email == "unknown":
             # trying the bioservices config file
-            if self.settings.params['user.email'][0] != "unknown":
-                self.email = self.settings.params['user.email'][0]
+            if self.settings.params["user.email"][0] != "unknown":
+                self.email = self.settings.params["user.email"][0]
             else:
                 self.logging.warning(warning)
 
     def help(self):
         """Open EUtils help page"""
-        self.on_web('http://www.ncbi.nlm.nih.gov/books/NBK25497')
+        self.on_web("http://www.ncbi.nlm.nih.gov/books/NBK25497")
 
     def _get_databases(self):
         """alias to run_eInfo"""
         # Let us use the REST services instead of WSDL, which fails sometimes
         # and for sure since version Sept 2015
         if self._databases is None:
-            res = self.http_get('einfo.fcgi', params={'retmode':'json'})
-            databases = res['einforesult']['dblist']
+            res = self.http_get("einfo.fcgi", params={"retmode": "json"})
+            databases = res["einforesult"]["dblist"]
 
             self._databases = sorted(databases)
         return self._databases
+
     databases = property(_get_databases, doc="Returns list of valid databases")
 
     def _check_db(self, db=None):
@@ -167,13 +172,13 @@ class EUtils(REST):
         if db is None or db not in self.databases:
             raise ValueError(msg, self.databases)
 
-    def _check_retmode(self, retmode, valids=['xml', 'text']):
+    def _check_retmode(self, retmode, valids=["xml", "text"]):
         if retmode not in valids:
             raise ValueError("You must provide a retmode in %s" % valids)
 
     def _get_params(self, keys=[], **kargs):
         # could use a defaultdict from collections.
-        params = {'tool': self.tool, 'email': self.email}
+        params = {"tool": self.tool, "email": self.email}
         # fill the structure with None
         for this in keys:
             params[this] = None
@@ -185,25 +190,37 @@ class EUtils(REST):
             else:
                 # unknown so let use it but raise a warning
                 params[k] = v
-                self.logging.warning("%s does not seem to be a known parameter. " % k+
-                        "Use it anyway but may be ignored")
+                self.logging.warning(
+                    "%s does not seem to be a known parameter. " % k
+                    + "Use it anyway but may be ignored"
+                )
         return params
 
     def _get_einfo_params(self, **kargs):
-        params = self._get_params(['db', 'version', 'retmode'], **kargs)
+        params = self._get_params(["db", "version", "retmode"], **kargs)
         return params
 
     def _get_esummary_params(self, **kargs):
-        keys = ['WebEnv', 'query_key', 'retstart', 'retmax',
-            'retmode', 'version']
+        keys = ["WebEnv", "query_key", "retstart", "retmax", "retmode", "version"]
         params = self._get_params(keys, **kargs)
         return params
 
     def _get_esearch_params(self, **kargs):
-        keys = ['retmax', 'retstart', 'WebEnv', 'query_key',
-                'datetype', 'retmode',
-                'field', 'maxdate', 'mindate', 'reldate', 'rettype',
-                'sort',  'usehistory']
+        keys = [
+            "retmax",
+            "retstart",
+            "WebEnv",
+            "query_key",
+            "datetype",
+            "retmode",
+            "field",
+            "maxdate",
+            "mindate",
+            "reldate",
+            "rettype",
+            "sort",
+            "usehistory",
+        ]
         params = self._get_params(keys, **kargs)
         return params
 
@@ -216,20 +233,40 @@ class EUtils(REST):
         return params
 
     def _get_efetch_params(self, **kargs):
-        keys = ['WebEnv', 'query_key', 'retmode', 'rettype', 'retstart',
-                'retmax', 'strand', 'seq_start', 'seq_stop', 'complexity']
+        keys = [
+            "WebEnv",
+            "query_key",
+            "retmode",
+            "rettype",
+            "retstart",
+            "retmax",
+            "strand",
+            "seq_start",
+            "seq_stop",
+            "complexity",
+        ]
         params = self._get_params(keys, **kargs)
         return params
 
     def _get_elink_params(self, **kargs):
         # Note that id could be id[] ?
-        keys = ['reldate', 'mindate', 'maxdate', 'datetype',
-                'term', 'holding', 'linkname', 'WebEnv', 'query_key', 'cmd']
+        keys = [
+            "reldate",
+            "mindate",
+            "maxdate",
+            "datetype",
+            "term",
+            "holding",
+            "linkname",
+            "WebEnv",
+            "query_key",
+            "cmd",
+        ]
         params = self._get_params(keys, **kargs)
         return params
 
     def _get_epost_params(self, **kargs):
-        params = self._get_params(['WebEnv'], **kargs)
+        params = self._get_params(["WebEnv"], **kargs)
         return params
 
     def _check_ids(self, sid):
@@ -241,7 +278,7 @@ class EUtils(REST):
             sid = ",".join([str(x) for x in sid])
 
         # If there are commas, let us split, strip spaces and join back the ids
-        sid = ",".join([x.strip() for x in sid.split(',') if x.strip()!=""])
+        sid = ",".join([x.strip() for x in sid.split(",") if x.strip() != ""])
 
         if len(sid.split(",")) > 200:
             raise ValueError("Number of comma separated IDs must be less than 200")
@@ -262,7 +299,7 @@ class EUtils(REST):
 
         """
         sid = self._check_ids(id)
-        ret = self.ESummary('taxonomy', sid)
+        ret = self.ESummary("taxonomy", sid)
         return ret
 
     def snp_summary(self, id):
@@ -349,24 +386,25 @@ class EUtils(REST):
             retmode = "xml"
 
         self._check_db(db)
-        #self._check_retmode(retmode, valids=['text', 'xml'])
+        # self._check_retmode(retmode, valids=['text', 'xml'])
         sid = self._check_ids(id)
 
         params = self._get_efetch_params(**kargs)
 
-        if 'strand' in params.keys() and params['strand'] != None:
-            self.devtools.check_param_in_list(params['strand'], [1, 2])
-        if 'complexity' in params.keys() and params['complexity'] != None:
-            self.devtools.check_param_in_list(params['complexity'],
-                    [0, 1, 2, 3, 4])
+        if "strand" in params.keys() and params["strand"] != None:
+            self.devtools.check_param_in_list(params["strand"], [1, 2])
+        if "complexity" in params.keys() and params["complexity"] != None:
+            self.devtools.check_param_in_list(params["complexity"], [0, 1, 2, 3, 4])
 
         query = "efetch.fcgi?db=%s&id=%s&retmode=%s" % (db, sid, retmode)
 
         ret = self.http_get(query, params=params)
-        try: ret = ret.content
-        except: pass
+        try:
+            ret = ret.content
+        except:
+            pass
 
-        if _retmode == "dict" and isinstance(ret, (bytes,str)):
+        if _retmode == "dict" and isinstance(ret, (bytes, str)):
             ret = self.parse_xml(ret, "dict")
 
         return ret
@@ -408,23 +446,25 @@ class EUtils(REST):
         else:
             return self.databases
 
-        kargs['retmode'] = "json"
+        kargs["retmode"] = "json"
 
         # let us create the query now
-        query = 'einfo.fcgi'
+        query = "einfo.fcgi"
         if db is not None:
-            query += '?db=%s' % db
+            query += "?db=%s" % db
 
         # with parameters
         params = self._get_einfo_params(**kargs)
 
         # the real call using GET method
-        ret = self.http_get(query,  frmt="json", params=params)
-        try: ret = ret.content
-        except: pass
+        ret = self.http_get(query, frmt="json", params=params)
+        try:
+            ret = ret.content
+        except:
+            pass
 
         try:
-            return ret['einforesult']['dbinfo']
+            return ret["einforesult"]["dbinfo"]
         except:
             return ret
 
@@ -432,17 +472,19 @@ class EUtils(REST):
         if method is None:
             method = self._xmlparser
 
-        if method == 'EUtilsParser':
+        if method == "EUtilsParser":
             ret = self.easyXML(ret)
             return EUtilsParser(ret)
-        elif method == 'objectify': # used in docstrings
+        elif method == "objectify":  # used in docstrings
             from bioservices.xmltools import XMLObjectify
+
             return XMLObjectify(ret)
-        elif method == 'dict':
+        elif method == "dict":
             import xmltodict
+
             return xmltodict.parse(ret)
 
-    def ESummary(self, db, id=None,  **kargs):
+    def ESummary(self, db, id=None, **kargs):
         """Returns document summaries for a list of input UIDs
 
 
@@ -471,14 +513,14 @@ class EUtils(REST):
         """
         sid = self._check_ids(id)
         self._check_db(db)
-        kargs['retmode'] = "json"
+        kargs["retmode"] = "json"
 
         params = self._get_esummary_params(**kargs)
         # the real call using GET method
         query = "esummary.fcgi?db=%s&id=%s" % (db, sid)
-        ret = self.http_get(query, frmt="json",  params=params)
+        ret = self.http_get(query, frmt="json", params=params)
         try:
-            return ret['result']
+            return ret["result"]
         except:
             return ret
 
@@ -511,9 +553,9 @@ class EUtils(REST):
         params = self._get_egquery_params(**kargs)
 
         query = "egquery.fcgi?term=%s" % (term)
-        ret = self.http_get(query, frmt="xml",  params=params)
+        ret = self.http_get(query, frmt="xml", params=params)
         try:
-            ret = self.parse_xml(ret)['Result']
+            ret = self.parse_xml(ret)["Result"]
             return ret
         except:
             return ret
@@ -555,14 +597,14 @@ class EUtils(REST):
             :meth:`_get_esearch_params`
         """
         self._check_db(db)
-        kargs['retmode'] = "json"
+        kargs["retmode"] = "json"
 
         params = self._get_esearch_params(**kargs)
 
         query = "esearch.fcgi?db=%s&term=%s" % (db, term)
-        ret = self.http_get(query, frmt="json",  params=params)
+        ret = self.http_get(query, frmt="json", params=params)
         try:
-            return ret['esearchresult']
+            return ret["esearchresult"]
         except:
             return ret
 
@@ -592,14 +634,13 @@ class EUtils(REST):
         params = self._get_esearch_params(**kargs)
 
         query = "espell.fcgi?db=%s&term=%s" % (db, term)
-        ret = self.http_get(query, frmt="json",  params=params)
-        try: 
+        ret = self.http_get(query, frmt="json", params=params)
+        try:
             ret = ret.content
-            ret = self.parse_xml(ret, 'EUtilsParser')
+            ret = self.parse_xml(ret, "EUtilsParser")
             return ret
-        except: 
+        except:
             return ret
-
 
     def ECitMatch(self, bdata, **kargs):
         r"""
@@ -632,13 +673,16 @@ class EUtils(REST):
         """
         # Fixes https://github.com/cokelaer/bioservices/issues/169
         from urllib.parse import unquote
-        params = {'bdata': unquote(bdata), "retmode": "xml"}
+
+        params = {"bdata": unquote(bdata), "retmode": "xml"}
 
         # note here, we use .cgi not .fcgi
         query = "ecitmatch.cgi?db=pubmed&retmode=xml"
-        ret = self.http_get(query, None,  params=params)
-        try: ret = ret.content
-        except: pass
+        ret = self.http_get(query, None, params=params)
+        try:
+            ret = ret.content
+        except:
+            pass
 
         return ret
 
@@ -699,11 +743,19 @@ class EUtils(REST):
         if db is None and dbfrom is None:
             raise ValueError("One of db or dbfrom parameter must be provided")
 
-        if 'cmd' in kargs.keys():
-            assert kargs['cmd'] in ["neighbor", "neighbor_score",
-                    "neighbor_history", "acheck", "llinks", "lcheck",
-                    "ncheck", "llinkslib", "prlinks"]
-            cmd = kargs['cmd']
+        if "cmd" in kargs.keys():
+            assert kargs["cmd"] in [
+                "neighbor",
+                "neighbor_score",
+                "neighbor_history",
+                "acheck",
+                "llinks",
+                "lcheck",
+                "ncheck",
+                "llinkslib",
+                "prlinks",
+            ]
+            cmd = kargs["cmd"]
         else:
             cmd = None
 
@@ -721,9 +773,9 @@ class EUtils(REST):
 
         params = self._get_elink_params(**kargs)
 
-        ret = self.http_get(query, frmt="txt",  params=params)
-        #try: ret = ret.content
-        #except: pass
+        ret = self.http_get(query, frmt="txt", params=params)
+        # try: ret = ret.content
+        # except: pass
 
         return ret
 
@@ -746,17 +798,18 @@ class EUtils(REST):
 
         query = "epost.fcgi/?db=%s&id=%s" % (db, sid)
 
-        ret = self.http_get(query, "xml",  params=params)
-        try: ret = ret.content
-        except: pass
+        ret = self.http_get(query, "xml", params=params)
+        try:
+            ret = ret.content
+        except:
+            pass
         ret = self.easyXML(ret)
         for item in ret.getchildren():
-            if item.tag == 'QueryKey':
+            if item.tag == "QueryKey":
                 query_key = item.text
-            elif item.tag == 'WebEnv':
+            elif item.tag == "WebEnv":
                 webenv = item.text
-        return {'WebEnv':webenv, 'QueryKey':query_key}
-
+        return {"WebEnv": webenv, "QueryKey": query_key}
 
 
 class AttrDict(dict):
@@ -770,6 +823,7 @@ class EUtilsParser(AttrDict):
 
     Used by :meth:`EUtils.EGQuery`, :meth:`EUtils.ELink`.
     """
+
     def __init__(self, xml):
         super(EUtilsParser, self).__init__()
 
@@ -777,8 +831,8 @@ class EUtilsParser(AttrDict):
             name = xml.root.tag
             self[name] = EUtilsParser(xml.root)
             children = []
-            #children = xml.root.getchildren()[0].getchildren()
-            #self.__name = xml.root.getchildren()[0].tag
+            # children = xml.root.getchildren()[0].getchildren()
+            # self.__name = xml.root.getchildren()[0].tag
         except:
             children = [x for x in xml]
             if len(children) == 0:
@@ -806,7 +860,6 @@ class EUtilsParser(AttrDict):
                         self[child.tag] = [self[child.tag]]
                         self[child.tag].append(e)
 
-
     def __str__(self):
         name = self._EUtilsParser__name
         if name == "DbInfo":
@@ -818,10 +871,6 @@ class EUtilsParser(AttrDict):
             print("Not implemented for {0}".format(name))
 
 
-
-
 class XMLEUtils(object):
     def __init__(self, xml):
         self.xml = xml
-
-

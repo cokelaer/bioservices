@@ -38,11 +38,11 @@ import io
 
 from bioservices.services import REST
 from bioservices import logger
+
 logger.name = __name__
 
 
 __all__ = ["EVA"]
-
 
 
 class EVA(REST):
@@ -57,8 +57,9 @@ class EVA(REST):
       studies.
     * resource: specifies the resource to be returned, therefore the JSON
       data model.
-    * filters: each specific endpoint allows different filters. 
+    * filters: each specific endpoint allows different filters.
     """
+
     _url = "http://wwwdev.ebi.ac.uk/eva/webservices/rest/"
 
     def __init__(self, verbose=False, cache=False):
@@ -66,11 +67,12 @@ class EVA(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(EVA, self).__init__(name="EVA", url=EVA._url,
-                verbose=verbose, cache=cache)
+        super(EVA, self).__init__(
+            name="EVA", url=EVA._url, verbose=verbose, cache=cache
+        )
         self.version = "v1"
 
     def fetch_allinfo(self, name):
         """e.g., PRJEB4019"""
-        res = self.http_get(self.version + "/studies/" + name +"/summary")
+        res = self.http_get(self.version + "/studies/" + name + "/summary")
         return res

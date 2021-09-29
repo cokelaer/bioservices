@@ -3,7 +3,7 @@
 #
 #  Copyright (c) 2013-2014 - EBI-EMBL
 #
-#  File author(s): 
+#  File author(s):
 #      Thomas Cokelaer <cokelaer@ebi.ac.uk>
 #
 #
@@ -32,8 +32,9 @@
 """
 from bioservices.services import REST
 from bioservices import logger
+
 logger.name = __name__
- 
+
 __all__ = ["Pfam"]
 
 
@@ -43,13 +44,15 @@ class Pfam(REST):
     This is not a REST interface actually but rather a parser to some of the
     HTML pages relatd to pathways.
 
-    One can retrieve the pathways names and their list of proteins. 
+    One can retrieve the pathways names and their list of proteins.
 
         >>> from bioservics import *
         >>> p = Pfam()
 
     """
+
     _url = "http://pfam.xfam.org/"
+
     def __init__(self, verbose=True):
         """**Constructor**
 
@@ -57,26 +60,16 @@ class Pfam(REST):
         """
         super(Pfam, self).__init__(name="Pfam", url=Pfam._url, verbose=verbose)
 
-
     def show(self, Id):
         """Just an example of opening a web page with a uniprot Id
 
-            p = Pfam()
-            p.show("P43403")
+        p = Pfam()
+        p.show("P43403")
 
         """
         url = self._url + "/protein/" + Id
         self.on_web(url)
 
-
     def get_protein(self, ID):
         res = self.http_get("protein", params={"id": ID, "output": "xml"})
         return res.content
-
-
-
-
-
-
-
-

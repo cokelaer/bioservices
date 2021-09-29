@@ -32,13 +32,14 @@
 
 from bioservices.services import REST
 from bioservices import logger
+
 logger.name = __name__
 
 
 __all__ = ["ArrayExpress"]
 
 
-class ArrayExpress():
+class ArrayExpress:
     """Interface to the `ArrayExpress <http://www.ebi.ac.uk/arrayexpress>`_ service
 
     ArrayExpress allows to retrieve data sets used in various experiments.
@@ -129,15 +130,19 @@ class ArrayExpress():
         for http requests. It is replaced internally by spaces if found
     .. warning:: filtering is not implemented (e.g., assaycount:[x TO y]syntax.)
     """
+
     def __init__(self, verbose=False, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose: prints informative messages
 
         """
-        self.services = REST(name="ArrayExpress",
-            url="http://www.ebi.ac.uk/arrayexpress", cache=cache,
-            verbose=verbose)
+        self.services = REST(
+            name="ArrayExpress",
+            url="http://www.ebi.ac.uk/arrayexpress",
+            cache=cache,
+            verbose=verbose,
+        )
 
         self.version = "v2"
 
@@ -147,60 +152,71 @@ class ArrayExpress():
         url = "{0}/{1}/{2}".format("json", self.version, mode)
 
         defaults = {
-            "accession":None, #ex: E-MEXP-31
-            "keywords":None,
+            "accession": None,  # ex: E-MEXP-31
+            "keywords": None,
             "species": None,
             "wholewords": "on",
-            "expdesign":  None,
+            "expdesign": None,
             "exptype": None,
             "gxa": "true",
             "pmid": None,
             "sa": None,
-            "ef": None,         # e.g., CellType
-            "efv": None,         # e.g., HeLa
-            "array":None,       # ex: A-AFFY-33
+            "ef": None,  # e.g., CellType
+            "efv": None,  # e.g., HeLa
+            "array": None,  # ex: A-AFFY-33
             "expandfo": "on",
             "directsub": "true",
-            "sortby": ["accession", "name", "assays", "species",
-                       "releasedate", "fgem", "raw", "atlas"],
+            "sortby": [
+                "accession",
+                "name",
+                "assays",
+                "species",
+                "releasedate",
+                "fgem",
+                "raw",
+                "atlas",
+            ],
             "sortorder": ["ascending", "descending"],
         }
 
         for k in kargs.keys():
             if k not in defaults.keys():
-                raise ValueError("Incorrect value provided ({}). Correct values are {}".format(
-                    k, sorted(defaults.keys())))
+                raise ValueError(
+                    "Incorrect value provided ({}). Correct values are {}".format(
+                        k, sorted(defaults.keys())
+                    )
+                )
 
-        #if len(kargs.keys()):
+        # if len(kargs.keys()):
         #    url += "?"
         params = {}
 
         for k, v in kargs.items():
             if k in ["expandfo", "wholewords"]:
                 if v in ["on", True, "true", "TRUE", "True"]:
-                    #params.append(k + "=on")
+                    # params.append(k + "=on")
                     params[k] = "on"
             elif k in ["gxa", "directsub"]:
                 if v in ["on", True, "true", "TRUE", "True"]:
-                    #params.append(k + "=true")
+                    # params.append(k + "=true")
                     params[k] = "true"
                 elif v in [False, "false", "False"]:
-                    #params.append(k + "=false")
+                    # params.append(k + "=false")
                     params[k] = "false"
                 else:
                     raise ValueError("directsub must be true or false")
             else:
                 if k in ["sortby", "sortorder"]:
                     self.services.devtools.check_param_in_list(v, defaults[k])
-                #params.append(k + "=" + v)
+                # params.append(k + "=" + v)
                 params[k] = v
 
         # NOTE: + is a special character that is replaced by %2B
         # The + character is the proper encoding for a space when quoting
         # GET or POST data. Thus, a literal + character needs to be escaped
         # as well, lest it be decoded to a space on the other end
-        for k,v in params.items():
-            params[k] = v.replace("+",  " ")
+        for k, v in params.items():
+            params[k] = v.replace("+", " ")
 
         self.services.logging.info(url)
         res = self.services.http_get(url, frmt="json", params=params)
@@ -296,19 +312,24 @@ class ArrayExpress():
         """
         files = self.retrieveFilesFromExperiment(experiment)
 
-        assert filename in files, """Error. Provided filename does not seem to be correct.
-            Files available for %s experiment are %s """ % (experiment, files)
+        assert (
+            filename in files
+        ), """Error. Provided filename does not seem to be correct.
+            Files available for %s experiment are %s """ % (
+            experiment,
+            files,
+        )
 
-        url =  "files/" + experiment + "/" + filename
+        url = "files/" + experiment + "/" + filename
 
         if save:
             res = self.services.http_get(url, frmt="txt")
-            f = open(filename,"w")
+            f = open(filename, "w")
             f.write(res)
             f.close()
         else:
             res = self.services.http_get(url, frmt="txt")
-            return  res
+            return res
 
     def retrieveFilesFromExperiment(self, experiment):
         """Given an experiment, returns the list of files found in its description
@@ -327,9 +348,9 @@ class ArrayExpress():
 
         """
         res = self.queryExperiments(keywords=experiment)
-        exp = res['experiments']['experiment']
-        files = exp['files']
-        output = [v['name'] for k,v in files.items() if k]
+        exp = res["experiments"]["experiment"]
+        files = exp["files"]
+        output = [v["name"] for k, v in files.items() if k]
         return output
 
     def queryAE(self, **kargs):
@@ -345,20 +366,19 @@ class ArrayExpress():
             a.queryAE(keywords="pneumonia", species='homo+sapiens')
         """
         sets = self.queryExperiments(**kargs)
-        return [x['accession'] for x in sets['experiments']['experiment']]
+        return [x["accession"] for x in sets["experiments"]["experiment"]]
 
-    def getAE(self, accession, type='full'):
+    def getAE(self, accession, type="full"):
         """retrieve all files from an experiments and save them locally"""
         filenames = self.retrieveFilesFromExperiment(accession)
         self.services.logging.info("Found %s files" % len(filenames))
-        for i,filename in enumerate(filenames):
+        for i, filename in enumerate(filenames):
             res = self.retrieveFile(accession, filename)
-            if filename.endswith('.zip'):
-                with open(filename, 'wb') as fout:
+            if filename.endswith(".zip"):
+                with open(filename, "wb") as fout:
                     self.services.logging.info("Downloading %s" % filename)
                     fout.write(res)
             else:
-                with open(filename, 'w') as fout:
+                with open(filename, "w") as fout:
                     self.services.logging.info("Downloading %s" % filename)
                     fout.write(res)
-                
