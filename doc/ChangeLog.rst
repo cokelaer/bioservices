@@ -4,6 +4,12 @@ Whats' new, what has changed
 
 
 
+Revision 1.8.1
+--------------
+
+* fix change in kegg (ORG_CODE replaces DEFINITION)
+
+
 
 Revision 1.8.0 roadmap
 ----------------------
