@@ -149,6 +149,10 @@ wikipathway           .. image:: https://github.com/cokelaer/bioservices/actions
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.8.1     * Integrated a change made in KEGG service (DEFINITON was changed to
+            ORG_CODE)
+          * for developers: applied black on all modules
+          * switch suds-jurko to new suds community 
 1.8.0     * add main standalone application. 
           * moved chemspider and clinvitae to the attic
           * removed picr service, not active anymore
