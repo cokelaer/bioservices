@@ -39,7 +39,6 @@ except:
 if "raw_input" in __builtins__:
     input = raw_input
 
-# This is a hack in case suds is already installed.
 # Indded, we want suds_jurko instead
 sys.path = [x for x in sys.path if "suds-" not in x]
 

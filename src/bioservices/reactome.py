@@ -39,7 +39,7 @@ import sys
 import webbrowser
 import copy
 
-from bioservices.services import WSDLService, REST
+from bioservices.services import REST
 
 __all__ = ["Reactome", "ReactomeOld", "ReactomeAnalysis"]
 
