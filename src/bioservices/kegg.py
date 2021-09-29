@@ -1271,7 +1271,7 @@ class KEGGParser(object):
             # strip only: expecting a single line (string)
             elif key in ['POSITION', 'DESCRIPTION', 'ENTRY', 'ORGANISM',
                     'CLASS', 'FORMULA', 'KEYWORDS', 'CATEGORY', 'ANNOTATION', 
-                    'DATA_SOURCE', 'MASS', 'COMPOSITION', 'DEFINITION',
+                    'DATA_SOURCE', 'MASS', 'COMPOSITION', 'ORG_CODE', 'CREATED', 'DEFINITION',
                     'KO_PATHWAY', 'EQUATION', 'TYPE', 'RCLASS', 'SYSNAME', "HISTORY",
                     "REL_PATHWAY"]:
                 # get rid of \n
