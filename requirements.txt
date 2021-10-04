@@ -7,7 +7,7 @@ requests
 requests_cache
 beautifulsoup4
 xmltodict
-suds>=0.7
+suds-community>=0.7
 wrapt
 lxml
 colorlog
