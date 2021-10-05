@@ -58,7 +58,7 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 install_requires = ["grequests", "requests",
         "requests_cache", "easydev>=0.9.36", "beautifulsoup4", "xmltodict",
         "lxml",
-        "suds-jurko", "appdirs", 'wrapt', "pandas", "colorlog"],
+        "suds-community", "appdirs", 'wrapt', "pandas", "colorlog"],
 
 
 setup(
