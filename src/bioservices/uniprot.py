@@ -4,8 +4,7 @@
 #  Copyright (c) 2013-2014 - EBI-EMBL
 #
 #  File author(s):
-#      Thomas Cokelaer <cokelaer@ebi.ac.uk>
-#
+#      Thomas Cokelaer <cokelaer@ebi.ac.uk
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
