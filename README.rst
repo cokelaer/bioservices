@@ -149,6 +149,7 @@ wikipathway           .. image:: https://github.com/cokelaer/bioservices/actions
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.8.2     * Fix suds package in code and requirements
 1.8.1     * Integrated a change made in KEGG service (DEFINITON was changed to
             ORG_CODE)
           * for developers: applied black on all modules
