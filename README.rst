@@ -149,6 +149,8 @@ wikipathway           .. image:: https://github.com/cokelaer/bioservices/actions
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.8.2     * Fix suds package in code and requirements
+1.8.1     * Quick Fix on KEGG due to a change in its API
 1.8.0     * add main standalone application. 
           * moved chemspider and clinvitae to the attic
           * removed picr service, not active anymore
