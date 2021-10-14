@@ -139,11 +139,20 @@ wikipathway           .. image:: https://github.com/cokelaer/bioservices/actions
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/wikipathway.yml
 ==================== ================================================================================================
 
-
 .. note:: Contributions to implement new wrappers are more than welcome. 
     See `BioServices github page <https://github.com/cokelaer/bioservices/>`_
     to join the development, and the Developer guide on how to implement new
     wrappers.
+
+Bioservices command
+====================
+
+In version 1.8.2, we included a bioservices command. For now it has only one subcommand to download a NCBI accession number:
+
+    bioservices download-accession --accession K01711.1
+
+
+
 
 
 ========= ====================================================================
