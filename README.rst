@@ -158,6 +158,8 @@ In version 1.8.2, we included a bioservices command. For now it has only one sub
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.8.3     * Eutils: remove warning due to unreachable URL. Set REST as
+            attribute rather and inheritance. 
 1.8.2     * Fix suds package in code and requirements
 1.8.1     * Integrated a change made in KEGG service (DEFINITON was changed to
             ORG_CODE)
