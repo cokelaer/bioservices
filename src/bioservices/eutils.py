@@ -43,7 +43,7 @@ __all__ = ["EUtils", "EUtilsParser"]
 # http://www.dalkescientific.com/writings/diary/archive/2005/09/30/using_eutils.html
 
 
-class EUtils(REST):
+class EUtils:
     """Interface to `NCBI Entrez Utilities <http://www.ncbi.nlm.nih.gov/entrez>`_ service
 
     .. note:: Technical note: the WSDL interface was dropped in july 2015
@@ -101,10 +101,14 @@ class EUtils(REST):
     def __init__(
         self, verbose=False, email="unknown", cache=False, xmlparser="EUtilsParser"
     ):
-        url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
-        super(EUtils, self).__init__(
-            name="EUtils", verbose=verbose, url=url, cache=cache, requests_per_sec=3
-        )
+
+        self.services = REST(
+            name="EUtils",
+            url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
+            cache=cache,
+            verbose=verbose,
+            requests_per_sec=3, 
+            url_defined_later=True)
 
         warning = """
 
@@ -145,10 +149,10 @@ class EUtils(REST):
         self.email = email
         if self.email == "unknown":
             # trying the bioservices config file
-            if self.settings.params["user.email"][0] != "unknown":
-                self.email = self.settings.params["user.email"][0]
+            if self.services.settings.params["user.email"][0] != "unknown":
+                self.email = self.servicse.settings.params["user.email"][0]
             else:
-                self.logging.warning(warning)
+                self.services.logging.warning(warning)
 
     def help(self):
         """Open EUtils help page"""
@@ -159,7 +163,7 @@ class EUtils(REST):
         # Let us use the REST services instead of WSDL, which fails sometimes
         # and for sure since version Sept 2015
         if self._databases is None:
-            res = self.http_get("einfo.fcgi", params={"retmode": "json"})
+            res = self.services.http_get("einfo.fcgi", params={"retmode": "json"})
             databases = res["einforesult"]["dblist"]
 
             self._databases = sorted(databases)
@@ -190,7 +194,7 @@ class EUtils(REST):
             else:
                 # unknown so let use it but raise a warning
                 params[k] = v
-                self.logging.warning(
+                self.services.logging.warning(
                     "%s does not seem to be a known parameter. " % k
                     + "Use it anyway but may be ignored"
                 )
@@ -398,7 +402,7 @@ class EUtils(REST):
 
         query = "efetch.fcgi?db=%s&id=%s&retmode=%s" % (db, sid, retmode)
 
-        ret = self.http_get(query, params=params)
+        ret = self.services.http_get(query, params=params)
         try:
             ret = ret.content
         except:
@@ -457,7 +461,7 @@ class EUtils(REST):
         params = self._get_einfo_params(**kargs)
 
         # the real call using GET method
-        ret = self.http_get(query, frmt="json", params=params)
+        ret = self.services.http_get(query, frmt="json", params=params)
         try:
             ret = ret.content
         except:
@@ -473,7 +477,7 @@ class EUtils(REST):
             method = self._xmlparser
 
         if method == "EUtilsParser":
-            ret = self.easyXML(ret)
+            ret = self.services.easyXML(ret)
             return EUtilsParser(ret)
         elif method == "objectify":  # used in docstrings
             from bioservices.xmltools import XMLObjectify
@@ -518,7 +522,7 @@ class EUtils(REST):
         params = self._get_esummary_params(**kargs)
         # the real call using GET method
         query = "esummary.fcgi?db=%s&id=%s" % (db, sid)
-        ret = self.http_get(query, frmt="json", params=params)
+        ret = self.services.http_get(query, frmt="json", params=params)
         try:
             return ret["result"]
         except:
@@ -553,7 +557,7 @@ class EUtils(REST):
         params = self._get_egquery_params(**kargs)
 
         query = "egquery.fcgi?term=%s" % (term)
-        ret = self.http_get(query, frmt="xml", params=params)
+        ret = self.services.http_get(query, frmt="xml", params=params)
         try:
             ret = self.parse_xml(ret)["Result"]
             return ret
@@ -602,7 +606,7 @@ class EUtils(REST):
         params = self._get_esearch_params(**kargs)
 
         query = "esearch.fcgi?db=%s&term=%s" % (db, term)
-        ret = self.http_get(query, frmt="json", params=params)
+        ret = self.services.http_get(query, frmt="json", params=params)
         try:
             return ret["esearchresult"]
         except:
@@ -634,7 +638,7 @@ class EUtils(REST):
         params = self._get_esearch_params(**kargs)
 
         query = "espell.fcgi?db=%s&term=%s" % (db, term)
-        ret = self.http_get(query, frmt="json", params=params)
+        ret = self.services.http_get(query, frmt="json", params=params)
         try:
             ret = ret.content
             ret = self.parse_xml(ret, "EUtilsParser")
@@ -678,7 +682,7 @@ class EUtils(REST):
 
         # note here, we use .cgi not .fcgi
         query = "ecitmatch.cgi?db=pubmed&retmode=xml"
-        ret = self.http_get(query, None, params=params)
+        ret = self.services.http_get(query, None, params=params)
         try:
             ret = ret.content
         except:
@@ -773,7 +777,7 @@ class EUtils(REST):
 
         params = self._get_elink_params(**kargs)
 
-        ret = self.http_get(query, frmt="txt", params=params)
+        ret = self.services.http_get(query, frmt="txt", params=params)
         # try: ret = ret.content
         # except: pass
 
@@ -798,12 +802,12 @@ class EUtils(REST):
 
         query = "epost.fcgi/?db=%s&id=%s" % (db, sid)
 
-        ret = self.http_get(query, "xml", params=params)
+        ret = self.services.http_get(query, "xml", params=params)
         try:
             ret = ret.content
         except:
             pass
-        ret = self.easyXML(ret)
+        ret = self.services.easyXML(ret)
         for item in ret.getchildren():
             if item.tag == "QueryKey":
                 query_key = item.text
