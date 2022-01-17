@@ -65,6 +65,8 @@ bigg                  .. image:: https://github.com/cokelaer/bioservices/actions
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/bigg.yml
 biocarta              .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biocarta.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/biocarta.yml
+biocontainers         .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biocontainersyml/badge.svg
+                         :target: https://github.com/cokelaer/bioservices/actions/workflows/biocontainers.yml
 biodbnet              .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biodbnet.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/biodbnet.yml
 biogrid               .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biogrid.yml/badge.svg
@@ -147,12 +149,13 @@ wikipathway           .. image:: https://github.com/cokelaer/bioservices/actions
 Bioservices command
 ====================
 
-In version 1.8.2, we included a bioservices command. For now it has only one subcommand to download a NCBI accession number:
+In version 1.8.2, we included a bioservices command. For now it has only one subcommand to download a NCBI accession number::
 
     bioservices download-accession --accession K01711.1
 
 
-
+Changelog
+=========
 
 
 ========= ====================================================================
@@ -160,6 +163,9 @@ Version   Description
 ========= ====================================================================
 1.8.3     * Eutils: remove warning due to unreachable URL. Set REST as
             attribute rather and inheritance. 
+          * NEW biocontainers module
+          * KEGG: add save_pathway method. Fix parsing of structure/pdb entry
+          * remove deprecated function from Reactome
 1.8.2     * Fix suds package in code and requirements
 1.8.1     * Integrated a change made in KEGG service (DEFINITON was changed to
             ORG_CODE)

@@ -87,11 +87,6 @@ def test_pathways_low_diagram_entity_allForms(reactome):
     assert len(res)
 
 
-def test_pathways_low_diagram_identifier_allForms(reactome):
-    res = reactome.get_pathways_low_diagram_identifier_allForms("PTEN")
-    assert len(res)
-
-
 def test_pathways_low_entity(reactome):
     res = reactome.get_pathways_low_entity("R-HSA-199420")
     assert len(res)

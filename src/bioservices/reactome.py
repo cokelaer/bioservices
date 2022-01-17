@@ -421,19 +421,6 @@ class Reactome:
         )
         return res
 
-    def get_pathways_low_diagram_identifier_allForms(self, identifier):
-        """
-
-        ::
-
-            r.get_pathways_low_diagram_identifier_allForms("PTEN")
-
-        """
-        res = self.services.http_get(
-            "data/pathways/low/diagram/identifier/{}/allForms".format(identifier),
-            frmt="json",
-        )
-        return res
 
     def get_pathways_low_entity(self, identifier):
         """A list of lower level pathways containing a given entity or event

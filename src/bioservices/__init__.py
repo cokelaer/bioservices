@@ -49,6 +49,9 @@ from .biocarta import *
 from . import biomodels
 from .biomodels import *
 
+from . import biocontainers
+from .biocontainers import Biocontainers
+
 from . import cog
 from .cog import *
 

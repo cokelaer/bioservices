@@ -1396,6 +1396,7 @@ class KEGGParser(object):
         self.raw_parsing = copy.deepcopy(output)
 
         for key, value in output.items():
+            print(key, value)
             # convert to a dict
             if key == "STATISTICS":
                 data = [x.split(":", 1) for x in output[key].split("\n")]
@@ -1434,6 +1435,7 @@ class KEGGParser(object):
                     value = value.replace("\n", " ")
                 # nothing to do here except strip
                 output[key] = value.strip()
+                print(key)
             # list : set of lines. Could be split by ; character but we use the
             # \n instead to be sure
             # COMMENT is sometimes on several lines
@@ -1558,7 +1560,7 @@ class KEGGParser(object):
             # dictionary, interpreted as follows
             # on each line, there is an identifier followed by : character
             # looks like there is just one line...
-            elif key in ["DRUG_TARGET", "STRUCTURE", "MOTIF"]:
+            elif key in ["DRUG_TARGET", "MOTIF", "PDB"]:
                 # STRUCTURE PDB can be long and span over several lines. e.g.,
                 # hsa:1525
                 new = {}
@@ -1566,10 +1568,13 @@ class KEGGParser(object):
                 import re
 
                 value = re.sub("\n {6,20}", " ", value)
-                for line in value.split("\n"):
-                    thiskey, content = line.split(":", 1)
-                    new[thiskey] = content
-                output[key] = new
+                try:
+                    for line in value.split("\n"):
+                        thiskey, content = line.split(":", 1)
+                        new[thiskey] = content
+                    output[key] = new
+                except ValueError:
+                    output[key] = value
             elif key in ["DBLINKS", "INTERACTION", "METABOLISM"]:
                 # D01441 for metabolism
                 # DBLINKS for C00624 should work out of the box
@@ -1592,6 +1597,7 @@ class KEGGParser(object):
             # get rid of the length
             elif key in ["AASEQ", "NTSEQ"]:
                 output[key] = value.split("\n", 1)[1].replace("\n", "")
+                output[key] = output[key].replace(" ", "")
             elif key.startswith("ENTRY"):
                 newvalue = self._interpret_entry(value)
                 output[key] = newvalue.strip()

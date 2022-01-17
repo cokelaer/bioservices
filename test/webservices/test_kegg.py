@@ -199,9 +199,11 @@ def test_show_module(kegg):
     kegg.show_module("md:hsa_M00001")
 
 
-def test_show_pathway(kegg):
+def test_show_pathway(kegg, tmp_path):
+    p = tmp_path / "test.png"
     kegg.show_entry("path:hsa05416")
     kegg.show_pathway("path:hsa05416", scale=50)
+    kegg.save_pathway("path:hsa05416", p.name, scale=50)
 
 
 def pathway2sif(kegg):
