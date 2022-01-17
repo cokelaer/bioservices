@@ -1,4 +1,4 @@
-name: uniprot Testing
+name: Biocontainer Testing
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     branches:
       - master
     paths:
-      - src/bioservices/uniprot.py
+      - src/bioservices/biocontainers.py
   pull_request:
     branches-ignore: []
 

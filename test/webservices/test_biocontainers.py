@@ -1,5 +1,5 @@
 from bioservices import Biocontainers
-
+import pytest
 
 skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
     reason="too slow for travis")
