@@ -1,5 +1,12 @@
 from bioservices import Biocontainers
 
+
+skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+    reason="too slow for travis")
+
+
+@skiptravis
+@pytest.mark.xfail
 def test_biocontainers():
 
     b = Biocontainers()
