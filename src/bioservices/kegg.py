@@ -730,7 +730,7 @@ class KEGG(REST):
         """
         raise NotImplementedError("Use :meth:`get` instead")
 
-    def show_pathway(self, pathId, scale=None, dcolor="pink", keggid={}):
+    def show_pathway(self, pathId, scale=None, dcolor="pink", keggid={}, show=True):
         """Show a given pathway inside a web browser
 
         :param str pathId: a valid pathway Id. See :meth:`pathwayIds`
@@ -783,8 +783,36 @@ class KEGG(REST):
                     url += "/%s%%09,%s/" % (k, "red")
 
         self.logging.info(url)
-        res = webbrowser.open(url)
-        return res
+        if show:
+            webbrowser.open(url)
+        return url
+
+    def save_pathway(self, pathId, filename, scale=None, keggid={}, params={}):
+        """Save KEGG pathway in PNG format
+
+        :param  pathId: a valid pathway identifier
+        :param str filename: output PNG file 
+        :param params: valid kegg params expected
+        """
+
+        import requests
+
+        url = self.show_pathway(pathId, scale, keggid=keggid, show=False)
+        html_page = requests.post(url, data=params)
+
+        html_page = html_page.content.decode()
+
+        links_to_png = [
+            x for x in html_page.split() if "png" in x and x.startswith("src")
+        ]
+        link_to_png = links_to_png[0].replace("src=", "").replace('"', "")
+        r = requests.get("https://www.kegg.jp/{}".format(link_to_png))
+
+        if filename is None:
+            filename = "{}.png".format(pathway_ID)
+
+        with open(filename, "wb") as fout:
+            fout.write(r.content)
 
     def show_module(self, modId):
         """Show a given module inside a web browser
@@ -1380,6 +1408,7 @@ class KEGGParser(object):
                 "ENTRY",
                 "ORGANISM",
                 "CLASS",
+                "SYMBOL",
                 "FORMULA",
                 "KEYWORDS",
                 "CATEGORY",
