@@ -1,4 +1,4 @@
-name: chembl Testing
+name: uniprot Testing
 
 on:
   workflow_dispatch:
@@ -6,17 +6,17 @@ on:
     branches:
       - master
     paths:
-      - src/bioservices/chembl.py
+      - src/bioservices/uniprot.py
   pull_request:
     branches-ignore: []
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     strategy:
       max-parallel: 5
       matrix:
-        python: [3.9, 3.7, 3.8]
+        python: [3.7, 3.8, 3.9]
 
     steps:
     - uses: actions/checkout@v2
@@ -31,5 +31,5 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest -n 1  --cov-report term --cov=bioservices.chembl test/webservices/test_chembl.py
+        pytest -n 1  --cov-report term --cov=bioservices.biocontainers test/webservices/test_biocontainers.py
 

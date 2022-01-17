@@ -1,4 +1,4 @@
-name: bigg Testing
+,ame: bigg Testing
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        python: [3.6, 3.7, 3.8]
+        python: [3.9, 3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v2

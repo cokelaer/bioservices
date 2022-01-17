@@ -34,6 +34,14 @@ ArrayExpress
     :undoc-members:
     :synopsis:
 
+Biocontainers
+=============
+
+.. automodule:: bioservices.biocontainers
+    :members:
+    :undoc-members:
+    :synopsis:
+
 BiGG
 ====
 
@@ -88,22 +96,6 @@ ChEMBL
 ==========
 
 .. automodule:: bioservices.chembl
-    :members:
-    :undoc-members:
-    :synopsis:
-
-ChemSpider
-===============
-
-.. automodule:: bioservices.chemspider
-    :members:
-    :undoc-members:
-    :synopsis:
-
-Clinvitae
-==============
-
-.. automodule:: bioservices.clinvitae
     :members:
     :undoc-members:
     :synopsis:

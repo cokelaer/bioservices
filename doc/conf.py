@@ -57,6 +57,7 @@ extensions = [
                   if sphinx.version_info[:2] >= (1, 4)
                   else 'sphinx.ext.pngmath'),
     'sphinx.ext.coverage',
+    'sphinx_copybutton',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
@@ -144,7 +145,7 @@ modindex_common_prefix = ["bioservices."]
 # to force their creation. Note that it requires singularity or dot to be
 # installed. Fixes https://github.com/biokit/bioconvert/issues/153
 
-plot_gallery = False
+plot_gallery = True
 
 #sphinx_gallery_conf = {
 #    "doc_module": "bioservices",
@@ -172,12 +173,6 @@ def touch_example_backreferences(app, what, name, obj, options, lines):
         open(examples_path, 'w').close()
 
 
-# Add the 'copybutton' javascript, to hide/show the prompt in code
-# examples
-def setup(app):
-    app.add_javascript('copybutton.js')
-    app.connect('autodoc-process-docstring', touch_example_backreferences)
-
 # -- Options for HTML output ---------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
@@ -197,7 +192,7 @@ else:
 # the user theme contains the otpions 'homepage', which is populated here
 #html_theme_options = {'homepage': init_sphinx.url}
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = [get_path_sphinx_themes()]
+#html_theme_path = [get_path_sphinx_themes()]
 
 
 
