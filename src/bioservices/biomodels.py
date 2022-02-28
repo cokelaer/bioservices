@@ -108,7 +108,7 @@ class BioModels(REST):
         models = []
         offset = 0
         res = self.search("*.*", numResults=chunk)
-        while type(res) is dict and "models" in res:
+        while len(res["facets"]):
             models.extend(res["models"])
             offset += chunk
             res = self.search("*.*", offset=offset, numResults=chunk)
