@@ -19,6 +19,7 @@ metainfo = {
     'url' : 'http://github.com/cokelaer/bioservices',
     'bugtrack_url': 'https://github.com/cokelaer/bioservices/issues',
     'description':'Access to Biological Web Services from Python' ,
+    "long_description_content_type": "text/x-rst",
     'platforms' : ['Linux', 'Unix', 'MacOsX', 'Windows'],
     'keywords' : [
         "BioServices", "WebServices", "Biology", "BioDBNet",
@@ -69,6 +70,7 @@ setup(
     author           = metainfo['authors']['Cokelaer'][0],
     author_email     = metainfo['authors']['Cokelaer'][1],
     long_description = readme + '\n\n' + history,
+    long_description_content_type = metainfo["long_description_content_type"],
     keywords         = metainfo['keywords'],
     description = metainfo['description'],
     license          = metainfo['license'],
