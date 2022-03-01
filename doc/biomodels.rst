@@ -29,9 +29,9 @@ look at the list of model identifiers::
 
 
 If you have a specific model identifier, then it is easy. You can 
-etrieve the model itself::
+retrieve the model itself::
 
-    model bm.get_model("BIOMD0000000100")
+    model s.get_model("BIOMD0000000100")
 
 and get its name or other types of information::
 
@@ -42,11 +42,11 @@ In particular, description, author and files associated with this model. Here,
 we can see the files and in particular a PNG image called
 **BIOMD0000000100.png**. You can get it as follows::
 
-    bm.get_model_download("BIOMD0000000100", filename="BIOMD0000000100.png")
+    s.get_model_download("BIOMD0000000100", filename="BIOMD0000000100.png")
 
 or just download the whole bundle::
     
-    bm.get_model_download("BIOMD0000000100")
+    s.get_model_download("BIOMD0000000100")
 
 saved into **BIOMD0000000100.zip**.
 
