@@ -38,6 +38,20 @@ needs for expertise in Web Services for the developers/users.
 
 BioServices provides access to about 40 Web Services. 
 
+Contributors
+============
+
+Maintaining BioServices would not have been possible without users and contributors. 
+Each contribution has been an encouragement to pursue this project. Thanks to all:
+
+<a href="https://github.com/cokelaer/bioservices/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=cokelaer/bioservices" />
+</a>
+
+
+Quick example
+=============
+
 Here is a small example using the UniProt Web Service to search for the zap70 specy in human
 organism::
 
@@ -53,6 +67,8 @@ organism::
 
 More examples and tutorials are available in the `On-line documentation <http://bioservices.readthedocs.io/>`_
 
+Current services
+================
 Here is the list of services available and their testing status.
 
 
@@ -145,16 +161,6 @@ wikipathway           .. image:: https://github.com/cokelaer/bioservices/actions
     See `BioServices github page <https://github.com/cokelaer/bioservices/>`_
     to join the development, and the Developer guide on how to implement new
     wrappers.
-
-Contributors
-============
-
-Maintaining BioServices would not have been possible without users and contributors. 
-Each contribution has been an encouragement to pursue this project. Thanks to all:
-
-<a href="https://github.com/cokelaer/bioservices/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=cokelaer/bioservices" />
-</a>
 
 Bioservices command
 ====================
