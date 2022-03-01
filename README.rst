@@ -146,6 +146,16 @@ wikipathway           .. image:: https://github.com/cokelaer/bioservices/actions
     to join the development, and the Developer guide on how to implement new
     wrappers.
 
+Contributors
+============
+
+Maintaining BioServices would not have been possible without users and contributors. 
+Each contribution has been an encouragement to pursue this project. Thanks to all:
+
+<a href="https://github.com/cokelaer/bioservices/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=cokelaer/bioservices" />
+</a>
+
 Bioservices command
 ====================
 
@@ -161,6 +171,8 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.8.4     * biomodels. Fix #208
+          * KEGG: fixed #204 #202 and #203
 1.8.3     * Eutils: remove warning due to unreachable URL. Set REST as
             attribute rather and inheritance. 
           * NEW biocontainers module

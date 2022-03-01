@@ -1396,7 +1396,6 @@ class KEGGParser(object):
         self.raw_parsing = copy.deepcopy(output)
 
         for key, value in output.items():
-            print(key, value)
             # convert to a dict
             if key == "STATISTICS":
                 data = [x.split(":", 1) for x in output[key].split("\n")]
@@ -1417,6 +1416,7 @@ class KEGGParser(object):
                 "DATA_SOURCE",
                 "MASS",
                 "COMPOSITION",
+                "STRUCTURE",
                 "ORG_CODE",
                 "CREATED",
                 "DEFINITION",
@@ -1435,7 +1435,7 @@ class KEGGParser(object):
                     value = value.replace("\n", " ")
                 # nothing to do here except strip
                 output[key] = value.strip()
-                print(key)
+                #print(key)
             # list : set of lines. Could be split by ; character but we use the
             # \n instead to be sure
             # COMMENT is sometimes on several lines
