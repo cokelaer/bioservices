@@ -44,10 +44,9 @@ Contributors
 Maintaining BioServices would not have been possible without users and contributors. 
 Each contribution has been an encouragement to pursue this project. Thanks to all:
 
-<a href="https://github.com/cokelaer/bioservices/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=cokelaer/bioservices" />
-</a>
-
+.. image:: https://contrib.rocks/image?repo=cokelaer/bioservices
+    :target: https://github.com/cokelaer/bioservices/graphs/contributors
+  
 
 Quick example
 =============
