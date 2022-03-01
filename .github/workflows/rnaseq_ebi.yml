@@ -9,6 +9,8 @@ on:
       - src/bioservices/rnaseq_ebi.py
   pull_request:
     branches-ignore: []
+    paths:
+      - src/bioservices/arrayexpressbigg.py
 
 jobs:
   build-linux:

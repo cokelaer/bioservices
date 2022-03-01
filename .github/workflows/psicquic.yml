@@ -9,6 +9,8 @@ on:
       - src/bioservices/psicquic.py
   pull_request:
     branches-ignore: []
+    paths:
+      - src/bioservices/arrayexpressbigg.py
 
 jobs:
   build-linux:

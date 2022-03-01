@@ -9,6 +9,8 @@ on:
       - src/bioservices/intact_complex.py
   pull_request:
     branches-ignore: []
+    paths:
+      - src/bioservices/arrayexpressbigg.py
 
 jobs:
   build-linux:
