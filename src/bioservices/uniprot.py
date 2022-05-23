@@ -39,7 +39,6 @@
 .. http://www.uniprot.org/docs/pkinfam
 
 """
-import types
 import io
 import sys
 
@@ -161,7 +160,7 @@ mapping = {
 }
 
 
-class UniProt(REST):
+class UniProt:
     """Interface to the `UniProt <http://www.uniprot.org>`_ service
 
     .. rubric:: Identifiers mapping between databases:
@@ -401,9 +400,9 @@ class UniProt(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(UniProt, self).__init__(
-            name="UniProt", url=UniProt._url, verbose=verbose, cache=cache
-        )
+
+        self.services = REST(name="UniProt", url=UniProt._url, verbose=verbose, cache=cache)
+
         self.TIMEOUT = 100
 
         self._database = "uniprot"
@@ -411,7 +410,7 @@ class UniProt(REST):
     def _download_flat_files(self):
         """could be used to get all data in flat files (about compressed 500Mb )"""
         url = "ftp://ftp.ebi.ac.uk/pub/databases/uniprot/knowledgebase/uniprot_sprot.dat.gz"
-        self.logging.info("Downloading uniprot file from the web. May take some time.:")
+        self.services.logging.info("Downloading uniprot file from the web. May take some time.:")
         import urllib
 
         urllib.urlretrieve(url, "uniprot_sprot.dat.gz")
@@ -457,11 +456,11 @@ class UniProt(REST):
         """
         url = "mapping/"  # the slash matters
 
-        query = self.devtools.list2string(query, sep=" ", space=False)
+        query = self.services.devtools.list2string(query, sep=" ", space=False)
         # if isinstance(query, list):
         #    query = " ".join(query)
         params = {"from": fr, "to": to, "format": "tab", "query": query}
-        result = self.http_post(url, frmt="txt", data=params)
+        result = self.services.http_post(url, frmt="txt", data=params)
 
         # changes in version 1.1.1 returns a dictionary instead of list
         try:
@@ -469,7 +468,7 @@ class UniProt(REST):
             del result[0]
             del result[0]
         except:
-            self.logging.warning("Results seems empty...returning empty dictionary.")
+            self.services.logging.warning("Results seems empty...returning empty dictionary.")
             return {}
 
         if len(result) == 0:
@@ -488,7 +487,7 @@ class UniProt(REST):
         return result_dict
 
     def searchUniProtId(self, uniprot_id, frmt="xml"):
-        self.logging.warning("DEPRECATED SINCE VERSION 1.3.1. use retrieve instead")
+        self.services.logging.warning("DEPRECATED SINCE VERSION 1.3.1. use retrieve instead")
 
     def retrieve(self, uniprot_id, frmt="xml", database="uniprot"):
         """Search for a uniprot ID in UniProtKB database
@@ -508,14 +507,14 @@ class UniProt(REST):
 
         """
         _valid_formats = ["txt", "xml", "rdf", "gff", "fasta"]
-        self.devtools.check_param_in_list(frmt, _valid_formats)
+        self.services.devtools.check_param_in_list(frmt, _valid_formats)
 
-        queries = self.devtools.to_list(uniprot_id)
+        queries = self.services.devtools.to_list(uniprot_id)
 
         url = [database + "/" + query + "." + frmt for query in queries]
-        res = self.http_get(url, frmt="txt")
+        res = self.services.http_get(url, frmt="txt")
         if frmt == "xml":
-            res = [self.easyXML(x) for x in res]
+            res = [self.services.easyXML(x) for x in res]
         if isinstance(res, list) and len(res) == 1:
             res = res[0]
         return res
@@ -642,11 +641,11 @@ class UniProt(REST):
                 "rss",
                 "html",
             ]
-            self.devtools.check_param_in_list(frmt, _valid_formats)
+            self.services.devtools.check_param_in_list(frmt, _valid_formats)
             params["format"] = frmt
 
         if columns is not None:
-            self.devtools.check_param_in_list(frmt, ["tab", "xls"])
+            self.services.devtools.check_param_in_list(frmt, ["tab", "xls"])
 
             # remove unneeded spaces before/after commas if any
             if "," in columns:
@@ -658,7 +657,7 @@ class UniProt(REST):
                 if col.startswith("database(") is True:
                     pass
                 else:
-                    self.devtools.check_param_in_list(col, self._valid_columns)
+                    self.services.devtools.check_param_in_list(col, self._valid_columns)
 
             # convert back to a string as expected by uniprot
             params["columns"] = ",".join([x.strip() for x in columns])
@@ -670,7 +669,7 @@ class UniProt(REST):
             params["compress"] = "yes"
 
         if sort:
-            self.devtools.check_param_in_list(sort, ["score"])
+            self.services.devtools.check_param_in_list(sort, ["score"])
             params["sort"] = sort
 
         if offset is not None:
@@ -684,7 +683,7 @@ class UniProt(REST):
         # + are interpreted and have a meaning.
         params["query"] = query.replace("+", " ")
         # res = s.request("/uniprot/?query=zap70+AND+organism:9606&format=xml", params)
-        res = self.http_get(database + "/", frmt="txt", params=params)
+        res = self.services.http_get(database + "/", frmt="txt", params=params)
         return res
 
     def quick_search(self, query, include=False, sort="score", limit=None):
@@ -742,7 +741,7 @@ class UniProt(REST):
         except:
             print("uniref method requires Pandas", file=sys.stderr)
             return
-        res = self.http_get(
+        res = self.services.http_get(
             "uniref/", params={"query": query, "format": "tab"}, frmt="txt"
         )
         try:
@@ -774,19 +773,19 @@ class UniProt(REST):
             entries = list(set(entries))
         output = pd.DataFrame()
 
-        self.logging.info(
+        self.services.logging.info(
             "fetching information from uniprot for {} entries".format(len(entries))
         )
 
         if limit < len(entries):
-            self.logging.warning("The limit paramter is less than the number of entries. Probably not what you want. set limit to the length of the entries to remove this message")
+            self.services.logging.warning("The limit paramter is less than the number of entries. Probably not what you want. set limit to the length of the entries to remove this message")
 
         nChunk = min(nChunk, len(entries))
         N, rest = divmod(len(entries), nChunk)
         for i in range(0, N + 1):
             this_entries = entries[i * nChunk : (i + 1) * nChunk]
             if len(this_entries):
-                self.logging.info("uniprot.get_df {}/{}".format(i + 1, N))
+                self.services.logging.info("uniprot.get_df {}/{}".format(i + 1, N))
                 query = "+or+".join(this_entries)
                 if organism:
                     query += "+and+" + organism
@@ -800,7 +799,7 @@ class UniProt(REST):
             else:
                 break
             if len(res) == 0:
-                self.logging.warning("some entries %s not found" % entries)
+                self.services.logging.warning("some entries %s not found" % entries)
             else:
                 try:
                     # python 2.X
@@ -839,7 +838,7 @@ class UniProt(REST):
                 )
                 output[col] = res
             except:
-                self.logging.warning("column could not be parsed. %s" % col)
+                self.services.logging.warning("column could not be parsed. %s" % col)
         # Sequences are splitted into chunks of 10 characters. let us rmeove
         # the spaces:
         output["Sequence"].fillna("", inplace=True)
