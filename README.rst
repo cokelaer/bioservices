@@ -176,6 +176,7 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.9.0     * Update unichem to reflect new API
 1.8.4     * biomodels. Fix #208
           * KEGG: fixed #204 #202 and #203
 1.8.3     * Eutils: remove warning due to unreachable URL. Set REST as
