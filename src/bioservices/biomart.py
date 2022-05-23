@@ -256,10 +256,10 @@ class BioMart(REST):
 
     def _init(self):
         temp = self.logging.level
-        self.logging.level = "ERROR"
+        self.logging.setLevel("ERROR")
         _ = self.lookfor("uniprot", verbose=False)
         _ = self.valid_attributes
-        self.logging.level = temp
+        self.logging.setLevel(temp)
 
     @require_host
     def registry(self):
