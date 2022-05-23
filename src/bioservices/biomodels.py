@@ -91,17 +91,11 @@ class BioModels(REST):
 
 
         """
-        super(BioModels, self).__init__(
-            name="BioModels", url=BioModels._url, verbose=verbose
-        )
+        super(BioModels, self).__init__(name="BioModels", url=BioModels._url, verbose=verbose)
 
     def _check_format(self, frmt, supported=["json", "xml", "html"]):
         if frmt not in supported:
-            raise ValueError(
-                "Supported format for this function are {}. You provided {}".format(
-                    supported, frmt
-                )
-            )
+            raise ValueError("Supported format for this function are {}. You provided {}".format(supported, frmt))
 
     def get_all_models(self, chunk=100):
         """Return all models"""
@@ -127,9 +121,7 @@ class BioModels(REST):
         :param frmt: format of the output (json, xml)
         """
         self._check_format(frmt, ["xml", "json"])
-        res = self.http_get(
-            "model/files/{}".format(model_id), frmt=frmt, params={"format": frmt}
-        )
+        res = self.http_get("model/files/{}".format(model_id), frmt=frmt, params={"format": frmt})
         return res
 
     def get_model_download(self, model_id, filename=None, output_filename=None):
@@ -226,9 +218,7 @@ class BioModels(REST):
             "publication_year-desc",
         ]
         if sort and sort not in sort_options:
-            raise ValueError(
-                "sort must be in {}. You provided {}".format(sort_options, sort)
-            )
+            raise ValueError("sort must be in {}. You provided {}".format(sort_options, sort))
         res = self.http_get("search", params=params)
         return res
 
@@ -257,9 +247,7 @@ class BioModels(REST):
         self.logging.info(output_filename)
         if os.path.exists(output_filename) and force is False:
             raise IOError(
-                "{} exists already. Set force to True or change the output_filename argument".format(
-                    output_filename
-                )
+                "{} exists already. Set force to True or change the output_filename argument".format(output_filename)
             )
 
         with open(output_filename, "wb") as fout:
@@ -295,9 +283,7 @@ class BioModels(REST):
         params = {"format": frmt, "size": size, "start": start, "query": query}
         sort_options = ["model", "entity", None]
         if sort not in sort_options:
-            raise ValueError(
-                "sort must be in {}. You provided {}".format(sort_options, sort)
-            )
+            raise ValueError("sort must be in {}. You provided {}".format(sort_options, sort))
         if sort:
             params["sort"] = sort
 
@@ -331,9 +317,7 @@ class BioModels(REST):
 
         """
         self._check_format(frmt)
-        res = self.http_get(
-            "p2m/representative", params={"format": frmt, "model": model}
-        )
+        res = self.http_get("p2m/representative", params={"format": frmt, "model": model})
         return res
 
     def get_p2m_representatives(self, models, frmt="json"):
@@ -363,9 +347,7 @@ class BioModels(REST):
             models = ",".join([x.strip() for x in models.split(",")])
 
         self._check_format(frmt)
-        res = self.http_get(
-            "p2m/representatives", params={"format": frmt, "modelIds": models}
-        )
+        res = self.http_get("p2m/representatives", params={"format": frmt, "modelIds": models})
         return res
 
     def get_pdgsmm_missing(self, frmt="json"):
@@ -392,9 +374,7 @@ class BioModels(REST):
 
         """
         self._check_format(frmt)
-        res = self.http_get(
-            "pdgsmm/representative", params={"format": frmt, "model": model}
-        )
+        res = self.http_get("pdgsmm/representative", params={"format": frmt, "model": model})
         return res
 
     def get_pdgsmm_representatives(self, models, frmt="json"):
@@ -417,7 +397,5 @@ class BioModels(REST):
             models = ",".join([x.strip() for x in models.split(",")])
 
         self._check_format(frmt)
-        res = self.http_get(
-            "pdgsmm/representatives", params={"format": frmt, "modelIds": models}
-        )
+        res = self.http_get("pdgsmm/representatives", params={"format": frmt, "modelIds": models})
         return res

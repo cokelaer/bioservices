@@ -182,9 +182,7 @@ class ArrayExpress:
         for k in kargs.keys():
             if k not in defaults.keys():
                 raise ValueError(
-                    "Incorrect value provided ({}). Correct values are {}".format(
-                        k, sorted(defaults.keys())
-                    )
+                    "Incorrect value provided ({}). Correct values are {}".format(k, sorted(defaults.keys()))
                 )
 
         # if len(kargs.keys()):

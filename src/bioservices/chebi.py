@@ -106,9 +106,7 @@ class ChEBI(WSDLService):
         conv = [str(x[0]) for x in res.DatabaseLinks if x[1] == target]
         return conv
 
-    def getLiteEntity(
-        self, search, searchCategory="ALL", maximumResults=200, stars="ALL"
-    ):
+    def getLiteEntity(self, search, searchCategory="ALL", maximumResults=200, stars="ALL"):
         """Retrieves list of entities containing the ChEBI ASCII name or identifier
 
         :param search: search string or category.
@@ -205,9 +203,7 @@ class ChEBI(WSDLService):
         res = self.serv.getOntologyChildren(chebiId)
         return res
 
-    def getAllOntologyChildrenInPath(
-        self, chebiId, relationshipType, onlyWithChemicalStructure=False
-    ):
+    def getAllOntologyChildrenInPath(self, chebiId, relationshipType, onlyWithChemicalStructure=False):
         """Retrieves the ontology children of an entity including the relationship type
 
         :param str chebiId: a valid ChEBI identifier (string)
@@ -236,9 +232,7 @@ class ChEBI(WSDLService):
                 "is substituent group of",
             ],
         )
-        res = self.serv.getAllOntologyChildrenInPath(
-            chebiId, relationshipType, onlyWithChemicalStructure
-        )
+        res = self.serv.getAllOntologyChildrenInPath(chebiId, relationshipType, onlyWithChemicalStructure)
         return res
 
     def getStructureSearch(
@@ -268,12 +262,8 @@ class ChEBI(WSDLService):
             >>> ch.getStructureSearch(smiles, "SMILES", "SIMILARITY", 3, 0.25)
         """
 
-        self.devtools.check_param_in_list(
-            structureSearchCategory, ["SIMILARITY", "SUBSTRUCTURE", "IDENTITY"]
-        )
+        self.devtools.check_param_in_list(structureSearchCategory, ["SIMILARITY", "SUBSTRUCTURE", "IDENTITY"])
         self.devtools.check_param_in_list(mode, ["MOLFILE", "SMILES", "CML"])
 
-        res = self.serv.getStructureSearch(
-            structure, mode, structureSearchCategory, totalResults, tanimotoCutoff
-        )
+        res = self.serv.getStructureSearch(structure, mode, structureSearchCategory, totalResults, tanimotoCutoff)
         return res

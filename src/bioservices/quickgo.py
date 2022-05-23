@@ -80,9 +80,7 @@ class QuickGO(REST):
         query = query.replace(":", "%3A")
         query = query.replace(",", "%2C")
         params = {"query": query, "limit": limit, "page": page}
-        res = self.http_get(
-            url, frmt="json", params=params, headers=self.get_headers("json")
-        )
+        res = self.http_get(url, frmt="json", params=params, headers=self.get_headers("json"))
         try:
             return res["results"]
         except:  # pragma: no cover
@@ -94,9 +92,7 @@ class QuickGO(REST):
         query = query.replace(":", "%3A")
         query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}".format(query)
-        results = self.http_get(
-            url, frmt="json", params={}, headers=self.get_headers("json")
-        )
+        results = self.http_get(url, frmt="json", params={}, headers=self.get_headers("json"))
         try:
             return results["results"]
         except:  # pragma: no cover
@@ -107,9 +103,7 @@ class QuickGO(REST):
         query = query.replace(":", "%3A")
         query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/ancestors".format(query)
-        results = self.http_get(
-            url, frmt="json", params={}, headers=self.get_headers("json")
-        )
+        results = self.http_get(url, frmt="json", params={}, headers=self.get_headers("json"))
         try:
             return results["results"]
         except:  # pragma: no cover
@@ -119,9 +113,7 @@ class QuickGO(REST):
         query = query.replace(":", "%3A")
         query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/children".format(query)
-        results = self.http_get(
-            url, frmt="json", params={}, headers=self.get_headers("json")
-        )
+        results = self.http_get(url, frmt="json", params={}, headers=self.get_headers("json"))
         try:
             return results["results"]
         except:  # pragma: no cover
@@ -139,9 +131,7 @@ class QuickGO(REST):
         query = query.replace(":", "%3A")
         query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/chart".format(query)
-        res = self.http_get(
-            url, frmt="json", params={}, headers={"Accept": "image/png"}
-        )
+        res = self.http_get(url, frmt="json", params={}, headers={"Accept": "image/png"})
         # import base64
         # res = base64.b64decode(res).decode()
         return res
@@ -160,9 +150,7 @@ class QuickGO(REST):
         _to = _to.replace(":", "%3A")
         _to = _to.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/paths/{}".format(_from, _to)
-        results = self.http_get(
-            url, frmt="json", params={}, headers=self.get_headers("json")
-        )
+        results = self.http_get(url, frmt="json", params={}, headers=self.get_headers("json"))
         return results
 
     def Annotation(
@@ -265,9 +253,7 @@ class QuickGO(REST):
         validity = {"includeFields": ["goName", "taxonName", "name", "synonyms"]}
 
         if isinstance(limit, int) is False or limit > 100 or limit < 0:
-            raise TypeError(
-                "limit parameter must be an integer greater than zero and less than 100"
-            )
+            raise TypeError("limit parameter must be an integer greater than zero and less than 100")
         if isinstance(page, int) is False or limit < 0:
             raise TypeError("page parameter must be an integer greater than zero")
 
@@ -363,9 +349,7 @@ or a string (e.g., 'PUBMED:') """
                 )
             params["reference"] = reference
 
-        res = self.http_get(
-            url, frmt="txt", params=params, headers=self.get_headers("json")
-        )
+        res = self.http_get(url, frmt="txt", params=params, headers=self.get_headers("json"))
 
         try:
             import json
@@ -389,9 +373,7 @@ or a string (e.g., 'PUBMED:') """
         data = self.Annotation(goId=goId, **kargs)
         number_of_pages = data["pageInfo"]["total"]
         if number_of_pages > max_number_of_pages:
-            print(
-                "As of 23d Oct 2017, the QuickGO API limits the number of pages to 25"
-            )
+            print("As of 23d Oct 2017, the QuickGO API limits the number of pages to 25")
             number_of_pages = max_number_of_pages
 
         # unfortunately, the new API requires to call the service for each page.
@@ -423,9 +405,7 @@ or a string (e.g., 'PUBMED:') """
     ):
         """ """
         if isinstance(limit, int) is False or limit > 100 or limit < 0:
-            raise TypeError(
-                "limit parameter must be an integer greater than zero and less than 100"
-            )
+            raise TypeError("limit parameter must be an integer greater than zero and less than 100")
         if isinstance(page, int) is False or limit < 0:
             raise TypeError("page parameter must be an integer greater than zero")
 

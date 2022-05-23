@@ -84,9 +84,7 @@ class PathwayCommons:
         self.easyXMLConversion = False
         self._default_extension = "json"
 
-        self.services = REST(
-            name="PathwayCommons", url=PathwayCommons._url, verbose=verbose, cache=cache
-        )
+        self.services = REST(name="PathwayCommons", url=PathwayCommons._url, verbose=verbose, cache=cache)
 
     # just a get/set to the default extension
     def _set_default_ext(self, ext):
@@ -478,9 +476,7 @@ class PathwayCommons:
         res = self.services.http_get(url, frmt="json")
         return res
 
-    def get_sifgraph_neighborhood(
-        self, source, limit=1, direction="BOTHSTREAM", pattern=None
-    ):
+    def get_sifgraph_neighborhood(self, source, limit=1, direction="BOTHSTREAM", pattern=None):
         """finds the neighborhood sub-network in the Pathway Commons Simple Interaction
         Format (extented SIF) graph (see http://www.pathwaycommons.org/pc2/formats#sif)
 
@@ -527,9 +523,7 @@ class PathwayCommons:
 
         return res.content
 
-    def get_sifgraph_common_stream(
-        self, source, limit=1, direction="DOWNSTREAM", pattern=None
-    ):
+    def get_sifgraph_common_stream(self, source, limit=1, direction="DOWNSTREAM", pattern=None):
         """finds the common stream for them; extracts a sub-network from the loaded
         Pathway Commons SIF model.
 

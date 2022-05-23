@@ -46,9 +46,7 @@ def _omicsdi_path_to_method_name(path):
 class OmicsDIAuth(requests.auth.AuthBase):
     def __init__(self, token):
         if not isinstance(token, string_types):
-            raise TypeError(
-                "Authentication Token cannot be %s. Must be of type str." % token
-            )
+            raise TypeError("Authentication Token cannot be %s. Must be of type str." % token)
 
         self._token = token
 
@@ -526,9 +524,7 @@ class OmicsDI(REST):
 
     def __init__(self, token=None, verbose=False, cache=False):
         self.super = super(OmicsDI, self)
-        self.super.__init__(
-            name="OmicsDI", url=OmicsDI._url, verbose=verbose, cache=cache
-        )
+        self.super.__init__(name="OmicsDI", url=OmicsDI._url, verbose=verbose, cache=cache)
 
         self.set_auth_token(token)
 

@@ -354,9 +354,7 @@ class ChEMBL(REST):
     _url = "https://www.ebi.ac.uk/chembl/api/data"
 
     def __init__(self, verbose=False, cache=False):
-        super(ChEMBL, self).__init__(
-            url=ChEMBL._url, name="ChEMBL", verbose=verbose, cache=cache
-        )
+        super(ChEMBL, self).__init__(url=ChEMBL._url, name="ChEMBL", verbose=verbose, cache=cache)
         self.format = "json"
 
     def _get_data(self, name, params):
@@ -431,9 +429,7 @@ class ChEMBL(REST):
     def _check_request(self, res):
         # If there is no output because of wrong query, a 404 is returned.
         if isinstance(res, int):
-            raise ValueError(
-                "Invalid request for {} {}. Check your query and parameters"
-            )
+            raise ValueError("Invalid request for {} {}. Check your query and parameters")
 
     def _get_this_service(self, name, query, params={"limit": 20, "offset": 0}):
         """
@@ -490,9 +486,7 @@ class ChEMBL(REST):
             # single key that is the plural for of the resource except if some
             # entries are not found. In such case, a
             if "not_found" in res.keys():
-                self.logging.warning(
-                    "Some entries were not found: {}".format(res["not_found"])
-                )
+                self.logging.warning("Some entries were not found: {}".format(res["not_found"]))
                 self.not_found = res["not_found"]
                 del res["not_found"]
             names = list(res.keys())[0]
@@ -504,14 +498,10 @@ class ChEMBL(REST):
         # Check the validity of limits
         assert params["limit"] > 0, "limits must be less than 1000"
         assert params["limit"] <= 1000, "limits must be positive"
-        res = self.http_get(
-            "{}/search.{}?q={}".format(name, self.format, query), params=params
-        )
+        res = self.http_get("{}/search.{}?q={}".format(name, self.format, query), params=params)
 
         if isinstance(res, int):
-            self.logging.warning(
-                "Invalid request for {} {}. Check your parameters".format(name, params)
-            )
+            self.logging.warning("Invalid request for {} {}. Check your parameters".format(name, params))
             return {}
 
         if "page_meta" in res and res["page_meta"]["next"]:
@@ -595,9 +585,7 @@ class ChEMBL(REST):
 
         return self._get_this_service("compound_record", query, params=params)
 
-    def get_compound_structural_alert(
-        self, query=None, limit=20, offset=0, filters=None
-    ):
+    def get_compound_structural_alert(self, query=None, limit=20, offset=0, filters=None):
         """Indicates certain anomaly in compound structure"""
         params = {"limit": limit, "offset": offset, "filters": filters}
         query = None
@@ -761,13 +749,9 @@ class ChEMBL(REST):
         structure = quote(structure)
         params = {"limit": limit, "offset": offset, "filters": filters}
         query = None
-        return self._get_this_service(
-            "substructure/{}".format(structure), query, params=params
-        )
+        return self._get_this_service("substructure/{}".format(structure), query, params=params)
 
-    def get_similarity(
-        self, structure, similarity=80, limit=20, offset=0, filters=None
-    ):
+    def get_similarity(self, structure, similarity=80, limit=20, offset=0, filters=None):
         """Molecule similarity search
 
         :param structure: provide a valid / existing substructure in
@@ -813,14 +797,10 @@ class ChEMBL(REST):
         structure = quote(structure)
 
         assert isinstance(similarity, int)
-        assert (
-            similarity >= 70 and similarity <= 100
-        ), "similarity must be in the range [70, 100]"
+        assert similarity >= 70 and similarity <= 100, "similarity must be in the range [70, 100]"
         params = {"limit": limit, "offset": offset, "filters": filters}
         query = None
-        return self._get_this_service(
-            "similarity/{}/{}".format(structure, similarity), query, params=params
-        )
+        return self._get_this_service("similarity/{}/{}".format(structure, similarity), query, params=params)
 
     def get_source(self, query=None, limit=20, offset=0, filters=None):
         """Document/Dataset source"""
@@ -899,9 +879,7 @@ class ChEMBL(REST):
         params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("xref_source", query, params=params)
 
-    def get_image(
-        self, query, dimensions=500, format="png", save=True, view=True, engine="indigo"
-    ):
+    def get_image(self, query, dimensions=500, format="png", save=True, view=True, engine="indigo"):
         """Get the image of a given compound in PNG png format.
 
         :param str query: a valid compound ChEMBLId or a list/tuple
@@ -979,9 +957,7 @@ class ChEMBL(REST):
 
         def _local_get(this):
             params = {"limit": 1, "offset": 0}
-            return self.http_get("{}?format=json".format(this), params=params)[
-                "page_meta"
-            ]["total_count"]
+            return self.http_get("{}?format=json".format(this), params=params)["page_meta"]["total_count"]
 
         data = {}
         for this in [
@@ -1113,9 +1089,7 @@ class ChEMBL(REST):
             accessions = set()
             for target in targs:
                 index = target_names.index(target)
-                accessions = accessions.union(
-                    [comp["accession"] for comp in targets[index]["target_components"]]
-                )
+                accessions = accessions.union([comp["accession"] for comp in targets[index]["target_components"]])
             compound2target[compound] = accessions
 
         return compound2target

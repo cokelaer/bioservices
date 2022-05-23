@@ -129,10 +129,7 @@ class MUSCLE:
 
         """
         if parameterId not in self.parameters:
-            raise ValueError(
-                "Invalid parameterId provided(%s). See parameters attribute"
-                % parameterId
-            )
+            raise ValueError("Invalid parameterId provided(%s). See parameters attribute" % parameterId)
 
         if parameterId not in self._parametersDetails.keys():
             request = "parameterdetails/" + parameterId
@@ -192,9 +189,7 @@ class MUSCLE:
         # catch some before, it is better
 
         # FIXME: return parameters from server are not valid
-        self.services.devtools.check_param_in_list(
-            frmt, ["fasta", "clw", "clwstrict", "html", "msf", "phyi", "phys"]
-        )
+        self.services.devtools.check_param_in_list(frmt, ["fasta", "clw", "clwstrict", "html", "msf", "phyi", "phys"])
         self.services.devtools.check_param_in_list(tree, ["none", "tree1", "tree2"])
 
         # parameter structure
@@ -277,9 +272,7 @@ class MUSCLE:
 
         """
         if self.get_status(jobid) != "FINISHED":  # pragma: no cover
-            self.services.logging.warning(
-                "waiting for the job to be finished. May take a while"
-            )
+            self.services.logging.warning("waiting for the job to be finished. May take a while")
             self.wait(jobid, verbose=False)
 
         if self.get_status(jobid) != "FINISHED":  # pragma: no cover

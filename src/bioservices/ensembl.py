@@ -68,9 +68,7 @@ class Ensembl:
 
         :param verbose: set to False to prevent informative messages
         """
-        self.services = REST(
-            name="Ensembl", url=Ensembl._url, verbose=verbose, cache=cache
-        )
+        self.services = REST(name="Ensembl", url=Ensembl._url, verbose=verbose, cache=cache)
         self.callback = None  # use in all methods
 
     def _check_frmt(self, frmt, values=[]):
@@ -391,13 +389,9 @@ class Ensembl:
         )
         return res
 
-    def get_homology_by_symbol(
-        self, species, symbol, frmt="json", aligned=True, compara=None
-    ):
+    def get_homology_by_symbol(self, species, symbol, frmt="json", aligned=True, compara=None):
         """Retrieves homology information (orthologs) by symbol"""
-        raise NotImplementedError(
-            "Please fill an issue her https://github.com/cokelaer/bioservices"
-        )
+        raise NotImplementedError("Please fill an issue her https://github.com/cokelaer/bioservices")
         # species='human', symbol='BRCA2'
 
     # CROSS REFERENCES
@@ -446,9 +440,7 @@ class Ensembl:
         )
         return res
 
-    def get_xrefs_by_name(
-        self, name, species, frmt="json", db_type="core", external_db=None
-    ):
+    def get_xrefs_by_name(self, name, species, frmt="json", db_type="core", external_db=None):
         """Performs a lookup based upon the primary accession or display label
         of an external reference and returning the information we hold about the
         entry
@@ -947,9 +939,7 @@ class Ensembl:
         )
         return res
 
-    def get_map_assembly_one_to_two(
-        self, first, second, region, species="human", frmt="json"
-    ):
+    def get_map_assembly_one_to_two(self, first, second, region, species="human", frmt="json"):
         """Convert the co-ordinates of one assembly to another
 
 
@@ -973,9 +963,7 @@ class Ensembl:
         )
         return res
 
-    def get_map_translation_to_region(
-        self, identifier, region, frmt="json", species=None
-    ):
+    def get_map_translation_to_region(self, identifier, region, frmt="json", species=None):
         """Convert from protein (translation) coordinates to genomic coordinates.
 
         Output reflects forward orientation coordinates as returned from the
@@ -1032,9 +1020,7 @@ class Ensembl:
         )
         return res
 
-    def get_ontology_by_name(
-        self, name, frmt="json", ontology=None, relation=None, simple=False
-    ):
+    def get_ontology_by_name(self, name, frmt="json", ontology=None, relation=None, simple=False):
         """Search for a list of ontological terms by their name
 
         :param str name: An ontology name. SQL wildcards See :class:`Ensembl` doc.
@@ -1159,9 +1145,7 @@ class Ensembl:
         )
         return res
 
-    def get_ontology_ancestors_chart_by_id(
-        self, identifier, frmt="json", ontology=None
-    ):
+    def get_ontology_ancestors_chart_by_id(self, identifier, frmt="json", ontology=None):
         """Reconstruct the entire ancestry of a term from is_a and part_of
         relationships.
 

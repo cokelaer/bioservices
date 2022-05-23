@@ -59,9 +59,7 @@ class Reactome:
     _url = "https://reactome.org/ContentService"
 
     def __init__(self, verbose=True, cache=False):
-        self.services = REST(
-            name="Reactome", url=Reactome._url, verbose="ERROR", cache=False
-        )
+        self.services = REST(name="Reactome", url=Reactome._url, verbose="ERROR", cache=False)
         self.debugLevel = verbose
 
     @property
@@ -179,9 +177,7 @@ class Reactome:
             "quality": quality,
         }
 
-        res = self.services.http_get(
-            "exporter/diagram/{}.{}".format(identifier, ext), params=params, frmt=ext
-        )
+        res = self.services.http_get("exporter/diagram/{}.{}".format(identifier, ext), params=params, frmt=ext)
         if filename:
             if ext != "svg":
                 with open(filename, "wb") as fout:
@@ -210,9 +206,7 @@ class Reactome:
             r.get_complex_subunits("R-HSA-5674003")
         """
         params = {"excludeStructuresSpecifies": excludeStructuresSpecifies}
-        res = self.services.http_get(
-            "data/complex/{}/subunits".format(identifier), params=params, frmt="json"
-        )
+        res = self.services.http_get("data/complex/{}/subunits".format(identifier), params=params, frmt="json")
         return res
 
     def get_complexes(self, resources, identifier):
@@ -232,9 +226,7 @@ class Reactome:
             r.get_complexes("UniProt", "P43403")
 
         """
-        res = self.services.http_get(
-            "data/complexes/{}/{}".format(resources, identifier), frmt="json"
-        )
+        res = self.services.http_get("data/complexes/{}/{}".format(resources, identifier), frmt="json")
         return res
 
     def get_entity_componentOf(self, identifier):
@@ -250,9 +242,7 @@ class Reactome:
             r.get_entity_componentOf("R-HSA-199420")
 
         """
-        res = self.services.http_get(
-            "data/entity/{}/componentOf".format(identifier), frmt="json"
-        )
+        res = self.services.http_get("data/entity/{}/componentOf".format(identifier), frmt="json")
         return res
 
     def get_entity_otherForms(self, identifier):
@@ -269,9 +259,7 @@ class Reactome:
             r.get_entity_otherForms("R-HSA-199420")
 
         """
-        res = self.services.http_get(
-            "data/entity/{}/otherForms".format(identifier), frmt="json"
-        )
+        res = self.services.http_get("data/entity/{}/otherForms".format(identifier), frmt="json")
         return res
 
     def get_event_ancestors(self, identifier):
@@ -292,9 +280,7 @@ class Reactome:
             r.get_event_ancestors("R-HSA-5673001")
 
         """
-        res = self.services.http_get(
-            "data/event/{}/ancestors".format(identifier), frmt="json"
-        )
+        res = self.services.http_get("data/event/{}/ancestors".format(identifier), frmt="json")
         return res
 
     def get_eventsHierarchy(self, species):
@@ -317,9 +303,7 @@ class Reactome:
             r.get_eventsHierarchy(9606)
         """
 
-        res = self.services.http_get(
-            "data/eventsHierarchy/{}".format(species), frmt="json"
-        )
+        res = self.services.http_get("data/eventsHierarchy/{}".format(species), frmt="json")
         return res
 
     def get_exporter_sbml(self, identifier):
@@ -333,9 +317,7 @@ class Reactome:
             r.exporter_sbml("R-HSA-68616")
 
         """
-        res = self.services.http_get(
-            "exporter/sbml/{}.xml".format(identifier), frmt="xml"
-        )
+        res = self.services.http_get("exporter/sbml/{}.xml".format(identifier), frmt="xml")
         return res
 
     def get_pathway_containedEvents(self, identifier):
@@ -352,9 +334,7 @@ class Reactome:
             res = r.get_pathway_containedEvents("R-HSA-5673001")
 
         """
-        res = self.services.http_get(
-            "data/pathway/{}/containedEvents".format(identifier), frmt="json"
-        )
+        res = self.services.http_get("data/pathway/{}/containedEvents".format(identifier), frmt="json")
         return res
 
     def get_pathway_containedEvents_by_attribute(self, identifier, attribute):
@@ -403,9 +383,7 @@ class Reactome:
             r.get_pathways_low_diagram_entity("R-HSA-199420")
 
         """
-        res = self.services.http_get(
-            "data/pathways/low/diagram/entity/{}".format(identifier), frmt="json"
-        )
+        res = self.services.http_get("data/pathways/low/diagram/entity/{}".format(identifier), frmt="json")
         return res
 
     def get_pathways_low_diagram_entity_allForms(self, identifier):
@@ -421,7 +399,6 @@ class Reactome:
         )
         return res
 
-
     def get_pathways_low_entity(self, identifier):
         """A list of lower level pathways containing a given entity or event
 
@@ -433,9 +410,7 @@ class Reactome:
 
             r.get_pathways_low_entity("R-HSA-199420")
         """
-        res = self.services.http_get(
-            "data/pathways/low/entity/{}".format(identifier), frmt="json"
-        )
+        res = self.services.http_get("data/pathways/low/entity/{}".format(identifier), frmt="json")
         return res
 
     def get_pathways_low_entity_allForms(self, identifier):
@@ -451,15 +426,11 @@ class Reactome:
 
             r.get_pathways_low_entity_allForms("R-HSA-199420")
         """
-        res = self.services.http_get(
-            "data/pathways/low/entity/{}/allForms".format(identifier), frmt="json"
-        )
+        res = self.services.http_get("data/pathways/low/entity/{}/allForms".format(identifier), frmt="json")
         return res
 
     def get_pathways_top(self, species):
-        res = self.services.http_get(
-            "data/pathways/top/{}".format(species), frmt="json"
-        )
+        res = self.services.http_get("data/pathways/top/{}".format(species), frmt="json")
         return res
 
     def get_references(self, identifier):
@@ -473,21 +444,15 @@ class Reactome:
             r.get_references(15377)
 
         """
-        res = self.services.http_get(
-            "references/mapping/{}".format(identifier), frmt="json"
-        )
+        res = self.services.http_get("references/mapping/{}".format(identifier), frmt="json")
         return res
 
     def get_mapping_identifier_pathways(self, resource, identifier):
-        res = self.services.http_get(
-            "data/mapping/{}/{}/pathways".format(resource, identifier), frmt="json"
-        )
+        res = self.services.http_get("data/mapping/{}/{}/pathways".format(resource, identifier), frmt="json")
         return res
 
     def get_mapping_identifier_reactions(self, resource, identifier):
-        res = self.services.http_get(
-            "data/mapping/{}/{}/reactions".format(resource, identifier), frmt="json"
-        )
+        res = self.services.http_get("data/mapping/{}/{}/reactions".format(resource, identifier), frmt="json")
 
     def search_facet(self):
         """A list of facets corresponding to the whole Reactome search data
@@ -505,9 +470,7 @@ class Reactome:
         This method retrieves faceting information on a specific query
 
         """
-        res = self.services.http_get(
-            "search/facet_query?query={}".format(query), frmt="json"
-        )
+        res = self.services.http_get("search/facet_query?query={}".format(query), frmt="json")
         return res
 
     def search_query(self, query):
@@ -527,9 +490,7 @@ class Reactome:
         for a given search term.
 
         """
-        res = self.services.http_get(
-            "search/spellcheck?query={}".format(query), frmt="json"
-        )
+        res = self.services.http_get("search/spellcheck?query={}".format(query), frmt="json")
         return res
 
     def search_suggest(self, query):
@@ -544,9 +505,7 @@ class Reactome:
             ['apoptosis', 'apoptosome', 'apoptosome-mediated', 'apoptotic']
 
         """
-        res = self.services.http_get(
-            "search/suggest?query={}".format(identifier), frmt="json"
-        )
+        res = self.services.http_get("search/suggest?query={}".format(identifier), frmt="json")
         return res
 
     def get_species_all(self):
@@ -576,9 +535,7 @@ class ReactomeOld(REST):
     _url = "http://reactomews.oicr.on.ca:8080/ReactomeRESTfulAPI/RESTfulWS"
 
     def __init__(self, verbose=True, cache=False):
-        super(ReactomeOld, self).__init__(
-            "Reactome(URL)", url=ReactomeOld._url, verbose="ERROR", cache=False
-        )
+        super(ReactomeOld, self).__init__("Reactome(URL)", url=ReactomeOld._url, verbose="ERROR", cache=False)
         self.debugLevel = verbose
         self.test = 2
 
@@ -587,9 +544,7 @@ class ReactomeOld(REST):
 
     def _download_list_pathways(self):
         if self._list_pathways is None:
-            res = self.session.get(
-                "http://www.reactome.org/download/current/ReactomePathways.txt"
-            )
+            res = self.session.get("http://www.reactome.org/download/current/ReactomePathways.txt")
             if res.status_code == 200:
                 res = res.text  # content does not work in python 3.3
                 res = res.strip()
@@ -631,9 +586,7 @@ class ReactomeOld(REST):
             >>> s = Reactome()
             >>> res = s.biopax_exporter(109581)
         """
-        res = self.http_get(
-            "biopaxExporter/Level{0}/{1}".format(level, identifier), frmt=None
-        )
+        res = self.http_get("biopaxExporter/Level{0}/{1}".format(level, identifier), frmt=None)
         return res
 
     def front_page_items(self, species):
@@ -967,9 +920,7 @@ class ReactomeAnalysis(REST):
     # "identifiers/projection?pageSize=8000&page=1&sortBy=ENTITIES_PVALUE&order=ASC&resource=TOTAL",
 
     def __init__(self, verbose=True, cache=False):
-        super(ReactomeAnalysis, self).__init__(
-            "Reactome(URL)", url=ReactomeAnalysis._url, verbose=verbose, cache=False
-        )
+        super(ReactomeAnalysis, self).__init__("Reactome(URL)", url=ReactomeAnalysis._url, verbose=verbose, cache=False)
         self.logging.warning(
             "Class in development. Some methods are already  working but those required POST do not. Coming soon "
         )

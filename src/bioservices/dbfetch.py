@@ -68,9 +68,7 @@ class DBFetch(REST):
         if db not in self.supported_databases:
             raise Exception("%s not a supportedDB. " % db)
 
-    def fetch(
-        self, query, db="ena_sequence", format="default", style="raw", pageHtml=False
-    ):
+    def fetch(self, query, db="ena_sequence", format="default", style="raw", pageHtml=False):
         """Fetch an entry in a defined format and style.
 
         :param str query: the entry identifier in db:id format (e.g. 'UniProtKB:WAP_RAT').
@@ -179,9 +177,7 @@ class DBFetch(REST):
 
         """
         self._check_db(db)
-        res = self.http_get(
-            "dbfetch?info=styles&format={}&db={}".format(format, db)
-        ).content
+        res = self.http_get("dbfetch?info=styles&format={}&db={}".format(format, db)).content
         res = res.decode().split()
         return res
 

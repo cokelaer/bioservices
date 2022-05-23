@@ -68,8 +68,8 @@ class Biocontainers:
         )
 
     def get_tools(self, limit=20000):
-        """Returns all available tools. """
-        params = {'limit': limit, 'sort_ield':'id', 'sort_order':'asc'}
+        """Returns all available tools."""
+        params = {"limit": limit, "sort_ield": "id", "sort_order": "asc"}
         res = self.services.http_get("tools", params=params)
         try:
             return pd.DataFrame(res)
@@ -88,5 +88,3 @@ class Biocontainers:
             return pd.DataFrame(res)
         except Exception:
             return res
-
-

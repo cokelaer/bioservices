@@ -254,9 +254,7 @@ class KEGG(REST):
         :param bool verbose: prints informative messages
 
         """
-        super(KEGG, self).__init__(
-            name="KEGG", url="http://rest.kegg.jp", verbose=verbose, cache=cache
-        )
+        super(KEGG, self).__init__(name="KEGG", url="http://rest.kegg.jp", verbose=verbose, cache=cache)
         self.easyXMLConversion = False
         self._organism = None
 
@@ -341,9 +339,7 @@ class KEGG(REST):
 
         if mode == "info":
             if database not in KEGG._valid_databases_info and isOrg is False:
-                self.logging.error(
-                    "database or organism provided is not correct (mode=info)"
-                )
+                self.logging.error("database or organism provided is not correct (mode=info)")
                 raise
         elif mode == "list":
             if database not in KEGG._valid_databases_list and isOrg is False:
@@ -438,10 +434,7 @@ class KEGG(REST):
 
         if organism:
             if organism not in self.organismIds:
-                self.logging.error(
-                    """Invalid organism provided (%s). See the organismIds attribute"""
-                    % organism
-                )
+                self.logging.error("""Invalid organism provided (%s). See the organismIds attribute""" % organism)
                 raise BioServicesError("Not a valid organism")
             if query not in ["pathway", "module"]:
                 self.logging.error(
@@ -498,8 +491,7 @@ class KEGG(REST):
         if option:
             if database not in _valid_db_options:
                 raise ValueError(
-                    "invalid database. Since option was provided, database must be in %s"
-                    % _valid_db_options
+                    "invalid database. Since option was provided, database must be in %s" % _valid_db_options
                 )
             if option not in _valid_options:
                 raise ValueError("invalid option. Must be in %s " % _valid_options)
@@ -762,9 +754,7 @@ class KEGG(REST):
             pathId = pathId.split(":")[1]
 
         if scale:
-            scale = (
-                int(scale / 100.0 * 100) / 100.0
-            )  # just need 2 digits and a value in [0,1]
+            scale = int(scale / 100.0 * 100) / 100.0  # just need 2 digits and a value in [0,1]
             url = "http://www.kegg.jp/kegg-bin/show_pathway?scale=" + str(scale)
             url += "&query=&map=" + pathId
         else:
@@ -791,7 +781,7 @@ class KEGG(REST):
         """Save KEGG pathway in PNG format
 
         :param  pathId: a valid pathway identifier
-        :param str filename: output PNG file 
+        :param str filename: output PNG file
         :param params: valid kegg params expected
         """
 
@@ -802,9 +792,7 @@ class KEGG(REST):
 
         html_page = html_page.content.decode()
 
-        links_to_png = [
-            x for x in html_page.split() if "png" in x and x.startswith("src")
-        ]
+        links_to_png = [x for x in html_page.split() if "png" in x and x.startswith("src")]
         link_to_png = links_to_png[0].replace("src=", "").replace('"', "")
         r = requests.get("https://www.kegg.jp/{}".format(link_to_png))
 
@@ -867,9 +855,7 @@ class KEGG(REST):
             self._organisms_tnumbers = self._get_database("organism", 0)
         return self._organisms_tnumbers
 
-    organismTnumbers = property(
-        _get_organisms_tnumbers, doc="returns list of organisms (T numbers)" + _docIds
-    )
+    organismTnumbers = property(_get_organisms_tnumbers, doc="returns list of organisms (T numbers)" + _docIds)
 
     def _get_glycans(self):
         if self._glycan is None:
@@ -923,20 +909,14 @@ class KEGG(REST):
             self._reaction = None
             self._brite = None
         else:
-            self.logging.error(
-                "Invalid organism. Check the list in :attr:`organismIds` attribute"
-            )
+            self.logging.error("Invalid organism. Check the list in :attr:`organismIds` attribute")
             raise
 
-    organism = property(
-        _get_organism, _set_organism, doc="returns the current default organism "
-    )
+    organism = property(_get_organism, _set_organism, doc="returns the current default organism ")
 
     def _get_pathways(self):
         if self.organism is None:
-            self.logging.warning(
-                "You must set the organism first (e.g., self.organism = 'hsa')"
-            )
+            self.logging.warning("You must set the organism first (e.g., self.organism = 'hsa')")
             return
 
         if self._pathway is None:
@@ -961,9 +941,7 @@ class KEGG(REST):
 
     def _get_modules(self):
         if self.organism is None:
-            self.logging.warning(
-                "You must set the organism first (e.g., self.organism = 'hsa')"
-            )
+            self.logging.warning("You must set the organism first (e.g., self.organism = 'hsa')")
             return
 
         if self._module is None:
@@ -1086,10 +1064,7 @@ class KEGG(REST):
                 }
             )
 
-        relations = [
-            (x.get("entry1"), x.get("entry2"), x.get("type"))
-            for x in res.findAll("relation")
-        ]
+        relations = [(x.get("entry1"), x.get("entry2"), x.get("type")) for x in res.findAll("relation")]
         subtypes = [x.findAll("subtype") for x in res.findAll("relation")]
 
         assert len(subtypes) == len(relations)
@@ -1138,18 +1113,10 @@ class KEGG(REST):
             if rel["name"] == "activation":
                 Id1 = rel["entry1"]
                 Id2 = rel["entry2"]
-                name1 = res["entries"][[x["id"] for x in res["entries"]].index(Id1)][
-                    "name"
-                ]
-                name2 = res["entries"][[x["id"] for x in res["entries"]].index(Id2)][
-                    "name"
-                ]
-                type1 = res["entries"][[x["id"] for x in res["entries"]].index(Id1)][
-                    "type"
-                ]
-                type2 = res["entries"][[x["id"] for x in res["entries"]].index(Id2)][
-                    "type"
-                ]
+                name1 = res["entries"][[x["id"] for x in res["entries"]].index(Id1)]["name"]
+                name2 = res["entries"][[x["id"] for x in res["entries"]].index(Id2)]["name"]
+                type1 = res["entries"][[x["id"] for x in res["entries"]].index(Id1)]["type"]
+                type2 = res["entries"][[x["id"] for x in res["entries"]].index(Id2)]["type"]
                 # print("names:", rel, name1, name2)
                 # print(type1, type2)
                 if type1 != "gene" or type2 != "gene":
@@ -1170,18 +1137,10 @@ class KEGG(REST):
             elif rel["name"] == "inhibition":
                 Id1 = rel["entry1"]
                 Id2 = rel["entry2"]
-                name1 = res["entries"][[x["id"] for x in res["entries"]].index(Id1)][
-                    "name"
-                ]
-                name2 = res["entries"][[x["id"] for x in res["entries"]].index(Id2)][
-                    "name"
-                ]
-                type1 = res["entries"][[x["id"] for x in res["entries"]].index(Id1)][
-                    "type"
-                ]
-                type2 = res["entries"][[x["id"] for x in res["entries"]].index(Id2)][
-                    "type"
-                ]
+                name1 = res["entries"][[x["id"] for x in res["entries"]].index(Id1)]["name"]
+                name2 = res["entries"][[x["id"] for x in res["entries"]].index(Id2)]["name"]
+                type1 = res["entries"][[x["id"] for x in res["entries"]].index(Id1)]["type"]
+                type2 = res["entries"][[x["id"] for x in res["entries"]].index(Id2)]["type"]
                 # print("names:", rel, name1, name2)
                 # print(type1, type2)
                 if type1 != "gene" or type2 != "gene":
@@ -1317,16 +1276,12 @@ class KEGGParser(object):
 
         # get() should return a large amount of text data
         if not res or not isinstance(res, str):
-            raise ValueError(
-                "Unexpected input, unable to parse data of type %s" % type(res)
-            )
+            raise ValueError("Unexpected input, unable to parse data of type %s" % type(res))
 
         if res[:5] == "ENTRY":
             dbentry = res.split("\n")[0].split(None, 2)[2]
         else:
-            raise ValueError(
-                "Unable to parse data, it does not comform to the expected KEGG format"
-            )
+            raise ValueError("Unable to parse data, it does not comform to the expected KEGG format")
 
         try:
             parser = self._parse(res)
@@ -1337,11 +1292,7 @@ class KEGGParser(object):
         return parser
 
     def _parse(self, res):
-        keys = [
-            x.split(" ")[0]
-            for x in res.split("\n")
-            if len(x) and x[0] != " " and x != "///"
-        ]
+        keys = [x.split(" ")[0] for x in res.split("\n") if len(x) and x[0] != " " and x != "///"]
         # let us go line by to not forget anything and know which entries are
         # found in the RHS. We may have duplicated once as can be found in th
         # keys variable as well.
@@ -1435,7 +1386,7 @@ class KEGGParser(object):
                     value = value.replace("\n", " ")
                 # nothing to do here except strip
                 output[key] = value.strip()
-                #print(key)
+                # print(key)
             # list : set of lines. Could be split by ; character but we use the
             # \n instead to be sure
             # COMMENT is sometimes on several lines
@@ -1529,32 +1480,22 @@ class KEGGParser(object):
             # list of dictionaries
             elif key == "REFERENCE":
                 # transform to a list since you may have several entries
-                newvalue = [
-                    self._interpret_references(this) for this in self._tolist(value)
-                ]
+                newvalue = [self._interpret_references(this) for this in self._tolist(value)]
                 output[key] = newvalue
             # list of dictionaries
             elif key == "PLASMID":
-                newvalue = [
-                    self._interpret_plasmid(this) for this in self._tolist(value)
-                ]
+                newvalue = [self._interpret_plasmid(this) for this in self._tolist(value)]
                 output[key] = newvalue
             # list of dictionaries
             elif key == "CHROMOSOME":
-                newvalue = [
-                    self._interpret_chromosome(this) for this in self._tolist(value)
-                ]
+                newvalue = [self._interpret_chromosome(this) for this in self._tolist(value)]
                 output[key] = newvalue
             # list of dictionaries
             elif key == "TAXONOMY":
-                newvalue = [
-                    self._interpret_taxonomy(this) for this in self._tolist(value)
-                ]
+                newvalue = [self._interpret_taxonomy(this) for this in self._tolist(value)]
                 output[key] = newvalue
             elif key == "SEQUENCE":
-                newvalue = [
-                    self._interpret_sequence(this) for this in self._tolist(value)
-                ]
+                newvalue = [self._interpret_sequence(this) for this in self._tolist(value)]
                 output[key] = newvalue
 
             # dictionary, interpreted as follows
@@ -1665,7 +1606,7 @@ class KEGGParser(object):
     def _interpret_sequence(self, data):
         fields = ["GENE", "ORGANISM", "TYPE"]
         current_field = "SEQUENCE"
-        res = dict({current_field: u""})
+        res = dict({current_field: ""})
 
         for this in data.split("\n"):
             this = this.strip()
@@ -1676,8 +1617,8 @@ class KEGGParser(object):
                     this = this.split(None, 1)[1]
                     res[current_field] = ""
                     break
-            res[current_field] += this + u" "
-        if res["SEQUENCE"] == u"":
+            res[current_field] += this + " "
+        if res["SEQUENCE"] == "":
             res.pop("SEQUENCE")
         for k in res.keys():
             res[k] = res[k].strip()

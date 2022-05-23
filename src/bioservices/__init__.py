@@ -1,4 +1,3 @@
-
 import pkg_resources
 
 from easydev import CustomConfig
@@ -157,4 +156,3 @@ from .omicsdi import OmicsDI
 
 # sub packages inside bioservices.
 from . import apps
-

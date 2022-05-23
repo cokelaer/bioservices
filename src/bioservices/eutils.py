@@ -96,17 +96,16 @@ class EUtils:
 
     """
 
-    def __init__(
-        self, verbose=False, email="unknown", cache=False, xmlparser="EUtilsParser"
-    ):
+    def __init__(self, verbose=False, email="unknown", cache=False, xmlparser="EUtilsParser"):
 
         self.services = REST(
             name="EUtils",
-            url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
+            url="https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
             cache=cache,
             verbose=verbose,
-            requests_per_sec=3, 
-            url_defined_later=True)
+            requests_per_sec=3,
+            url_defined_later=True,
+        )
 
         warning = """
 
@@ -193,8 +192,7 @@ class EUtils:
                 # unknown so let use it but raise a warning
                 params[k] = v
                 self.services.logging.warning(
-                    "%s does not seem to be a known parameter. " % k
-                    + "Use it anyway but may be ignored"
+                    "%s does not seem to be a known parameter. " % k + "Use it anyway but may be ignored"
                 )
         return params
 

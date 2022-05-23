@@ -74,9 +74,7 @@ class NCBIblast:
 
     """
 
-    _sequence_example = (
-        "MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS"
-    )
+    _sequence_example = "MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS"
 
     def __init__(self, verbose=False):
         """.. rubric:: NCBIblast constructor
@@ -147,10 +145,7 @@ class NCBIblast:
 
         """
         if parameterId not in self.parameters:
-            raise ValueError(
-                "Invalid parameterId provided(%s). See parameters attribute"
-                % parameterId
-            )
+            raise ValueError("Invalid parameterId provided(%s). See parameters attribute" % parameterId)
 
         if parameterId not in self._parametersDetails.keys():
             request = "parameterdetails/" + parameterId
@@ -170,15 +165,7 @@ class NCBIblast:
             self._parametersDetails[parameterId] = data
         return self._parametersDetails[parameterId]
 
-    def run(
-        self,
-        program=None,
-        database=None,
-        sequence=None,
-        stype="protein",
-        email=None,
-        **kargs
-    ):
+    def run(self, program=None, database=None, sequence=None, stype="protein", email=None, **kargs):
         """Submit a job with the specified parameters.
 
         .. python ncbiblast_urllib2.py -D ENSEMBL --email "test@yahoo.com" --sequence
@@ -358,9 +345,7 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
             file suffix and mediaType of the identifier.
         """
         if self.get_status(jobid) != "FINISHED":
-            self.services.logging.warning(
-                "waiting for the job to be finished. May take a while"
-            )
+            self.services.logging.warning("waiting for the job to be finished. May take a while")
             self.wait(jobid, verbose=False)
         url = "resulttypes/" + jobid
         res = self.services.http_get(
@@ -405,9 +390,7 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
 
         """
         if self.get_status(jobid) != "FINISHED":
-            self.services.logging.warning(
-                "waiting for the job to be finished. May take a while"
-            )
+            self.services.logging.warning("waiting for the job to be finished. May take a while")
             self.wait(jobid)
         if self.get_status(jobid) != "FINISHED":
             raise ValueError("job is not finished")

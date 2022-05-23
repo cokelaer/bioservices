@@ -67,9 +67,7 @@ class EVA(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(EVA, self).__init__(
-            name="EVA", url=EVA._url, verbose=verbose, cache=cache
-        )
+        super(EVA, self).__init__(name="EVA", url=EVA._url, verbose=verbose, cache=cache)
         self.version = "v1"
 
     def fetch_allinfo(self, name):

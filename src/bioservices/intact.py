@@ -58,13 +58,9 @@ class IntactComplex(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(IntactComplex, self).__init__(
-            name="IntactComplex", url=IntactComplex._url, verbose=verbose, cache=cache
-        )
+        super(IntactComplex, self).__init__(name="IntactComplex", url=IntactComplex._url, verbose=verbose, cache=cache)
 
-    def search(
-        self, query, frmt="json", facets=None, first=None, number=None, filters=None
-    ):
+    def search(self, query, frmt="json", facets=None, first=None, number=None, filters=None):
         """Search for a complex inside intact complex.
 
         :param str query: the query (e.g., ndc80)

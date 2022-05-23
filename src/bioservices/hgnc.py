@@ -201,9 +201,7 @@ class HGNCDeprecated(REST):
     def __init__(self, verbose=False, cache=False):
         url = "http://www.avatar.se/HGNC/wr/"
         super(HGNC, self).__init__("HGNC", url=url, verbose=verbose, cache=cache)
-        self.logging.warning(
-            "Service unavailable when testing (Aug 2014). May not work"
-        )
+        self.logging.warning("Service unavailable when testing (Aug 2014). May not work")
 
         self._always_return_list = False
 
@@ -246,9 +244,7 @@ class HGNCDeprecated(REST):
                 res = self.easyXML(res)
             # res = bs4.BeautifulSoup(res)
         except HTTPError:
-            self.logging.critical(
-                "!!BioServices HTTPError caught in HGNC. Probably an invalid gene name"
-            )
+            self.logging.critical("!!BioServices HTTPError caught in HGNC. Probably an invalid gene name")
 
             res = bs4.BeautifulSoup()
         # except Exception:
@@ -328,9 +324,7 @@ class HGNCDeprecated(REST):
             # format is HTML. Finally; we get only the attribute 'xlink:href'
             links = [
                 y.attrs["xlink:href"]
-                for y in [x for x in xml.findAll("xref") if x["xdb"] == db][0].findAll(
-                    "link"
-                )
+                for y in [x for x in xml.findAll("xref") if x["xdb"] == db][0].findAll("link")
                 if y.attrs["format"] == keep
             ]
             values[db]["link"] = links[:]
@@ -391,9 +385,7 @@ class HGNCDeprecated(REST):
         .. seealso:: :meth:`mapping_all`
         """
 
-        xml = self.services.http_get(
-            "s;index.xml?" + self.urlencode({"search": "xref", "value": value})
-        )
+        xml = self.services.http_get("s;index.xml?" + self.urlencode({"search": "xref", "value": value}))
         xml = self.easyXML(xml)
         genes = xml.findAll("gene")
         res = [g.attrs for g in genes]

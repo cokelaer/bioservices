@@ -347,59 +347,45 @@ class PSICQUIC:
         res = self.registry
         return [x.findAll("name")[0].text for x in res.findAll("service")]
 
-    registry_names = property(
-        _get_registry_names, doc="returns all services available (names)"
-    )
+    registry_names = property(_get_registry_names, doc="returns all services available (names)")
 
     def _get_registry_restricted(self):
         res = self.registry
         return [x.findAll("restricted")[0].text for x in res.findAll("service")]
 
-    registry_restricted = property(
-        _get_registry_restricted, doc="returns restricted status of services"
-    )
+    registry_restricted = property(_get_registry_restricted, doc="returns restricted status of services")
 
     def _get_registry_resturl(self):
         res = self.registry
         data = [x.findAll("resturl")[0].text for x in res.findAll("service")]
         return data
 
-    registry_resturls = property(
-        _get_registry_resturl, doc="returns URL of REST services"
-    )
+    registry_resturls = property(_get_registry_resturl, doc="returns URL of REST services")
 
     def _get_registry_restex(self):
         res = self.registry
         data = [x.findAll("restexample")[0].text for x in res.findAll("service")]
         return data
 
-    registry_restexamples = property(
-        _get_registry_restex, doc="retuns REST example for each service"
-    )
+    registry_restexamples = property(_get_registry_restex, doc="retuns REST example for each service")
 
     def _get_registry_soapurl(self):
         res = self.registry
         return [x.findAll("soapurl")[0].text for x in res.findAll("service")]
 
-    registry_soapurls = property(
-        _get_registry_soapurl, doc="returns URL of WSDL service"
-    )
+    registry_soapurls = property(_get_registry_soapurl, doc="returns URL of WSDL service")
 
     def _get_registry_active(self):
         res = self.registry
         return [x.findAll("active")[0].text for x in res.findAll("service")]
 
-    registry_actives = property(
-        _get_registry_active, doc="returns active state of each service"
-    )
+    registry_actives = property(_get_registry_active, doc="returns active state of each service")
 
     def _get_registry_count(self):
         res = self.registry
         return [x.findAll("count")[0].text for x in res.findAll("service")]
 
-    registry_counts = property(
-        _get_registry_count, doc="returns number of entries in each service"
-    )
+    registry_counts = property(_get_registry_count, doc="returns number of entries in each service")
 
     def _get_registry_version(self):
         res = self.registry
@@ -414,9 +400,7 @@ class PSICQUIC:
                 version[i] = None
         return version
 
-    registry_versions = property(
-        _get_registry_version, doc="returns version of each service"
-    )
+    registry_versions = property(_get_registry_version, doc="returns version of each service")
 
     def query(
         self,
@@ -478,10 +462,7 @@ class PSICQUIC:
         try:
             index = names.index(service)
         except ValueError:
-            self.logging.error(
-                "The service you gave (%s) is not registered. See self.registery_names"
-                % service
-            )
+            self.logging.error("The service you gave (%s) is not registered. See self.registery_names" % service)
             raise ValueError
 
         # get the base url according to the service requested
@@ -574,10 +555,7 @@ class PSICQUIC:
         """
         # get the active names only
         activeDBs = self.activeDBs[:]
-        res = [
-            (str(name), int(self.query(name, query, output="count")[0]))
-            for name in activeDBs
-        ]
+        res = [(str(name), int(self.query(name, query, output="count")[0])) for name in activeDBs]
         return dict(res)
 
     def getName(self, data):
@@ -630,41 +608,27 @@ class PSICQUIC:
             try:
                 dbs = [x.split(":")[0] for x in entry.split("|")]
                 IDs = [x.split(":")[1] for x in entry.split("|")]
-                valid_dbs = [
-                    (db, ID)
-                    for db, ID in zip(dbs, IDs)
-                    if db in self._mapping_uniprot.keys()
-                ]
+                valid_dbs = [(db, ID) for db, ID in zip(dbs, IDs) if db in self._mapping_uniprot.keys()]
                 # search for an existing DB
                 if len(valid_dbs) >= 1:
                     idsA[i] = valid_dbs[0][0] + ":" + valid_dbs[0][1]
                 else:
-                    self.logging.debug(
-                        "none of the DB for this entry (%s) are available" % (entry)
-                    )
+                    self.logging.debug("none of the DB for this entry (%s) are available" % (entry))
                     idsA[i] = "?" + dbs[0] + ":" + IDs[0]
             except:
                 self.logging.info("Could not extract name from %s" % entry)
-                idsA[i] = (
-                    "??:" + entry
-                )  # we add a : so that we are sure that a split(":") will work
+                idsA[i] = "??:" + entry  # we add a : so that we are sure that a split(":") will work
         # the second ID
         for i, entry in enumerate(idsB):
             try:
                 dbs = [x.split(":")[0] for x in entry.split("|")]
                 IDs = [x.split(":")[1] for x in entry.split("|")]
-                valid_dbs = [
-                    (db, ID)
-                    for db, ID in zip(dbs, IDs)
-                    if db in self._mapping_uniprot.keys()
-                ]
+                valid_dbs = [(db, ID) for db, ID in zip(dbs, IDs) if db in self._mapping_uniprot.keys()]
                 # search for an existing DB
                 if len(valid_dbs) >= 1:
                     idsB[i] = valid_dbs[0][0] + ":" + valid_dbs[0][1]
                 else:
-                    self.logging.debug(
-                        "none of the DB (%s) for this entry are available" % (entry)
-                    )
+                    self.logging.debug("none of the DB (%s) for this entry are available" % (entry))
                     idsB[i] = "?" + dbs[0] + ":" + IDs[0]
             except:
                 self.logging.info("Could not extract name from %s" % entry)
@@ -673,10 +637,7 @@ class PSICQUIC:
         countA = len([x for x in idsA if x.startswith("?")])
         countB = len([x for x in idsB if x.startswith("?")])
         if countA + countB > 0:
-            self.logging.warning(
-                "%s ids out of %s were not identified"
-                % (countA + countB, len(idsA) * 2)
-            )
+            self.logging.warning("%s ids out of %s were not identified" % (countA + countB, len(idsA) * 2))
             print(set([x.split(":")[0] for x in idsA if x.startswith("?")]))
             print(set([x.split(":")[0] for x in idsB if x.startswith("?")]))
         self.logging.info("knownName done")
@@ -719,11 +680,7 @@ class PSICQUIC:
         if verbose:
             print("After removing the None: ", len(data))
 
-        data = [
-            x
-            for x in data
-            if x[0].startswith("!") is False and x[1].startswith("!") is False
-        ]
+        data = [x for x in data if x[0].startswith("!") is False and x[1].startswith("!") is False]
         if verbose:
             print("After removing the !: ", len(data))
 
@@ -735,9 +692,7 @@ class PSICQUIC:
 
         data = [x for x in data if keep_only in x[0] and keep_only in x[1]]
         if verbose:
-            print(
-                "After removing entries that don't match %s : " % keep_only, len(data)
-            )
+            print("After removing entries that don't match %s : " % keep_only, len(data))
 
         if keep_self_loop is False:
             data = [x for x in data if x[0] != x[1]]
@@ -785,9 +740,7 @@ class PSICQUIC:
     def mappingOneDB(self, data):
         query = {}
         self.logging.debug("converting IDs with proper DB name (knownName function)")
-        entriesA, entriesB = self.knownName(
-            data
-        )  # idsA and B contains list of a single identifier of the form db:id
+        entriesA, entriesB = self.knownName(data)  # idsA and B contains list of a single identifier of the form db:id
         # the db is known from _mapping.uniprot otherwise it is called "unknown"
 
         # get unique DBs to build the query dictionary
@@ -835,13 +788,8 @@ class PSICQUIC:
                     DBname = self._mapping_uniprot[k]
 
                     if DBname is not None:
-                        self.logging.warning(
-                            "Request sent to uniprot for %s database (%s/%s)"
-                            % (DBname, counter, N)
-                        )
-                        res = self.uniprot.mapping(
-                            fr=DBname, to="ID", query=" ".join(this_query)
-                        )
+                        self.logging.warning("Request sent to uniprot for %s database (%s/%s)" % (DBname, counter, N))
+                        res = self.uniprot.mapping(fr=DBname, to="ID", query=" ".join(this_query))
                         for x in this_query:
                             if x not in res:  # was not found
                                 mapping[x] = "!" + k + ":" + x
@@ -853,9 +801,7 @@ class PSICQUIC:
                                 if len(res[x]) == 1:
                                     mapping[x] = res[x][0]
                                 else:
-                                    self.logging.warning(
-                                        "psicquic mapping found more than 1 id. keep first one"
-                                    )
+                                    self.logging.warning("psicquic mapping found more than 1 id. keep first one")
                                     mapping[x] = res[x][0]
                     else:
                         for x in this_query:
@@ -927,9 +873,7 @@ class AppsPPI(object):
         print("Requests sent to psicquic. Can take a while, please be patient...")
         self.results_query = self.psicquic.queryAll(query, databases)
         self.interactions = self.psicquic.convertAll(self.results_query)
-        self.interactions = self.psicquic.postCleaningAll(
-            self.interactions, flatten=False, verbose=self.verbose
-        )
+        self.interactions = self.psicquic.postCleaningAll(self.interactions, flatten=False, verbose=self.verbose)
         self.N = len(self.interactions.keys())
         self.counter = {}
         self.relevant_interactions = {}
@@ -965,11 +909,7 @@ class AppsPPI(object):
         print("-------------")
         summ = {}
         for i in range(1, N + 1):
-            res = [
-                (x.split("++"), counter[x])
-                for x in counter.keys()
-                if len(counter[x]) == i
-            ]
+            res = [(x.split("++"), counter[x]) for x in counter.keys() if len(counter[x]) == i]
             print("Found %s interactions in %s common databases" % (len(res), i))
             res = [x.split("++") for x in counter.keys() if len(counter[x]) == i]
             if len(res):
@@ -983,17 +923,9 @@ class AppsPPI(object):
     def get_reference(self, idA, idB):
         key = idA + "++" + idB
         uniq = len(self.counter[key])
-        ret = [
-            x
-            for k in self.interactions.keys()
-            for x in self.interactions[k]
-            if x[0] == idA and x[1] == idB
-        ]
+        ret = [x for k in self.interactions.keys() for x in self.interactions[k] if x[0] == idA and x[1] == idB]
         N = len(ret)
-        print(
-            "Interactions %s -- %s has %s entries in %s databases (%s):"
-            % (idA, idB, N, uniq, self.counter[key])
-        )
+        print("Interactions %s -- %s has %s entries in %s databases (%s):" % (idA, idB, N, uniq, self.counter[key]))
         for r in ret:
             print(r[5], " reference", r[4])
 
@@ -1007,9 +939,7 @@ class AppsPPI(object):
         except ImportError:
             from bioservices import BioServicesError
 
-            raise BioServicesError(
-                "You must install pylab/matplotlib to use this functionality"
-            )
+            raise BioServicesError("You must install pylab/matplotlib to use this functionality")
         labels = range(1, self.N + 1)
         print(labels)
         counting = [len(self.relevant_interactions[i]) for i in labels]

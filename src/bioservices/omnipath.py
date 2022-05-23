@@ -55,9 +55,7 @@ class OmniPath(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(OmniPath, self).__init__(
-            name="OmniPath", url=OmniPath._url, verbose=verbose, cache=cache
-        )
+        super(OmniPath, self).__init__(name="OmniPath", url=OmniPath._url, verbose=verbose, cache=cache)
 
     def get_about(self):
         """Information about the version"""
@@ -119,9 +117,7 @@ class OmniPath(REST):
             params["fields"] = fields
 
         # TODO handle multiple fields
-        res = self.http_get(
-            self.url + "interactions/%s" % query, frmt=frmt, params=params
-        )
+        res = self.http_get(self.url + "interactions/%s" % query, frmt=frmt, params=params)
         return res
 
     def get_resources(self, frmt="json"):

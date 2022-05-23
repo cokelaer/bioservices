@@ -97,10 +97,7 @@ class Seqret:
 
         """
         if parameterId not in self.parameters:
-            raise ValueError(
-                "Invalid parameterId provided(%s). See parameters attribute"
-                % parameterId
-            )
+            raise ValueError("Invalid parameterId provided(%s). See parameters attribute" % parameterId)
 
         request = "parameterdetails/" + parameterId
         res = self.services.http_get(request, frmt="json")
@@ -219,15 +216,11 @@ class Seqret:
             provide additional parameters for derived result types.
         """
         if self.get_status(jobid) != "FINISHED":
-            self.services.logging.warning(
-                "Your job is not finished yet. Try again later."
-            )
+            self.services.logging.warning("Your job is not finished yet. Try again later.")
             return
 
         # result_types = self.get_result_types(jobid)
         # assert parameters in result_types
-        res = self.services.http_get(
-            "result/{}/{}".format(jobid, result_type), frmt="txt"
-        )
+        res = self.services.http_get("result/{}/{}".format(jobid, result_type), frmt="txt")
 
         return res

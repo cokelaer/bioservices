@@ -60,9 +60,7 @@ class PRIDE(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(PRIDE, self).__init__(
-            name="PRIDE", url=PRIDE._url, verbose=verbose, cache=cache
-        )
+        super(PRIDE, self).__init__(name="PRIDE", url=PRIDE._url, verbose=verbose, cache=cache)
 
     def get_project(self, identifier):
         """Retrieve project information by accession
@@ -375,9 +373,7 @@ class PRIDE(REST):
         if sequence is None:
             res = self.http_get("peptide/list/project/%s" % identifier, params=params)
         else:
-            res = self.http_get(
-                "peptide/list/project/%s/sequence/%s" % (identifier, sequence)
-            )
+            res = self.http_get("peptide/list/project/%s/sequence/%s" % (identifier, sequence))
 
         try:
             res = res["list"]
@@ -401,9 +397,7 @@ class PRIDE(REST):
         if sequence is None:
             res = self.http_get("peptide/count/project/%s" % identifier)
         else:
-            res = self.http_get(
-                "peptide/count/project/%s/sequence/%s" % (identifier, sequence)
-            )
+            res = self.http_get("peptide/count/project/%s/sequence/%s" % (identifier, sequence))
         return res
 
     @params_to_update
@@ -433,9 +427,7 @@ class PRIDE(REST):
         if sequence is None:
             res = self.http_get("peptide/list/assay/%s" % identifier, params=params)
         else:
-            res = self.http_get(
-                "peptide/list/assay/%s/sequence/%s" % (identifier, sequence)
-            )
+            res = self.http_get("peptide/list/assay/%s/sequence/%s" % (identifier, sequence))
         try:
             res = res["list"]
         except:
@@ -459,7 +451,5 @@ class PRIDE(REST):
         if sequence is None:
             res = self.http_get("peptide/count/assay/%s" % identifier)
         else:
-            res = self.http_get(
-                "peptide/count/assay/%s/sequence/%s" % (identifier, sequence)
-            )
+            res = self.http_get("peptide/count/assay/%s/sequence/%s" % (identifier, sequence))
         return res

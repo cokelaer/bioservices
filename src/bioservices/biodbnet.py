@@ -74,9 +74,7 @@ class BioDBNet:
         :param bool verbose:
 
         """
-        self.services = REST(
-            name="BioDBNet", url=BioDBNet._url, verbose=verbose, cache=cache
-        )
+        self.services = REST(name="BioDBNet", url=BioDBNet._url, verbose=verbose, cache=cache)
         self._valid_inputs = self.getInputs()
 
     def _list_to_string(self, values):

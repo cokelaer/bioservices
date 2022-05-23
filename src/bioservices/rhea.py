@@ -152,9 +152,7 @@ class Rhea:
         if columns is None:
             params["columns"] = ",".join(self._valid_columns)
 
-        response = self.services.http_get(
-            "rhea/?query={}".format(query), frmt="txt", params=params
-        )
+        response = self.services.http_get("rhea/?query={}".format(query), frmt="txt", params=params)
 
         try:
             import pandas as pd
@@ -205,9 +203,7 @@ class Rhea:
         if columns is None:
             params["columns"] = ",".join(self._valid_columns)
 
-        response = self.services.http_get(
-            "rhea?".format(query), frmt="txt", params=params
-        )
+        response = self.services.http_get("rhea?".format(query), frmt="txt", params=params)
         try:
             import pandas as pd
             import io

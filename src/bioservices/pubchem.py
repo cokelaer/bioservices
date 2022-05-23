@@ -50,9 +50,7 @@ class PubChem(REST):
             "PubChem is not finalised yet. This is currently only a draft version",
             file=sys.stderr,
         )
-        super(PubChem, self).__init__(
-            name="PubChem", url=PubChem._url, verbose=verbose, cache=cache
-        )
+        super(PubChem, self).__init__(name="PubChem", url=PubChem._url, verbose=verbose, cache=cache)
 
     def get_compound_by_smiles(self, identifier, frmt="json"):
 

@@ -277,9 +277,7 @@ class Panther:
         res = res["search"]["annotation_data_sets"]["annotation_data_type"]
         return res
 
-    def get_ortholog(
-        self, gene_list, organism, target_organism=None, ortholog_type="all"
-    ):
+    def get_ortholog(self, gene_list, organism, target_organism=None, ortholog_type="all"):
         """search for matching orthologs in target organisms.
 
         Searches for matching orthologs in the gene family that contains

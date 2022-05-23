@@ -105,10 +105,7 @@ class ConfigReadOnly(object):
             msg = "Welcome to %s" % self.name.capitalize()
             print(underline(msg))
             print("It looks like you do not have a configuration file.")
-            print(
-                "We are creating one with default values in %s ."
-                % self.user_config_file_path
-            )
+            print("We are creating one with default values in %s ." % self.user_config_file_path)
             print("Done")
             self.create_default_config_file()
 
@@ -132,10 +129,7 @@ class ConfigReadOnly(object):
                         )
                         self.params[newkey][0] = cast(value)
                 else:
-                    print(
-                        "Warning:: found invalid option or section in %s (ignored):"
-                        % self.user_config_file_path
-                    )
+                    print("Warning:: found invalid option or section in %s (ignored):" % self.user_config_file_path)
                     print("   %s %s" % (section, option))
 
     def _get_home(self):
@@ -194,9 +188,7 @@ class ConfigReadOnly(object):
         sdir = self.appdirs.user_config_dir
         return self._get_and_create(sdir)
 
-    user_config_dir = property(
-        _get_config_dir, doc="return directory of this configuration file"
-    )
+    user_config_dir = property(_get_config_dir, doc="return directory of this configuration file")
 
     def _get_cache_dir(self):
         sdir = self.appdirs.user_cache_dir
@@ -207,9 +199,7 @@ class ConfigReadOnly(object):
     def _get_config_file_path(self):
         return self.user_config_dir + os.sep + self.config_file
 
-    user_config_file_path = property(
-        _get_config_file_path, doc="return configuration filename (with fullpath)"
-    )
+    user_config_file_path = property(_get_config_file_path, doc="return configuration filename (with fullpath)")
 
     def _get_config_file(self):
         return self.name + ".cfg"
@@ -225,17 +215,11 @@ class ConfigReadOnly(object):
         try:
             _ = self.user_config_dir
         except:
-            print(
-                "Could not retrieve or create the config file and/or directory in %s"
-                % self.name
-            )
+            print("Could not retrieve or create the config file and/or directory in %s" % self.name)
         try:
             _ = self.user_cache_dir
         except:
-            print(
-                "Could not retrieve or create the cache file and/or directory in %s"
-                % self.name
-            )
+            print("Could not retrieve or create the cache file and/or directory in %s" % self.name)
         self.read_user_config_file_and_update_params()
 
     def create_default_config_file(self, force=False):
@@ -263,11 +247,7 @@ class ConfigReadOnly(object):
         fh = open(self.user_config_file_path, "w")  # open and delete content
         for section in sections:
             fh.write("[" + section + "]\n")
-            options = [
-                x.split(".")[1]
-                for x in self._default_params.keys()
-                if x.startswith(section + ".")
-            ]
+            options = [x.split(".")[1] for x in self._default_params.keys() if x.startswith(section + ".")]
             for option in options:
                 key = section + "." + option
                 value = self._default_params[key]
@@ -286,9 +266,7 @@ class ConfigReadOnly(object):
 
 class BioServicesConfig(ConfigReadOnly):
     def __init__(self):
-        super(BioServicesConfig, self).__init__(
-            name="bioservices", default_params=defaultParams
-        )
+        super(BioServicesConfig, self).__init__(name="bioservices", default_params=defaultParams)
 
     # some aliases
     def _get_caching(self):

@@ -248,9 +248,7 @@ class PDB:
         :param bool verbose: prints informative messages (default is off)
 
         """
-        self.services = REST(
-            name="PDB", verbose=verbose, cache=cache, url_defined_later=True
-        )
+        self.services = REST(name="PDB", verbose=verbose, cache=cache, url_defined_later=True)
         self.services.url = PDB._url
 
     def search(self, query, request_options=None, request_info=None, return_type=None):

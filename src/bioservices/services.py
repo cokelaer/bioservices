@@ -47,7 +47,6 @@ from easydev import DevTools
 import colorlog
 
 
-
 __all__ = ["Service", "WSDLService", "BioServicesError", "REST"]
 
 
@@ -79,9 +78,7 @@ class Service:
         503: "Service not available. The server is being updated, try again later",
     }
 
-    def __init__(
-        self, name, url=None, verbose=True, requests_per_sec=10, url_defined_later=False
-    ):
+    def __init__(self, name, url=None, verbose=True, requests_per_sec=10, url_defined_later=False):
         """.. rubric:: Constructor
 
         :param str name: a name for this service
@@ -120,9 +117,9 @@ class Service:
         self.logging = colorlog.getLogger(f"bioservices.{self.name}")
 
         if verbose:
-            self.logging.setLevel('INFO')
+            self.logging.setLevel("INFO")
         else:
-            self.logging.setLevel('WARNING')
+            self.logging.setLevel("WARNING")
 
         self._url = url
         try:
@@ -130,9 +127,7 @@ class Service:
                 urlopen(self.url)
         except Exception as err:
             if url_defined_later is False:
-                self.logging.warning(
-                    "The URL (%s) provided cannot be reached." % self.url
-                )
+                self.logging.warning("The URL (%s) provided cannot be reached." % self.url)
         self._easyXMLConversion = True
 
         self.devtools = DevTools()
@@ -308,8 +303,7 @@ class WSDLService(Service):
                     % (
                         method.name,
                         ", ".join(
-                            "type:%s: %s - element %s"
-                            % (part.type, part.name, part.element)
+                            "type:%s: %s - element %s" % (part.type, part.name, part.element)
                             for part in method.soap.input.body.parts
                         ),
                     )
@@ -320,9 +314,7 @@ class WSDLService(Service):
     def _get_methods(self):
         return [x.name for x in self.suds.wsdl.services[0].ports[0].methods.values()]
 
-    wsdl_methods = property(
-        _get_methods, doc="returns methods available in the WSDL service"
-    )
+    wsdl_methods = property(_get_methods, doc="returns methods available in the WSDL service")
 
     def wsdl_create_factory(self, name, **kargs):
         params = self.suds.factory.create(name)
@@ -360,9 +352,7 @@ class WSDLService(Service):
 class RESTbase(Service):
     _service = "REST"
 
-    def __init__(
-        self, name, url=None, verbose=True, requests_per_sec=3, url_defined_later=False
-    ):
+    def __init__(self, name, url=None, verbose=True, requests_per_sec=3, url_defined_later=False):
         super(RESTbase, self).__init__(
             name,
             url,
@@ -518,9 +508,7 @@ class REST(RESTbase):
     def delete_cache(self):
         cache_file = self.CACHE_NAME + ".sqlite"
         if os.path.exists(cache_file):
-            msg = (
-                "You are about to delete this bioservices cache: %s. Proceed? (y/[n]) "
-            )
+            msg = "You are about to delete this bioservices cache: %s. Proceed? (y/[n]) "
             res = input(msg % cache_file)
             if res == "y":
                 os.remove(cache_file)
@@ -627,10 +615,7 @@ class REST(RESTbase):
             # build the requests
             urls = self._get_all_urls(keys, frmt)
             self.logging.debug("grequests.get processing")
-            rs = (
-                grequests.get(url, session=session, params=params)
-                for key, url in zip(keys, urls)
-            )
+            rs = (grequests.get(url, session=session, params=params) for key, url in zip(keys, urls))
             # execute them
             self.logging.debug("grequests.map call")
             ret = grequests.map(rs, size=min(self.settings.CONCURRENT, len(keys)))
@@ -699,10 +684,7 @@ class REST(RESTbase):
         url = self._build_url(query)
 
         if url.count("//") > 1:
-            self.logging.warning(
-                "URL of the services contains a double //."
-                + "Check your URL and remove trailing /"
-            )
+            self.logging.warning("URL of the services contains a double //." + "Check your URL and remove trailing /")
         self.logging.debug(url)
         try:
             kargs["params"] = params
@@ -734,17 +716,7 @@ class REST(RESTbase):
                 )
             )
 
-    def http_post(
-        self,
-        query,
-        params=None,
-        data=None,
-        frmt="xml",
-        headers=None,
-        files=None,
-        content=None,
-        **kargs
-    ):
+    def http_post(self, query, params=None, data=None, frmt="xml", headers=None, files=None, content=None, **kargs):
         # query and frmt are bioservices parameters. Others are post parameters
         # NOTE in requests.get you can use params parameter
         # BUT in post, you use data

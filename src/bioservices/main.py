@@ -67,6 +67,4 @@ def download_accession(**kwargs):
     """
     from bioservices.apps.download_fasta import download_fasta
 
-    download_fasta(
-        kwargs["accession"], output_filename=kwargs["output"], method=kwargs["method"]
-    )
+    download_fasta(kwargs["accession"], output_filename=kwargs["output"], method=kwargs["method"])

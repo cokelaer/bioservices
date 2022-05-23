@@ -205,9 +205,7 @@ class BioMart(REST):
 
         """
         url = "undefined"
-        super(BioMart, self).__init__(
-            "BioMart", url=url, verbose=verbose, cache=cache, url_defined_later=True
-        )
+        super(BioMart, self).__init__("BioMart", url=url, verbose=verbose, cache=cache, url_defined_later=True)
 
         self._names = None
         self._marts = None
@@ -225,11 +223,7 @@ class BioMart(REST):
                 self.host = hosts[i]
                 i += 1
             if self.host is None:
-                raise IOError(
-                    "no host provided and no default hosts {} not reachable".format(
-                        hosts
-                    )
-                )
+                raise IOError("no host provided and no default hosts {} not reachable".format(hosts))
         else:
             self.host = host
         self._biomartQuery = BioMartQuery()
@@ -300,9 +294,7 @@ class BioMart(REST):
 
         """
         if mart not in self.names:
-            raise BioServicesError(
-                "Provided mart name (%s) is not valid. see 'names' attribute" % mart
-            )
+            raise BioServicesError("Provided mart name (%s) is not valid. see 'names' attribute" % mart)
         ret = self.http_get("?type=datasets&mart=%s" % mart, frmt="txt")
 
         if raw is False:
@@ -316,9 +308,7 @@ class BioMart(REST):
     def get_datasets(self, mart):
         """Retrieve datasets with description"""
         if mart not in self.names:
-            raise BioServicesError(
-                "Provided mart name (%s) is not valid. see 'names' attribute" % mart
-            )
+            raise BioServicesError("Provided mart name (%s) is not valid. see 'names' attribute" % mart)
 
         ret = self.http_get("?type=datasets&mart=%s" % mart, frmt="txt")
         import pandas as pd
@@ -340,12 +330,8 @@ class BioMart(REST):
 
         """
         # assert dataset in self.names
-        if dataset not in [
-            x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]
-        ]:
-            raise ValueError(
-                "provided dataset (%s) is not found. see valid_attributes" % dataset
-            )
+        if dataset not in [x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]]:
+            raise ValueError("provided dataset (%s) is not found. see valid_attributes" % dataset)
         ret = self.http_get("?type=attributes&dataset=%s" % dataset, frmt="txt")
 
         ret = [x for x in ret.split("\n") if len(x)]
@@ -373,12 +359,8 @@ class BioMart(REST):
             scrofa,Taeniopygia guttata ,Xenopus tropicalis]
 
         """
-        if dataset not in [
-            x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]
-        ]:
-            raise ValueError(
-                "provided dataset (%s) is not found. see valid_attributes" % dataset
-            )
+        if dataset not in [x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]]:
+            raise ValueError("provided dataset (%s) is not found. see valid_attributes" % dataset)
         ret = self.http_get("?type=filters&dataset=%s" % dataset, frmt="txt")
         ret = [x for x in ret.split("\n") if len(x)]
         results = {}
@@ -558,11 +540,7 @@ class BioMart(REST):
 
             for i, name in enumerate(self.names):
                 try:
-                    res[name] = [
-                        x.split("\t")[1]
-                        for x in results[i].split("\n")
-                        if len(x.strip()) > 1
-                    ]
+                    res[name] = [x.split("\t")[1] for x in results[i].split("\n") if len(x.strip()) > 1]
                 except:
                     res[name] = "?"
             self._valid_attributes = res.copy()
@@ -572,9 +550,7 @@ class BioMart(REST):
 
     @require_host
     def lookfor(self, pattern, verbose=True):
-        for a, x, y, z in zip(
-            self.hosts, self.databases, self.names, self.displayNames
-        ):
+        for a, x, y, z in zip(self.hosts, self.databases, self.names, self.displayNames):
             found = False
             if pattern.lower() in x.lower():
                 found = True

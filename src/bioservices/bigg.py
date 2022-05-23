@@ -92,8 +92,7 @@ class BiGG:
     def _get_model_resource(self, type_, model_id, ids=None):
         if type_ not in _ACCEPTABLE_MODEL_RESOURCE_TYPES:
             raise TypeError(
-                "Unknown model resource type %s. Acceptable types are %s"
-                % (type_, _ACCEPTABLE_MODEL_RESOURCE_TYPES)
+                "Unknown model resource type %s. Acceptable types are %s" % (type_, _ACCEPTABLE_MODEL_RESOURCE_TYPES)
             )
 
         query = "models/%s/%s" % (model_id, type_)
@@ -124,20 +123,14 @@ class BiGG:
 
     def search(self, query, type_):
         if type_ not in _ACCEPTABLE_SEARCH_TYPES:
-            raise TypeError(
-                "Unknown type %s. Acceptable types are %s"
-                % (type_, _ACCEPTABLE_SEARCH_TYPES)
-            )
+            raise TypeError("Unknown type %s. Acceptable types are %s" % (type_, _ACCEPTABLE_SEARCH_TYPES))
 
         params = {"query": query, "search_type": type_}
         return self._http_get_results("search", params=params)
 
     def download(self, model_id, format_="json", gzip=True, target=None):
         if format_ not in _ACCEPTABLE_MODEL_DOWNLOAD_FORMATS:
-            raise TypeError(
-                "Unknown format %s. Accepted types are %s."
-                % (format_, _ACCEPTABLE_MODEL_DOWNLOAD_FORMATS)
-            )
+            raise TypeError("Unknown format %s. Accepted types are %s." % (format_, _ACCEPTABLE_MODEL_DOWNLOAD_FORMATS))
 
         path = "%s.%s" % (model_id, format_)
 

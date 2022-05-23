@@ -73,12 +73,8 @@ class WikiPathways(REST):
         :param bool verbose:
 
         """
-        super(WikiPathways, self).__init__(
-            name="WikiPathways", url=WikiPathways._url, verbose=verbose, cache=cache
-        )
-        self._organism = (
-            "Homo sapiens"  # This function is redundant (see class service)
-        )
+        super(WikiPathways, self).__init__(name="WikiPathways", url=WikiPathways._url, verbose=verbose, cache=cache)
+        self._organism = "Homo sapiens"  # This function is redundant (see class service)
         self.logging.info("Fetching organisms...")
 
         #: Get a list of all available organisms.
@@ -92,17 +88,12 @@ class WikiPathways(REST):
         if organism in self.organisms:
             self._organism = organism
         else:
-            raise ValueError(
-                "'%s' is not supported in WikiPathways. See :attr:`organisms`"
-                % organism
-            )
+            raise ValueError("'%s' is not supported in WikiPathways. See :attr:`organisms`" % organism)
 
     def _get_organism(self):
         return self._organism
 
-    organism = property(
-        _get_organism, _set_organism, doc="Read/write attribute for the organism"
-    )
+    organism = property(_get_organism, _set_organism, doc="Read/write attribute for the organism")
 
     def findPathwaysByLiterature(self, query):
         """Find pathways by their literature references.
@@ -293,9 +284,7 @@ class WikiPathways(REST):
 
         .. todo:: interpret XML
         """
-        res = self.http_get(
-            self.url + "/getRecentChanges?timestamp=%s&format=json" % timestamp
-        )
+        res = self.http_get(self.url + "/getRecentChanges?timestamp=%s&format=json" % timestamp)
         return res
 
     def login(self, usrname, password):
@@ -331,9 +320,7 @@ class WikiPathways(REST):
 
         .. note:: use :meth:`savePathwayAs` to save into a file.
         """
-        self.devtools.check_param_in_list(
-            filetype, ["gpml", "png", "svg", "pdf", "txt", "pwf", "owl"]
-        )
+        self.devtools.check_param_in_list(filetype, ["gpml", "png", "svg", "pdf", "txt", "pwf", "owl"])
 
         url = self.url + "/getPathwayAs?fileType=%s" % filetype
         url += "&pwId=%s " % pathwayId
@@ -461,9 +448,7 @@ class WikiPathways(REST):
         """
         raise NotImplementedError
 
-    def getColoredPathway(
-        self, pathwayId, filetype="svg", revision=0, color=None, graphId=None
-    ):
+    def getColoredPathway(self, pathwayId, filetype="svg", revision=0, color=None, graphId=None):
         """Get a colored image version of the pathway.
 
         :param str pwId: The pathway identifier.

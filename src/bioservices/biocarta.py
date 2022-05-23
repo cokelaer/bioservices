@@ -90,9 +90,7 @@ class BioCarta:
 
         :param verbose: set to False to prevent informative messages
         """
-        self.services = REST(
-            name="BioCarta", url=BioCarta._url, cache=cache, verbose=verbose
-        )
+        self.services = REST(name="BioCarta", url=BioCarta._url, cache=cache, verbose=verbose)
         self.fname = "biocarta_pathways.txt"
 
         self._organism = None
@@ -108,17 +106,13 @@ class BioCarta:
         if organism == self._organism:
             return
         if organism not in BioCarta.organisms:
-            raise ValueError(
-                "Invalid organism. Check the list in :attr:`organisms` attribute"
-            )
+            raise ValueError("Invalid organism. Check the list in :attr:`organisms` attribute")
 
         self._organism = organism
         self._organism_prefix = BioCarta._organism_prefixes[organism]
         self._pathways = None
 
-    organism = property(
-        _get_organism, _set_organism, doc="returns the current default organism"
-    )
+    organism = property(_get_organism, _set_organism, doc="returns the current default organism")
 
     def _get_pathway_categories(self):
         if self._pathway_categories is None:
@@ -134,10 +128,7 @@ class BioCarta:
         to the organism defined in :attr:`organism` are returned.
         """
         if self.organism is None:
-            raise ValueError(
-                "Please set the organism attribute to one of %s"
-                % self._organism_prefixes.keys()
-            )
+            raise ValueError("Please set the organism attribute to one of %s" % self._organism_prefixes.keys())
 
         if BioCarta._all_pathways is None:
             BioCarta._all_pathways = readXML(self._all_pathways_url)
@@ -145,18 +136,13 @@ class BioCarta:
         if self._pathways is None:
 
             url_pattern = re.compile(
-                "http://cgap.nci.nih.gov/Pathways/BioCarta/%s_(.+)[Pp]athway"
-                % (self._organism_prefix)
+                "http://cgap.nci.nih.gov/Pathways/BioCarta/%s_(.+)[Pp]athway" % (self._organism_prefix)
             )
             is_pathway_url = lambda tag: tag.name == "a" and not tag.has_attr("class")
-            self._pathways = BioCarta._all_pathways.findAll(
-                is_pathway_url, href=url_pattern
-            )
+            self._pathways = BioCarta._all_pathways.findAll(is_pathway_url, href=url_pattern)
 
             # Now let us select only the name.
-            self._pathways = sorted(
-                [entry.attrs["href"].rsplit("/", 1)[1] for entry in self._pathways]
-            )
+            self._pathways = sorted([entry.attrs["href"].rsplit("/", 1)[1] for entry in self._pathways])
         return self._pathways
 
     all_pathways = property(_get_all_pathways)

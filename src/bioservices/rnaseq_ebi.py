@@ -43,7 +43,6 @@ try:
     def tsv_parser(data):
         return pd.read_csv(StringIO(data), sep="\t")
 
-
 except:
 
     def tsv_parser(data):

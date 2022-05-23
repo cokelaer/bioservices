@@ -143,9 +143,7 @@ class PDBe:
         if isinstance(query, str) and "," not in query:
             res = self.services.http_get("related_publications/{}".format(query))
         else:
-            res = self.services.http_post(
-                "related_publications/", data=query, frmt="json"
-            )
+            res = self.services.http_post("related_publications/", data=query, frmt="json")
         return self._return(res)
 
     def get_experiment(self, query):
@@ -304,9 +302,7 @@ class PDBe:
 
         """
         assert len(query) == 4, "a 4-character PDB id code is required"
-        res = self.services.http_get(
-            "polymer_coverage/{}/chain/{}".format(query, chain_id)
-        )
+        res = self.services.http_get("polymer_coverage/{}/chain/{}".format(query, chain_id))
         return self._return(res)
 
     def get_secondary_structure(self, query):
@@ -329,9 +325,7 @@ class PDBe:
         if isinstance(query, str) and "," not in query:
             res = self.services.http_get("secondary_structure/{}".format(query))
         else:
-            res = self.services.http_post(
-                "secondary_structure/", data=query, frmt="json"
-            )
+            res = self.services.http_post("secondary_structure/", data=query, frmt="json")
         return self._return(res)
 
     def get_residue_listing(self, query):
@@ -436,9 +430,7 @@ class PDBe:
         if isinstance(query, str) and "," not in query:
             res = self.services.http_get("observed_residues_ratio/{}".format(query))
         else:
-            res = self.services.http_post(
-                "observed_residues_ratio", data=query, frmt="json"
-            )
+            res = self.services.http_post("observed_residues_ratio", data=query, frmt="json")
         return self._return(res)
 
     def get_assembly(self, query):
@@ -478,9 +470,7 @@ class PDBe:
         if isinstance(query, str) and "," not in query:
             res = self.services.http_get("electron_density_statistics/{}".format(query))
         else:
-            res = self.services.http_post(
-                "electron_density_statistics", data=query, frmt="json"
-            )
+            res = self.services.http_post("electron_density_statistics", data=query, frmt="json")
         return self._return(res)
 
     def get_functional_annotation(self, query):
@@ -538,7 +528,5 @@ class PDBe:
         if isinstance(query, str) and "," not in query:
             res = self.services.http_get("related_experiment_data/{}".format(query))
         else:
-            res = self.services.http_post(
-                "related_experiment_data", data=query, frmt="json"
-            )
+            res = self.services.http_post("related_experiment_data", data=query, frmt="json")
         return self._return(res)

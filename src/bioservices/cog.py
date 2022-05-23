@@ -86,9 +86,7 @@ class COG:
 
     def get_cogs_by_assembly_id(self, assembly_id):
         """Filter COGs by assembly ID: GCA_000007185.1"""
-        res = self.services.http_get(
-            "cog", frmt="json", params={"assembly": assembly_id}
-        )
+        res = self.services.http_get("cog", frmt="json", params={"assembly": assembly_id})
         return res
 
     def get_cogs_by_orgnanism(self, name):
@@ -121,16 +119,12 @@ class COG:
 
     def get_cogs_by_id_and_category(self, cog_id, category):
         """Filter COGs by COG id and Taxonomy Categories: COG0004 and CYANOBACTERIA"""
-        res = self.services.http_get(
-            "cog", frmt="json", params={"cog": cog_id, "category": category}
-        )
+        res = self.services.http_get("cog", frmt="json", params={"cog": cog_id, "category": category})
         return res
 
     def get_cogs_by_id_and_organism(self, cog_id, organism):
         """Filter COGs by COG id and organism: COG0004 and Escherichia_coli_K-12_sub_MG1655"""
-        res = self.services.http_get(
-            "cog", frmt="json", params={"cog": cog_id, "organism,": organism}
-        )
+        res = self.services.http_get("cog", frmt="json", params={"cog": cog_id, "organism,": organism})
         return res
 
     def get_all_cogs_definition(self):

@@ -98,13 +98,9 @@ class Mapper(Logging):
         http://en.wikipedia.org/wiki/Protein_Kinase_B
 
         """
-        return self._uniprot_service.mapping(
-            fr="ACC", to="REFSEQ_NT_ID", query="P31749"
-        )
+        return self._uniprot_service.mapping(fr="ACC", to="REFSEQ_NT_ID", query="P31749")
 
-    def _update_uniprot_xref(
-        self, df, xref=["HGNC_ID", "ENSEMBLE_ID", "P_ENTREZGENEID"]
-    ):
+    def _update_uniprot_xref(self, df, xref=["HGNC_ID", "ENSEMBLE_ID", "P_ENTREZGENEID"]):
         """Update the dataframe using Uniprot to map indices onto cross
         reference databases
 
@@ -112,13 +108,9 @@ class Mapper(Logging):
         """
         for ref in xref:
             print("Processing %s " % ref)
-            res = self._uniprot_service.multi_mapping(
-                "ACC", ref, list(df.index), timeout=10, ntrials=5
-            )
+            res = self._uniprot_service.multi_mapping("ACC", ref, list(df.index), timeout=10, ntrials=5)
             if "%s__uniprot_mapping" % ref not in df.columns:
-                thisdf = pd.DataFrame(
-                    {"%s__uniprot_mapping": res.values()}, index=res.keys()
-                )
+                thisdf = pd.DataFrame({"%s__uniprot_mapping": res.values()}, index=res.keys())
                 df = df.join(thisdf)
             else:
                 for index in df.index:
@@ -157,9 +149,7 @@ class Mapper(Logging):
         import pandas as pd
         import StringIO
 
-        c = pd.read_csv(
-            StringIO.StringIO(res2), delimiter="\t", index_col="Gene Symbol"
-        )
+        c = pd.read_csv(StringIO.StringIO(res2), delimiter="\t", index_col="Gene Symbol")
         return c
 
 
@@ -226,17 +216,12 @@ class HGNCMapper(object):
 
     def build_dataframe(self):
         # simplify to get a dictionary of dictionary
-        data = {
-            k1: {k2: v2["xkey"] for k2, v2 in self.alldata[k1].iteritems()}
-            for k1 in self.alldata.keys()
-        }
+        data = {k1: {k2: v2["xkey"] for k2, v2 in self.alldata[k1].iteritems()} for k1 in self.alldata.keys()}
         dfdata = pd.DataFrame(data)
         dfdata = dfdata.transpose()
         # rename to tag with "HGNC"
         dfdata.columns = [this + "__HGNC_mapping" for this in dfdata.columns]
-        print(
-            "a dataframe was built using HGNC data set and saved in attributes  self._df_hgnc"
-        )
+        print("a dataframe was built using HGNC data set and saved in attributes  self._df_hgnc")
         return dfdata
 
 
@@ -311,10 +296,7 @@ class KEGGMapper(object):
         for name in names:
             # e.g. name == position
             data[name] = [
-                self.alldata[entry][name]
-                if name in self.alldata[entry].keys()
-                else None
-                for entry in self.entries
+                self.alldata[entry][name] if name in self.alldata[entry].keys() else None for entry in self.entries
             ]
 
         df = pd.DataFrame(data, index=self.entries)
@@ -327,9 +309,7 @@ class KEGGMapper(object):
                     # fill df_i,j
                     df.ix[entry][key + "_kegg"] = res[key]
                 else:
-                    raise NotImplementedError(
-                        "Found an unknown key in KEGG dblink:%s" % key
-                    )
+                    raise NotImplementedError("Found an unknown key in KEGG dblink:%s" % key)
         return df
 
     def load_all_kegg_entries(self, filename="kegg_gene.dat"):

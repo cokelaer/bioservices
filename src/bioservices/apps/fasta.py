@@ -110,10 +110,7 @@ class MultiFASTA(object):
             if f.accession != None and f.accession not in self.ids:
                 self._fasta[f.accession] = f
             else:
-                print(
-                    "Accession %s is already in the ids list or could not be interpreted. skipped"
-                    % str(f.accession)
-                )
+                print("Accession %s is already in the ids list or could not be interpreted. skipped" % str(f.accession))
 
     @ifpandas
     def _get_df(self):
@@ -219,9 +216,7 @@ class FASTA(object):
         if self.fasta:
             return "".join(self.fasta.split("\n")[1:])
         else:
-            raise ValueError(
-                "You need to load a fasta sequence first using get_fasta or read_fasta"
-            )
+            raise ValueError("You need to load a fasta sequence first using get_fasta or read_fasta")
 
     sequence = property(_get_sequence, doc="returns the sequence only")
 
@@ -230,9 +225,7 @@ class FASTA(object):
         if self.fasta:
             return self.fasta.split("\n")[0]
         else:
-            raise ValueError(
-                "You need to load a fasta sequence first using get_fasta or read_fasta"
-            )
+            raise ValueError("You need to load a fasta sequence first using get_fasta or read_fasta")
 
     header = property(_get_header, doc="returns header only")
 
@@ -322,9 +315,7 @@ class FASTA(object):
     def _get_organism(self):
         return self._get_info_from_header("OS")
 
-    organism = property(
-        _get_organism, doc="returns organism from OS keyword found in the header if any"
-    )
+    organism = property(_get_organism, doc="returns organism from OS keyword found in the header if any")
 
     def _get_PE(self):
         pe = self._get_info_from_header("PE")
@@ -417,8 +408,7 @@ class FASTA(object):
         data = data.split(">")[1:]
         if len(data) > 1 or len(data) == 0:
             raise ValueError(
-                """Only one sequence expected to be found. Found %s. Please use MultiFASTA class instead"""
-                % len(data)
+                """Only one sequence expected to be found. Found %s. Please use MultiFASTA class instead""" % len(data)
             )
 
         self._data = data
@@ -430,9 +420,7 @@ class FASTA(object):
         self._fasta = data[:]
         self._fasta = self._fasta[0]
         if self.dbtype not in self.known_dbtypes:
-            print(
-                "Only sp and gi header are recognised so far but sequence and header are loaded"
-            )
+            print("Only sp and gi header are recognised so far but sequence and header are loaded")
 
     def _interpret(self, data):
         # cleanup the data in case of empty spaces or \n characters
