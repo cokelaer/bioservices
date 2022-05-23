@@ -43,8 +43,9 @@ if "raw_input" in __builtins__:
 sys.path = [x for x in sys.path if "suds-" not in x]
 
 
-from easydev import Logging
 from easydev import DevTools
+import colorlog
+
 
 
 __all__ = ["Service", "WSDLService", "BioServicesError", "REST"]
@@ -58,7 +59,7 @@ class BioServicesError(Exception):
         return repr(self.value)
 
 
-class Service(object):
+class Service:
     """Base class for WSDL and REST classes
 
     .. seealso:: :class:`REST`, :class:`WSDLService`
@@ -116,7 +117,12 @@ class Service(object):
         super(Service, self).__init__()
         self.requests_per_sec = requests_per_sec
         self.name = name
-        self.logging = Logging("bioservices:%s" % self.name, verbose)
+        self.logging = colorlog.getLogger(f"bioservices.{self.name}")
+
+        if verbose:
+            self.logging.setLevel('INFO')
+        else:
+            self.logging.setLevel('WARNING')
 
         self._url = url
         try:
@@ -128,11 +134,6 @@ class Service(object):
                     "The URL (%s) provided cannot be reached." % self.url
                 )
         self._easyXMLConversion = True
-
-        # used by HGNC where some XML contains non-utf-8 characters !!
-        # should be able to fix it with requests once HGNC works again
-        # self._fixing_unicode = False
-        # self._fixing_encoding = "utf-8"
 
         self.devtools = DevTools()
         self.settings = BioServicesConfig()
@@ -471,6 +472,7 @@ class REST(RESTbase):
         "png": "image/png",
         "jpg": "image/jpg",
         "svg": "image/svg",
+        "svg+xml": "image/svg+xml",
         "gif": "image/gif",
         "jpeg": "image/jpg",
         "txt": "text/plain",
