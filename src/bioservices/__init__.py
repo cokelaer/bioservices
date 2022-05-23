@@ -1,30 +1,20 @@
-"""BioServices
-
-import bioservices
-u = bioservices.uniprot.UniProt()
-u.search("ZAP70")
-
-
-see online documentation for details on pypi or github.
-
-"""
-import sys
 
 import pkg_resources
 
 from easydev import CustomConfig
+from easydev.logging_tools import Logging
 
-__version__ = "1.6.0"
+
+logger = Logging("bioservices", "WARNING", text_color="green")
+
 try:
     version = pkg_resources.require("bioservices")[0].version
-    __version__ = version
 except:
-    version = __version__
+    version = "1.9.0"
 
 import colorlog
 
-logger = colorlog.getLogger("bioservices")
-
+logger = colorlog.getLogger(logger.name)
 
 # Initialise the config directory if not already done
 configuration = CustomConfig("bioservices", verbose=False)
@@ -166,8 +156,5 @@ from . import omicsdi
 from .omicsdi import OmicsDI
 
 # sub packages inside bioservices.
-
-# import mapping
 from . import apps
 
-# import dev

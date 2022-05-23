@@ -29,10 +29,8 @@
        -- from http://www.ncbi.nlm.nih.gov/books/NBK25497/, March 2013
 
 """
-import json
 from bioservices import REST
-from bioservices import __version__
-from bioservices import logger
+from bioservices import logger, version
 
 logger.name = __name__
 
@@ -143,7 +141,7 @@ class EUtils:
         self._xmlparser = xmlparser
 
         self._databases = None
-        self.tool = "BioServices, " + __version__
+        self.tool = "BioServices, " + version
 
         #: fill this with your email address
         self.email = email
