@@ -778,6 +778,9 @@ class UniProt(REST):
             "fetching information from uniprot for {} entries".format(len(entries))
         )
 
+        if limit < len(entries):
+            self.logging.warning("The limit paramter is less than the number of entries. Probably not what you want. set limit to the length of the entries to remove this message")
+
         nChunk = min(nChunk, len(entries))
         N, rest = divmod(len(entries), nChunk)
         for i in range(0, N + 1):
@@ -787,6 +790,7 @@ class UniProt(REST):
                 query = "+or+".join(this_entries)
                 if organism:
                     query += "+and+" + organism
+
                 res = self.search(
                     query,
                     frmt="tab",
