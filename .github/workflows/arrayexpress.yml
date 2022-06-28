@@ -10,7 +10,10 @@ on:
   pull_request:
     branches-ignore: []
     paths:
-      - src/bioservices/arrayexpressbigg.py
+      - src/bioservices/arrayexpress.py
+  schedule:
+    - cron: '0 0 1 * *'
+
 
 jobs:
   build-linux:

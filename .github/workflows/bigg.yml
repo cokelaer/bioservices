@@ -1,4 +1,4 @@
-,ame: bigg Testing
+name: bigg Testing
 
 on:
   workflow_dispatch:
@@ -10,7 +10,9 @@ on:
   pull_request:
     branches-ignore: []
     paths:
-      - src/bioservices/arrayexpressbigg.py
+      - src/bioservices/bigg.py
+  schedule:
+    - cron: '0 0 1 * *'
 
 jobs:
   build-linux:
