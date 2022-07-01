@@ -20,7 +20,7 @@ def test_get_compounds(unichem):
     res = unichem.get_compounds('CHEMBL12', 1)
     res = res['compounds']
     assert 'sources' in res[0]
-    
+
     assert unichem.get_compounds('CHEMBL12', 'dummy') == {}
 
 def test_get_sources_by_inchikey(unichem):
@@ -40,7 +40,7 @@ def test_connectivity(unichem):
     res = unichem.get_connectivity('CHEMBL12', 1)
     assert 'sources' in res
 
-    assert unichem.get_connectivity('CHEMBL12', 'dummy') == {}
+    assert unichem.get_connectivity('CHEMBL12', 'dummy')  == {}
 
 def test_images(unichem, tmpdir):
 
@@ -102,10 +102,10 @@ def test_get_sources_by_inchikey(unichem):
 
     # Now let us make a mistake:
     res = unichem.get_sources_by_inchikey("dummy")
-    assert res == {}
+    assert "error" in res
     res = unichem.get_sources_by_inchikey(["dummy1", 'dummy2'])
-    assert res['dummy1'] == {}
-    assert res['dummy2'] == {}
+    assert "error" in res['dummy1']
+    assert "error" in res['dummy2']
 
 def test_get_sources_by_inchikey_verbose(unichem):
 
@@ -125,10 +125,10 @@ def test_get_sources_by_inchikey_verbose(unichem):
 
     # Now let us make a mistake:
     res = unichem.get_sources_by_inchikey_verbose("dummy")
-    assert res == {}
+    assert "error" in res
     res = unichem.get_sources_by_inchikey_verbose(["dummy1", 'dummy2'])
-    assert res['dummy1'] == {}
-    assert res['dummy2'] == {}
+    assert "error" in res['dummy1']
+    assert "error" in res['dummy2']
 
 
 def test_get_structure(unichem):
