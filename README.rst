@@ -176,6 +176,7 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.10.0    * Update uniprot to use the new API (june 2022)
 1.9.0     * Update unichem to reflect new API
 1.8.4     * biomodels. Fix #208
           * KEGG: fixed #204 #202 and #203
