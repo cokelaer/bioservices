@@ -40,7 +40,6 @@
 
 """
 import io
-import sys
 import time
 import urllib
 import json
@@ -808,11 +807,7 @@ class UniProt:
             if len(res) == 0:
                 self.services.logging.warning("some entries %s not found" % entries)
             else:
-                try:
-                    # python 2.X
-                    df = pd.read_csv(io.StringIO(unicode(res)), sep="\t")
-                except:
-                    df = pd.read_csv(io.StringIO(str(res)), sep="\t")
+                df = pd.read_csv(io.StringIO(str(res)), sep="\t")
 
                 if isinstance(output, type(None)):
                     output = df.copy()
