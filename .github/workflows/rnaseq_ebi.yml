@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
     paths:
       - src/bioservices/rnaseq_ebi.py
   pull_request:

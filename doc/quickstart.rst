@@ -61,10 +61,10 @@ from a database to another one. For instance to convert the UniProtKB ID into KE
 
     >>> from bioservices.uniprot import UniProt
     >>> u = UniProt(verbose=False)
-    >>> u.mapping(fr="ACC+ID", to="KEGG_ID", query='P43403')
-    {'P43403': ['hsa:7535']}
+    >>> u.mapping(fr="UniProtKB_AC-ID", to="KEGG", query='P43403')
+    {'results': [{'from': 'P43403', 'to': 'hsa:7535'}]}
 
-Note that the returned response from uniprot web service is converted into a list. The first two elements are the databases used for the mapping. Then, alternance of the queried element and the answer populates the list. 
+Note that the returned response from uniprot web service is a dictionary with a key called **results**, which needs to be selected. Then, a list of identifiers is provided. 
 
 You can also search for a specific UniProtKB ID to get exhaustive information::
 
@@ -77,8 +77,6 @@ You can also search for a specific UniProtKB ID to get exhaustive information::
 
 To obtain the FASTA sequence, you can use :meth:`~bioservices.uniprot.UniProt.searchUniProtId`::
 
-
-    >>> res = u.searchUniProtId("P09958", frmt="xml")
     >>> print(u.searchUniProtId("P09958", frmt="fasta"))
     sp|P09958|FURIN_HUMAN Furin OS=Homo sapiens GN=FURIN PE=1 SV=2
     MELRPWLLWVVAATGTLVLLAADAQGQKVFTNTWAVRIPGGPAVANSVARKHGFLNLGQI

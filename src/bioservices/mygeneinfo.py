@@ -47,7 +47,7 @@ class MyGeneInfo:
     .. doctest::
 
         >>> from bioservices import MyGeneInfo
-        >>> s = MyGeneInfoe()
+        >>> s = MyGeneInfo()
 
     """
 
