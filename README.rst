@@ -16,6 +16,8 @@ BIOSERVICES: access to biological web services programmatically
 .. image:: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/bioservices.png
     :target: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/bioservices.png
 
+TEST
+
 :Python_version_available: BioServices is tested for Python 3.6, 3.7, 3.8, 3.9
 :Contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
 :Issues: Please use https://github.com/cokelaer/bioservices/issues
