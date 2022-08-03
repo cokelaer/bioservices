@@ -115,10 +115,14 @@ def test_info(kegg):
     except:
         assert True
 
-def test_list(kegg):
+def test_list_pathway(kegg):
     kegg.list("pathway") # returns the list of reference pathways
+
+def test_list_org(kegg):
     kegg.list("organism") # returns the list of KEGG organisms with taxonomic classification
-    kegg.list("hsa") # returns the entire list of human genes
+
+
+def test_list(kegg):
     kegg.list("T01001") # same as above
     kegg.list("hsa:10458+ece:Z5100") # returns the list of a human gene and an E.coli O157 gene
     kegg.list("cpd:C01290+gl:G00092") # returns the list of a compound entry and a glycan entry
@@ -226,6 +230,8 @@ def test_KEGGParser(kegg):
     d = s.parse(s.get("rc:RC00001"))
     d = s.parse(s.get("rn:R00001"))
     d = s.parse(s.get("rp:RP00001"))
+    
+
 
 
     d = s.parse(s.get('C15682'))
@@ -241,6 +247,10 @@ def test_KEGGParser(kegg):
     assert d["SEQUENCE"][0]["ORGANISM"] == '[1] Penicillium chrysogenum [2] Emericella nidulans (Aspergillus nidulans [GN:ani] )'
     assert d['SEQUENCE'][0]['SEQUENCE'] == '0 Aad  1 Cys  2 Val'
     assert d['SEQUENCE'][0]['TYPE'] == "NRP"
+
+    #issue 225
+    d = s.parse(s.get("gn:T40001"))
+    assert 'DISEASE' in d
 
 
 def test_KEGGParser_parse_invalid(parse_input):

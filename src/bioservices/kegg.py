@@ -1432,13 +1432,31 @@ class KEGGParser(object):
                         v = ""
                     kp[k] = v
                 output[key] = kp.copy()
+            elif key in ["DISEASE"]:
+                # DISEASE come in to flavors. Either a list (e.g. gn:T40001) with a title
+                # and a host, or as a list with key/title as in hsa:7535
+                # H00093  Combined immunodeficiency
+                # H02540  Infantile-onset multisystem autoimmune disease
 
+                if isinstance(value, list):
+                    kp = []
+                    for disease in value:
+                        name, host = disease.split("\n")
+                        if name.startswith('DISEASE'):
+                            name = name[8:].strip()
+                        kp.append({'name': name, 'host':host})
+                    output[key] = kp
+                else:
+                    kp = {}
+                    for line in value.split("\n"):
+                        k,v = line.split(None, 1)
+                        kp[k] = v
+                    output[key] = kp.copy()
             elif key in [
                 "DRUG",
                 "ORTHOLOGY",
                 "COMPOUND",
                 "RMODULE",
-                "DISEASE",
                 "PATHWAY_MAP",
                 "STR_MAP",
                 "OTHER_MAP",
@@ -1446,6 +1464,7 @@ class KEGGParser(object):
                 "MODULE",
                 "GENES",
             ]:
+
                 kp = {}
                 for line in value.split("\n"):
                     try:  # empty orthology in rc:RC00004
