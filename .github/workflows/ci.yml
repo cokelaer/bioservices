@@ -5,10 +5,15 @@ on:
   push:
     branches:
       - main
+    paths:
+      - src/bioservices/services.py
+      - src/bioservices/xmltools.py
   pull_request:
     branches-ignore: []
     paths:
-      - src/bioservices/arrayexpressbigg.py
+      - src/bioservices/services.py
+      - src/bioservices/xmltools.py
+
   schedule:
     - cron: '0 0 1 * *'
 
@@ -30,6 +35,7 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Install the package itself
       run: |
+          pip install -r requirements.txt
           pip install .
 
     - name: Test with pytest
