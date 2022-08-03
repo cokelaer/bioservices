@@ -177,6 +177,7 @@ Changelog
 Version   Description
 ========= ====================================================================
 1.10.1    * allow command line to download genbank and GFF
+          * update pride module to use new PRIDE API (July 2022)
 1.10.0    * Update uniprot to use the new API (june 2022)
 1.9.0     * Update unichem to reflect new API
 1.8.4     * biomodels. Fix #208
