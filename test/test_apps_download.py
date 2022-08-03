@@ -4,7 +4,7 @@ import pytest
 
 
 @pytest.mark.flaky
-def test_ena():
+def test_download():
 
     from easydev import TempFile
     with TempFile() as f1:

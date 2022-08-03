@@ -3,7 +3,7 @@ name: arrayexpressbigg Testing
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - src/bioservices/arrayexpressbigg.py
   pull_request:

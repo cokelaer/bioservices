@@ -147,7 +147,7 @@ class EUtils:
         if self.email == "unknown":
             # trying the bioservices config file
             if self.services.settings.params["user.email"][0] != "unknown":
-                self.email = self.servicse.settings.params["user.email"][0]
+                self.email = self.services.settings.params["user.email"][0]
             else:
                 self.services.logging.warning(warning)
 

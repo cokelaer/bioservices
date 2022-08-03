@@ -49,7 +49,7 @@ class ENA:
 
     .. doctest::
 
-        >>> from bioservices import ENQ
+        >>> from bioservices import ENA
         >>> s = ENA(verbose=False)
 
 

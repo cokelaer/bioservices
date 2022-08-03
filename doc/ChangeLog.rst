@@ -1,6 +1,7 @@
 Whats' new, what has changed
 ================================
 
+From version 1.8.1 onwards change log will be on the main page. 
 
 
 
@@ -24,12 +25,14 @@ Revision 1.7.12 (Jan 2021-July 2021)
 * continous integration revisited with github actions
 
 * NEWS:
+
   * COG services qdded 
   * New module: mygeneinfom pdbe
   * added  panther module (pantherdb.org)
 
 
 * CHANGES
+
   * update dbbionet to fulfill future new API
   * Migrate to PDB new API (Jan 2021)
   * Update Quickgo service
@@ -37,12 +40,14 @@ Revision 1.7.12 (Jan 2021-July 2021)
   * Update ChEMBL after an ChEMBL API change
 
 * BUGS and FIXES
+
   * General fixes and update from @thobalose (https://github.com/cokelaer/bioservices/pull/149) to
   * PSICQUIC fix (https://github.com/cokelaer/bioservices/issues/189) to
   * Fix ENA new API
   * Fix NCBIBlast and Muscle services (new API)
 
 * DEPRECATED:
+
   * deprecated PICR and TCGA modules (the latter was not really available anyway)
 
 
