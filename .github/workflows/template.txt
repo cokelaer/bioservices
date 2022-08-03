@@ -9,6 +9,10 @@ on:
       - src/bioservices/__name__.py
   pull_request:
     branches-ignore: []
+    paths:
+      - src/bioservices/__name__.py
+  schedule:
+    - cron: '0 0 1 * *'
 
 jobs:
   build-linux:
@@ -16,7 +20,8 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        python: [3.6, 3.7, 3.8]
+        python: [3.7, 3.8, 3.9]
+      fail-fast: false
 
     steps:
     - uses: actions/checkout@v2
@@ -26,6 +31,7 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Install the package itself and dependencies
       run: |
+          pip install -r requirements.txt
           pip install .
           pip install -r requirements_dev.txt
 

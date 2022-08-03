@@ -23,7 +23,6 @@ jobs:
         python: [3.7, 3.8, 3.9]
       fail-fast: false
 
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.X
@@ -32,6 +31,7 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Install the package itself and dependencies
       run: |
+          pip install -r requirements.txt
           pip install .
           pip install -r requirements_dev.txt
 
