@@ -61,7 +61,7 @@ method from the UniProt class called :meth:`~bioservices.uniprot.UniProt.retriev
 
     >>> sequence = u.retrieve("P43403", "fasta")
     >>> print(sequence)
-    >sp|P43403|ZAP70_HUMAN Tyrosine-protein kinase ZAP-70 OS=Homo sapiens GN=ZAP70 PE=1 SV=1
+    >sp|P43403|ZAP70_HUMAN Tyrosine-protein kinase ZAP-70 OS=Homo sapiens OX=9606 GN=ZAP70 PE=1 SV=1
     MPDPAAHLPFFYGSISRAEAEEHLKLAGMADGLFLLRQCLRSLGGYVLSLVHDVRFHHFP
     IERQLNGTYAIAGGKAHCGPAELCEFYSRDPDGLPCNLRKPCNRPSGLEPQPGVFDCLRD
     AMVRDYVRQTWKLEGEALEQAIISQAPQVEKLIATTAHERMPWYHSSLTREEAERKLYSG

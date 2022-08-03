@@ -9,12 +9,12 @@ BIOSERVICES: access to biological web services programmatically
 .. image:: https://github.com/cokelaer/bioservices/actions/workflows/ci.yml/badge.svg
    :target: https://github.com/cokelaer/bioservices/actions/workflows/ci.yml
 
-.. image:: http://readthedocs.org/projects/bioservices/badge/?version=master
-    :target: http://bioservices.readthedocs.org/en/master/?badge=master
+.. image:: http://readthedocs.org/projects/bioservices/badge/?version=main
+    :target: http://bioservices.readthedocs.org/en/main/?badge=main
     :alt: Documentation Status
 
-.. image:: https://raw.githubusercontent.com/cokelaer/bioservices/master/doc/bioservices.png
-    :target: https://raw.githubusercontent.com/cokelaer/bioservices/master/doc/bioservices.png
+.. image:: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/bioservices.png
+    :target: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/bioservices.png
 
 :Python_version_available: BioServices is tested for Python 3.6, 3.7, 3.8, 3.9
 :Contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
@@ -164,9 +164,9 @@ wikipathway           .. image:: https://github.com/cokelaer/bioservices/actions
 Bioservices command
 ====================
 
-In version 1.8.2, we included a bioservices command. For now it has only one subcommand to download a NCBI accession number::
+In version 1.8.2, we included a bioservices command. For now it has only one subcommand to download a NCBI accession number and possibly it genbank or GFF file (if available)::
 
-    bioservices download-accession --accession K01711.1
+    bioservices download-accession --accession K01711.1 --with-gbk 
 
 
 Changelog
@@ -176,6 +176,7 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.10.1    * allow command line to download genbank and GFF
 1.10.0    * Update uniprot to use the new API (june 2022)
 1.9.0     * Update unichem to reflect new API
 1.8.4     * biomodels. Fix #208

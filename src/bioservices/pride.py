@@ -19,8 +19,7 @@
 
 .. topic:: What is PRIDE ?
 
-    :URL: http://www.ebi.ac.uk/pride/archive/
-    :URL: http://www.ebi.ac.uk/pride/ws/archive
+    :URL: http://www.ebi.ac.uk/pride/ws/archive/v2
 
     .. highlights::
 
@@ -33,7 +32,7 @@
 
 
 """
-import wrapt
+import tqdm
 
 from bioservices.services import REST
 from bioservices import logger
@@ -44,412 +43,242 @@ logger.name = __name__
 __all__ = ["PRIDE"]
 
 
-@wrapt.decorator
-def params_to_update(wrapped, instance, args, kwargs):
-    vars(wrapped)["actual_kwargs"] = kwargs
-    return wrapped(*args, **kwargs)
+class PRIDE:
+    """Interface to the `PRIDE <http://rest.ensembl.org>`_ service
 
 
-class PRIDE(REST):
-    """Interface to the `PRIDE <http://rest.ensembl.org>`_ service"""
 
-    _url = "https://www.ebi.ac.uk/pride/ws/archive"
+    ::
+
+        from bioservices import PRIDE
+        p = PRIDE()
+        p.get_peptide_evidence(projectAccession)
+
+    .. versionchanged:: 1.10.1
+
+        Due to new API:
+
+        - the method project_count was dropped.
+        - get_project_list was renamed in get_project_files
+        - get_assays, get_assay_count, get_assay_count_project_accession, get_assay_list were dropped in v2
+        - get_protein_list, get_protein_count, get_protein_count_assay, get_protein_list, get_protein_list_assay
+          replaced by get_protein_evidences method
+        - get_peptide_list_assay, get_peptide_count, get_peptide_list, get_peptide_list_sequence,
+          get_peptide_count_assay replaced by get_peptide_evidence.
+
+    """
+
+    _url = "https://www.ebi.ac.uk/pride/ws/archive/v2"
 
     def __init__(self, verbose=False, cache=False):
         """**Constructor**
 
         :param verbose: set to False to prevent informative messages
+        :param cache: set to True to use caching. Not recommended for
+            this service that evolves a lot
         """
-        super(PRIDE, self).__init__(name="PRIDE", url=PRIDE._url, verbose=verbose, cache=cache)
+        self.services = REST(name="PRIDE", url=PRIDE._url, verbose=verbose, cache=cache)
 
     def get_project(self, identifier):
         """Retrieve project information by accession
 
+        List of PRIDE Archive Projects. The following method do not allows
+        to perform search, for search functionality you will need to use
+        the search/projects. The result list is Paginated using the pageSize and page.
+
         :param str identifier: a valid PRIDE identifier e.g., PRD000001
-        :return: a dictionary with the project details. See
-            http://www.ebi.ac.uk/pride/ws/archive/#!/project for details
+
+        :return: if identifier is invalid, returns an emppty dictionary {}
 
         .. doctest::
 
             >>> from bioservices import PRIDE
             >>> p = PRIDE()
             >>> res = p.get_project("PRD000001")
-            >>> res['numPeptides']
-            6758
+            >>> res['title']
+            'COFRADIC proteome of unstimulated human blood platelets'
 
         """
-        res = self.http_get("project/%s" % identifier)
+        res = self.services.http_get(f"projects/{identifier}")
+        if res == 400:
+            logger.warning(
+                f"Nothing found for {identifier}. may be this is not a valid identifier. Use get_projects"
+            )
+            return {}
         return res
 
-    @params_to_update
-    def get_project_list(
-        self,
-        query="",
-        show=10,
-        page=0,
-        sort=None,
-        order="desc",
-        speciesFilter=None,
-        ptmsFilter=None,
-        tissueFilter=None,
-        diseaseFilter=None,
-        titleFilter=None,
-        instrumentFilter=None,
-        experimentTypeFilter=None,
-        quantificationfilter=None,
-        projectTagFilter=None,
-    ):
+    def get_projects(self, pageSize=100, max_pages=1e9):
+        """Get list of all projects"""
+        N = self.get_projects_count()
+        Npages = int(N / pageSize)
+        Npages = min(Npages, max_pages)
+
+        results = []
+        page_count = 0
+        for page in tqdm.tqdm(range(Npages)):
+            res = self.services.http_get("projects", params={"pageSize": pageSize, "page": page})
+            results.extend(res["_embedded"]["projects"])
+            page_count += 1
+            if page_count > max_pages:
+                break
+
+        return results
+
+    def get_projects_count(self):
+        res = self.services.http_get("projects")
+        return res["page"]["totalElements"]
+
+    def get_project_files(self, accession, pageSize=100, page=0, sortConditions=None, sortDirection="DESC", filters=""):
         """list projects or given criteria
 
-        :param str query: search term to query for
-        :param int show: how many results to return per page
+        :param str accession: the accession number to look for
+        :param int pageSize: how many results to return per page
         :param int page: which page (starting from 0) of the result to return
-        :param str sort: the field to sort on
-        :param str order: the sorting order (asc or desc)
-        :param str speciesFilter: filter by species (NCBI taxon ID or name)
-        :param str ptmsFilter: filter by PTM annotation	query
-        :param str tissueFilter: filter by tissue annotation
-        :param str diseaseFilter: filter by disease annotation
-        :param str titleFilter:	filter the title for keywords
-        :param str instrumentFilter: filter for instrument names or keywords
-        :param str experimentTypeFilter: filter by experiment type
-        :param str quantificationFilter: filter by quantification annotation
-        :param str projectTagFilter: filter by project tags
+        :param str sortConditions: default is submission_date but more fields
+            can be separated by comma and passed. Example: submission_date,project_title
+        :param str sortDirection: the sorting order (ASC or DESC)
+        :param str filters: Parameters to filter the search results. The structure of
+            the filter is: field1==value1, field2==value2. Example accession==PRD000001
 
         ::
 
             >>> p = PRIDE()
-            >>> projects = p.get_project_list(show=100)
+            >>> results = p.get_project_files(accession="PRD000001", pageSize=10, page=1)
+
+
+        In v1.10.1 due to new PRIDE API, the method **get_file_count** was dropped. You can use::
+
+            len(results['_embedded']['files'])
+
+        Similarly the **get_file_list** method was dropped since all results are
+        stored in the output of this method
+
 
         """
-        params = self.get_project_list.actual_kwargs
+        params = {
+            "pageSize": pageSize,
+            "page": page,
+            "sortDirection": sortDirection,
+            "sortConditions": sortConditions,
+            "filter": filters,
+        }
 
-        res = self.http_get("project/list", params=params)
+        res = self.services.http_get(f"projects/{accession}/files", params=params)
         try:
             res = res["list"]
         except:
             pass
         return res
 
-    @params_to_update
-    def get_project_count(
+    def get_protein_evidences(
         self,
-        query="",
-        speciesFilter=None,
-        ptmsFilter=None,
-        tissueFilter=None,
-        diseaseFilter=None,
-        titleFilter=None,
-        instrumentFilter=None,
-        experimentTypeFilter=None,
-        quantificationfilter=None,
-        projectTagFilter=None,
+        project_accession=None,
+        assay_accession=None,
+        reported_accession=None,
+        pageSize=100,
+        page=0,
+        sortDirection="DESC",
+        sortConditions="projectAccession",
     ):
 
-        """Count projects for given criteria
+        """Get all proteins evidence
 
-        Takes same query parameters as the /list operation; typically used to
-        retrieve number of results before querying with /list
-
-        :param str query: search term to query for
-        :param str speciesFilter: filter by species (NCBI taxon ID or name)
-        :param str ptmsFilter: filter by PTM annotation	query
-        :param str tissueFilter: filter by tissue annotation
-        :param str diseaseFilter: filter by disease annotation
-        :param str titleFilter:	filter the title for keywords
-        :param str instrumentFilter: filter for instrument names or keywords
-        :param str experimentTypeFilter: filter by experiment type
-        :param str quantificationFilter: filter by quantification annotation
-        :param str projectTagFilter: filter by project tags
-        :return: number of projects  (integer)
-
-
-        """
-        params = self.get_project_count.actual_kwargs
-        res = self.http_get("project/count", params=params)
-        return res
-
-    def get_assays(self, identifier):
-        """Retrieve assay information by assay accession
-
-        :param int identifier: assay accession number
+        :param project_accession:
+        :param assay_accession:
+        :param reported_accession:
+        :param int pageSize: how many results to return per page
+        :param int page: which page (starting from 0) of the result to return
+        :param str sortConditions: default is submission_date but more fields
+            can be separated by comma and passed. Example: submission_date,project_title
+        :param str sortDirection: the sorting order (ASC or DESC)
 
         ::
 
-            >>> p = PRIDE()
-            >>> res = p.get_assays(1643)
-            >>> res['proteinCount']
-            276
-
+            p.get_protein_evidences()['_embedded']['proteinevidences']
         """
-        res = self.http_get("assay/%s" % identifier)
+
+        params = {}
+        if project_accession:
+            params["projectAccession"] = project_accession
+        if assay_accession:  # pragma: no cover
+            params["assayAccession"] = assay_accession
+        if reported_accession:  # pragma: no cover
+            params["reportedAccession"] = reported_accession
+        params["pageSize"] = pageSize
+        params["page"] = page
+        params["sortConditions"] = sortConditions
+        params["sortDirection"] = sortDirection
+
+        res = self.services.http_get(f"proteinevidences", params=params)
         return res
 
-    def get_assay_list(self, identifier):
-        """Return list of assays for a project accession nuber
+    def get_peptide_evidence(
+        self,
+        project_accession=None,
+        assay_accession=None,
+        protein_accession=None,
+        peptide_evidence_accession=None,
+        peptide_sequence=None,
+        pageSize=100,
+        page=0,
+        sortDirection="DESC",
+        sortConditions="projectAccession",
+    ):
+        """Get all the peptide evidences for an specific protein evidence
 
-        :param str identifier: project accession number. See :meth:`get_project_list`
-        :return: list of dictionaries. Each dictionary represents an assay.
 
-        ::
+        :param project_accession:
+        :param assay_accession:
+        :param protein_accession:
+        :param peptide_evidence_accession:
+        :param peptide_sequence:
+        :param int pageSize: how many results to return per page
+        :param int page: which page (starting from 0) of the result to return
+        :param str sortConditions: default is submission_date but more fields
+            can be separated by comma and passed. Example: submission_date,project_title
+        :param str sortDirection: the sorting order (ASC or DESC)
 
-            >>> p = PRIDE()
-            >>> assays = p.get_assay_list('PRD000001')
-            >>> len(assays)  # could be found with get_assay_count_project_accession
-            5
-            >>> assays[1]['assayAccession']
-            1643
+        Retrieving data from project accession should be fast::
 
+            p.get_peptide_evidence(protein_accession="Q8IX30")
+
+        but other methods may be slow::
+
+            p.get_peptide_evidence(peptide_sequence="CQGSPGASKAMLSCNR")
         """
-        res = self.http_get("assay/list/project/%s" % identifier)
-        try:
-            res = res["list"]
-        except:
-            pass
+        params = {}
+        if project_accession:
+            params["projectAccession"] = project_accession
+        if assay_accession:  # pragma: no cover
+            params["assayAccession"] = assay_accession
+        if protein_accession:  # pragma: no cover
+            params["proteinAccession"] = protein_accession
+        if peptide_evidence_accession:  # pragma: no cover
+            params["peptideEvidenceAccession"] = peptide_evidence_accession
+        if peptide_sequence:  # pragma: no cover
+            params["peptideSequence"] = peptide_sequence
+        params["pageSize"] = pageSize
+        params["page"] = page
+        params["sortConditions"] = sortConditions
+
+        res = self.services.http_get(f"peptideevidences", params=params)
         return res
 
-    def get_assay_count(self, identifier):
-        """Count assays for a project accession number
+    def get_stats(self, name=None):
+        """Retrieve statistics by Name
 
-        :param str identifier: a project accession number
-        :return: integer
+        If you do not have the name, just type::
 
-        ::
+            p.get_stats()
 
-            >>> p = PRIDE()
-            >>> assays = p.get_assay_count('PRD000001')
-            5
+        and then, e.g., ::
 
+            p.get_stats("SUBMISSIONS_PER_YEAR")
 
         """
-        res = self.http_get("assay/count/project/%s" % identifier)
-        return res
 
-    def get_file_list(self, identifier):
-        """return list of files for a project
-
-        :param str identifier: a project accession number
-
-        ::
-
-            >>> files = p.get_file_count('PRD000001')
-            >>> len(files)
-            5
-
-        """
-        res = self.http_get("file/list/project/%s" % identifier)
-        try:
-            res = res["list"]
-        except:
-            pass
-        return res
-
-    def get_file_count(self, identifier):
-        """return count of files in a project
-
-        :param str identifier: a project accession number
-        :return: int
-
-        ::
-
-            >>> p.get_file_count('PRD000001')
-            5
-
-        """
-        res = self.http_get("file/count/project/%s" % identifier)
-        return res
-
-    def get_file_list_assay(self, identifier):
-        """list files for an assay
-
-        :param int identifier: assay accession number
-        :return: list of dictionary, Each dictionary represents a file data structure
-
-
-        ::
-
-            res = p.get_file_assay(1643)
-
-        """
-        res = self.http_get("file/list/assay/%s" % identifier)
-        try:
-            res = res["list"]
-        except:
-            pass
-        return res
-
-    def get_file_count_assay(self, identifier):
-        """list files for an assay
-
-        :param int identifier: assay accession number
-        :return: int
-
-        ::
-
-            p.get_file_assay(1643)
-        """
-        res = self.http_get("file/count/assay/%s" % identifier)
-        return res
-
-    @params_to_update
-    def get_protein_list(self, identifier, show=10, page=0):
-        """Retrieve protein identifications by project accession
-
-        :param str identifier: a project accession number
-        :param int show:		how many results to return per page
-        :param int page:		which page (starting from 0) of the result to return
-
-        """
-        params = self.get_protein_list.actual_kwargs
-        res = self.http_get("protein/list/project/%s" % identifier, params=params)
-        try:
-            res = res["list"]
-        except:
-            pass
-        return res
-
-    def get_protein_count(self, identifier):
-        """Count protein identifications by project accession
-
-        :param str identifier: a project accession number
-        :return: int
-
-        """
-        res = self.http_get("protein/count/project/%s" % identifier)
-        return res
-
-    @params_to_update
-    def get_protein_list_assay(self, identifier, show=10, page=0):
-        """Retrieve protein identifications by assay accession
-
-        :param str identifier: a project accession number
-        :param int show:		how many results to return per page
-        :param int page:		which page (starting from 0) of the result to return
-
-        """
-        params = self.get_protein_list_assay.actual_kwargs
-        res = self.http_get("protein/list/assay/%s" % identifier, params=params)
-        try:
-            res = res["list"]
-        except:
-            pass
-        return res
-
-    def get_protein_count_assay(self, identifier):
-        """Count protein identifications by assay accession
-
-        :param str identifier: a project accession number
-        :return: int
-
-        """
-        res = self.http_get("protein/count/assay/%s" % identifier)
-        return res
-
-    @params_to_update
-    def get_peptide_list(self, identifier, sequence=None, show=10, page=0):
-        """Retrieve peptide identifications by project accession (and sequence)
-
-        :param str identifier: a project accession number
-        :param str sequence: the peptide sequence to limit the query on (optional).
-            If provided, show and page are not used
-        :param int show:		how many results to return per page
-        :param int page:		which page (starting from 0) of the result to return
-
-        ::
-
-
-            >>> peptides = p.get_peptide_list('PRD000001',  sequence='PLIPIVVEQTGR')
-            >>> len(peptides)
-            4
-            >>> peptides = p.get_peptide_list('PRD000001')
-            >>> len(peptides)
-            10
-            >>> peptides = p.get_peptide_list('PRD000001', show=100)
-
-        .. note:: the function merge two functions from the PRIDE API (get_peptide_list and
-            get_peptide_list_sequence)
-        """
-        params = self.get_peptide_list.actual_kwargs
-        if sequence is None:
-            res = self.http_get("peptide/list/project/%s" % identifier, params=params)
+        if name is None:
+            res = self.services.http_get("stats/")
         else:
-            res = self.http_get("peptide/list/project/%s/sequence/%s" % (identifier, sequence))
-
-        try:
-            res = res["list"]
-        except:
-            pass
-        return res
-
-    def get_peptide_count(self, identifier, sequence=None):
-        """Count peptide identifications by project accession
-
-        :param str identifier: a project accession number
-        :return: int
-
-
-            >>> p.get_peptide_count('PRD000001', sequence='PLIPIVVEQTGR')
-            4
-            >>> p.get_peptide_count('PRD000001')
-            6758
-
-        """
-        if sequence is None:
-            res = self.http_get("peptide/count/project/%s" % identifier)
-        else:
-            res = self.http_get("peptide/count/project/%s/sequence/%s" % (identifier, sequence))
-        return res
-
-    @params_to_update
-    def get_peptide_list_assay(self, identifier, sequence=None, show=10, page=0):
-        """Retrieve peptide identifications by assay accession (and sequence)
-
-        :param str identifier: an assay accession number
-        :param str sequence: the peptide sequence to limit the query on (optional).
-            If provided, show and page are not used
-        :param int show:		how many results to return per page
-        :param int page:		which page (starting from 0) of the result to return
-
-        ::
-
-            >>> peptides = p.get_peptide_list_assay(1643,  sequence='AAATQKKVER')
-            >>> len(peptides)
-            5
-            >>> peptides = p.get_peptide_list_assay(1643)
-            >>> len(peptides)
-            10
-            >>> peptides = p.get_peptide_list_assay(1643, show=100)
-
-        .. note:: the function merge two functions from the PRIDE API (get_peptide_list and
-            get_peptide_list_sequence)
-        """
-        params = self.get_peptide_list_assay.actual_kwargs
-        if sequence is None:
-            res = self.http_get("peptide/list/assay/%s" % identifier, params=params)
-        else:
-            res = self.http_get("peptide/list/assay/%s/sequence/%s" % (identifier, sequence))
-        try:
-            res = res["list"]
-        except:
-            pass
-        return res
-
-    def get_peptide_count_assay(self, identifier, sequence=None):
-        """Count peptide identifications by assay accession
-
-        :param str identifier: an assay accession number
-        :return: int
-
-        ::
-
-            >>> p.get_peptide_count_assay(1643, sequence='AAATQKKVER')
-            5
-            >>> p.get_peptide_count_assay(1643)
-            1696
-
-        """
-        if sequence is None:
-            res = self.http_get("peptide/count/assay/%s" % identifier)
-        else:
-            res = self.http_get("peptide/count/assay/%s/sequence/%s" % (identifier, sequence))
+            res = self.services.http_get(f"stats/{name}")
         return res
