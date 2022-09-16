@@ -13,8 +13,8 @@ BIOSERVICES: access to biological web services programmatically
     :target: http://bioservices.readthedocs.org/en/main/?badge=main
     :alt: Documentation Status
 
-.. image:: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/bioservices.png
-    :target: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/bioservices.png
+.. image:: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_256.png
+    :target: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_256.png
 
 :Python_version_available: BioServices is tested for Python 3.6, 3.7, 3.8, 3.9
 :Contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
@@ -176,8 +176,13 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.10.2    * Fix #226 and applied PR from Fix from @GianArauz
+            https://github.com/cokelaer/bioservices/pull/232 about UniProt 
+            error
+          * Update MANIFEST to fix #232
 1.10.1    * allow command line to download genbank and GFF
           * update pride module to use new PRIDE API (July 2022)
+          * Fixed KEGG bug #225
 1.10.0    * Update uniprot to use the new API (june 2022)
 1.9.0     * Update unichem to reflect new API
 1.8.4     * biomodels. Fix #208
