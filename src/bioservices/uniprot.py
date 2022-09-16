@@ -816,26 +816,8 @@ class UniProt:
 
         # you may end up with duplicated...
         output.drop_duplicates(inplace=True)
-        columns = [
-            "lit_pubmed_id",
-            "protein_families",
-            "Gene names",
-            "go",
-            "go_ids",
-            "interaction",
-            "keyword",
-        ]
-        for col in columns:
-            try:
-                res = output[col].apply(
-                    lambda x: [
-                        this.strip() for this in str(x).split(";") if this != "nan"
-                    ]
-                )
-                output[col] = res
-            except:
-                self.services.logging.warning("column could not be parsed. %s" % col)
-        # Sequences are splitted into chunks of 10 characters. let us rmeove
+
+        # Sequences are splitted into chunks of 10 characters. let us remove
         # the spaces:
         if "sequence" in output.columns:
             output["sequence"].fillna("", inplace=True)
