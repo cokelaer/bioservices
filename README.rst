@@ -13,11 +13,11 @@ BIOSERVICES: access to biological web services programmatically
     :target: http://bioservices.readthedocs.org/en/main/?badge=main
     :alt: Documentation Status
 
-.. image:: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_256.png
-    :target: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_256.png
+.. image:: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_logo_256.png
+    :target: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_logo_256.png
 
 :Python_version_available: BioServices is tested for Python 3.6, 3.7, 3.8, 3.9
-:Contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
+:Contributions: Please join https://github.com/cokelaer/bioservices 
 :Issues: Please use https://github.com/cokelaer/bioservices/issues
 :How to cite: Cokelaer et al. *BioServices: a common Python package to access biological Web Services programmatically*
      `Bioinformatics <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ (2013) 29 (24): 3241-3242
@@ -46,7 +46,7 @@ Each contribution has been an encouragement to pursue this project. Thanks to al
 
 .. image:: https://contrib.rocks/image?repo=cokelaer/bioservices
     :target: https://github.com/cokelaer/bioservices/graphs/contributors
-  
+
 
 Quick example
 =============
@@ -56,13 +56,25 @@ organism::
 
     >>> from bioservices import UniProt
     >>> u = UniProt(verbose=False)
-    >>> data = u.search("zap70+and+taxonomy:9606", frmt="tab", limit=3, 
-    ...                 columns="entry name,length,id, genes")
+    >>> data = u.search("zap70+and+taxonomy_id:9606", frmt="tab", limit=3, 
+    ...                 columns="id,length,accession, gene_names")
     >>> print(data)
     Entry name   Length  Entry   Gene names
     ZAP70_HUMAN  619     P43403  ZAP70 SRK
     B4E0E2_HUMAN 185     B4E0E2
     RHOH_HUMAN   191     Q15669  RHOH ARHH TTF
+
+
+.. note:: major changes of UniProt API changed all columns names in June 2022. The code above is valid for bioservices
+   versions >1.10. Earlier version used::
+
+        >>> data = u.search("zap70+and+taxonomy:9606", frmt="tab", limit=3, 
+        ...                 columns="entry name,length,id, genes")
+
+   Correspondences can be found in::
+
+        u._legacy_names
+
 
 More examples and tutorials are available in the `On-line documentation <http://bioservices.readthedocs.io/>`_
 
