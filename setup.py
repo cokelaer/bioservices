@@ -5,7 +5,7 @@ import glob
 
 _MAJOR               = 1
 _MINOR               = 10
-_MICRO               = 2
+_MICRO               = 3
 version              = '%d.%d.%d' % (_MAJOR, _MINOR, _MICRO)
 release              = '%d.%d' % (_MAJOR, _MINOR)
 
@@ -34,9 +34,9 @@ metainfo = {
           'Intended Audience :: Science/Research',
           'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
           'Operating System :: OS Independent',
-          'Programming Language :: Python :: 3.6',
           'Programming Language :: Python :: 3.7',
           'Programming Language :: Python :: 3.8',
+          'Programming Language :: Python :: 3.9',
           'Topic :: Software Development :: Libraries :: Python Modules',
           'Topic :: Scientific/Engineering :: Bio-Informatics',
           'Topic :: Scientific/Engineering :: Information Analysis',
@@ -45,22 +45,21 @@ metainfo = {
     }
 
 
-with open('README.rst') as f:
-    readme = f.read()
-with open('HISTORY.rst') as f:
-    history = f.read()
+with open('README.rst', 'r', encoding='utf-8') as f:
+    long_description =  f.read()
 
+with open('requirements.txt', 'r') as f:
+    install_requires = f.read()
 
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 # sphinx-gallery and numpydoc are used for the doc only.
 # Could have a if on_rtd
-install_requires = ["grequests", "requests",
-        "requests_cache", "easydev>=0.9.36", "beautifulsoup4", "xmltodict",
-        "lxml",
-        "suds-community", "appdirs", 'wrapt', "pandas", "colorlog"],
-
+#install_requires = ["grequests", "requests",
+#        "requests_cache", "easydev>=0.9.36", "beautifulsoup4", "xmltodict",
+#        "lxml",
+#        "suds-community", "appdirs", 'wrapt', "pandas", "colorlog"],
 
 setup(
     name             = 'bioservices',
@@ -69,7 +68,7 @@ setup(
     maintainer_email = metainfo['authors']['Cokelaer'][1],
     author           = metainfo['authors']['Cokelaer'][0],
     author_email     = metainfo['authors']['Cokelaer'][1],
-    long_description = readme + '\n\n' + history,
+    long_description = long_description, 
     long_description_content_type = metainfo["long_description_content_type"],
     keywords         = metainfo['keywords'],
     description = metainfo['description'],
@@ -86,6 +85,17 @@ setup(
 
     # If user of python2.6 ordereddict must be installed manually
     install_requires = install_requires,
+    extras_require={
+        "testing": [
+            "pytest",
+            "pytest-cov",
+            "pytest-xdist",
+            "pytest-mock",
+            "pytest-timeout",
+            "pytest-runner",
+            "coveralls",
+        ],
+    },
     entry_points = {
         'console_scripts':[
            'bioservices=bioservices.main:main',

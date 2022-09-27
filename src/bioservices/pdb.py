@@ -240,7 +240,7 @@ class PDB:
     Again, many more complex examples can be found on PDB page.
     """
 
-    _url = "http://search.rcsb.org/rcsbsearch/v1/"
+    _url = "https://search.rcsb.org/rcsbsearch/v2/query"
 
     def __init__(self, verbose=False, cache=False):
         """.. rubric:: Constructor
@@ -338,9 +338,9 @@ class PDB:
             if return_type:
                 query["return_type"] = return_type
         if "return_type" not in query:  # pragma: no cover
-            raise ValueError("Yourr query must have a return_type key")
-        print(query)
-        res = self.services.http_post("query", frmt="json", json=query)
+            raise ValueError("Your query must have a return_type key")
+        print
+        res = self.services.http_post("", frmt="json", json=query)
         return res
 
     def get_current_ids(self):

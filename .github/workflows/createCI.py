@@ -6,7 +6,6 @@
 services = [
     'arrayexpress',
     'bigg',
-    'biocarta',
     'biodbnet',
     'biogrid',
     'biomart',

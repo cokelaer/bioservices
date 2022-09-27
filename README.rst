@@ -16,7 +16,10 @@ BIOSERVICES: access to biological web services programmatically
 .. image:: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_logo_256.png
     :target: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_logo_256.png
 
-:Python_version_available: BioServices is tested for Python 3.6, 3.7, 3.8, 3.9
+.. image:: https://static.pepy.tech/personalized-badge/bioservices?period=month&units=international_system&left_color=black&right_color=orange&left_text=Downloads
+    :target: https://pepy.tech/project/bioservices
+
+:Python_version_available: BioServices is tested for Python 3.7, 3.8, 3.9
 :Contributions: Please join https://github.com/cokelaer/bioservices 
 :Issues: Please use https://github.com/cokelaer/bioservices/issues
 :How to cite: Cokelaer et al. *BioServices: a common Python package to access biological Web Services programmatically*
@@ -91,9 +94,7 @@ arrayexpress          .. image:: https://github.com/cokelaer/bioservices/actions
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/arrayexpress.yml
 bigg                  .. image:: https://github.com/cokelaer/bioservices/actions/workflows/bigg.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/bigg.yml
-biocarta              .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biocarta.yml/badge.svg
-                         :target: https://github.com/cokelaer/bioservices/actions/workflows/biocarta.yml
-biocontainers         .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biocontainersyml/badge.svg
+biocontainers         .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biocontainers.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/biocontainers.yml
 biodbnet              .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biodbnet.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/biodbnet.yml
@@ -189,6 +190,8 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.10.3    * Update pdb service to use v2 API
+          * remove biocarta (website not accesible anymore)
 1.10.2    * Fix #226 and applied PR from Fix from @GianArauz
             https://github.com/cokelaer/bioservices/pull/232 about UniProt 
             error
@@ -213,6 +216,19 @@ Version   Description
 1.8.0     * add main standalone application. 
           * moved chemspider and clinvitae to the attic
           * removed picr service, not active anymore
+1.4.X     * NEW RNAseq from EBI in rnaseq_ebi module
+          * Replaced deprecated HGNC with the official web service from genenames.org
+          * Fully updated EUtils since WSDL is now down; implementation uses REST now.
+          * Removed the apps/taxonomy module now part of http://github.com/biokit. 
+1.3.X     * CACHE files are now stored in a general directory in the home
+          * New REST class to use **requests** package instead of urllib2. 
+          * Creation of a global configuration file in .config/bioservice/bioservices.cfg
+          * NEW services: Reactome, Readseq, Ensembl, EUtils
+1.2.X     * NEW services: BioDBnet, BioDBNet, MUSCLE, PathwayCommons, GeneProf
+1.1.X     * NEW services: biocarta, pfam, ChEBI, UniChem
+1.0.0:    * first stable release
+0.9.X:    * NEW services: BioModels, Kegg, Reactome, Chembl, PICR, QuickGO, 
+            Rhea, UniProt,WSDbfetch, NCBIblast, PSICQUIC, Wikipath
 ========= ====================================================================
 
 
