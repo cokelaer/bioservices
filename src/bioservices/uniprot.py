@@ -812,7 +812,8 @@ class UniProt:
                 if isinstance(output, type(None)):
                     output = df.copy()
                 else:
-                    output = output.append(df, ignore_index=True)
+                    # output = output.append(df, ignore_index=True)
+                    output = pd.concat([output, df], ignore_index=True)
 
         # you may end up with duplicated...
         output.drop_duplicates(inplace=True)
@@ -835,7 +836,7 @@ class UniProt:
                 output[col] = res
             except:
                 self.services.logging.warning("column could not be parsed. %s" % col)
-        # Sequences are splitted into chunks of 10 characters. let us rmeove
+        # Sequences are splitted into chunks of 10 characters. Let us remove
         # the spaces:
         if "sequence" in output.columns:
             output["sequence"].fillna("", inplace=True)
