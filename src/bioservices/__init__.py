@@ -32,9 +32,6 @@ from .services import *
 from . import biodbnet
 from .biodbnet import *
 
-from . import biocarta
-from .biocarta import *
-
 from . import biomodels
 from .biomodels import *
 
