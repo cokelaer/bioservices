@@ -87,7 +87,10 @@ class QuickGO(REST):
             return res
 
     def get_go_terms(self, query, max_number_of_pages=None):
-        """Get information on all terms and page through the result"""
+        """Get information on all terms and page through the result
+        
+        :param str query: terms as string of comma seperated values
+        """
 
         query = query.replace(":", "%3A")
         query = query.replace(",", "%2C")
