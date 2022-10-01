@@ -33,6 +33,7 @@
 """
 import os
 from bioservices.services import REST
+from tqdm import tqdm
 import webbrowser
 from bioservices import logger
 
@@ -45,7 +46,7 @@ except:
 __all__ = ["ChEMBL"]
 
 
-class ChEMBL(REST):
+class ChEMBL:
     """New ChEMBL API bioservices 1.6.0
 
     **Resources**
@@ -326,7 +327,7 @@ class ChEMBL(REST):
     Get approved drugs for lung cancer
 
 
-    The ChEMBL API significantly changed in 2018 and the nez version of
+    The ChEMBL API significantly changed in 2018 and the new version of
     bioservices (1.6.0) had to change the API as well, which has been
     simplified.
 
@@ -354,7 +355,8 @@ class ChEMBL(REST):
     _url = "https://www.ebi.ac.uk/chembl/api/data"
 
     def __init__(self, verbose=False, cache=False):
-        super(ChEMBL, self).__init__(url=ChEMBL._url, name="ChEMBL", verbose=verbose, cache=cache)
+        self.services = REST(name="ChEMBL", url=ChEMBL._url, verbose=verbose, cache=cache, 
+            url_defined_later=True)
         self.format = "json"
 
     def _get_data(self, name, params):
@@ -368,7 +370,7 @@ class ChEMBL(REST):
         # Not sure whether it is a bug or intended behaviour but this caused
         # some issues during the debugging.
 
-        # So http_get("mechanism?format=json&limit=10000&offset=10")
+        # So services.http_get("mechanism?format=json&limit=10000&offset=10")
         # returns 990 entries and not 1000 as expected.
 
         # if a resources is small (e.g. tissue has 655 < 1000 entries) there is
@@ -380,7 +382,7 @@ class ChEMBL(REST):
         # The limit used in all other calls
         limit = 1000
 
-        res = self.http_get("{}".format(name), params=params)
+        res = self.services.http_get("{}".format(name), params=params)
         self._check_request(res)
 
         # get rid of page_meta key/value
@@ -398,24 +400,23 @@ class ChEMBL(REST):
             max_data = res["page_meta"]["total_count"]
 
         N = max_data
-        from easydev import Progress
 
-        pb = Progress(N)
         count = 1
 
-        while res["page_meta"]["next"] and len(data) < max_data:
-            params["limit"] = limit
-            params["offset"] = limit * count + offset
-            res = self.http_get("{}".format(name), params=params)
-            data += res[names]
-            count += 1
-            pb.animate(len(data))
-            self.page_meta = res["page_meta"]
+        with tqdm(total=N, desc='TEST') as pb:
+            while res["page_meta"]["next"] and len(data) < max_data:
+                params["limit"] = limit
+                params["offset"] = limit * count + offset
+                res = self.services.http_get("{}".format(name), params=params)
+                data += res[names]
+                count += 1
+                pb.update(len(data))
+                self.page_meta = res["page_meta"]
 
         if self.page_meta["next"]:
             offset = self.page_meta["offset"]
             total = self.page_meta["total_count"] - len(data) - int(offset)
-            self.logging.warning(
+            self.services.logging.warning(
                 "More data available ({}). rerun with higher"
                 "limit and/or offset {}. Check content of page_meta"
                 " attribute".format(total, offset)
@@ -475,18 +476,18 @@ class ChEMBL(REST):
             res = self._get_data(name, params)
         # user may use integer, floats or strings.
         elif isinstance(query, (str, int, float)):
-            res = self.http_get("{}/{}".format(name, query), params=params)
+            res = self.services.http_get("{}/{}".format(name, query), params=params)
             self._check_request(res)
         elif isinstance(query, list):
             assert params["limit"] <= 1000, "limit must be less than 1000"
             ids = ";".join([str(x) for x in query])
-            res = self.http_get("{}/set/{}".format(name, ids), params=params)
+            res = self.services.http_get("{}/set/{}".format(name, ids), params=params)
             self._check_request(res)
             # Note that there is no page_meta key in the returned object but a
             # single key that is the plural for of the resource except if some
             # entries are not found. In such case, a
             if "not_found" in res.keys():
-                self.logging.warning("Some entries were not found: {}".format(res["not_found"]))
+                self.services.logging.warning("Some entries were not found: {}".format(res["not_found"]))
                 self.not_found = res["not_found"]
                 del res["not_found"]
             names = list(res.keys())[0]
@@ -498,16 +499,16 @@ class ChEMBL(REST):
         # Check the validity of limits
         assert params["limit"] > 0, "limits must be less than 1000"
         assert params["limit"] <= 1000, "limits must be positive"
-        res = self.http_get("{}/search.{}?q={}".format(name, self.format, query), params=params)
+        res = self.services.http_get("{}/search.{}?q={}".format(name, self.format, query), params=params)
 
         if isinstance(res, int):
-            self.logging.warning("Invalid request for {} {}. Check your parameters".format(name, params))
+            self.services.logging.warning("Invalid request for {} {}. Check your parameters".format(name, params))
             return {}
 
         if "page_meta" in res and res["page_meta"]["next"]:
             Next = res["page_meta"]["next"]
             offset = Next.split("&offset=")[1]
-            self.logging.warning("More data available with offset {}".format(offset))
+            self.services.logging.warning("More data available with offset {}".format(offset))
         return res
 
     def search_activity(self, query, limit=20, offset=0):
@@ -915,7 +916,7 @@ class ChEMBL(REST):
         for query in queries:
             req = "image/{}".format(query)
             params = {"engine": engine, "format": format, "dimensions": dimensions}
-            target_data = self.http_get(req, frmt=None, params=params)
+            target_data = self.services.http_get(req, frmt=None, params=params)
 
             file_out = os.getcwd()
             if format == "png":
@@ -926,7 +927,7 @@ class ChEMBL(REST):
                 file_out += "/%s.svg" % query
                 with open(file_out, "w") as thisfile:
                     thisfile.write(target_data)
-            self.logging.info("saved to %s" % file_out)
+            self.services.logging.info("saved to %s" % file_out)
 
             fout = file_out
             res["chemblids"].append(query)
@@ -945,7 +946,7 @@ class ChEMBL(REST):
 
         .. seealso:: :meth:`get_status_resources`
         """
-        return self.http_get("status?format=json")
+        return self.services.http_get("status?format=json")
 
     def get_status_resources(self):
         """Return number of entries for all resources
@@ -957,7 +958,7 @@ class ChEMBL(REST):
 
         def _local_get(this):
             params = {"limit": 1, "offset": 0}
-            return self.http_get("{}?format=json".format(this), params=params)["page_meta"]["total_count"]
+            return self.services.http_get("{}?format=json".format(this), params=params)["page_meta"]["total_count"]
 
         data = {}
         for this in [
@@ -986,11 +987,11 @@ class ChEMBL(REST):
             "target_relation",
             "tissue",
         ]:
-            self.logging.info("Looking at {}".format(this))
+            self.services.logging.info("Looking at {}".format(this))
             try:
                 data[this] = _local_get(this)
             except:
-                self.logging.warning("{} resources seems down".format(this))
+                self.services.logging.warning("{} resources seems down".format(this))
         return data
 
     def order_by(self, data, name, ascending=True):
@@ -1055,22 +1056,19 @@ class ChEMBL(REST):
         compound2target = defaultdict(set)
 
         filter = "molecule_chembl_id__in={}"
-        from easydev import Progress
 
         if isinstance(compounds, list):
             pass
         else:
             compounds = list(compounds)
 
-        pb = Progress(len(compounds))
-        for i in range(0, len(compounds)):
+        for compound in tqdm(compounds):
             # FIXME could get activities by bunch using
             # ",".join(compounds[i:i+10) for example
-            activities = self.get_activity(filters=filter.format(compounds[i]))
+            activities = self.get_activity(filters=filter.format(compound))
             # get target ChEMBL IDs from activities
             for act in activities:
                 compound2target[act["molecule_chembl_id"]].add(act["target_chembl_id"])
-            pb.animate(i + 1)
 
         # What we need is to get targets for all targets found in the previous
         # step. For each compound/drug there are hundreds of targets though. And
