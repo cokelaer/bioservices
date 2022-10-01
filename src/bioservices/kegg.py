@@ -542,6 +542,10 @@ class KEGG(REST):
               # same as above
               s.get("hsa05130", "image")
 
+              # to retrieve genome, you must preceed the entry with gn:
+              s.get('gn:T01001')
+              # to retrieve a network, you must preceed it with network:
+              s.get('network:nt06214')
 
           Another example here below shows how to save the image of a given pathway::
 
@@ -1366,6 +1370,7 @@ class KEGGParser(object):
                 "KEYWORDS",
                 "HISTORY",
                 "MASS",
+                "MAP",
                 "ORGANISM",
                 "ORG_CODE",
                 "POSITION",
@@ -1455,6 +1460,7 @@ class KEGGParser(object):
                 "COMPOUND",
                 "RMODULE",
                 "PATHWAY_MAP",
+                "MEMBER",
                 "STR_MAP",
                 "OTHER_MAP",
                 "PATHWAY",

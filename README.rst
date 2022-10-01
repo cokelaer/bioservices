@@ -13,11 +13,12 @@ BIOSERVICES: access to biological web services programmatically
     :target: http://bioservices.readthedocs.org/en/main/?badge=main
     :alt: Documentation Status
 
+.. image:: https://static.pepy.tech/personalized-badge/bioservices?period=month&units=international_system&left_color=black&right_color=orange&left_text=Downloads
+    :target: https://pepy.tech/project/bioservices
+
 .. image:: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_logo_256.png
     :target: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_logo_256.png
 
-.. image:: https://static.pepy.tech/personalized-badge/bioservices?period=month&units=international_system&left_color=black&right_color=orange&left_text=Downloads
-    :target: https://pepy.tech/project/bioservices
 
 :Python_version_available: BioServices is tested for Python 3.7, 3.8, 3.9
 :Contributions: Please join https://github.com/cokelaer/bioservices 
@@ -192,6 +193,7 @@ Version   Description
 ========= ====================================================================
 1.10.3    * Update pdb service to use v2 API
           * remove biocarta (website not accesible anymore)
+          * Update Chembl (no API changes)
 1.10.2    * Fix #226 and applied PR from Fix from @GianArauz
             https://github.com/cokelaer/bioservices/pull/232 about UniProt 
             error

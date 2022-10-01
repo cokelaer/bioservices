@@ -62,5 +62,4 @@ User guide
     references
     external_references.rst
     faqs
-    ChangeLog.rst
     contributors

@@ -771,6 +771,15 @@ class UniProt:
             set it to None to keep all entries but this will be very slow
         :return: dataframe with indices being the uniprot id (e.g. DIG1_YEAST)
 
+        To get about 100 columns related to the accession P62988, type:
+
+            df = u.get_df('P62988')
+
+        Note that you may preceed the accesion by the keyword **sec_acc) to access secondary 
+        accessions numbers::
+
+            df = u.get_df('sec_acc:P62988')
+
         """
         if isinstance(entries, str):
             entries = [entries]

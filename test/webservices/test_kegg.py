@@ -159,6 +159,8 @@ def test_get(kegg):
         assert False
     except:
         assert True
+    res = kegg.get('network:nt06214')
+
 
 
 def test_parse(kegg, parse_input):
