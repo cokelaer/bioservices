@@ -115,7 +115,7 @@ def checkURLs(urls):
         except:
             pass
 
-class BioModels(WSDLService):
+class BioModelsOld(WSDLService):
     """Interface to the `BioModels <http://www.ebi.ac.uk/biomodels>`_ service
 
     ::
@@ -147,7 +147,7 @@ class BioModels(WSDLService):
 
         """
         
-        logger.warning("This is a deprecated version of biomodels services, which will be shut down in June 2020"
+        logger.warning("This is a deprecated version of biomodels services, which will be shut down in June 2020")
         if BioModelsOld._url is None:
             raise Exception("Unable to connect to BioModels")
 

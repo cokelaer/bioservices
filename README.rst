@@ -13,11 +13,14 @@ BIOSERVICES: access to biological web services programmatically
     :target: http://bioservices.readthedocs.org/en/main/?badge=main
     :alt: Documentation Status
 
-.. image:: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/bioservices.png
-    :target: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/bioservices.png
+.. image:: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_logo_256.png
+    :target: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_logo_256.png
 
-:Python_version_available: BioServices is tested for Python 3.6, 3.7, 3.8, 3.9
-:Contributions: Please join https://github.com/cokelaer/bioservices and share your notebooks https://github.com/bioservices/notebooks/
+.. image:: https://static.pepy.tech/personalized-badge/bioservices?period=month&units=international_system&left_color=black&right_color=orange&left_text=Downloads
+    :target: https://pepy.tech/project/bioservices
+
+:Python_version_available: BioServices is tested for Python 3.7, 3.8, 3.9
+:Contributions: Please join https://github.com/cokelaer/bioservices 
 :Issues: Please use https://github.com/cokelaer/bioservices/issues
 :How to cite: Cokelaer et al. *BioServices: a common Python package to access biological Web Services programmatically*
      `Bioinformatics <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ (2013) 29 (24): 3241-3242
@@ -46,7 +49,7 @@ Each contribution has been an encouragement to pursue this project. Thanks to al
 
 .. image:: https://contrib.rocks/image?repo=cokelaer/bioservices
     :target: https://github.com/cokelaer/bioservices/graphs/contributors
-  
+
 
 Quick example
 =============
@@ -56,13 +59,26 @@ organism::
 
     >>> from bioservices import UniProt
     >>> u = UniProt(verbose=False)
-    >>> data = u.search("zap70+and+taxonomy:9606", frmt="tab", limit=3, 
-    ...                 columns="entry name,length,id, genes")
+    >>> data = u.search("zap70+and+taxonomy_id:9606", frmt="tsv", limit=3, 
+    ...                 columns="id,length,accession, gene_names")
     >>> print(data)
     Entry name   Length  Entry   Gene names
     ZAP70_HUMAN  619     P43403  ZAP70 SRK
     B4E0E2_HUMAN 185     B4E0E2
     RHOH_HUMAN   191     Q15669  RHOH ARHH TTF
+
+
+.. note:: major changes of UniProt API changed all columns names in June 2022. The code above is valid for bioservices
+   versions >1.10. Earlier version used::
+
+        >>> data = u.search("zap70+and+taxonomy:9606", frmt="tab", limit=3, 
+        ...                 columns="entry name,length,id, genes")
+
+   Note that columns names have changed, the frmt was changed from tab to tsv 
+   and taxonomy is now taxonomy_id. Names correspondences can be found in::
+
+        u._legacy_names
+
 
 More examples and tutorials are available in the `On-line documentation <http://bioservices.readthedocs.io/>`_
 
@@ -78,9 +94,7 @@ arrayexpress          .. image:: https://github.com/cokelaer/bioservices/actions
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/arrayexpress.yml
 bigg                  .. image:: https://github.com/cokelaer/bioservices/actions/workflows/bigg.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/bigg.yml
-biocarta              .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biocarta.yml/badge.svg
-                         :target: https://github.com/cokelaer/bioservices/actions/workflows/biocarta.yml
-biocontainers         .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biocontainersyml/badge.svg
+biocontainers         .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biocontainers.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/biocontainers.yml
 biodbnet              .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biodbnet.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/biodbnet.yml
@@ -176,8 +190,15 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.10.3    * Update pdb service to use v2 API
+          * remove biocarta (website not accesible anymore)
+1.10.2    * Fix #226 and applied PR from Fix from @GianArauz
+            https://github.com/cokelaer/bioservices/pull/232 about UniProt 
+            error
+          * Update MANIFEST to fix #232
 1.10.1    * allow command line to download genbank and GFF
           * update pride module to use new PRIDE API (July 2022)
+          * Fixed KEGG bug #225
 1.10.0    * Update uniprot to use the new API (june 2022)
 1.9.0     * Update unichem to reflect new API
 1.8.4     * biomodels. Fix #208
@@ -195,6 +216,19 @@ Version   Description
 1.8.0     * add main standalone application. 
           * moved chemspider and clinvitae to the attic
           * removed picr service, not active anymore
+1.4.X     * NEW RNAseq from EBI in rnaseq_ebi module
+          * Replaced deprecated HGNC with the official web service from genenames.org
+          * Fully updated EUtils since WSDL is now down; implementation uses REST now.
+          * Removed the apps/taxonomy module now part of http://github.com/biokit. 
+1.3.X     * CACHE files are now stored in a general directory in the home
+          * New REST class to use **requests** package instead of urllib2. 
+          * Creation of a global configuration file in .config/bioservice/bioservices.cfg
+          * NEW services: Reactome, Readseq, Ensembl, EUtils
+1.2.X     * NEW services: BioDBnet, BioDBNet, MUSCLE, PathwayCommons, GeneProf
+1.1.X     * NEW services: biocarta, pfam, ChEBI, UniChem
+1.0.0:    * first stable release
+0.9.X:    * NEW services: BioModels, Kegg, Reactome, Chembl, PICR, QuickGO, 
+            Rhea, UniProt,WSDbfetch, NCBIblast, PSICQUIC, Wikipath
 ========= ====================================================================
 
 
