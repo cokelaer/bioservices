@@ -20,7 +20,7 @@ BIOSERVICES: access to biological web services programmatically
     :target: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_logo_256.png
 
 
-:Python_version_available: BioServices is tested for Python 3.7, 3.8, 3.9
+:Python_version_available: BioServices is tested for Python 3.7, 3.8, 3.9, 3.10
 :Contributions: Please join https://github.com/cokelaer/bioservices 
 :Issues: Please use https://github.com/cokelaer/bioservices/issues
 :How to cite: Cokelaer et al. *BioServices: a common Python package to access biological Web Services programmatically*
