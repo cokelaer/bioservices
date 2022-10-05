@@ -191,6 +191,7 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.10.4    * Fix v1.10.3 adding missing requirements.txt
 1.10.3    * Update pdb service to use v2 API
           * remove biocarta (website not accesible anymore)
           * Update Chembl (no API changes)
