@@ -159,8 +159,6 @@ reactome              .. image:: https://github.com/cokelaer/bioservices/actions
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/reactome.yml
 rhea                  .. image:: https://github.com/cokelaer/bioservices/actions/workflows/rhea.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/rhea.yml
-rnaseq_ebi            .. image:: https://github.com/cokelaer/bioservices/actions/workflows/rnaseq_ebi.yml/badge.svg
-                         :target: https://github.com/cokelaer/bioservices/actions/workflows/rnaseq_ebi.yml
 seqret                .. image:: https://github.com/cokelaer/bioservices/actions/workflows/seqret.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/seqret.yml
 unichem               .. image:: https://github.com/cokelaer/bioservices/actions/workflows/unichem.yml/badge.svg
