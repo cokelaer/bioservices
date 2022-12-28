@@ -36,7 +36,7 @@ from bioservices import logger
 logger.name = __name__
 
 
-class OmniPath(REST):
+class OmniPath:
     """Interface to the `OmniPath <http://www.ebi.ac.uk/unichem/>`_ service
 
     .. doctest::
@@ -55,17 +55,17 @@ class OmniPath(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(OmniPath, self).__init__(name="OmniPath", url=OmniPath._url, verbose=verbose, cache=cache)
+        self.services = REST(name="OmniPath", url=OmniPath._url, verbose=verbose, cache=cache)
 
     def get_about(self):
         """Information about the version"""
-        res = self.http_get(self.url + "about").content
+        res = self.services.http_get("about").content
         return res
 
     def get_network(self, frmt="json"):
         """Get basic statistics about the whole network including sources"""
         assert frmt in ["json", "tsv"], "frmt must be set to json or tsv"
-        res = self.http_get(self.url + "network", frmt=frmt, params={"format": frmt})
+        res = self.services.http_get("network", frmt=frmt, params={"format": frmt})
 
         return res
 
@@ -117,19 +117,19 @@ class OmniPath(REST):
             params["fields"] = fields
 
         # TODO handle multiple fields
-        res = self.http_get(self.url + "interactions/%s" % query, frmt=frmt, params=params)
+        res = self.services.http_get("interactions/%s" % query, frmt=frmt, params=params)
         return res
 
     def get_resources(self, frmt="json"):
         """Return statistics about the databases and their contents"""
-        res = self.http_get(self.url + "resources", frmt=frmt, params={"format": frmt})
+        res = self.services.http_get("resources", frmt=frmt, params={"format": frmt})
         return res
 
     def get_info(self):
         """Currently returns HTML page"""
         from easydev import browser
 
-        browser.browse(self.url + "info")
+        browser.browse("info")
 
     def get_ptms(self, query="", ptm_type=None, frmt="json", fields=[]):
         """List enzymes, substrates and PTMs
@@ -158,5 +158,5 @@ class OmniPath(REST):
         if len(fields):
             params["fields"] = fields
 
-        res = self.http_get(self.url + "ptms/%s" % query, frmt="json", params=params)
+        res = self.services.http_get("ptms/%s" % query, frmt="json", params=params)
         return res

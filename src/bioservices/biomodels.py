@@ -32,25 +32,19 @@
 
 """
 import os
-import copy
-import webbrowser
-from functools import wraps
+from urllib.request import urlopen
+
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
-from bioservices.services import REST
 
-try:
-    # python 3
-    from urllib.request import urlopen
-except:
-    from urllib2 import urlopen
 
 __all__ = ["BioModels"]
 
 
-class BioModels(REST):
+class BioModels:
     """Interface to the `BioModels <http://www.ebi.ac.uk/biomodels>`_ service
 
     ::
@@ -91,7 +85,8 @@ class BioModels(REST):
 
 
         """
-        super(BioModels, self).__init__(name="BioModels", url=BioModels._url, verbose=verbose)
+        self.services = REST(name="BioModels", url=BioModels._url, verbose=verbose)
+
 
     def _check_format(self, frmt, supported=["json", "xml", "html"]):
         if frmt not in supported:
@@ -111,7 +106,7 @@ class BioModels(REST):
     def get_model(self, model_id, frmt="json"):
         """Fetch information about a given model at a particular revision."""
         self._check_format(frmt)
-        res = self.http_get(model_id, frmt=frmt, params={"format": frmt})
+        res = self.services.http_get(model_id, frmt=frmt, params={"format": frmt})
         return res
 
     def get_model_files(self, model_id, frmt="json"):
@@ -121,7 +116,7 @@ class BioModels(REST):
         :param frmt: format of the output (json, xml)
         """
         self._check_format(frmt, ["xml", "json"])
-        res = self.http_get("model/files/{}".format(model_id), frmt=frmt, params={"format": frmt})
+        res = self.services.http_get("model/files/{}".format(model_id), frmt=frmt, params={"format": frmt})
         return res
 
     def get_model_download(self, model_id, filename=None, output_filename=None):
@@ -166,16 +161,16 @@ class BioModels(REST):
         if filename:
             params["filename"] = filename
 
-        res = self.http_get("model/download/{}".format(model_id), params=params)
+        res = self.services.http_get("model/download/{}".format(model_id), params=params)
 
         if filename:
-            self.logging.info("Saving {}".format(filename))
+            self.services.logging.info("Saving {}".format(filename))
             if output_filename is None:
                 output_filename = filename
             with open(output_filename, "wb") as fout:
                 fout.write(res.content)
         else:
-            self.logging.info("Saving file {}.zip".format(model_id))
+            self.services.logging.info("Saving file {}.zip".format(model_id))
             if output_filename is None:
                 output_filename = "{}.zip".format(model_id)
             with open(output_filename, "wb") as fout:
@@ -219,7 +214,7 @@ class BioModels(REST):
         ]
         if sort and sort not in sort_options:
             raise ValueError("sort must be in {}. You provided {}".format(sort_options, sort))
-        res = self.http_get("search", params=params)
+        res = self.services.http_get("search", params=params)
         return res
 
     def search_download(self, models, output_filename="models.zip", force=False):
@@ -238,13 +233,13 @@ class BioModels(REST):
         """
         if isinstance(models, list):
             models = ",".join(models)
-        res = self.http_get("search/download", params={"models": models})
+        res = self.services.http_get("search/download", params={"models": models})
 
         if res == 404:
-            self.logging.error("One of your model ID was probably incorrect")
+            self.services.logging.error("One of your model ID was probably incorrect")
             return
 
-        self.logging.info(output_filename)
+        self.services.logging.info(output_filename)
         if os.path.exists(output_filename) and force is False:
             raise IOError(
                 "{} exists already. Set force to True or change the output_filename argument".format(output_filename)
@@ -287,7 +282,7 @@ class BioModels(REST):
         if sort:
             params["sort"] = sort
 
-        res = self.http_get("parameterSearch/search", params=params)
+        res = self.services.http_get("parameterSearch/search", params=params)
 
         return res
 
@@ -300,9 +295,9 @@ class BioModels(REST):
 
         """
         self._check_format(frmt)
-        res = self.http_get("p2m/missing", params={"format": frmt})
+        res = self.services.http_get("p2m/missing", params={"format": frmt})
         res = res["missing"]
-        self.logging.info("Found {} missing model".format(len(res)))
+        self.services.logging.info("Found {} missing model".format(len(res)))
         return res
 
     def get_p2m_representative(self, model, frmt="json"):
@@ -317,7 +312,7 @@ class BioModels(REST):
 
         """
         self._check_format(frmt)
-        res = self.http_get("p2m/representative", params={"format": frmt, "model": model})
+        res = self.services.http_get("p2m/representative", params={"format": frmt, "model": model})
         return res
 
     def get_p2m_representatives(self, models, frmt="json"):
@@ -347,7 +342,7 @@ class BioModels(REST):
             models = ",".join([x.strip() for x in models.split(",")])
 
         self._check_format(frmt)
-        res = self.http_get("p2m/representatives", params={"format": frmt, "modelIds": models})
+        res = self.services.http_get("p2m/representatives", params={"format": frmt, "modelIds": models})
         return res
 
     def get_pdgsmm_missing(self, frmt="json"):
@@ -357,9 +352,9 @@ class BioModels(REST):
         :return: list of model identifiers
         """
         self._check_format(frmt)
-        res = self.http_get("pdgsmm/missing", params={"format": frmt})
+        res = self.services.http_get("pdgsmm/missing", params={"format": frmt})
         res = res["missing"]
-        self.logging.info("Found {} missing model".format(len(res)))
+        self.services.logging.info("Found {} missing model".format(len(res)))
         return res
 
     def get_pdgsmm_representative(self, model, frmt="json"):
@@ -374,7 +369,7 @@ class BioModels(REST):
 
         """
         self._check_format(frmt)
-        res = self.http_get("pdgsmm/representative", params={"format": frmt, "model": model})
+        res = self.services.http_get("pdgsmm/representative", params={"format": frmt, "model": model})
         return res
 
     def get_pdgsmm_representatives(self, models, frmt="json"):
@@ -397,5 +392,5 @@ class BioModels(REST):
             models = ",".join([x.strip() for x in models.split(",")])
 
         self._check_format(frmt)
-        res = self.http_get("pdgsmm/representatives", params={"format": frmt, "modelIds": models})
+        res = self.services.http_get("pdgsmm/representatives", params={"format": frmt, "modelIds": models})
         return res

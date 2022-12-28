@@ -1,6 +1,7 @@
 from bioservices.cog import COG
 import pytest
 
+
 def test_cog():
     c = COG()
     c.get_cogs()
@@ -19,4 +20,3 @@ def test_cog():
     c.get_cog_definition_by_name("Thiamin-binding stress-response protein YqgV, UPF0045 family")
     c.get_taxonomic_categories()
     c.get_taxonomic_category_by_name("ALPHAPROTEOBACTERIA")
-

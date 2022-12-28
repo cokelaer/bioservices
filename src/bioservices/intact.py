@@ -41,7 +41,7 @@ class Intact(object):
         print("Not implemented yet. For Intact Complex, please use IntactComplex class")
 
 
-class IntactComplex(REST):
+class IntactComplex:
     """Interface to the `Intact <http://www.ebi.ac.uk/intact/>`_ service
 
     .. doctest::
@@ -58,7 +58,7 @@ class IntactComplex(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(IntactComplex, self).__init__(name="IntactComplex", url=IntactComplex._url, verbose=verbose, cache=cache)
+        self.services = REST(name="IntactComplex", url=IntactComplex._url, verbose=verbose, cache=cache)
 
     def search(self, query, frmt="json", facets=None, first=None, number=None, filters=None):
         """Search for a complex inside intact complex.
@@ -153,7 +153,7 @@ class IntactComplex(REST):
             "filters": filters,
         }
 
-        result = self.http_get("search/" + query, frmt="json", params=params)
+        result = self.services.http_get("search/" + query, frmt="json", params=params)
 
         # if isinstance(result, int):
         #    raise ValueError("Got a number from Intact request. Check validity of the arguments ")
@@ -172,5 +172,5 @@ class IntactComplex(REST):
         :param str query: EBI-1163476
 
         """
-        result = self.http_get("details/" + query, frmt="json")
+        result = self.services.http_get("details/" + query, frmt="json")
         return result

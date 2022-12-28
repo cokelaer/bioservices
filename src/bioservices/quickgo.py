@@ -37,7 +37,7 @@ from bioservices.services import REST
 __all__ = ["QuickGO"]
 
 
-class QuickGO(REST):
+class QuickGO:
     """Interface to the `QuickGO <http://www.ebi.ac.uk/QuickGO/WebServices.html>`_ service
 
     Retrieve information given a GO identifier:
@@ -60,11 +60,10 @@ class QuickGO(REST):
 
         """
         # super(QuickGO, self).__init__(url="http://www.ebi.ac.uk/QuickGO-Old",
-        super(QuickGO, self).__init__(
-            url="https://www.ebi.ac.uk/QuickGO",
+        self.services = REST(url="https://www.ebi.ac.uk/QuickGO",
             name="quickGO",
             verbose=verbose,
-            cache=cache,
+            cache=cache
         )
 
     def go_search(self, query, limit=600, page=1):
@@ -80,7 +79,7 @@ class QuickGO(REST):
         query = query.replace(":", "%3A")
         query = query.replace(",", "%2C")
         params = {"query": query, "limit": limit, "page": page}
-        res = self.http_get(url, frmt="json", params=params, headers=self.get_headers("json"))
+        res = self.services.http_get(url, frmt="json", params=params, headers=self.services.get_headers("json"))
         try:
             return res["results"]
         except:  # pragma: no cover
@@ -88,14 +87,14 @@ class QuickGO(REST):
 
     def get_go_terms(self, query, max_number_of_pages=None):
         """Get information on all terms and page through the result
-        
+
         :param str query: terms as string of comma seperated values
         """
 
         query = query.replace(":", "%3A")
         query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}".format(query)
-        results = self.http_get(url, frmt="json", params={}, headers=self.get_headers("json"))
+        results = self.services.http_get(url, frmt="json", params={}, headers=self.services.get_headers("json"))
         try:
             return results["results"]
         except:  # pragma: no cover
@@ -106,7 +105,7 @@ class QuickGO(REST):
         query = query.replace(":", "%3A")
         query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/ancestors".format(query)
-        results = self.http_get(url, frmt="json", params={}, headers=self.get_headers("json"))
+        results = self.services.http_get(url, frmt="json", params={}, headers=self.services.get_headers("json"))
         try:
             return results["results"]
         except:  # pragma: no cover
@@ -116,7 +115,7 @@ class QuickGO(REST):
         query = query.replace(":", "%3A")
         query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/children".format(query)
-        results = self.http_get(url, frmt="json", params={}, headers=self.get_headers("json"))
+        results = self.services.http_get(url, frmt="json", params={}, headers=self.services.get_headers("json"))
         try:
             return results["results"]
         except:  # pragma: no cover
@@ -134,7 +133,7 @@ class QuickGO(REST):
         query = query.replace(":", "%3A")
         query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/chart".format(query)
-        res = self.http_get(url, frmt="json", params={}, headers={"Accept": "image/png"})
+        res = self.services.http_get(url, frmt="json", params={}, headers={"Accept": "image/png"})
         # import base64
         # res = base64.b64decode(res).decode()
         return res
@@ -153,7 +152,7 @@ class QuickGO(REST):
         _to = _to.replace(":", "%3A")
         _to = _to.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/paths/{}".format(_from, _to)
-        results = self.http_get(url, frmt="json", params={}, headers=self.get_headers("json"))
+        results = self.services.http_get(url, frmt="json", params={}, headers=self.services.get_headers("json"))
         return results
 
     def Annotation(
@@ -336,7 +335,7 @@ class QuickGO(REST):
                 "F": "molecular_function",
                 "C": "cellular_component",
             }
-            self.devtools.check_param_in_list(aspect, _valid_aspect)
+            self.services.devtools.check_param_in_list(aspect, _valid_aspect)
             params["aspect"] = aspects[aspect]
 
         if reference:
@@ -352,7 +351,7 @@ or a string (e.g., 'PUBMED:') """
                 )
             params["reference"] = reference
 
-        res = self.http_get(url, frmt="txt", params=params, headers=self.get_headers("json"))
+        res = self.services.http_get(url, frmt="txt", params=params, headers=self.services.get_headers("json"))
 
         try:
             import json

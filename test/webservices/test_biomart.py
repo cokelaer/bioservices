@@ -4,8 +4,8 @@ import pytest
 
 @pytest.fixture
 def biomart():
-    biomart = BioMart(host='www.ensembl.org', verbose=False)
-    biomart.mart_test = 'ENSEMBL_MART_ENSEMBL'
+    biomart = BioMart(host="www.ensembl.org", verbose=False)
+    biomart.mart_test = "ENSEMBL_MART_ENSEMBL"
     return biomart
 
 
@@ -25,8 +25,7 @@ def _test_datasets(biomart):
 
 @pytest.mark.flaky
 def _test_attributes(biomart):
-    assert 'oanatinus_gene_ensembl' in \
-        biomart.valid_attributes[biomart.mart_test]
+    assert "oanatinus_gene_ensembl" in biomart.valid_attributes[biomart.mart_test]
 
 
 @pytest.mark.flaky
@@ -39,7 +38,7 @@ def test_config(biomart):
     biomart.configuration("oanatinus_gene_ensembl")
 
 
-#fails on travais sometines
+# fails on travais sometines
 @pytest.mark.flaky
 def _test_query(biomart):
     res = biomart.query(biomart._xml_example)
@@ -66,6 +65,7 @@ def test_biomart_constructor():
         pass
     s.host = "www.ensembl.org"
 
+
 # # reactome not maintained anymore ?
 # https://support.bioconductor.org/p/62622/
 def _test_reactome_example():
@@ -73,7 +73,7 @@ def _test_reactome_example():
     s = BioMart("reactome.org")
     s.lookfor("reactome")
     s.datasets("REACTOME")
-    #['interaction', 'complex', 'reaction', 'pathway']
+    # ['interaction', 'complex', 'reaction', 'pathway']
     s.new_query()
     s.add_dataset_to_xml("pathway")
     s.add_filter_to_xml("species_selection", "Homo sapiens")
@@ -81,4 +81,3 @@ def _test_reactome_example():
     s.add_attribute_to_xml("_displayname")
     xmlq = s.get_xml()
     res = s.query(xmlq)
-

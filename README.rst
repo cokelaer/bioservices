@@ -191,6 +191,11 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.11.0    * Fix uniprot limitation of 25 results only (
+          * For developers: all services are now refactorised to use services
+            as an attribute rather than a parent class.
+          * Remove ReactomeOld and ReactomeAnalysis (deprecated)
+          * move rnaseq_ebi (deprecated) to attic for book_keeping
 1.10.4    * Fix v1.10.3 adding missing requirements.txt
 1.10.3    * Update pdb service to use v2 API
           * remove biocarta (website not accesible anymore)

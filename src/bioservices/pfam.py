@@ -38,7 +38,7 @@ logger.name = __name__
 __all__ = ["Pfam"]
 
 
-class Pfam(REST):
+class Pfam:
     """Interface to `Pfam <http://pfam.sanger.ac.uk>`_ pages
 
     This is not a REST interface actually but rather a parser to some of the
@@ -58,7 +58,7 @@ class Pfam(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(Pfam, self).__init__(name="Pfam", url=Pfam._url, verbose=verbose)
+        self.services = REST(name="Pfam", url=Pfam._url, verbose=verbose)
 
     def show(self, Id):
         """Just an example of opening a web page with a uniprot Id
@@ -68,8 +68,8 @@ class Pfam(REST):
 
         """
         url = self._url + "/protein/" + Id
-        self.on_web(url)
+        self.services.on_web(url)
 
     def get_protein(self, ID):
-        res = self.http_get("protein", params={"id": ID, "output": "xml"})
+        res = self.services.http_get("protein", params={"id": ID, "output": "xml"})
         return res.content

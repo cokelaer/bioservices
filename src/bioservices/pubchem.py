@@ -36,7 +36,7 @@ from bioservices.services import REST
 __all__ = ["PubChem"]
 
 
-class PubChem(REST):
+class PubChem:
     """Interface to the `PubChem <todo>`_ service"""
 
     _url = "http://pubchem.ncbi.nlm.nih.gov/rest/pug"
@@ -50,13 +50,13 @@ class PubChem(REST):
             "PubChem is not finalised yet. This is currently only a draft version",
             file=sys.stderr,
         )
-        super(PubChem, self).__init__(name="PubChem", url=PubChem._url, verbose=verbose, cache=cache)
+        self.services = REST(name="PubChem", url=PubChem._url, verbose=verbose, cache=cache)
 
     def get_compound_by_smiles(self, identifier, frmt="json"):
 
-        res = self.http_get(
+        res = self.services.http_get(
             "compound/smiles/" + identifier + "/cids/%s" % frmt,
             frmt=frmt,
-            headers=self.get_headers(content=frmt),
+            headers=self.services.get_headers(content=frmt),
         )
         return res

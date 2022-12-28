@@ -3,21 +3,18 @@ from easydev import TempFile
 import pytest
 import os
 
-#pytestmark = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
+# pytestmark = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
 #     reason="On travis")
 
 
-modelId = 'BIOMD0000000256'
-uniprotId = 'P10113'
-pubId = '18308339'
-GOId = 'GO:0001756'
+modelId = "BIOMD0000000256"
+uniprotId = "P10113"
+pubId = "18308339"
+GOId = "GO:0001756"
 reacID = "REACT_1590"
 personName = "LeNovere"
 
 modelID = "BIOMD0000000100"
-
-
-
 
 
 @pytest.fixture
@@ -27,8 +24,7 @@ def biomodels():
 
 def test_get_model(biomodels):
     res = biomodels.get_model("BIOMD0000000100")
-    assert res['submissionId'] == "MODEL4589754842"
-    
+    assert res["submissionId"] == "MODEL4589754842"
 
     try:
         res = biomodels.get_model("BIOMD0000000100", frmt="dummy")
@@ -48,8 +44,7 @@ def test_get_model_download(biomodels):
 
     with TempFile(suffix=".png") as fout:
         # we download only the PNG file and save it in a new filename
-        biomodels.get_model_download(modelID, filename="BIOMD0000000100.png", 
-            output_filename=fout.name)
+        biomodels.get_model_download(modelID, filename="BIOMD0000000100.png", output_filename=fout.name)
 
 
 def test_get_p2m_representative(biomodels):
@@ -58,15 +53,16 @@ def test_get_p2m_representative(biomodels):
     res = biomodels.get_p2m_representative(modelID)
     assert res["requestedModelId"] == modelID
 
+
 def test_search(biomodels):
 
     res = biomodels.search("XXXXXXXXXXXXX")
     assert res["matches"] == 0
 
     res = biomodels.search(modelID, sort="id-asc", offset=1, numResults=5)
-    assert res['queryParameters']['offset'] == 1
-    assert res['queryParameters']['sortBy'] == "id"
-    assert res['queryParameters']['sortDirection'] == "asc"
+    assert res["queryParameters"]["offset"] == 1
+    assert res["queryParameters"]["sortBy"] == "id"
+    assert res["queryParameters"]["sortDirection"] == "asc"
 
     try:
         biomodels.search(modelID, sort="id-asffc")
@@ -80,16 +76,14 @@ def test_search(biomodels):
 def test_search_download(biomodels):
 
     with TempFile(suffix=".zip") as fout:
-        biomodels.search_download("BIOMD0000000100,BIOMD0000000654,",
-            output_filename=fout.name, force=True)
-        biomodels.search_download(["BIOMD0000000100","BIOMD0000000654"],
-            output_filename=fout.name, force=True)
+        biomodels.search_download("BIOMD0000000100,BIOMD0000000654,", output_filename=fout.name, force=True)
+        biomodels.search_download(["BIOMD0000000100", "BIOMD0000000654"], output_filename=fout.name, force=True)
 
     biomodels.search_download("XXXXXXXXXXXXXX")
 
+
 def test_search_parameters(biomodels):
     res = biomodels.search_parameter("MAPK", size=100, sort="entity")
-    
 
 
 def test_get_p2m_representatives(biomodels):
@@ -97,7 +91,7 @@ def test_get_p2m_representatives(biomodels):
     res = biomodels.get_p2m_representatives(models)
     assert sorted(models.split(",")) == sorted(res.keys())
 
-    models = ["BMID000000112902","BMID000000009880","BMID000000027397"]
+    models = ["BMID000000112902", "BMID000000009880", "BMID000000027397"]
     res = biomodels.get_p2m_representatives(models)
     assert sorted(models) == sorted(res.keys())
 
@@ -108,10 +102,12 @@ def test_get_pdgsmm_representative(biomodels):
     res = biomodels.get_pdgsmm_representative(modelID)
     assert res["requestedModelId"] == modelID
 
+
 def test_get_pdgsmm_representatives(biomodels):
     models = "MODEL1707110145,MODEL1707112456,MODEL1707115900"
     res = biomodels.get_pdgsmm_representatives(models)
     assert sorted(models.split(",")) == sorted(res.keys())
+
 
 """
 def test_size(biomodels):
@@ -257,4 +253,3 @@ def _test_extra_getUniprotIds(biomodels):
 def test_getModelsIdByUniprot(biomodels):
     biomodels.getModelsIdByUniprot("P10113")
 """
-

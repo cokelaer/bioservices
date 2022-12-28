@@ -35,7 +35,6 @@
     .. sectionauthor:: Thomas Cokelaer, Feb 2014
 
 """
-import io
 from bioservices.services import REST
 from bioservices import logger
 
@@ -90,7 +89,7 @@ class BioDBNet:
         # remove spaces so as to compare the input/output databases with the
         # list of databases returned by getInputs
         outputs = self._list_to_string(output_db)
-        inputResult = self.getInputs()
+        #inputResult = self.getInputs()
         # getOutputsForInput method
         outputResult = self.getOutputsForInput(input_db)
         outputResult = [this.lower().replace(" ", "") for this in outputResult]
@@ -258,8 +257,6 @@ class BioDBNet:
             self.logging.error(err)
             return request
         inputValues = self._interpret_input_db(inputValues)
-
-        # df = pd.readcsv(io.StringIO(res.strip()), sep="\t")
 
     def dbWalk(self, db_path, input_values, taxon=9606):
         """Walk through biological database network

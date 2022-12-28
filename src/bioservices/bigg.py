@@ -27,8 +27,6 @@ Interface to the BiGG Models API Service
         -- BiGG Models Home Page, March 10, 2020.
 """
 
-import os.path as osp
-
 from bioservices.services import REST
 from bioservices.util import sequencify, squash
 

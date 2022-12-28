@@ -1636,7 +1636,7 @@ class Ensembl:
         raise NotImplementedError
         # POST vep/:species/id/   Fetch variant consequences for multiple ids
         self._check_frmt(frmt, ["xml"])
-        res = self.services.http_get(
+        _ = self.services.http_get(
             "variation/{0}/{1}".format(species, identifier),
             frmt=frmt,
             headers=self.services.get_headers(content=frmt),

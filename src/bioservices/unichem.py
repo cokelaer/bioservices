@@ -33,7 +33,6 @@
 import json
 
 from bioservices import REST
-from bioservices import logger
 
 import colorlog
 

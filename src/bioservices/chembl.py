@@ -355,8 +355,7 @@ class ChEMBL:
     _url = "https://www.ebi.ac.uk/chembl/api/data"
 
     def __init__(self, verbose=False, cache=False):
-        self.services = REST(name="ChEMBL", url=ChEMBL._url, verbose=verbose, cache=cache, 
-            url_defined_later=True)
+        self.services = REST(name="ChEMBL", url=ChEMBL._url, verbose=verbose, cache=cache, url_defined_later=True)
         self.format = "json"
 
     def _get_data(self, name, params):
@@ -403,7 +402,7 @@ class ChEMBL:
 
         count = 1
 
-        with tqdm(total=N, desc='TEST') as pb:
+        with tqdm(total=N, desc="TEST") as pb:
             while res["page_meta"]["next"] and len(data) < max_data:
                 params["limit"] = limit
                 params["offset"] = limit * count + offset
@@ -881,7 +880,7 @@ class ChEMBL:
         return self._get_this_service("xref_source", query, params=params)
 
     def get_image(self, query, dimensions=500, format="png", save=True, view=True, engine="indigo"):
-        """Get the image of a given compound in PNG png format.
+        r"""Get the image of a given compound in PNG png format.
 
         :param str query: a valid compound ChEMBLId or a list/tuple
             of valid compound ChEMBLIds.

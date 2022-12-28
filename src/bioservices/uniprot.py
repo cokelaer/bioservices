@@ -1,10 +1,8 @@
 #
 #  This file is part of bioservices software
 #
-#  Copyright (c) 2013-2014 - EBI-EMBL
-#
-#  File author(s):
-#      Thomas Cokelaer <cokelaer@ebi.ac.uk
+#  Copyright (c) 2013-2016 - EBI-EMBL
+#  Copyright (c) 2016-2021 - Institut Pasteur, Paris
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
@@ -43,6 +41,7 @@ import io
 import time
 import urllib
 import json
+import tqdm
 
 import pandas as pd
 
@@ -70,14 +69,14 @@ class UniProt:
         >>> sequence = u.search("ZAP70_HUMAN", columns="sequence")
 
 
-    .. versionchanged:: 1.10 
-    
+    .. versionchanged:: 1.10
+
         Uniprot update its service in June 2022. Changes were made in the bioservices
-        API with small changes. User API is more or less the same. Main issues that may 
-        be faced are related to change of output column names. Please see the 
+        API with small changes. User API is more or less the same. Main issues that may
+        be faced are related to change of output column names. Please see the
         :attr:`_legacy_names` for corresponding changes.
 
-        Some notes about searches. The *and* and *or* are now upper cases. 
+        Some notes about searches. The *and* and *or* are now upper cases.
         The *organism* and *taxonomy* fields are now *organism_id* and *taxonomy_id*
 
 
@@ -85,84 +84,78 @@ class UniProt:
 
     # June 2022, API changes and these labels changed:
     _legacy_names = {
-        'id': 'accession',
-        'entry name': 'id',
-        'genes': 'gene_names',
-        'genes(PREFERRED)':	'gene_primary',
-        'genes(ALTERNATIVE)': 'gene_synonym',
-        'genes(OLN)': 'gene_oln',
-        'genes(ORF)':	'gene_orf',
-        'organism':	'organism_name',
-        'organism-id':	'organism_id',
-        'protein names':	'protein_name',
-        'proteome':	'xref_proteomes',
-        'lineage(ALL)':	'lineage',
-        'virus hosts':	'virus_hosts',
-
-        'comment(ALTERNATIVE PRODUCTS)': 'cc_alternative_products',
-        'feature(ALTERNATIVE SEQUENCE)': 'ft_var_seq',
-        'comment(ERRONEOUS GENE MODEL PREDICTION)': 'error_gmodel_pred',
-        'fragment': 'fragment',
-        'encodedon': 'organelle',
-        'length': 'length',
-        'mass': 'mass',
-        'comment(MASS SPECTROMETRY)': 'cc_mass_spectrometry',
-        'feature(NATURAL VARIANT)': 'ft_variant',
-        'feature(NON ADJACENT RESIDUES)': 'ft_non_cons',
-        'feature(NON STANDARD RESIDUE)': 'ft_non_std',
-        'feature(NON TERMINAL RESIDUE)': 'ft_non_ter',
-        'comment(POLYMORPHISM)': 'cc_polymorphism',
-        'comment(RNA EDITING)': 'cc_rna_editing',
-        'sequence': 'sequence',
-        'comment(SEQUENCE CAUTION)': 'cc_sequence_caution',
-        'feature(SEQUENCE CONFLICT)': 'ft_conflict',
-        'feature(SEQUENCE UNCERTAINTY)': 'ft_unsure',
-        'version(sequence)': 'sequence_version',
-
+        "id": "accession",
+        "entry name": "id",
+        "genes": "gene_names",
+        "genes(PREFERRED)": "gene_primary",
+        "genes(ALTERNATIVE)": "gene_synonym",
+        "genes(OLN)": "gene_oln",
+        "genes(ORF)": "gene_orf",
+        "organism": "organism_name",
+        "organism-id": "organism_id",
+        "protein names": "protein_name",
+        "proteome": "xref_proteomes",
+        "lineage(ALL)": "lineage",
+        "virus hosts": "virus_hosts",
+        "comment(ALTERNATIVE PRODUCTS)": "cc_alternative_products",
+        "feature(ALTERNATIVE SEQUENCE)": "ft_var_seq",
+        "comment(ERRONEOUS GENE MODEL PREDICTION)": "error_gmodel_pred",
+        "fragment": "fragment",
+        "encodedon": "organelle",
+        "length": "length",
+        "mass": "mass",
+        "comment(MASS SPECTROMETRY)": "cc_mass_spectrometry",
+        "feature(NATURAL VARIANT)": "ft_variant",
+        "feature(NON ADJACENT RESIDUES)": "ft_non_cons",
+        "feature(NON STANDARD RESIDUE)": "ft_non_std",
+        "feature(NON TERMINAL RESIDUE)": "ft_non_ter",
+        "comment(POLYMORPHISM)": "cc_polymorphism",
+        "comment(RNA EDITING)": "cc_rna_editing",
+        "sequence": "sequence",
+        "comment(SEQUENCE CAUTION)": "cc_sequence_caution",
+        "feature(SEQUENCE CONFLICT)": "ft_conflict",
+        "feature(SEQUENCE UNCERTAINTY)": "ft_unsure",
+        "version(sequence)": "sequence_version",
         # function
-        'comment(ABSORPTION)': 'absorption',
-        'feature(ACTIVE SITE)': 'ft_act_site',
-        'comment(ACTIVITY REGULATION)': 'cc_activity_regulation',
-        'feature(BINDING SITE)': 'ft_binding',
-        'chebi': 'ft_ca_bind',
-        'chebi(Catalytic activity)': 'cc_catalytic_activity',
-        'chebi(Cofactor)': 'cc_cofactor',
-        'feature(DNA BINDING)': 'ft_dna_bind',
-        'ec': 'ec',
-        'comment(FUNCTION)': 'cc_function',
-        'comment(KINETICS)': 'kinetics',
-        'feature(METAL BINDING)': 'ft_metal',
-        'feature(NP BIND)': 'ft_np_bind',
-        'comment(PATHWAY)': 'cc_pathway',
-        'comment(PH DEPENDENCE)': 'ph_dependence',
-        'comment(REDOX POTENTIAL)': 'redox_potential',
-        'rhea-id': 'rhea_id',
-        'feature(SITE)': 'ft_site',
-        'comment(TEMPERATURE DEPENDENCE)': 'temp_dependence',
-
+        "comment(ABSORPTION)": "absorption",
+        "feature(ACTIVE SITE)": "ft_act_site",
+        "comment(ACTIVITY REGULATION)": "cc_activity_regulation",
+        "feature(BINDING SITE)": "ft_binding",
+        "chebi": "ft_ca_bind",
+        "chebi(Catalytic activity)": "cc_catalytic_activity",
+        "chebi(Cofactor)": "cc_cofactor",
+        "feature(DNA BINDING)": "ft_dna_bind",
+        "ec": "ec",
+        "comment(FUNCTION)": "cc_function",
+        "comment(KINETICS)": "kinetics",
+        "feature(METAL BINDING)": "ft_metal",
+        "feature(NP BIND)": "ft_np_bind",
+        "comment(PATHWAY)": "cc_pathway",
+        "comment(PH DEPENDENCE)": "ph_dependence",
+        "comment(REDOX POTENTIAL)": "redox_potential",
+        "rhea-id": "rhea_id",
+        "feature(SITE)": "ft_site",
+        "comment(TEMPERATURE DEPENDENCE)": "temp_dependence",
         # misc
-        'annotation score': 'annotation_score',
-        'comment(CAUTION)': 'cc_caution',
-        'features': 'feature',
-        'keyword-id': 'keywordid',
-        'keywords': 'keyword',
-        'comment(MISCELLANEOUS)': 'cc_miscellaneous',
-        'existence': 'protein_existence',
-        'reviewed': 'reviewed',
-        'tools': 'tools',
-        'uniparcid': 'uniparc_id',
-
+        "annotation score": "annotation_score",
+        "comment(CAUTION)": "cc_caution",
+        "features": "feature",
+        "keyword-id": "keywordid",
+        "keywords": "keyword",
+        "comment(MISCELLANEOUS)": "cc_miscellaneous",
+        "existence": "protein_existence",
+        "reviewed": "reviewed",
+        "tools": "tools",
+        "uniparcid": "uniparc_id",
         # Interaction =============================
         "interactor": "cc_interaction",
         "comment(SUBUNIT)": "cc_subunit",
-
         # GO
         "go": "go",
         "go(biological process)": "go_p",
         "go(cellular component)": "go_c",
         "go(molecular function)": "go_f",
         "go-id": "go_id",
-
         # Date of
         "created": "date_created",
         "last-modified": "date_modified",
@@ -173,48 +166,43 @@ class UniProt:
         "feature(BETA STRAND)": "ft_strand",
         "feature(HELIX)": "ft_helix",
         "feature(TURN)": "ft_turn",
-
         # subcellular function
-        "comment(SUBCELLULAR LOCATION)":"cc_subcellular_location",
-        "feature(INTRAMEMBRANE)":"ft_intramem",
-        "feature(TOPOLOGICAL DOMAIN)":"ft_topo_dom",
+        "comment(SUBCELLULAR LOCATION)": "cc_subcellular_location",
+        "feature(INTRAMEMBRANE)": "ft_intramem",
+        "feature(TOPOLOGICAL DOMAIN)": "ft_topo_dom",
         "feature(TRANSMEMBRANE)": "ft_transmem",
-
         # Pathology
-        'comment(ALLERGEN)': 'cc_allergen',
-        'comment(BIOTECHNOLOGY)': 'cc_biotechnology',
-        'comment(DISRUPTION PHENOTYPE)': 'cc_disruption_phenotype',
-        'comment(DISEASE)': 'cc_disease',
-        'feature(MUTAGENESIS)': 'ft_mutagen',
-        'comment(PHARMACEUTICAL)': 'cc_pharmaceutical',
-        'comment(TOXIC DOSE)': 'cc_toxic_dose',
-
+        "comment(ALLERGEN)": "cc_allergen",
+        "comment(BIOTECHNOLOGY)": "cc_biotechnology",
+        "comment(DISRUPTION PHENOTYPE)": "cc_disruption_phenotype",
+        "comment(DISEASE)": "cc_disease",
+        "feature(MUTAGENESIS)": "ft_mutagen",
+        "comment(PHARMACEUTICAL)": "cc_pharmaceutical",
+        "comment(TOXIC DOSE)": "cc_toxic_dose",
         # PTM
-        'feature(CHAIN)': 'ft_chain',
-        'feature(CROSS LINK)': 'ft_crosslnk',
-        'feature(DISULFIDE BOND)': 'ft_disulfid',
-        'feature(GLYCOSYLATION)': 'ft_carbohyd',
-        'feature(INITIATOR METHIONINE)': 'ft_init_met',
-        'feature(LIPIDATION)': 'ft_lipid',
-        'feature(MODIFIED RESIDUE)': 'ft_mod_res',
-        'feature(PEPTIDE)': 'ft_peptide',
-        'comment(PTM)': 'cc_ptm',
-        'feature(PROPEPTIDE)': 'ft_propep',
-        'feature(SIGNAL)': 'ft_signal',
-        'feature(TRANSIT)': 'ft_transit',
-
+        "feature(CHAIN)": "ft_chain",
+        "feature(CROSS LINK)": "ft_crosslnk",
+        "feature(DISULFIDE BOND)": "ft_disulfid",
+        "feature(GLYCOSYLATION)": "ft_carbohyd",
+        "feature(INITIATOR METHIONINE)": "ft_init_met",
+        "feature(LIPIDATION)": "ft_lipid",
+        "feature(MODIFIED RESIDUE)": "ft_mod_res",
+        "feature(PEPTIDE)": "ft_peptide",
+        "comment(PTM)": "cc_ptm",
+        "feature(PROPEPTIDE)": "ft_propep",
+        "feature(SIGNAL)": "ft_signal",
+        "feature(TRANSIT)": "ft_transit",
         # Family domains
-        'feature(COILED COIL)': 'ft_coiled',
-        'feature(COMPOSITIONAL BIAS)': 'ft_compbias',
-        'comment(DOMAIN)': 'cc_domain',
-        'feature(DOMAIN EXTENT)': 'ft_domain',
-        'feature(MOTIF)': 'ft_motif',
-        'families': 'protein_families',
-        'feature(REGION)': 'ft_region',
-        'feature(REPEAT)': 'ft_repeat',
-        'comment(SIMILARITY)': '<does not exist>',
-        'feature(ZINC FINGER)': 'ft_zn_fing',
-
+        "feature(COILED COIL)": "ft_coiled",
+        "feature(COMPOSITIONAL BIAS)": "ft_compbias",
+        "comment(DOMAIN)": "cc_domain",
+        "feature(DOMAIN EXTENT)": "ft_domain",
+        "feature(MOTIF)": "ft_motif",
+        "families": "protein_families",
+        "feature(REGION)": "ft_region",
+        "feature(REPEAT)": "ft_repeat",
+        "comment(SIMILARITY)": "<does not exist>",
+        "feature(ZINC FINGER)": "ft_zn_fing",
     }
 
     _valid_columns = [
@@ -232,7 +220,6 @@ class UniProt:
         "xref_proteomes",
         "lineage",
         "virus_hosts",
-
         # Sequences ========================================================
         "fragment",
         "sequence",
@@ -253,81 +240,71 @@ class UniProt:
         "ft_conflict",
         "ft_unsure",
         "sequence_version",
-        
         # Family and Domains ========================================
-        'ft_coiled',
-        'ft_compbias',
-        'cc_domain',
-        'ft_domain',
-        'ft_motif',
-        'protein_families',
-        'ft_region',
-        'ft_repeat',
-        'ft_zn_fing',
-
+        "ft_coiled",
+        "ft_compbias",
+        "cc_domain",
+        "ft_domain",
+        "ft_motif",
+        "protein_families",
+        "ft_region",
+        "ft_repeat",
+        "ft_zn_fing",
         # Function ===================================================
-        'absorption',
-        'ft_act_site',
-        'cc_activity_regulation',
-        'ft_binding',
-        #'ft_ca_bind',
-        'cc_catalytic_activity',
-        'cc_cofactor',
-        'ft_dna_bind',
-        'ec',
-        'cc_function',
-        'kinetics',
-        #'ft_metal',
-        #'ft_np_bind',
-        'cc_pathway',
-        'ph_dependence',
-        'redox_potential',
-        #'rhea_id',
-        'ft_site',
-        'temp_dependence',
-
+        "absorption",
+        "ft_act_site",
+        "cc_activity_regulation",
+        "ft_binding",
+        # 'ft_ca_bind',
+        "cc_catalytic_activity",
+        "cc_cofactor",
+        "ft_dna_bind",
+        "ec",
+        "cc_function",
+        "kinetics",
+        # 'ft_metal',
+        # 'ft_np_bind',
+        "cc_pathway",
+        "ph_dependence",
+        "redox_potential",
+        # 'rhea_id',
+        "ft_site",
+        "temp_dependence",
         # Gene Ontology ==================================
         "go",
         "go_p",
         "go_f",
         "go_c",
         "go_id",
-
         # Interaction ======================================
         "cc_interaction",
         "cc_subunit",
-
         # EXPRESSION =======================================
         "cc_developmental_stage",
         "cc_induction",
         "cc_tissue_specificity",
-
         # Publications
         "lit_pubmed_id",
-        
         # Date of
         "date_created",
         "date_modified",
         "date_sequence_modified",
         "version",
-
         # Structure
         "structure_3d",
         "ft_strand",
         "ft_helix",
         "ft_turn",
-
         # Subcellular location
         "cc_subcellular_location",
         "ft_intramem",
         "ft_topo_dom",
         "ft_transmem",
-
         # Miscellaneous ==========================
         "annotation_score",
         "cc_caution",
         "comment_count",
-        #"feature",
+        # "feature",
         "feature_count",
         "keyword",
         "keywordid",
@@ -336,32 +313,29 @@ class UniProt:
         "tools",
         "reviewed",
         "uniparc_id",
-        
         # Pathology
-        'cc_allergen',
-        'cc_biotechnology',
-        'cc_disruption_phenotype',
-        'cc_disease',
-        'ft_mutagen',
-        'cc_pharmaceutical',
-        'cc_toxic_dose',
-
+        "cc_allergen",
+        "cc_biotechnology",
+        "cc_disruption_phenotype",
+        "cc_disease",
+        "ft_mutagen",
+        "cc_pharmaceutical",
+        "cc_toxic_dose",
         # PTM / Processsing
-        'ft_chain',
-        'ft_crosslnk',
-        'ft_disulfid',
-        'ft_carbohyd',
-        'ft_init_met',
-        'ft_lipid',
-        'ft_mod_res',
-        'ft_peptide',
-        'cc_ptm',
-        'ft_propep',
-        'ft_signal',
-        'ft_transit',
-
+        "ft_chain",
+        "ft_crosslnk",
+        "ft_disulfid",
+        "ft_carbohyd",
+        "ft_init_met",
+        "ft_lipid",
+        "ft_mod_res",
+        "ft_peptide",
+        "cc_ptm",
+        "ft_propep",
+        "ft_signal",
+        "ft_transit",
         # not documented
-        'xref_pdb'
+        "xref_pdb",
     ]
     _url = "https://rest.uniprot.org"
 
@@ -378,7 +352,7 @@ class UniProt:
         self._valid_mapping = None
         self._database = "uniprot"
 
-    def _download_flat_files(self, output="uniprot_sprot.dat.gz"): #pragma: no cover
+    def _download_flat_files(self, output="uniprot_sprot.dat.gz"):  # pragma: no cover
         """could be used to get all data in flat files (about compressed 500Mb )"""
         # deprecated in v1.10 due to API change in uniprot
         url = "ftp://ftp.ebi.ac.uk/pub/databases/uniprot/knowledgebase/uniprot_sprot.dat.gz"
@@ -395,32 +369,49 @@ class UniProt:
         groups = fields["groups"]
         rules = {}
         for item in fields["rules"]:
-            ID = item['ruleId']
+            ID = item["ruleId"]
             rules[ID] = item
 
-        # This is suppose to be a set of database name available in Uniprot 
+        # This is suppose to be a set of database name available in Uniprot
         from_to = {}
-        for item in [x for group in groups for x in group['items']]:
+        for item in [x for group in groups for x in group["items"]]:
             # should be name, not DisplayName
-            name = item['name']
-            if item['from']:
-                tos = rules[item['ruleId']]['tos']
+            name = item["name"]
+            if item["from"]:
+                tos = rules[item["ruleId"]]["tos"]
                 from_to[name] = tos
 
         self._valid_mapping = from_to
-    
+
     valid_mapping = property(_get_valid_mapping, _set_valid_mapping)
 
-    def mapping(self, fr="UniProtKB_AC-ID", to="KEGG", query="P13368", polling_interval_seconds=3, max_waiting_time=100):
+    def _get_next_link(self, headers):
+        import re
+
+        re_next_link = re.compile(r'<(.+)>; rel="next"')
+        if "Link" in headers:
+            match = re_next_link.match(headers["Link"])
+            if match:
+                return match.group(1)
+
+    def mapping(
+        self,
+        fr="UniProtKB_AC-ID",
+        to="KEGG",
+        query="P13368",
+        polling_interval_seconds=3,
+        max_waiting_time=100,
+        progress=True,
+    ):
         """This is an interface to the UniProt mapping service
 
         :param fr: the source database identifier. See :attr:`valid_mapping`.
         :param to: the targetted database identifier. See :attr:`valid_mapping`.
-        :param query: a string containing one or more IDs separated by a space
+        :param query: a string containing one or more IDs separated by a comma
             It can also be a list of strings.
         :param polling_interval_seconds: the number of seconds between each status check of the current job
         :param max_waiting_time: the maximum number of seconds to wait for the final answer.
-        :return: a dictionary with two possible keys. The first one is 'results' 
+        :return: a dictionary with two possible keys. The first one is 'results'
             with the from / to answers and the second one 'failedIds' with Ids that were not found
 
         ::
@@ -428,22 +419,22 @@ class UniProt:
             >>> u.mapping("UniProtKB_AC-ID", "KEGG", 'P43403')
             {'results': [{'from': 'P43403', 'to': 'hsa:7535'}]}
 
-        The output is a dictionary. Identifiers that were not found are stored in the keys 
+        The output is a dictionary. Identifiers that were not found are stored in the keys
         'failedIds'. Succesful queries are stored in the 'results' key that is a list
         of dictionaries with two keys set to 'from' and 'to'. The 'from' key should be in your input list.
-        The 'to' key is the result. Here we have the KEGG identifier recognised by its prefix 'hsa:', which is for human. 
+        The 'to' key is the result. Here we have the KEGG identifier recognised by its prefix 'hsa:', which is for human.
         Sometimes the output ('to') it is more complicated. Consider the following  example::
 
             u.mapping("UniParc", "UniProtKB", 'UPI0000000001,UPI0000000002')
 
         You will see that the UniParc results is more complex than just an identifier.
 
-        See :attr:`valid_mapping` attribut for list of valid mapping identifiers.
+        See :attr:`valid_mapping` attribute for list of valid mapping identifiers.
 
         Note that according to Uniprot (June 2022), there are various limits on ID Mapping Job Submission:
 
         ========= =====================================================================================
-        Limit	  Details     
+        Limit	  Details
         ========= =====================================================================================
         100,000	  Total number of ids allowed in comma separated param ids in /idmapping/run api
         500,000	  Total number of "mapped to" ids allowed
@@ -456,14 +447,15 @@ class UniProt:
             instead of strings so as to store more than one values.
         .. versionchanged:: 1.2.0 input query can also be a list of strings
             instead of just a string
-        .. versionchanged:: 1.3.1:: use http_post instead of http_get. This is 3 times
+        .. versionchanged:: 1.3.1 use http_post instead of http_get. This is 3 times
             faster and allows queries with more than 600 entries in one go.
-        .. version 1.10.0:: new API due to  uniprot website update
+        .. versionchanged:: 1.10.0 new API due to  uniprot website update
+        .. versionchanged:: 1.11.0 implement batch to prevent limit of 25 results.
         """
 
         if isinstance(query, (list, tuple)):
             query = ",".join(query)
-        elif isinstance(query,str):
+        elif isinstance(query, str):
             pass
 
         # First, we call the real mapping request
@@ -471,20 +463,33 @@ class UniProt:
 
         job = self.services.http_post("idmapping/run", frmt="json", data=params)
         try:
-            job_id = job['jobId']
+            job_id = job["jobId"]
         except TypeError:
-             logger.error(self.services.last_response.content.decode())
-             return
+            logger.error(self.services.last_response.content.decode())
+            return
 
-        # the job id will tell us about the job status 
+        # the job id will tell us about the job status
         results = None
         waiting_time = 0
-        while not results and waiting_time < max_waiting_time:   
-            logger.info("Waiting for {job_id} to complete")         
+        while not results and waiting_time < max_waiting_time:
+            logger.info("Waiting for {job_id} to complete")
             results = self.services.http_get(f"idmapping/status/{job_id}", frmt="json")
-            if results != 500 and 'results' in results:
-                return results
-            else: #pragma: no cover
+
+            # once ready, we can process the data
+            if results != 500 and "results" in results:
+                total = int(self.services.last_response.headers["X-Total-Results"])
+                batches = results["results"]
+                fails = results["failedIds"]
+
+                size = 25
+                for x in tqdm.tqdm(range(size, total, size), disable=not progress):
+                    link = self._get_next_link(self.services.last_response.headers)
+                    batch = self.services.http_get(link, frmt="json")
+                    batches += batch["results"]
+                    fails += results["failedIds"]
+                return {"results": batches, "failedIds": fails}
+
+            else:  # pragma: no cover
                 time.sleep(polling_interval_seconds)
                 results = None
             waiting_time += polling_interval_seconds
@@ -492,7 +497,7 @@ class UniProt:
     def retrieve(self, uniprot_id, frmt="json", database="uniprot", include=False):
         """Search for a uniprot ID in UniProtKB database
 
-        :param str uniprot: a valid UniProtKB ID, or uniref, uniparc or taxonomy. 
+        :param str uniprot: a valid UniProtKB ID, or uniref, uniparc or taxonomy.
         :param str frmt: expected output format amongst xml, txt, fasta, gff, rdf
         :param str database:  database name in (uniprot, uniparc, uniref, taxonomy)
         :param bool include: include data with RDF format.
@@ -509,38 +514,36 @@ class UniProt:
 
 
         .. versionchanged:: 1.10 the xml format is now returned as raw XML. It is not
-            interpreted anymore. The RDF has now an additional option to include data 
+            interpreted anymore. The RDF has now an additional option to include data
             from referenced data sets directly in the returned data (set include=True parameter).
-            Default output format is now set to json. 
+            Default output format is now set to json.
         """
-        if database == 'uniprot': 
-            if frmt not in ("txt", "xml", "rdf", "gff", "fasta", "json"):#pragma: no cover
+        if database == "uniprot":
+            if frmt not in ("txt", "xml", "rdf", "gff", "fasta", "json"):  # pragma: no cover
                 self.services.logging.warning("frmt must be set to one of: txt, xml, rdf, gff, fasta, json.")
-        elif database == 'uniparc':
-            if frmt not in ( "xml", "rdf", "fasta", 'tsv', 'json'): #pragma: no cover
+        elif database == "uniparc":
+            if frmt not in ("xml", "rdf", "fasta", "tsv", "json"):  # pragma: no cover
                 raise ValueError("frmt must be set to one of: tsv, xml, rdf, gff, fasta, json")
                 self.services.logging.warning("frmt must be set to one of: txt, xml, rdf, gff, fasta.")
-        elif database == 'uniref':
-            if frmt not in ("xml", "rdf", "fasta", 'tsv', 'json'): #pragma: no cover
+        elif database == "uniref":
+            if frmt not in ("xml", "rdf", "fasta", "tsv", "json"):  # pragma: no cover
                 self.services.logging.warning("frmt must be set to one of: xml, rdf, gff, fasta, json.")
         elif database == "taxonomy":
             pass
-        else: #pragma: no cover
+        else:  # pragma: no cover
             self.services.logging.warning("database must be set to uniref, uniparc, uniprot or taxonomy")
-
 
         if isinstance(uniprot_id, str):
             queries = uniprot_id.split(",")
         else:
             queries = uniprot_id
-        #queries = self.services.devtools.to_list(uniprot_id)
 
         # some magic here not documented on uniprot website...but multiple queries are possible
         url = [database + "/" + query + "." + frmt for query in queries]
 
         # the frmt=txt here is for the requests, nothing related to the uniprot format
-        res = self.services.http_get(url, frmt="txt", params={'include':include})
-        if frmt == 'json':
+        res = self.services.http_get(url, frmt="txt", params={"include": include})
+        if frmt == "json":
             for i, x in enumerate(res):
                 try:
                     res[i] = json.loads(x)
@@ -556,11 +559,11 @@ class UniProt:
 
         :param str uniprot_id: a valid identifier (e.g. P12345)
 
-        This is just an alias to :meth:`retrieve` when setting the format to 'fasta'. 
+        This is just an alias to :meth:`retrieve` when setting the format to 'fasta'.
         Method kept for legacy.
 
         """
-        res = self.retrieve(uniprot_id, frmt='fasta')
+        res = self.retrieve(uniprot_id, frmt="fasta")
         return res
 
     def search(
@@ -572,31 +575,36 @@ class UniProt:
         sort="score",
         compress=False,
         limit=None,
-        offset=None,
-        maxTrials=10,
+        size=25,
         database="uniprotkb",
+        progress=True,
     ):
         """Provide some interface to the uniprot search interface.
 
         :param str query: query must be a valid uniprot query.
             See https://www.uniprot.org/help/query-fields and examples below
-        :param str frmt: a valid format amongst html, tab, xls, asta, gff,
-            txt, xml, rdf, list, rss. If tab or xls, you can also provide the
-            columns argument.  (default is tab)
+        :param str frmt: a valid format amongst xlsx, fasta, gff,
+            tsv and json. OTher format are not available within bioservices (rss, obo, rdf, xml)
+            (default is tsv)
         :param str columns: comma-separated list of values. Works only if fomat
-            is tsv or xls. For UnitProtKB, some possible columns are:
-            id, entry name, length, organism. 
+            is tsv or xlsx. For UnitProtKB, some possible columns are:
+            id, entry name, length, organism.
             See also :attr:`~bioservices.uniprot.UniProt.valid_mapping`
             for the full list of column keywords.
         :param bool include_isoform: include isoform sequences when the frmt
             parameter is fasta. Include description when frmt is rdf.
         :param str sort: by score by default. Set to None to bypass this behaviour
         :param bool compress: gzip the results
-        :param int limit: Maximum number of results to retrieve.
-        :param int offset:  Offset of the first result, typically used together
-            with the limit parameter.
-        :param int maxTrials: this request is unstable, so we may want to try
-            several time.
+        :param int limit: Stops the download of results once this limit is crossed.
+            if size is 25 and limit is set to 30, 25+25 results will be returned though.
+            users need to do a post filtering.
+        :param int size: chunk of results (25 by default on uniprot website).
+
+        :return: depends on the value of **frmt**. Uniprot API returns all results in several
+            pages with **size** elements per page. If frmt is set to xlsx, output is a list of
+            excel-like page with **size** per item. If frmt is set to tsv, bioservices concatenate
+            all pages in a single string. Similarly for **gff**, **fasta** or **json**, bioservices concatenates
+            all pages in a single variable (txt or dictionary depending on the requested format).
 
         To obtain the list of uniprot ID returned by the search of zap70 can be
         retrieved as follows::
@@ -625,7 +633,7 @@ class UniProt:
 
             >>> u.search("P12345)
 
-        including the ID P12345 but also related entries. If you 
+        including the ID P12345 but also related entries. If you
         need only the entry that perfectly match the query, use::
 
             >>> u.search("accession:P12345")
@@ -638,28 +646,30 @@ class UniProt:
             the header: 'score', 'taxonomy', 'tools'. this is a uniprot feature,
             not bioservices.
 
-        .. versionchanged:: 1.10 
-        
+        .. versionchanged:: 1.10
+
             Due to uniprot API changes in June 2022:
 
-            * parameter 'include' is not named 'include_isoform
+            * parameter 'include' is now named 'include_isoform
             * default parameter 'tab' is now 'tsv' but does not change the results
+
+        .. versionchanged:: 1.11
+
+            * removed the offset argument
+            * add size parameter and keep limit parameter
+            * add progress bar option (True by default)
+            * drop frmt in : rdf, obo, xml, html
 
         """
         params = {}
 
         if frmt is not None:
             _valid_formats = [
-                "xls",
+                "xlsx",
                 "fasta",
+                "json",
                 "gff",
-                "txt",
                 "tsv",
-                "xml",
-                "rss",
-                "list",
-                "rss",
-                "html",
             ]
             self.services.devtools.check_param_in_list(frmt, _valid_formats)
             params["format"] = frmt
@@ -672,7 +682,6 @@ class UniProt:
                 columns = [x.strip() for x in columns.split(",")]
             else:
                 columns = [columns]
-
 
             # convert back to a string as expected by uniprot
             params["fields"] = ",".join([x.strip() for x in columns])
@@ -687,36 +696,77 @@ class UniProt:
             self.services.devtools.check_param_in_list(sort, ["score"])
             params["sort"] = sort
 
-        if offset is not None:
-            #if isinstance(offset, int):
-            params["cursor"] = offset
+        if size is not None:
+            if isinstance(size, int):
+                params["size"] = size
 
+        # if a limit is provided, we will stop before getting all pages
+        # consequently, we want the size to be a multiple of limit.
         if limit is not None:
-            if isinstance(limit, int):
+            if isinstance(size, int):
                 params["size"] = limit
 
         # + are interpreted and have a meaning. See arrayexpress module for details
-
         query = query.replace("+", " ")
-        params['query'] = query
-        del params['sort']
+        params["query"] = query
+        del params["sort"]
 
         res = self.services.http_get(f"{database}/search", frmt="txt", params=params)
-        return res
 
-    def quick_search(self, query, include_isoforms=False, sort="score", limit=None):
+        # concatenate by removing intermediate header
+        if frmt in ["tsv"]:
+            batches = res
+        # concatenate
+        elif frmt in ["fasta", "gff"]:
+            batches = res
+        elif frmt in ["json"]:
+            batches = json.loads(res)
+        else:
+            batches = [res]
+
+        try:
+            total = int(self.services.last_response.headers["X-Total-Results"])
+        except KeyError:
+            self.services.logging.error("No results found")
+            return
+
+        if limit is not None:
+            total = limit
+
+        # start after first chunk since we already called the general search once
+        for x in tqdm.tqdm(range(size, total, size), disable=not progress):
+            link = self._get_next_link(self.services.last_response.headers)
+            batch = self.services.http_get(link, frmt="txt")
+
+            # drop the header for tsv
+            if frmt in ["tsv"]:
+                batch = batch.split("\n")[1:]
+                batches += "\n".join(batch)
+            elif frmt in ["fasta", "gff"]:
+                batches += batch
+            elif frmt in ["json"]:
+                batches["results"].extend(json.loads(batch)["results"])
+            else:
+                batches += [batch]
+
+        if frmt in ["tsv"]:
+            # remove last empty line
+            batches = batches.strip()
+
+        return batches
+
+    def quick_search(self, query, limit=1):
         """a specialised version of :meth:`search`
 
         This is equivalent to::
 
             u = uniprot.UniProt()
-            u.search(query, frmt='tsv', sort="score", limit=None)
+            u.search(query, frmt='tsv', sort="score", limit=1)
 
         :returns: a dictionary.
 
         """
-        res = self.search(query, "tsv", include_isoforms=include_isoforms, 
-            sort=sort, limit=limit)
+        res = self.search(query, "tsv", include_isoforms=False, sort="score", limit=limit, progress=False)
 
         # if empty result, nothing to do
         if res and len(res) == 0:
@@ -724,7 +774,7 @@ class UniProt:
 
         # else populate a dictionary
         newres = {}
-        for line in res.split("\n")[1:-1]:
+        for line in res.split("\n")[1:]:
             # print line
             Entry, a, b, c, d, e, f = line.split("\t")
             # print Entry, a, b, c, d, e, f
@@ -752,15 +802,13 @@ class UniProt:
 
             u.uniref("uniprot:(ec:1.1.1.282 taxonomy_name:bacteria reviewed:true)")
 
-        .. versionchanged:: 1.10 due to uniprot API changes in June 2022, 
+        .. versionchanged:: 1.10 due to uniprot API changes in June 2022,
             we now return a json instead of a pandas dataframe.
         """
-        res = self.services.http_get(
-            f"uniref/UniRef90_{query}.json", frmt="json"
-        )
+        res = self.services.http_get(f"uniref/UniRef90_{query}.json", frmt="json")
         return res
 
-    def get_df(self, entries, nChunk=100, organism=None, limit=10):
+    def get_df(self, entries, nChunk=100, organism=None, limit=10, columns=None, progress=False):
         """Given a list of uniprot entries, this method returns a dataframe with all possible columns
 
 
@@ -775,7 +823,7 @@ class UniProt:
 
             df = u.get_df('P62988')
 
-        Note that you may preceed the accesion by the keyword **sec_acc) to access secondary 
+        Note that you may preceed the accesion by the keyword **sec_acc) to access secondary
         accessions numbers::
 
             df = u.get_df('sec_acc:P62988')
@@ -787,12 +835,7 @@ class UniProt:
             entries = list(set(entries))
         output = pd.DataFrame()
 
-        self.services.logging.info(
-            "fetching information from uniprot for {} entries".format(len(entries))
-        )
-
-        if limit < len(entries):
-            self.services.logging.warning("The limit paramter is less than the number of entries. Probably not what you want. set limit to the length of the entries to remove this message")
+        self.services.logging.info("fetching information from uniprot for {} entries".format(len(entries)))
 
         nChunk = min(nChunk, len(entries))
         N, rest = divmod(len(entries), nChunk)
@@ -805,10 +848,7 @@ class UniProt:
                     query += f"+AND+{organism}"
 
                 res = self.search(
-                    query,
-                    frmt="tsv",
-                    columns=",".join(self._valid_columns),
-                    limit=limit,
+                    query, frmt="tsv", columns=",".join(self._valid_columns), limit=limit, progress=progress
                 )
             else:
                 break
@@ -831,5 +871,8 @@ class UniProt:
         if "sequence" in output.columns:
             output["sequence"].fillna("", inplace=True)
             output.Sequence = output["sequence"].apply(lambda x: x.replace(" ", ""))
+
+        if columns:
+            output = output[columns.split(",")]
 
         return output

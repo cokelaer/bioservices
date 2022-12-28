@@ -58,7 +58,7 @@ pages.
   Here are some examples of entry Ids:
 
     * **genes_id**: A KEGG organism and a gene name (e.g. 'eco:b0001').
-    * **enzyme_id**: 'ec' and an enzyme code. (e.g. 'ec:1.1.1.1'). 
+    * **enzyme_id**: 'ec' and an enzyme code. (e.g. 'ec:1.1.1.1').
       See :attr:`~bioservices.kegg.KEGG.enzymeIds`.
     * **compound_id**: 'cpd' and a compound number (e.g. 'cpd:C00158').
       Some compounds also have 'glycan_id' and
@@ -76,7 +76,7 @@ pages.
     * **pathway_id**: 'path' and a pathway number. Pathway numbers prefixed
       by 'map' specify the reference pathway and pathways prefixed by
       a KEGG organism specify pathways specific to the organism (e.g.
-      'path:map00020', 'path:eco00020'). 
+      'path:map00020', 'path:eco00020')
       See :attr:`~bioservices.kegg.KEGG.pathwayIds` attribute.
     * **motif_id**: a motif database names ('ps' for prosite, 'bl' for blocks,
       'pr' for prints, 'pd' for prodom, and 'pf' for pfam) and a motif entry
@@ -167,7 +167,7 @@ from easydev.logging_tools import Logging
 __all__ = ["KEGG", "KEGGParser"]
 
 
-class KEGG(REST):
+class KEGG:
     """Interface to the `KEGG <http://www.genome.jp/kegg/pathway.html>`_ service
 
     This class provides an interface to the KEGG REST API. The weblink tools
@@ -254,7 +254,7 @@ class KEGG(REST):
         :param bool verbose: prints informative messages
 
         """
-        super(KEGG, self).__init__(name="KEGG", url="http://rest.kegg.jp", verbose=verbose, cache=cache)
+        self.services = REST(name="KEGG", url="http://rest.kegg.jp", verbose=verbose, cache=cache)
         self.easyXMLConversion = False
         self._organism = None
 
@@ -334,24 +334,24 @@ class KEGG(REST):
             return False
 
     def _checkDB(self, database=None, mode=None):
-        self.logging.info("checking database %s (mode=%s)" % (database, mode))
+        self.services.logging.info("checking database %s (mode=%s)" % (database, mode))
         isOrg = self.isOrganism(database)
 
         if mode == "info":
             if database not in KEGG._valid_databases_info and isOrg is False:
-                self.logging.error("database or organism provided is not correct (mode=info)")
+                self.services.logging.error("database or organism provided is not correct (mode=info)")
                 raise
         elif mode == "list":
             if database not in KEGG._valid_databases_list and isOrg is False:
-                self.logging.error("database provided is not correct (mode=list)")
+                self.services.logging.error("database provided is not correct (mode=list)")
                 raise
         elif mode == "find":
             if database not in KEGG._valid_databases_find and isOrg is False:
-                self.logging.error("database provided is not correct (mode=find)")
+                self.services.logging.error("database provided is not correct (mode=find)")
                 raise
         elif mode == "link":
             if database not in KEGG._valid_databases_link and isOrg is False:
-                self.logging.error("database provided is not correct (mode=link)")
+                self.services.logging.error("database provided is not correct (mode=link)")
                 raise
 
         else:
@@ -377,7 +377,7 @@ class KEGG(REST):
             which clashes with Logging framework info() method.
         """
         self._checkDB(database, mode="info")
-        res = self.http_get("info/" + database, frmt="txt")
+        res = self.services.http_get("info/" + database, frmt="txt")
         return res
 
     def list(self, query, organism=None):
@@ -434,10 +434,10 @@ class KEGG(REST):
 
         if organism:
             if organism not in self.organismIds:
-                self.logging.error("""Invalid organism provided (%s). See the organismIds attribute""" % organism)
+                self.services.logging.error("""Invalid organism provided (%s). See the organismIds attribute""" % organism)
                 raise BioServicesError("Not a valid organism")
             if query not in ["pathway", "module"]:
-                self.logging.error(
+                self.services.logging.error(
                     """
     If organism is set, then the first argument
     (database) must be either 'pathway' or 'module'. You provided %s"""
@@ -446,7 +446,7 @@ class KEGG(REST):
                 raise
             url += "/" + organism
 
-        res = self.http_get(url, "txt")
+        res = self.services.http_get(url, "txt")
         return res
 
     def find(self, database, query, option=None):
@@ -497,7 +497,7 @@ class KEGG(REST):
                 raise ValueError("invalid option. Must be in %s " % _valid_options)
             url += "/" + option
 
-        res = self.http_get(url, frmt="txt")
+        res = self.services.http_get(url, frmt="txt")
         return res
 
     def show_entry(self, entry):
@@ -509,7 +509,7 @@ class KEGG(REST):
 
         """
         url = "http://www.kegg.jp/dbget-bin/www_bget?" + entry
-        self.logging.info(url)
+        self.services.logging.info(url)
         webbrowser.open(url)
 
     def get(self, dbentries, option=None, parse=False):
@@ -568,7 +568,7 @@ class KEGG(REST):
                 raise ValueError("invalid option. Must be in %s " % _valid_options)
             url += "/" + option
 
-        res = self.http_get(url, frmt="txt")
+        res = self.services.http_get(url, frmt="txt")
 
         if parse is True:
             res = self.parse(res)
@@ -679,7 +679,7 @@ class KEGG(REST):
             self.logging.info("arguments not checked")
         """
         url = "conv/" + target + "/" + source
-        res = self.http_get(url, frmt="txt")
+        res = self.services.http_get(url, frmt="txt")
 
         try:
             t = [x.split("\t")[0] for x in res.strip().split("\n")]
@@ -711,7 +711,7 @@ class KEGG(REST):
         self._checkDB(target, mode="link")
 
         url = "link/" + target + "/" + source
-        res = self.http_get(url, frmt="txt")
+        res = self.services.http_get(url, frmt="txt")
         return res
 
     def entry(self, dbentries):
@@ -773,7 +773,7 @@ class KEGG(REST):
                 for k in keggid:
                     url += "/%s%%09,%s/" % (k, "red")
 
-        self.logging.info(url)
+        self.services.logging.info(url)
         if show:
             webbrowser.open(url)
         return url
@@ -798,7 +798,7 @@ class KEGG(REST):
         r = requests.get("https://www.kegg.jp/{}".format(link_to_png))
 
         if filename is None:
-            filename = "{}.png".format(pathway_ID)
+            filename = f"{pathId}.png"
 
         with open(filename, "wb") as fout:
             fout.write(r.content)
@@ -814,7 +814,7 @@ class KEGG(REST):
         if modId.startswith("md:"):
             modId = modId.split(":")[1]
         url = "http://www.kegg.jp/module/" + modId
-        self.logging.info(url)
+        self.services.logging.info(url)
         res = webbrowser.open(url)
         return res
 
@@ -910,18 +910,18 @@ class KEGG(REST):
             self._reaction = None
             self._brite = None
         else:
-            self.logging.error("Invalid organism. Check the list in :attr:`organismIds` attribute")
+            self.services.logging.error("Invalid organism. Check the list in :attr:`organismIds` attribute")
             raise
 
     organism = property(_get_organism, _set_organism, doc="returns the current default organism ")
 
     def _get_pathways(self):
         if self.organism is None:
-            self.logging.warning("You must set the organism first (e.g., self.organism = 'hsa')")
+            self.services.logging.warning("You must set the organism first (e.g., self.organism = 'hsa')")
             return
 
         if self._pathway is None:
-            res = self.http_get("list/pathway/%s" % self.organism, frmt="txt")
+            res = self.services.http_get("list/pathway/%s" % self.organism, frmt="txt")
             orgs = [x.split()[0] for x in res.split("\n") if len(x)]
             self._pathway = orgs[:]
         return self._pathway
@@ -942,11 +942,11 @@ class KEGG(REST):
 
     def _get_modules(self):
         if self.organism is None:
-            self.logging.warning("You must set the organism first (e.g., self.organism = 'hsa')")
+            self.services.logging.warning("You must set the organism first (e.g., self.organism = 'hsa')")
             return
 
         if self._module is None:
-            res = self.http_get("list/module/%s" % self.organism)
+            res = self.services.http_get("list/module/%s" % self.organism)
             orgs = [x.split()[0] for x in res.split("\n") if len(x)]
             self._module = orgs[:]
         return self._module
@@ -1009,7 +1009,7 @@ class KEGG(REST):
         if not isinstance(dic, int) and "PATHWAY" in dic.keys():
             return dic["PATHWAY"]
         else:
-            self.logging.info("No pathway found ?")
+            self.services.logging.info("No pathway found ?")
 
     def parse_kgml_pathway(self, pathwayId, res=None):
         """Parse the pathway in KGML format and returns a dictionary (relations and entries)
@@ -1048,9 +1048,9 @@ class KEGG(REST):
         output = {"relations": [], "entries": []}
         # Fixing bug #24 assembla
         if res is None:
-            res = self.easyXML(self.get(pathwayId, "kgml"))
+            res = self.services.easyXML(self.get(pathwayId, "kgml"))
         else:
-            res = self.easyXML(res)
+            res = self.services.easyXML(res)
 
         # read and parse the entries
         entries = [x for x in res.findAll("entry")]
@@ -1130,8 +1130,8 @@ class KEGG(REST):
                         name1 = self.conv("uniprot", name1)[name1]
                         name2 = self.conv("uniprot", name2)[name2]
                     except Exception:
-                        self.logging.info(name1)
-                        self.logging.info(name2)
+                        self.services.logging.info(name1)
+                        self.services.logging.info(name2)
                         raise Exception
                 # print(name1, 1, name2)
                 sif.append([name1, 1, name2])
@@ -1176,7 +1176,7 @@ class KEGG(REST):
         try:
             parse = self.keggParser.parse(entry)
         except:
-            self.logging.warning("Could not parse the entry correctly.")
+            self.services.logging.warning("Could not parse the entry correctly.")
 
         return parse
 
@@ -1415,7 +1415,7 @@ class KEGGParser(object):
                         try:
                             k, v = line.strip().split(None, 1)
                         except:
-                            # self.logging.warning("empty line in %s %s" % (key, line))
+                            # self.services.logging.warning("empty line in %s %s" % (key, line))
                             k = line.strip()
                             v = ""
                         kp[k] = v
@@ -1429,7 +1429,7 @@ class KEGGParser(object):
                     try:
                         k, v = line.strip().split(None, 1)
                     except:
-                        # self.logging.warning("empty line in %s %s" % (key, line))
+                        # self.services.logging.warning("empty line in %s %s" % (key, line))
                         k = line.strip()
                         v = ""
                     kp[k] = v
@@ -1444,14 +1444,14 @@ class KEGGParser(object):
                     kp = []
                     for disease in value:
                         name, host = disease.split("\n")
-                        if name.startswith('DISEASE'):
+                        if name.startswith("DISEASE"):
                             name = name[8:].strip()
-                        kp.append({'name': name, 'host':host})
+                        kp.append({"name": name, "host": host})
                     output[key] = kp
                 else:
                     kp = {}
                     for line in value.split("\n"):
-                        k,v = line.split(None, 1)
+                        k, v = line.split(None, 1)
                         kp[k] = v
                     output[key] = kp.copy()
             elif key in [
@@ -1473,7 +1473,7 @@ class KEGGParser(object):
                     try:  # empty orthology in rc:RC00004
                         k, v = line.strip().split(None, 1)
                     except:
-                        # self.logging.warning("empty line in %s %s" % (key, line))
+                        # self.services.logging.warning("empty line in %s %s" % (key, line))
                         k = line.strip()
                         v = ""
                     if k.endswith(":"):
@@ -1487,7 +1487,7 @@ class KEGGParser(object):
                     try:  # empty orthology in rc:RC00004
                         k, v = line.strip().split(None, 1)
                     except:
-                        # self.logging.warning("empty line in %s %s" % (key, line))
+                        # self.services.logging.warning("empty line in %s %s" % (key, line))
                         k = line.strip()
                         v = ""
                     if k.endswith(":"):
@@ -1691,14 +1691,6 @@ class KEGGParser(object):
             if fields[0] in ("REFERENCE", "AUTHORS", "TITLE", "JOURNAL"):
                 res[fields[0]] = fields[1]
 
-            # if this.strip().startswith("REFERENCE"):
-            #    res['REFERENCE'] = this.strip().split(None,1)[1]
-            # elif this.strip().startswith("JOURNAL"):
-            #    res['JOURNAL'] = this.strip().split(None,1)[1]
-            # elif this.strip().startswith("AUTHORS"):
-            #    res['AUTHORS'] = this.strip().split(None,1)[1]
-            # elif this.strip().startswith("TITLE"):
-            #    res['TITLE'] = this.strip().split(None,1)[1]
         return res
 
     def _interpret_plasmid(self, data):
@@ -1743,7 +1735,7 @@ class KEGGTools(KEGG):
     def __init__(self, verbose=False, organism="hsa"):
         self.kegg = KEGG()
         self.parser = KEGGParser()
-        self.kegg.logging.info("Initialisation. Please wait")
+        self.kegg.services.logging.info("Initialisation. Please wait")
         self.load_genes(organism)
 
     def load_genes(self, organism):

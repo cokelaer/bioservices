@@ -33,9 +33,6 @@
 
 
 """
-import types
-import io
-
 from bioservices.services import REST
 from bioservices import logger
 
@@ -45,7 +42,7 @@ logger.name = __name__
 __all__ = ["EVA"]
 
 
-class EVA(REST):
+class EVA:
     """Interface to the `EVA <http://www.ebi.ac.uk/eva>`_ service
 
 
@@ -67,10 +64,10 @@ class EVA(REST):
 
         :param verbose: set to False to prevent informative messages
         """
-        super(EVA, self).__init__(name="EVA", url=EVA._url, verbose=verbose, cache=cache)
+        self.services = REST(name="EVA", url=EVA._url, verbose=verbose, cache=cache)
         self.version = "v1"
 
     def fetch_allinfo(self, name):
         """e.g., PRJEB4019"""
-        res = self.http_get(self.version + "/studies/" + name + "/summary")
+        res = self.services.http_get(self.version + "/studies/" + name + "/summary")
         return res

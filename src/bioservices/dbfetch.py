@@ -38,7 +38,7 @@ logger.name = __name__
 __all__ = ["DBFetch"]
 
 
-class DBFetch(REST):
+class DBFetch:
     """Interface to `DBFetch <http://www.ebi.ac.uk/Tools/webservices/services/dbfetch_rest>`_ service
 
     ::
@@ -59,7 +59,8 @@ class DBFetch(REST):
 
         :param bool verbose: print informative messages
         """
-        super(DBFetch, self).__init__(name="DBfetch", url=DBFetch._url, verbose=verbose)
+
+        self.services = REST(name="DBfetch", url=DBFetch._url, verbose=verbose)
         self._supportedDBs = None
         self._supportedFormats = None
         self._supportedStyles = None
@@ -93,7 +94,7 @@ class DBFetch(REST):
 
         """
         self._check_db(db)
-        res = self.http_get(
+        res = self.services.http_get(
             "dbfetch",
             params={
                 "db": db,
@@ -122,7 +123,7 @@ class DBFetch(REST):
             'The UniProt Knowledgebase (UniProtKB) is the central access point for extensive curated protein information, including function, classification, and cross-references. Search UniProtKB to retrieve everything that is known about a particular sequence.'
 
         """
-        res = self.http_get("dbfetch/dbfetch.databases?style=json")
+        res = self.services.http_get("dbfetch/dbfetch.databases?style=json")
         if db:
             self._check_db(db)
             res = res[db]
@@ -158,7 +159,7 @@ class DBFetch(REST):
 
         """
         self._check_db(db)
-        res = self.http_get("dbfetch?info=formats&db={}".format(db)).content
+        res = self.services.http_get("dbfetch?info=formats&db={}".format(db)).content
         res = res.decode().split()
         return res
 
@@ -177,7 +178,7 @@ class DBFetch(REST):
 
         """
         self._check_db(db)
-        res = self.http_get("dbfetch?info=styles&format={}&db={}".format(format, db)).content
+        res = self.services.http_get("dbfetch?info=styles&format={}&db={}".format(format, db)).content
         res = res.decode().split()
         return res
 
@@ -189,7 +190,7 @@ class DBFetch(REST):
         if self._supportedDBs:
             return self._supportedDBs
         else:
-            res = self.http_get("dbfetch?info=dbs").content
+            res = self.services.http_get("dbfetch?info=dbs").content
             self._supportedDBs = res.decode().split() + ["default"]
         return self._supportedDBs
 

@@ -101,9 +101,7 @@ class PRIDE:
         """
         res = self.services.http_get(f"projects/{identifier}")
         if res == 400:
-            logger.warning(
-                f"Nothing found for {identifier}. may be this is not a valid identifier. Use get_projects"
-            )
+            logger.warning(f"Nothing found for {identifier}. may be this is not a valid identifier. Use get_projects")
             return {}
         return res
 

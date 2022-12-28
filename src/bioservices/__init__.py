@@ -99,9 +99,6 @@ from .uniprot import *
 from . import unichem
 from .unichem import *
 
-from . import rnaseq_ebi
-from .rnaseq_ebi import RNASEQ_EBI
-
 from . import reactome
 from .reactome import *
 

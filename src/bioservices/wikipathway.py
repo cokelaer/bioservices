@@ -38,7 +38,7 @@ import pandas as pd
 __all__ = ["WikiPathways"]
 
 
-class WikiPathways(REST):
+class WikiPathways:
     """Interface to `Pathway <http://www.wikipathways.org/index.php>`_ service
 
     .. doctest::
@@ -65,7 +65,7 @@ class WikiPathways(REST):
       * u'getRelations': No API found in Wikipathway web page
     """
 
-    _url = "http://webservice.wikipathways.org/"
+    _url = "http://webservice.wikipathways.org"
 
     def __init__(self, verbose=True, cache=False):
         """.. rubric:: Constructor
@@ -73,15 +73,15 @@ class WikiPathways(REST):
         :param bool verbose:
 
         """
-        super(WikiPathways, self).__init__(name="WikiPathways", url=WikiPathways._url, verbose=verbose, cache=cache)
+        self.services = REST(name="WikiPathways", url=WikiPathways._url, verbose=verbose, cache=cache)
         self._organism = "Homo sapiens"  # This function is redundant (see class service)
-        self.logging.info("Fetching organisms...")
+        self.services.logging.info("Fetching organisms...")
 
         #: Get a list of all available organisms.
         self.organisms = self.listOrganisms()
 
     def listOrganisms(self):
-        res = self.http_get(self.url + "/listOrganisms?format=json")
+        res = self.services.http_get("listOrganisms?format=json")
         return res["organisms"]
 
     def _set_organism(self, organism):
@@ -108,7 +108,7 @@ class WikiPathways(REST):
 
         """
         params = {"format": "json", "query": query}
-        res = self.http_get(self.url + "findPathwaysByLiterature", params=params)
+        res = self.services.http_get("findPathwaysByLiterature", params=params)
 
         return res["result"]
 
@@ -140,7 +140,7 @@ class WikiPathways(REST):
         database while "ENSG00000130164" is searched for in the En" database
         only.
         """
-        url = self.url + "/findPathwaysByXref?ids="
+        url = self._url + "/findPathwaysByXref?ids="
         if isinstance(ids, (str, int, float)):
             url += "{}".format(ids)
         elif isinstance(ids, list):
@@ -159,7 +159,7 @@ class WikiPathways(REST):
         if codes:
             for code in codes:
                 url += "&codes={}".format(code)
-        res = self.http_get(url + "&format=json")
+        res = self.services.http_get(url + "&format=json")
 
         # results = pd.DataFrame(results)
 
@@ -177,8 +177,8 @@ class WikiPathways(REST):
             res = w.findInteractions("P53")
 
         """
-        url = self.url + "findInteractions?query={}&format=json".format(query)
-        res = self.http_get(url)["result"]
+        query = f"findInteractions?query={query}&format=json"
+        res = self.services.http_get(query)["result"]
 
     def listPathways(self, organism=None):
         """Get a list of all available pathways.
@@ -196,10 +196,10 @@ class WikiPathways(REST):
             df.groupby("species").count()['name'].sort_values().plot(kind="barh")
         """
         if organism:
-            self.devtools.check_param_in_list(organism, self.organisms)
-            request = self.http_get("/listPathways?%s&format=json" % organism)
+            self.services.devtools.check_param_in_list(organism, self.organisms)
+            request = self.services.http_get("listPathways?%s&format=json" % organism)
         else:
-            request = self.http_get("/listPathways?format=json")
+            request = self.services.http_get("listPathways?format=json")
         pathways = request["pathways"]
 
         pathways = pd.DataFrame(pathways).set_index("id")
@@ -220,7 +220,7 @@ class WikiPathways(REST):
         """
         url = "getPathway?pwId=%s" % pathwayId
         url += "&revision=%s&format=json" % revision
-        request = self.http_get(url)
+        request = self.services.http_get(url)
 
         return request["pathway"]
 
@@ -236,9 +236,9 @@ class WikiPathways(REST):
             >>> s = Wikipathway()
             >>> s.getPathwayInfo("WP2320")
         """
-        url = "/getPathwayInfo?pwId=%s" % pathwayId
-        request = self.http_get(url)
-        data = self.easyXML(request.content)
+        url = "getPathwayInfo?pwId=%s" % pathwayId
+        request = self.services.http_get(url)
+        data = self.services.easyXML(request.content)
         data = data.findAll("ns1:pathwayinfo")
         pathway = {}
         for this in data:
@@ -264,12 +264,12 @@ class WikiPathways(REST):
 
         """
 
-        query = self.url + "/getPathwayHistory?pwId=%s&timestamp=%s" % (
+        query = "getPathwayHistory?pwId=%s&timestamp=%s" % (
             pathwayId,
             str(date),
         )
         query += "&format=json"
-        return self.http_get(query)
+        return self.services.http_get(query)
 
     def getRecentChanges(self, timestamp):
         """Get the recently changed pathways.
@@ -284,7 +284,7 @@ class WikiPathways(REST):
 
         .. todo:: interpret XML
         """
-        res = self.http_get(self.url + "/getRecentChanges?timestamp=%s&format=json" % timestamp)
+        res = self.services.http_get("getRecentChanges?timestamp=%s&format=json" % timestamp)
         return res
 
     def login(self, usrname, password):
@@ -320,12 +320,12 @@ class WikiPathways(REST):
 
         .. note:: use :meth:`savePathwayAs` to save into a file.
         """
-        self.devtools.check_param_in_list(filetype, ["gpml", "png", "svg", "pdf", "txt", "pwf", "owl"])
+        self.services.devtools.check_param_in_list(filetype, ["gpml", "png", "svg", "pdf", "txt", "pwf", "owl"])
 
-        url = self.url + "/getPathwayAs?fileType=%s" % filetype
+        url = "getPathwayAs?fileType=%s" % filetype
         url += "&pwId=%s " % pathwayId
         url += "&revision=%s&format=json" % revision
-        res = self.http_get(url)
+        res = self.services.http_get(url)
         return res["data"]
 
     def savePathwayAs(self, pathwayId, filename, revision=0, display=True):
@@ -460,11 +460,11 @@ class WikiPathways(REST):
         .. todo:: graphId, color parameters
         """
 
-        url = self.url + "getColoredPathway?pwId={}".format(pathwayId)
+        url = "getColoredPathway?pwId={}".format(pathwayId)
         if revision:
             url += "&revision={}".format(revision)
         url += "&format=json"
-        request = self.http_get(url)
+        request = self.services.http_get(url)
         try:
             data = request["data"]
             return base64.b64decode(data)
@@ -497,11 +497,11 @@ class WikiPathways(REST):
 
         .. warning:: AND or OR must be in big caps
         """
-        url = self.url + "/findPathwaysByText?query=%s" % query
+        url = "findPathwaysByText?query=%s" % query
         if species:
             url += "&species=%s" % species
         url += "&format=json"
-        request = self.http_get(url)
+        request = self.services.http_get(url)
         data = request["result"]
 
         try:
@@ -521,9 +521,9 @@ class WikiPathways(REST):
 
             s.getOntologyTermsByPathway("WP4")
         """
-        url = self.url + "getOntologyTermsByPathway?pwId={}".format(pathwayId)
+        url = "getOntologyTermsByPathway?pwId={}".format(pathwayId)
         url += "&format=json"
-        request = self.http_get(url)
+        request = self.services.http_get(url)
         results = request["terms"]
 
         return results
@@ -541,9 +541,9 @@ class WikiPathways(REST):
             >>> s.getPathwaysByOntologyTerm('PW:0000724')
 
         """
-        url = self.url + "getPathwaysByOntologyTerm?term={}".format(terms)
+        url = "getPathwaysByOntologyTerm?term={}".format(terms)
         url += "&format=json"
-        request = self.http_get(url)
+        request = self.services.http_get(url)
         return request["pathways"]
 
     def getPathwaysByParentOntologyTerm(self, term):
@@ -553,9 +553,9 @@ class WikiPathways(REST):
         :returns: List of WSPathwayInfo The pathway information.
 
         """
-        url = self.url + "getPathwaysByParentOntologyTerm?term={}".format(term)
+        url = "getPathwaysByParentOntologyTerm?term={}".format(term)
         url += "&format=json"
-        request = self.http_get(url)
+        request = self.services.http_get(url)
         return request["pathways"]
 
     def showPathwayInBrowser(self, pathwayId):

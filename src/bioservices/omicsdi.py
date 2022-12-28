@@ -68,7 +68,7 @@ class OmicsDIAuth(requests.auth.AuthBase):
         return r
 
 
-class OmicsDI(REST):
+class OmicsDI:
     _url = "http://www.omicsdi.org/ws"
     _api = {
         "paths": [
@@ -523,8 +523,7 @@ class OmicsDI(REST):
     }
 
     def __init__(self, token=None, verbose=False, cache=False):
-        self.super = super(OmicsDI, self)
-        self.super.__init__(name="OmicsDI", url=OmicsDI._url, verbose=verbose, cache=cache)
+        self.services = REST(name="OmicsDI", url=OmicsDI._url, verbose=verbose, cache=cache)
 
         self.set_auth_token(token)
 
@@ -548,10 +547,10 @@ class OmicsDI(REST):
 
     def _create_api_function(self, api):
         METHOD_CALLERS = {
-            "GET": self.http_get,
-            "POST": self.http_post,
-            "PUT": self.http_put,
-            "DELETE": self.http_delete,
+            "GET": self.services.http_get,
+            "POST": self.services.http_post,
+            "PUT": self.services.http_put,
+            "DELETE": self.services.http_delete,
         }
 
         doc = api.get("doc")
@@ -596,7 +595,7 @@ class OmicsDI(REST):
                 auth = OmicsDIAuth(token=self.token)
                 args.update({"auth": auth})
 
-            method_caller = METHOD_CALLERS.get(method, self.http_get)
+            method_caller = METHOD_CALLERS.get(method, self.services.http_get)
 
             return method_caller(query, **args)
 

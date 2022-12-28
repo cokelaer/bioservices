@@ -1,7 +1,6 @@
 from bioservices import Pfam
 
 
-
 def test_pfam():
 
     p = Pfam()

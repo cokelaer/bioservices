@@ -1,9 +1,9 @@
-from bioservices import Reactome, ReactomeOld
+from bioservices import Reactome
 import pytest
 from easydev import TempFile
 import os
-skiptravis = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
-     reason="On travis")
+
+skiptravis = pytest.mark.skipif("TRAVIS_PYTHON_VERSION" in os.environ, reason="On travis")
 
 
 @pytest.fixture
@@ -31,8 +31,7 @@ def test_exporter_diagram(reactome):
     res = reactome.get_exporter_diagram("R-HSA-5674003", ext="png")
     res = reactome.get_exporter_diagram("R-HSA-5674003", ext="jpg")
     res = reactome.get_exporter_diagram("R-HSA-5674003", ext="jpg", quality=1)
-    res = reactome.get_exporter_diagram("R-HSA-5674003", ext="jpg", quality=1,
-                                    diagramProfile="Standard")
+    res = reactome.get_exporter_diagram("R-HSA-5674003", ext="jpg", quality=1, diagramProfile="Standard")
 
     with TempFile(suffix=".png") as fout:
         res = reactome.get_exporter_diagram(109581, ext="png", filename=fout.name)
@@ -140,13 +139,4 @@ def test_species_all(reactome):
 def test_species_main(reactome):
     res = reactome.get_species_main()
     assert len(res)
-
-
-
-# obsolet
-def __test_species():
-    r = ReactomeOld(verbose=True)
-    assert len(r.get_species()) > 10
-    res = r.query_by_ids("Pathway", 'TP53')
-    assert len(res) >= 1
 
