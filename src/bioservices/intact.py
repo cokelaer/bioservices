@@ -141,7 +141,7 @@ class IntactComplex:
 
 
         """
-        self.devtools.check_param_in_list(frmt, ["pandas", "json"])
+        self.services.devtools.check_param_in_list(frmt, ["pandas", "json"])
 
         # note that code format to be json, which is the only option so
         # we can use pandas as a frmt without addition code.

@@ -4,4 +4,5 @@ recursive-exclude doc *
 recursive-exclude * __pycache__
 recursive-exclude * *pyc
 recursive-exclude .github *
+recursive-exclude src/bioservices/attic *
 
