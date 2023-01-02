@@ -189,6 +189,8 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.11.1    * Fix regression i uniprot.mapping 
+            (https://github.com/cokelaer/bioservices/issues/245)
 1.11.0    * Fix uniprot limitation of 25 results only (
           * For developers: all services are now refactorised to use services
             as an attribute rather than a parent class.

@@ -106,3 +106,8 @@ def test_get_df(uniprot):
 
 def test_fasta(uniprot):
     "Q9Y617" in uniprot.get_fasta(["Q9Y617-1"])
+
+
+#https://github.com/cokelaer/bioservices/issues/245
+def test_mapping_regression(uniprot):
+    uniprot.mapping("UniProtKB_AC-ID", "KEGG", "P43403,P123456")

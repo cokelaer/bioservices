@@ -1,3 +1,4 @@
+import pytest
 from bioservices.panther import Panther
 
 
