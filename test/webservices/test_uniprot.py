@@ -110,4 +110,11 @@ def test_fasta(uniprot):
 
 #https://github.com/cokelaer/bioservices/issues/245
 def test_mapping_regression(uniprot):
-    uniprot.mapping("UniProtKB_AC-ID", "KEGG", "P43403,P123456")
+    # P123456 is a failed ID
+    res = uniprot.mapping("UniProtKB_AC-ID", "KEGG", "P43403,P123456")
+    assert res['failedIds']
+    # here no failedId but we expect an empty failedIds in the returned dictionary (empty list)
+    res = uniprot.mapping("UniProtKB_AC-ID", "KEGG", "P43403")
+    assert res['failedIds'] == []
+
+
