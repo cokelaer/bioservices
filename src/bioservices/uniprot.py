@@ -690,7 +690,7 @@ class UniProt:
             params["includeIsoform"] = "yes"
 
         if compress is True:
-            params["compress"] = "yes"
+            params["compressed"] = "true"
 
         if sort:
             self.services.devtools.check_param_in_list(sort, ["score"])
