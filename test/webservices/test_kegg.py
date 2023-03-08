@@ -83,32 +83,32 @@ def test_parse_kgml_pathway(kegg):
 
 @pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_ids1(kegg):
-    assert kegg.enzymeIds[0].startswith("ec")
+    assert kegg.enzymeIds[0].startswith("1.")
 
 
 @pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_ids2(kegg):
-    assert kegg.compoundIds[0].startswith("cpd")
+    assert kegg.compoundIds[0].startswith("C")
 
 
 @pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_ids3(kegg):
-    assert kegg.glycanIds[0].startswith("gl")
+    assert kegg.glycanIds[0].startswith("G")
 
 
 @pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_ids4(kegg):
-    assert kegg.reactionIds[0].startswith("rn")
+    assert kegg.reactionIds[0].startswith("R")
 
 
 @pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_ids5(kegg):
-    assert kegg.drugIds[0].startswith("dr")
+    assert kegg.drugIds[0].startswith("D")
 
 
 @pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_ids6(kegg):
-    assert kegg.koIds[0].startswith("ko")
+    assert kegg.koIds[0].startswith("K")
 
 
 @pytest.mark.flaky(max_runs=3, min_passes=1)

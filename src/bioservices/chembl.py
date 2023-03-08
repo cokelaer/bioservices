@@ -694,15 +694,19 @@ class ChEMBL:
         params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("organism", query, params=params)
 
+    """
+    # subservices removed apparatently (march 2023) hence the commented code
+
     def search_protein_class(self, query, limit=20, offset=0):
         params = {"limit": limit, "offset": offset}
         return self._search("protein_class", query, params=params)
 
     def get_protein_class(self, query=None, limit=20, offset=0, filters=None):
-        """Protein family classification of TargetComponents"""
+        "Protein family classification of TargetComponents"
         params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("protein_class", query, params=params)
 
+    """
     def get_substructure(self, structure, limit=20, offset=0, filters=None):
         """Molecule substructure search
 
@@ -906,10 +910,10 @@ class ChEMBL:
         .. todo:: ignorecoords option
         """
         # NOTE: not async requests here.
-        self.devtools.check_range(dimensions, 1, 500)
-        self.devtools.check_param_in_list(engine, ["rdkit", "indigo"])
-        self.devtools.check_param_in_list(format, ["png", "svg"])
-        queries = self.devtools.to_list(query)
+        self.services.devtools.check_range(dimensions, 1, 500)
+        self.services.devtools.check_param_in_list(engine, ["rdkit", "indigo"])
+        self.services.devtools.check_param_in_list(format, ["png", "svg"])
+        queries = self.services.devtools.to_list(query)
 
         res = {"filenames": [], "images": [], "chemblids": []}
         for query in queries:

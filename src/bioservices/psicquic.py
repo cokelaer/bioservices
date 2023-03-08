@@ -462,7 +462,7 @@ class PSICQUIC:
         try:
             index = names.index(service)
         except ValueError:
-            self.logging.error("The service you gave (%s) is not registered. See self.registery_names" % service)
+            self.services.logging.error("The service you gave (%s) is not registered. See self.registery_names" % service)
             raise ValueError
 
         # get the base url according to the service requested
@@ -525,7 +525,7 @@ class PSICQUIC:
                 raise ValueError("database %s not in active databases" % x)
 
         for name in databases:
-            self.logging.warning("Querying %s" % name),
+            self.services.logging.warning("Querying %s" % name),
             res = self.query(
                 name,
                 query,
@@ -541,7 +541,7 @@ class PSICQUIC:
 
                 results[name] = copy.copy(res)
         for name in databases:
-            self.logging.info("Found %s in %s" % (len(results[name]), name))
+            self.services.logging.info("Found %s in %s" % (len(results[name]), name))
         return results
 
     def getInteractionCounter(self, query):
@@ -587,7 +587,7 @@ class PSICQUIC:
 
 
         """
-        self.logging.info("converting data into known names")
+        self.services.logging.info("converting data into known names")
         idsA = [x[0].replace('"', "") for x in data]
         idsB = [x[1].replace('"', "") for x in data]
         # extract the first and second ID but let us check if it is part of a
@@ -613,10 +613,10 @@ class PSICQUIC:
                 if len(valid_dbs) >= 1:
                     idsA[i] = valid_dbs[0][0] + ":" + valid_dbs[0][1]
                 else:
-                    self.logging.debug("none of the DB for this entry (%s) are available" % (entry))
+                    self.services.logging.debug("none of the DB for this entry (%s) are available" % (entry))
                     idsA[i] = "?" + dbs[0] + ":" + IDs[0]
             except:
-                self.logging.info("Could not extract name from %s" % entry)
+                self.services.logging.info("Could not extract name from %s" % entry)
                 idsA[i] = "??:" + entry  # we add a : so that we are sure that a split(":") will work
         # the second ID
         for i, entry in enumerate(idsB):
@@ -628,19 +628,19 @@ class PSICQUIC:
                 if len(valid_dbs) >= 1:
                     idsB[i] = valid_dbs[0][0] + ":" + valid_dbs[0][1]
                 else:
-                    self.logging.debug("none of the DB (%s) for this entry are available" % (entry))
+                    self.services.logging.debug("none of the DB (%s) for this entry are available" % (entry))
                     idsB[i] = "?" + dbs[0] + ":" + IDs[0]
             except:
-                self.logging.info("Could not extract name from %s" % entry)
+                self.services.logging.info("Could not extract name from %s" % entry)
                 idsB[i] = "??:" + entry
 
         countA = len([x for x in idsA if x.startswith("?")])
         countB = len([x for x in idsB if x.startswith("?")])
         if countA + countB > 0:
-            self.logging.warning("%s ids out of %s were not identified" % (countA + countB, len(idsA) * 2))
+            self.services.logging.warning("%s ids out of %s were not identified" % (countA + countB, len(idsA) * 2))
             print(set([x.split(":")[0] for x in idsA if x.startswith("?")]))
             print(set([x.split(":")[0] for x in idsB if x.startswith("?")]))
-        self.logging.info("knownName done")
+        self.services.logging.info("knownName done")
         return idsA, idsB
 
     def preCleaning(self, data):
@@ -656,7 +656,7 @@ class PSICQUIC:
         """
         results = {}
         for k in data.keys():
-            self.logging.info("Post cleaning %s" % k)
+            self.services.logging.info("Post cleaning %s" % k)
             ret = self.postCleaning(data[k], keep_only="HUMAN", verbose=verbose)
             if len(ret):
                 results[k] = ret
@@ -708,12 +708,12 @@ class PSICQUIC:
     def convertAll(self, data):
         results = {}
         for k in data.keys():
-            self.logging.info("Analysing %s" % k)
+            self.services.logging.info("Analysing %s" % k)
             results[k] = self.convert(data[k], db=k)
         return results
 
     def convert(self, data, db=None):
-        self.logging.debug("converting the database %s" % db)
+        self.services.logging.debug("converting the database %s" % db)
         idsA, idsB = self.knownName(data)
         mapping = self.mappingOneDB(data)
         results = []
@@ -739,7 +739,7 @@ class PSICQUIC:
 
     def mappingOneDB(self, data):
         query = {}
-        self.logging.debug("converting IDs with proper DB name (knownName function)")
+        self.services.logging.debug("converting IDs with proper DB name (knownName function)")
         entriesA, entriesB = self.knownName(data)  # idsA and B contains list of a single identifier of the form db:id
         # the db is known from _mapping.uniprot otherwise it is called "unknown"
 
@@ -788,7 +788,7 @@ class PSICQUIC:
                     DBname = self._mapping_uniprot[k]
 
                     if DBname is not None:
-                        self.logging.warning("Request sent to uniprot for %s database (%s/%s)" % (DBname, counter, N))
+                        self.services.logging.warning("Request sent to uniprot for %s database (%s/%s)" % (DBname, counter, N))
                         res = self.uniprot.mapping(fr=DBname, to="ID", query=" ".join(this_query))
                         for x in this_query:
                             if x not in res:  # was not found
@@ -801,7 +801,7 @@ class PSICQUIC:
                                 if len(res[x]) == 1:
                                     mapping[x] = res[x][0]
                                 else:
-                                    self.logging.warning("psicquic mapping found more than 1 id. keep first one")
+                                    self.services.logging.warning("psicquic mapping found more than 1 id. keep first one")
                                     mapping[x] = res[x][0]
                     else:
                         for x in this_query:

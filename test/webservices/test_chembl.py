@@ -2,7 +2,6 @@ from bioservices.chembl import ChEMBL
 import pytest
 import os
 
-skiptravis = pytest.mark.skipif("TRAVIS_PYTHON_VERSION" in os.environ, reason="On travis")
 
 
 SMILE = "CC(=O)Oc1ccccc1C(=O)O"
@@ -95,7 +94,7 @@ def test_activity(chembl):
         "mechanism",
         "metabolism",
         "molecule_form",
-        "protein_class",
+        #"protein_class",
         "source",
         "target",
         "target_component",
@@ -119,8 +118,7 @@ def test_ATC(chembl):
 # SEARCHES ------------------
 
 
-@skiptravis
-def test_search_protein_class(chembl):
+def _test_search_protein_class(chembl):
     res1715 = chembl.get_protein_class(1715)
     # no good example. This returns noting but at least calls the method
     chembl.search_protein_class("CAMK")

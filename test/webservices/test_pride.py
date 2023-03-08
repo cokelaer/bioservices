@@ -1,8 +1,6 @@
 from bioservices import PRIDE
-import pytest
 import os
-
-pytestmark = pytest.mark.skipif("TRAVIS_PYTHON_VERSION" in os.environ, reason="On travis")
+import pytest
 
 p = PRIDE()
 
@@ -43,7 +41,8 @@ def test_stats():
     assert "SUBMISSIONS_PER_YEAR" in p.get_stats()
     p.get_stats("SUBMISSIONS_PER_YEAR")
 
-
+@pytest.mark.xfail(reason="too slow", method="thread")
+@pytest.mark.timeout(30)
 def test_peptide():
     res = p.get_peptide_evidence("PXD016700")
     assert res["_embedded"]

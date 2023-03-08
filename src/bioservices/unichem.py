@@ -96,7 +96,7 @@ class UniChem:
         res['compounds'][0]
 
 
-    .. changed:: version 1.9. drop xml parser.
+    .. versionchanged:: version 1.9. drop xml parser.
 
 
     """
@@ -384,6 +384,8 @@ class UniChem:
 
         .. plot::
 
+            from bioservices import UniChem
+            u = UniChem()
             res = u.get_images('304698', filename='test.svg')
 
         """
