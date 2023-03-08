@@ -33,7 +33,6 @@
 import types
 import io
 import sys
-from math import ceil
 
 from tqdm import tqdm
 
@@ -88,7 +87,7 @@ class COG:
 
         while True:
             params["page"] += 1
-            for i in range(trials):
+            for _ in range(trials):
                 other = self.services.http_get(service_name, frmt="json", params=params)
                 try:
                     res["results"].extend(other["results"])

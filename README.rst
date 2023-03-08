@@ -1,3 +1,7 @@
+.. image:: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_logo_256.png
+    :target: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_logo_256.png
+
+
 #################################################################################
 BIOSERVICES: access to biological web services programmatically
 #################################################################################
@@ -16,8 +20,8 @@ BIOSERVICES: access to biological web services programmatically
 .. image:: https://static.pepy.tech/personalized-badge/bioservices?period=month&units=international_system&left_color=black&right_color=orange&left_text=Downloads
     :target: https://pepy.tech/project/bioservices
 
-.. image:: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_logo_256.png
-    :target: https://raw.githubusercontent.com/cokelaer/bioservices/main/doc/_static/bioservices2_logo_256.png
+|Codacy-Grade|
+
 
 
 :Python_version_available: BioServices is tested for Python 3.7, 3.8, 3.9, 3.10
@@ -189,6 +193,11 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.11.2    * Update COG service to be more user-friendly and return all pages
+            by default
+          * uniprot set progress to False in the search method
+          * Merged #250 and #249 user PRs (compress option in uniprot module 
+            and logging issue in biodbnet)
 1.11.1    * Fix regression i uniprot.mapping 
             (https://github.com/cokelaer/bioservices/issues/245)
 1.11.0    * Fix uniprot limitation of 25 results only (
@@ -240,3 +249,5 @@ Version   Description
 ========= ====================================================================
 
 
+.. |Codacy-Grade| image:: https://app.codacy.com/project/badge/Grade/9b8355ff642f4de9acd4b270f8d14d10
+   :target: https://app.codacy.com/gh/cokelaer/bioservices/dashboard

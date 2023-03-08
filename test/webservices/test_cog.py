@@ -41,9 +41,9 @@ def test_cogs_by_category_id():
     c.get_cogs_by_category_id("651137", page=1)
 
 
-def test_cogs_by_category():
+def test_cogs_by_protein_name():
     c = COG()
-    c.get_cogs_by_category("AJP49128.1", page=1)
+    c.get_cogs_by_protein_name("AJP49128.1", page=1)
 
 
 def test_cogs_by_id_and_category():
@@ -83,5 +83,5 @@ def test_taxonomic_category_by_name():
 
 def test_search_organism():
     c = COG()
-    results = c.search_organism("coli")
+    _ = c.search_organism("coli")
 

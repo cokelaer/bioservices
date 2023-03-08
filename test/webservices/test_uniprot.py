@@ -97,7 +97,7 @@ def test_quick_search(uniprot):
 
 
 def test_uniref(uniprot):
-    assert "goTerms" in uniprot.uniref("Q03063")
+    assert "entryType" in uniprot.uniref("Q03063")
 
 
 def test_get_df(uniprot):

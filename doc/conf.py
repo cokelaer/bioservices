@@ -57,7 +57,6 @@ extensions = [
                   if sphinx.version_info[:2] >= (1, 4)
                   else 'sphinx.ext.pngmath'),
     'sphinx.ext.coverage',
-    'sphinx_copybutton',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
@@ -72,7 +71,6 @@ extensions = [
 
 
 todo_include_todos=True
-jscopybutton_path = "copybutton.js"
 autoclass_content = 'both'
 
 # Add any paths that contain templates here, relative to this directory.
