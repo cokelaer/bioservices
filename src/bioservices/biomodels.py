@@ -40,7 +40,6 @@ from bioservices.services import REST
 logger.name = __name__
 
 
-
 __all__ = ["BioModels"]
 
 
@@ -86,7 +85,6 @@ class BioModels:
 
         """
         self.services = REST(name="BioModels", url=BioModels._url, verbose=verbose)
-
 
     def _check_format(self, frmt, supported=["json", "xml", "html"]):
         if frmt not in supported:

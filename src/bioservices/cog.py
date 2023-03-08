@@ -94,8 +94,6 @@ class COG:
                     res["results"].extend(other["results"])
                     break
                 except TypeError:
-                    #if other["results"] is None
-                    print(other)
                     pass
                 except Exception as err:
                     raise (err)

@@ -578,5 +578,3 @@ class ReactomePathway(object):
 
         return txt
 """
-
-

@@ -577,7 +577,7 @@ class UniProt:
         limit=None,
         size=25,
         database="uniprotkb",
-        progress=True,
+        progress=False,
     ):
         """Provide some interface to the uniprot search interface.
 
@@ -611,15 +611,16 @@ class UniProt:
 
             >>> u.search('zap70+AND+organism_id:9606')
             >>> u.search("zap70+AND+taxonomy_id:9606", frmt="tsv", limit=3,
-            ...    columns="entry_name,length,id, gene_names")
-            Entry name  Length  Entry   Gene names
-            CBLB_HUMAN  982 Q13191  CBLB RNF56 Nbla00127
-            CBL_HUMAN   906 P22681  CBL CBL2 RNF55
-            CD3Z_HUMAN  164 P20963  CD247 CD3Z T3Z TCRZ
+            ...    columns="accession,length,id, gene_names")
+            Entry	Length	Entry Name	Gene Names
+            P43403	619	ZAP70_HUMAN	ZAP70 SRK
+            P22681	906	CBL_HUMAN	CBL CBL2 RNF55
+            P20963	164	CD3Z_HUMAN	CD247 CD3Z T3Z TCRZ
+
 
         other examples::
 
-            >>> u.search("ZAP70+AND+organism_id:9606", limit=3, columns="id,xref_pdb")
+            >> u.search("ZAP70+AND+organism_id:9606", limit=3, columns="id,xref_pdb")
 
         You can also do a search on several keywords. This is especially useful
         if you have a list of known entry names.::
