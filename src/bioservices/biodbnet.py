@@ -146,7 +146,7 @@ class BioDBNet:
             df.index.name = input_db
             return df
         except Exception as err:
-            self.logging.error(err)
+            self.services.logging.error(err)
             return request
 
     def dbFind(self, output_db, input_values, taxon="9606"):
@@ -254,7 +254,7 @@ class BioDBNet:
             df.index.name = input_db
             return df
         except Exception as err:
-            self.logging.error(err)
+            self.services.logging(err)
             return request
         inputValues = self._interpret_input_db(inputValues)
 
