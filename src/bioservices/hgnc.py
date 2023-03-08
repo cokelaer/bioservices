@@ -155,5 +155,3 @@ class HGNC:
         headers = self.services.get_headers(content=frmt)
         res = self.services.http_get(url, frmt=frmt, headers=headers)
         return res
-
-

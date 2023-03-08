@@ -60,11 +60,7 @@ class QuickGO:
 
         """
         # super(QuickGO, self).__init__(url="http://www.ebi.ac.uk/QuickGO-Old",
-        self.services = REST(url="https://www.ebi.ac.uk/QuickGO",
-            name="quickGO",
-            verbose=verbose,
-            cache=cache
-        )
+        self.services = REST(url="https://www.ebi.ac.uk/QuickGO", name="quickGO", verbose=verbose, cache=cache)
 
     def go_search(self, query, limit=600, page=1):
         """Searches a simple user query, e.g., query=apopto

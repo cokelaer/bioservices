@@ -47,7 +47,7 @@ class PDBe:
 
         >>> from bioservices import PDBe
         >>> s = PDBe()
-        >>> res = s.get_file("1FBV", "pdb")
+        >>> res = s.get_files("1FBV")
 
     """
 
@@ -57,8 +57,8 @@ class PDBe:
         :param bool verbose: prints informative messages (default is off)
 
         """
-        url = "https://www.ebi.ac.uk/pdbe/api/pdb/entry/"
-        self.services = REST(name="PDBe", url=url, verbose=verbose, cache=cache)
+        url = "https://www.ebi.ac.uk/pdbe/api/pdb/entry"
+        self.services = REST(name="PDBe", url=url, verbose=verbose, cache=cache, url_defined_later=True)
 
     def _check_id(self, pdbid):
         if isinstance(pdbid, list):

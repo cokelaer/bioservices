@@ -89,7 +89,7 @@ class BioDBNet:
         # remove spaces so as to compare the input/output databases with the
         # list of databases returned by getInputs
         outputs = self._list_to_string(output_db)
-        #inputResult = self.getInputs()
+        # inputResult = self.getInputs()
         # getOutputsForInput method
         outputResult = self.getOutputsForInput(input_db)
         outputResult = [this.lower().replace(" ", "") for this in outputResult]

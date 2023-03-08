@@ -434,7 +434,9 @@ class KEGG:
 
         if organism:
             if organism not in self.organismIds:
-                self.services.logging.error("""Invalid organism provided (%s). See the organismIds attribute""" % organism)
+                self.services.logging.error(
+                    """Invalid organism provided (%s). See the organismIds attribute""" % organism
+                )
                 raise BioServicesError("Not a valid organism")
             if query not in ["pathway", "module"]:
                 self.services.logging.error(
