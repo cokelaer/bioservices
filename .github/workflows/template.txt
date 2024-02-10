@@ -20,7 +20,7 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        python: [3.7, 3.8, 3.9]
+        python: [ 3.8, 3.9,'3.10']
       fail-fast: false
 
     steps:
@@ -31,9 +31,12 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Install the package itself and dependencies
       run: |
-          pip install .[testing]
+          pip install poetry
+          poetry install --with dev
 
     - name: Test with pytest
       run: |
-        pytest -n 1  --cov-report term --cov=bioservices.__name__ test/webservices/test___name__.py
+        poetry run pytest -n 1  --cov-report term --cov=bioservices.__name__ test/webservices/test___name__.py
+
+
 
