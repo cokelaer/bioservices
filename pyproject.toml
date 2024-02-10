@@ -1,0 +1,81 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "bioservices"
+version = "1.12.0"
+description = "Access to Biological Web Services from Python"
+authors = ["Thomas Cokelaer <thomas.cokelaer@pasteur.fr>"]
+license = "GPLv3"
+readme = ["README.rst", "LICENSE"]
+keywords = ["BioServices", "WebServices", "Biology", "BioDBNet", "ChEBI", "UniChem", "Kegg", "KEGG", "BioModels",   "EUtils", "UniProt", "PICR", "ArrayExpress", "MUSCLE", "QuickGO", "PDB", "PSICQUIC", "Blast", "BioMART", "PantherDB", "BioGRID", "MIRIAM", "BioMart", "GeneProf", "ChEMBL", "ChemSpider",  "HGNC", "PathwayCommons", "Rhea", "Ensembl"]
+
+classifiers = [
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Education",
+        "Intended Audience :: End Users/Desktop",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: BSD License",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Scientific/Engineering :: Bio-Informatics",
+        "Topic :: Scientific/Engineering :: Information Analysis",
+]
+
+
+[tool.poetry.scripts]
+bioservices = "bioservices.main:main"
+
+
+[project.urls]
+Homepage = "https://bioservices.readthedocs.io"
+Repository = "https://github.com/cokelaer/bioservices"
+Issues = "https://github.com/cokelaer/bioservices/issues"
+Documentation =  "https://bioesrvices.readthedocs.io"
+
+
+
+[tool.poetry.dependencies]
+python = "^3.8"
+click = "^8.1.7"
+easydev = "^0.12.1"
+matplotlib = "<3.8.2"
+tqdm = "^4.66.1"
+rich-click = "^1.7.2"
+beautifulsoup4 = "^4.12.3"
+colorlog = "^6.8.2"
+grequests = "^0.7.0"
+requests = "^2.31.0"
+pandas = ">=0.21.1"
+lxml = "^5.1.0"
+xmltodict = "^0.13.0"
+wrapt = "^1.16.0"
+requests-cache = "^1.1.1"
+suds-community = "^1.1.2"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.4"
+pytest-cov = "^4.1.0"
+pytest-xdist = "^3.5.0"
+pytest-mock = "^3.12.0"
+pytest-timeout = "^2.2.0"
+pytest-runner = "^6.0.1"
+coveralls = "^3.3.1"
+flaky = "^3.7.0"
+
+
+[tool.poetry.group.doc.dependencies]
+sphinx = ">3"
+sphinx-rtd-theme = "^2.0.0"
+sphinx-gallery = "^0.15.0"
+
+
+
+
