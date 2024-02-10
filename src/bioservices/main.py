@@ -14,7 +14,7 @@ import os
 from pathlib import Path
 import subprocess
 
-import click
+import rich_click as click
 
 import colorlog
 
