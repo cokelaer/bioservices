@@ -159,7 +159,7 @@ class COG:
     def get_all_cogs_definition(self, page=None):
         """Get all COG Definitions:"""
         if page is None:
-            self._get_all("cogdef")
+            res = self._get_all("cogdef")
         else:
             res = self.services.http_get("cogdef", frmt="json", params={"page": page})
         return res
@@ -221,6 +221,6 @@ class COG:
         candidates = []
         for x in results["results"]:
             for y in x["organisms"]:
-                if "coli" in y["genome_name"].lower():
+                if name in y["genome_name"].lower():
                     candidates.append(y)
         return candidates
