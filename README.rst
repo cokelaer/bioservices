@@ -28,7 +28,7 @@ BIOSERVICES: access to biological web services programmatically
 
 
 
-:Python_version_available: BioServices is tested for Python 3.7, 3.8, 3.9, 3.10
+:Python_version_available: BioServices is tested for Python 3.9, 3.10, 3.11, 3.12
 :Contributions: Please join https://github.com/cokelaer/bioservices 
 :Issues: Please use https://github.com/cokelaer/bioservices/issues
 :How to cite: Cokelaer et al. *BioServices: a common Python package to access biological Web Services programmatically*
@@ -199,6 +199,7 @@ Version   Description
 ========= ====================================================================
 1.13.0    * Fix pyproject missing requirements
           * Fix pkg_resources warning
+          * drop python 3.8, add py3.12
 1.12.0    * migrating to pyproject
 1.11.2    * Update COG service to be more user-friendly and return all pages
             by default
