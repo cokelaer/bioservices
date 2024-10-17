@@ -197,6 +197,8 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.13.0    * Fix pyproject missing requirements
+          * Fix pkg_resources warning
 1.12.0    * migrating to pyproject
 1.11.2    * Update COG service to be more user-friendly and return all pages
             by default

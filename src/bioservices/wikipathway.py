@@ -569,3 +569,10 @@ class WikiPathways:
         """
         url = self.getPathwayInfo(pathwayId)["url"]
         webbrowser.open(url)
+
+
+    def getXrefList(self, pathwayId, code):
+        url = f"getXrefList?pwId={pathwayId}&format=json&code={code}"
+        request = self.services.http_get(url)
+        return request['xrefs']
+

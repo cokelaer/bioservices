@@ -1,4 +1,17 @@
-import pkg_resources
+
+from importlib import metadata
+
+
+def get_package_version(package_name):
+    try:
+        version = metadata.version(package_name)
+        return version
+    except metadata.PackageNotFoundError:
+        return f"{package_name} not found"
+
+
+version = get_package_version("bioservices")
+
 
 from easydev import CustomConfig
 from easydev.logging_tools import Logging
@@ -6,10 +19,6 @@ from easydev.logging_tools import Logging
 
 logger = Logging("bioservices", "WARNING", text_color="green")
 
-try:
-    version = pkg_resources.require("bioservices")[0].version
-except:
-    version = "1.9.0"
 
 import colorlog
 
