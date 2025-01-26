@@ -2,14 +2,14 @@
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry]
+[project]
 name = "bioservices"
 version = "1.13.0"
 description = "Access to Biological Web Services from Python"
-authors = ["Thomas Cokelaer <thomas.cokelaer@pasteur.fr>"]
+authors = [{name="Thomas Cokelaer", email="thomas.cokelaer@pasteur.fr"}]
 license = "GPLv3"
-readme = ["README.rst", "LICENSE"]
-keywords = ["BioServices", "WebServices", "Biology", "BioDBNet", "ChEBI", "UniChem", "Kegg", "KEGG", "BioModels",   "EUtils", "UniProt", "PICR", "ArrayExpress", "MUSCLE", "QuickGO", "PDB", "PSICQUIC", "Blast", "BioMART", "PantherDB", "BioGRID", "MIRIAM", "BioMart", "GeneProf", "ChEMBL", "ChemSpider",  "HGNC", "PathwayCommons", "Rhea", "Ensembl"]
+readme = "README.rst"
+keywords = ["BioServices", "WebServices", "Biology", "ChEBI", "UniChem", "Kegg", "KEGG", "BioModels", "EUtils", "UniProt", "PICR", "ArrayExpress", "MUSCLE", "QuickGO", "PDB", "PSICQUIC", "Blast", "BioMART", "PantherDB", "BioGRID", "MIRIAM", "BioMart", "GeneProf", "ChEMBL", "ChemSpider",  "HGNC", "PathwayCommons", "Rhea", "Ensembl"]
 
 classifiers = [
         "Development Status :: 5 - Production/Stable",
@@ -29,8 +29,28 @@ classifiers = [
         "Topic :: Scientific/Engineering :: Information Analysis",
 ]
 
+requires-python = ">=3.8,<4.0"
+dependencies = [
+    "click (>=8.1.8,<9.0.0)",
+    "appdirs (>=1.4.4,<2.0.0)",
+    "matplotlib (<4)",
+    "easydev (>=0.13.3,<0.14.0)",
+    "tqdm (>=4.67.1,<5.0.0)",
+    "rich-click (>=1.8.5,<2.0.0)",
+    "colorlog (>=6.9.0,<7.0.0)",
+    "beautifulsoup4 (>=4.12.3,<5.0.0)",
+    "grequests (>=0.7.0,<0.8.0)",
+    "requests (>=2.32.3,<3.0.0)",
+    "lxml (>=5.3.0,<6.0.0)",
+    "requests-cache (>=1.2.1,<2.0.0)",
+    "suds-community (>=1.2.0,<2.0.0)",
+    "wrapt (>=1.17.2,<2.0.0)",
+    "xmltodict (>=0.14.2,<0.15.0)",
+    "pandas (<2.2)"
 
-[tool.poetry.scripts]
+]
+
+[project.scripts]
 bioservices = "bioservices.main:main"
 
 
@@ -40,26 +60,6 @@ Repository = "https://github.com/cokelaer/bioservices"
 Issues = "https://github.com/cokelaer/bioservices/issues"
 Documentation =  "https://bioesrvices.readthedocs.io"
 
-
-
-[tool.poetry.dependencies]
-python = "^3.8"
-appdirs = "^1.4.4"
-click = "^8.1.7"
-easydev = "^0.12.1"
-matplotlib = "<4"
-tqdm = "^4.66.1"
-rich-click = "^1.7.2"
-beautifulsoup4 = "^4.12.3"
-colorlog = "^6.8.2"
-grequests = "^0.7.0"
-requests = "^2.31.0"
-pandas = ">=0.21.1"
-lxml = "^5.1.0"
-xmltodict = "^0.13.0"
-wrapt = "^1.16.0"
-requests-cache = "^1.1.1"
-suds-community = "^1.1.2"
 
 
 [tool.poetry.group.dev.dependencies]

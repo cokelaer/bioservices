@@ -36,8 +36,8 @@
 import sys
 import time
 
-from bioservices.services import REST
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
@@ -346,7 +346,7 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
         """
         if self.get_status(jobid) != "FINISHED":
             self.services.logging.warning("waiting for the job to be finished. May take a while")
-            self.wait(jobid, verbose=False)
+            self.wait(jobid)
         url = "resulttypes/" + jobid
         res = self.services.http_get(
             url,

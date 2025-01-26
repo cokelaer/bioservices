@@ -1,7 +1,9 @@
-from bioservices import BioModels
-from easydev import TempFile
-import pytest
 import os
+
+import pytest
+from easydev import TempFile
+
+from bioservices import BioModels
 
 # pytestmark = pytest.mark.skipif( "TRAVIS_PYTHON_VERSION" in os.environ,
 #     reason="On travis")
@@ -73,7 +75,8 @@ def test_search(biomodels):
         assert True
 
 
-def test_search_download(biomodels):
+# too slow
+def _test_search_download(biomodels):
 
     with TempFile(suffix=".zip") as fout:
         biomodels.search_download("BIOMD0000000100,BIOMD0000000654,", output_filename=fout.name, force=True)
@@ -138,7 +141,7 @@ def test_getAuthorsByModelId(biomodels):
 
 def test_getDateLastModifByModelId(biomodels):
     res = biomodels.getDateLastModifByModelId(modelId)
-    # This changes with time so no need to check 
+    # This changes with time so no need to check
     #assert res == '2012-05-16T14:44:17+00:00'
 
 def test_getEncodersByModelId(biomodels):
@@ -147,7 +150,7 @@ def test_getEncodersByModelId(biomodels):
 
 def test_getLastModifiedDateByModelId(biomodels):
     res = biomodels.getLastModifiedDateByModelId("BIOMD0000000256")
-    # This changes with time so no need to check 
+    # This changes with time so no need to check
     #assert res == '2012-05-16T14:44:17+00:00'
 
 def test_getModelNameById(biomodels):

@@ -1,13 +1,13 @@
-from bioservices.muscle import MUSCLE
-from bioservices import uniprot
-import pytest
 import os
 
-skiptravis = pytest.mark.skipif("TRAVIS_PYTHON_VERSION" in os.environ, reason="too long On travis ")
+import pytest
+
+from bioservices import uniprot
+from bioservices.muscle import MUSCLE
 
 
-@skiptravis
-@pytest.mark.xfail
+@pytest.mark.xfail(reason="too slow")
+@pytest.mark.timeout(10)
 def test_muscle():
     m = MUSCLE(verbose=False)
     m.parameters

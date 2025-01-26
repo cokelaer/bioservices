@@ -16,13 +16,14 @@
 ##############################################################################
 """This module includes common tools to manipulate XML files"""
 import xml.etree.ElementTree as ET
+
 import bs4
 
 try:
-    from urllib.request import urlopen
     from urllib.error import HTTPError
+    from urllib.request import urlopen
 except:
-    from urllib2 import urlopen, HTTPError
+    from urllib2 import HTTPError, urlopen
 
 __all__ = ["easyXML", "readXML"]
 
@@ -92,7 +93,7 @@ class easyXML(object):
 
     def _get_soup(self):
         if self._soup is None:
-            self._soup = bs4.BeautifulSoup(self.data, "lxml")
+            self._soup = bs4.BeautifulSoup(self.data, features="xml")
         return self._soup
 
     soup = property(_get_soup, doc="Returns the beautiful soup instance")

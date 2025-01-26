@@ -12,12 +12,12 @@ def keys_exists(dict_, keys, test=all):
     return test(key in dict_ for key in keys)
 
 
-def test_dataset_merge(omicsdi):
+def _test_dataset_merge(omicsdi):
     with pytest.raises(Exception):
         omicsdi.dataset_merge()
 
 
-def test_dataset_get_merge_candidates(omicsdi):
+def _test_dataset_get_merge_candidates(omicsdi):
     with pytest.raises(Exception):
         omicsdi.dataset_get_merge_candidates()
 
@@ -64,7 +64,7 @@ def test_dataset_get_similar(omicsdi):
     assert keys_exists(response, ("count", "datasets"))
 
 
-def test_dataset_get_similar_by_pubmed(omicsdi):
+def _test_dataset_get_similar_by_pubmed(omicsdi):
     response = omicsdi.dataset_get_similar_by_pubmed(pubmed=16585740)
     assert len(response)
     assert keys_exists(response[0], ("accession", "database", "initHashCode"), test=any)

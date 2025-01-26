@@ -13,17 +13,19 @@ Interface to the OmicsDI API Service
         -- OmicsDI Home Page, March 22, 2020.
 """
 
+import collections
+
 # imports - standard imports
 import re
-import collections
 
 # imports - third-party imports
 import requests
 
+from bioservices._compat import iteritems, string_types
+
 # imports - module imports
 from bioservices.services import REST
 from bioservices.util import sequencify
-from bioservices._compat import string_types, iteritems
 
 __all__ = ["OmicsDI"]
 
@@ -73,7 +75,7 @@ class OmicsDI:
     _api = {
         "paths": [
             {
-                "path": "/dataset/merge",
+                "path": "dataset/merge",
                 "method": "POST",
                 "params": "mergeCandidate",
                 "auth": True,
@@ -88,7 +90,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/dataset/getMergeCandidates",
+                "path": "dataset/getMergeCandidates",
                 "params": ["start", "size"],
                 "auth": True,
                 "doc": """
@@ -102,7 +104,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/dataset/:domain/:acc/files",
+                "path": "dataset/:domain/:acc/files",
                 "function_name": "dataset_domain_accession_files",
                 "params": {
                     "domain": {"type": "path"},
@@ -122,7 +124,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/dataset/search",
+                "path": "dataset/search",
                 "params": ["query", "sortfield", "order", "start", "size", "faceCount"],
                 "doc": """
                 Retrieve datasets in the resource using different queries
@@ -139,7 +141,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/dataset/latest",
+                "path": "dataset/latest",
                 "params": "size",
                 "doc": """
                 Retrieve the latest datasets in the repository
@@ -155,7 +157,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/dataset/batch",
+                "path": "dataset/batch",
                 "params": {
                     "accession": {"required": True, "argument": "accession"},
                     "database": {"required": True},
@@ -174,7 +176,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/dataset/mostAccessed",
+                "path": "dataset/mostAccessed",
                 "params": {"size": {"required": True}},
                 "doc": """
                 Retrieve a specific dataset
@@ -190,7 +192,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/dataset/getFileLinks",
+                "path": "dataset/getFileLinks",
                 "params": {
                     "accession": {"required": True, "argument": "accession"},
                     "database": {"required": True},
@@ -208,7 +210,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/dataset/:domain/:acc",
+                "path": "dataset/:domain/:acc",
                 "function_name": "dataset_domain_accession",
                 "params": {
                     "domain": {"type": "path"},
@@ -233,7 +235,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/dataset/getSimilar",
+                "path": "dataset/getSimilar",
                 "params": {
                     "accession": {"required": True, "argument": "accession"},
                     "database": {"required": True},
@@ -255,7 +257,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/dataset/getSimilarByPubmed",
+                "path": "dataset/getSimilarByPubmed",
                 "params": {"pubmed": {"required": True}},
                 "doc": """
                 Retrieve all datasets which have same pubmed id
@@ -272,7 +274,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/database/all",
+                "path": "database/all",
                 "doc": """
                 Get DataBase List
 
@@ -289,7 +291,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/term/getTermByPattern",
+                "path": "term/getTermByPattern",
                 "params": {"q": {"argument": "query"}, "size": {}},
                 "doc": """
                 Retrieve the Terms for a pattern
@@ -305,7 +307,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/term/frequentlyTerm/list",
+                "path": "term/frequentlyTerm/list",
                 "params": {
                     "size": {},
                     "domain": {
@@ -328,7 +330,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/seo/home",
+                "path": "seo/home",
                 "doc": """
                 Retrieve data for home page
 
@@ -344,7 +346,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/seo/search",
+                "path": "seo/search",
                 "doc": """
                 Retrieve data for browse page
 
@@ -359,7 +361,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/seo/api",
+                "path": "seo/api",
                 "doc": """
                 Retrieve data for api page
 
@@ -374,7 +376,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/seo/database",
+                "path": "seo/database",
                 "doc": """
                 Retrieve data for databases page
 
@@ -389,7 +391,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/seo/dataset/:domain/:acc",
+                "path": "seo/dataset/:domain/:acc",
                 "function_name": "seo_dataset_domain_accession",
                 "params": {
                     "domain": {"type": "path", "required": True},
@@ -410,7 +412,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/seo/about",
+                "path": "seo/about",
                 "doc": """
                 Retrieve data for about page
 
@@ -425,7 +427,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/statistics/organisms",
+                "path": "statistics/organisms",
                 "params": "size",
                 "doc": """
                 Return statistics about the number of datasets per Organisms
@@ -444,7 +446,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/statistics/tissues",
+                "path": "statistics/tissues",
                 "params": "size",
                 "doc": """
                 Return statistics about the number of datasets per Tissue
@@ -459,7 +461,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/statistics/omics",
+                "path": "statistics/omics",
                 "doc": """
                 Return statistics about the number of datasets per Omics Type
 
@@ -475,7 +477,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/statistics/diseases",
+                "path": "statistics/diseases",
                 "doc": """
                 Return statistics about the number of datasets per diseases
 
@@ -492,7 +494,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/statistics/domains",
+                "path": "statistics/domains",
                 "doc": """
                 Return statistics about the number of datasets per Repository
 
@@ -508,7 +510,7 @@ class OmicsDI:
             """,
             },
             {
-                "path": "/statistics/omicsByYear",
+                "path": "statistics/omicsByYear",
                 "doc": """
                 Return statistics about the number of datasets per OmicsType on recent 5 years.
 
@@ -566,7 +568,12 @@ class OmicsDI:
             if params:
                 parameters = []
 
-                if isinstance(params, collections.Mapping):
+                try:
+                    from collections import Mapping
+                except ImportError:
+                    from collections.abc import Mapping
+
+                if isinstance(params, Mapping):
                     for param, info in iteritems(params):
                         type_ = info.get("type", "param")
                         required = info.get("required")
@@ -591,9 +598,9 @@ class OmicsDI:
 
             args = {"params": data, "frmt": "json"}
 
-            if auth_required:
-                auth = OmicsDIAuth(token=self.token)
-                args.update({"auth": auth})
+            # if auth_required:
+            #    auth = OmicsDIAuth(token=self.token)
+            #    args.update({"auth": auth})
 
             method_caller = METHOD_CALLERS.get(method, self.services.http_get)
 

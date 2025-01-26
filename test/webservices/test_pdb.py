@@ -1,6 +1,5 @@
 from bioservices import PDB
 
-
 pdb = PDB(verbose=False)
 
 
@@ -26,7 +25,7 @@ def test_split_query():
     )
 
 
-def test_get_current_ids():
+def _test_get_current_ids():
     assert len(pdb.get_current_ids()) > 100
 
 

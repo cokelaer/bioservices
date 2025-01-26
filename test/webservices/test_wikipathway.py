@@ -1,7 +1,9 @@
-from bioservices.wikipathway import WikiPathways
-import pytest
 import os
+
+import pytest
 from easydev import TempFile
+
+from bioservices.wikipathway import WikiPathways
 
 
 @pytest.fixture
@@ -49,7 +51,7 @@ def test_getPathwayInfo(wikipath):
 
 
 def test_getPathwayAs(wikipath):
-    res = wikipath.getPathwayAs("WP4", filetype="png")
+    res = wikipath._getPathwayAs("WP4", filetype="png")
 
 
 @pytest.mark.xfail(reason="too slow", method="thread")

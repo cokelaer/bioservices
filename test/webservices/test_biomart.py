@@ -1,5 +1,6 @@
-from bioservices import BioMart
 import pytest
+
+from bioservices import BioMart
 
 
 @pytest.fixture
@@ -29,13 +30,18 @@ def _test_attributes(biomart):
 
 
 @pytest.mark.flaky
-def test_filteres(biomart):
-    biomart.filters("oanatinus_gene_ensembl")
+def test_filters(biomart):
+    biomart = BioMart(host="www.ensembl.org", verbose=False)
+    biomart.mart_test = "ENSEMBL_MART_ENSEMBL"
+    try:
+        biomart.filters("oanatinus_gene_ensembl")
+    except:
+        biomart.filters("oanatinus_genomic_sequence")
 
 
 @pytest.mark.flaky
 def test_config(biomart):
-    biomart.configuration("oanatinus_gene_ensembl")
+    biomart.configuration("oanatinus_genomic_sequence")
 
 
 # fails on travais sometines

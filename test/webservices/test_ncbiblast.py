@@ -1,8 +1,8 @@
-from bioservices import NCBIblast
-import pytest
 import os
 
-skiptravis = pytest.mark.skipif("TRAVIS_PYTHON_VERSION" in os.environ, reason="too slow for travis")
+import pytest
+
+from bioservices import NCBIblast
 
 
 @pytest.fixture
@@ -25,12 +25,14 @@ def test_paramdetails(ncbi):
         assert True
 
 
-@skiptravis
-@pytest.mark.xfail
+@pytest.mark.xfail(reason="too slow", method="thread")
+@pytest.mark.timeout(10)
 def test_run(ncbi):
 
     try:
-        ncbi.jobid = ncbi.run(program="blastp", sequence=ncbi._sequence_example, stype="protein", database="uniprotkb")
+        ncbi.jobid = ncbi.run(
+            program="blastp", sequence=ncbi._sequence_example, stype="protein", database="uniprotkb_viruses"
+        )
         assert False  # missing email argument
     except:
         assert True
@@ -38,7 +40,7 @@ def test_run(ncbi):
         program="blastp",
         sequence=ncbi._sequence_example,
         stype="protein",
-        database="uniprotkb",
+        database="uniprotkb_viruses",
         email="cokelaer@ebi.ac.uk",
         matrix="BLOSUM45",
     )

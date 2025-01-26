@@ -30,10 +30,14 @@
         -- From WikiPathway web site. Dec 2012
 
 """
-from bioservices.services import REST
-import copy, webbrowser, base64
+import base64
+import copy
+import json
+import webbrowser
 
 import pandas as pd
+
+from bioservices.services import REST
 
 __all__ = ["WikiPathways"]
 
@@ -236,16 +240,12 @@ class WikiPathways:
             >>> s = Wikipathway()
             >>> s.getPathwayInfo("WP2320")
         """
-        url = "getPathwayInfo?pwId=%s" % pathwayId
+        url = f"getPathwayInfo?pwId={pathwayId}&format=json"
         request = self.services.http_get(url)
-        data = self.services.easyXML(request.content)
-        data = data.findAll("ns1:pathwayinfo")
-        pathway = {}
-        for this in data:
-            for tag in ["id", "url", "name", "species", "revision"]:
-                text = this.find("ns2:%s" % tag).getText()
-                pathway[tag] = text
-        return pathway
+        try:
+            return request["pathwayInfo"]
+        except TypeError:
+            return request
 
     def getPathwayHistory(self, pathwayId, date):
         """Get the revision history of a pathway.
@@ -264,11 +264,7 @@ class WikiPathways:
 
         """
 
-        query = "getPathwayHistory?pwId=%s&timestamp=%s" % (
-            pathwayId,
-            str(date),
-        )
-        query += "&format=json"
+        query = f"getPathwayHistory?pwId={pathwayId}&timestamp={data}&format=json"
         return self.services.http_get(query)
 
     def getRecentChanges(self, timestamp):
@@ -308,7 +304,7 @@ class WikiPathways:
         # d = {"name":usrname, "pass":password}
         # return self.serv.login(**d)
 
-    def getPathwayAs(self, pathwayId, filetype="png", revision=0):
+    def _getPathwayAs(self, pathwayId, filetype="png", revision=0):
         """Download a pathway in the specified file format.
 
         :param str pathwayId: the pathway identifier.
@@ -320,13 +316,16 @@ class WikiPathways:
 
         .. note:: use :meth:`savePathwayAs` to save into a file.
         """
-        self.services.devtools.check_param_in_list(filetype, ["gpml", "png", "svg", "pdf", "txt", "pwf", "owl"])
+        valids = ["gpml", "png", "svg", "pdf", "txt", "pwf", "owl"]
+        assert filetype in valids, f"filetype must be in {valids}"
 
-        url = "getPathwayAs?fileType=%s" % filetype
-        url += "&pwId=%s " % pathwayId
-        url += "&revision=%s&format=json" % revision
+        url = f"getPathwayAs?fileType={filetype}&pwId={pathwayId}"
+        url += f"&revision={revision}&format=json"
         res = self.services.http_get(url)
-        return res["data"]
+        try:
+            return res["data"]
+        except (TypeError, AttributeError):
+            return res
 
     def savePathwayAs(self, pathwayId, filename, revision=0, display=True):
         """Save a pathway.
@@ -347,7 +346,9 @@ class WikiPathways:
             filename = "%s.%s" % (filename, "pdf")
         filetype = filename.split(".")[-1]
 
-        res = self.getPathwayAs(pathwayId, filetype=filetype, revision=revision)
+        print(filetype)
+
+        res = self._getPathwayAs(pathwayId, filetype=filetype, revision=revision)
 
         with open(filename, "wb") as f:
             import binascii
@@ -553,8 +554,7 @@ class WikiPathways:
         :returns: List of WSPathwayInfo The pathway information.
 
         """
-        url = "getPathwaysByParentOntologyTerm?term={}".format(term)
-        url += "&format=json"
+        url = f"getPathwaysByParentOntologyTerm?term={term}&format=json"
         request = self.services.http_get(url)
         return request["pathways"]
 
@@ -567,12 +567,11 @@ class WikiPathways:
             wikipathway one) showing a wikipathway URL.
 
         """
+        print(self.getPathwayInfo(pathwayId))
         url = self.getPathwayInfo(pathwayId)["url"]
         webbrowser.open(url)
-
 
     def getXrefList(self, pathwayId, code):
         url = f"getXrefList?pwId={pathwayId}&format=json&code={code}"
         request = self.services.http_get(url)
-        return request['xrefs']
-
+        return request["xrefs"]

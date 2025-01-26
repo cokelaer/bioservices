@@ -132,7 +132,6 @@ param           Interaction parameters. Only true or
 
 from bioservices import REST, UniProt
 
-
 # http://code.google.com/p/psicquic/wiki/PsicquicSpec_1_3_Rest
 
 # http://www.biocatalogue.org/services/2078#operations
@@ -357,21 +356,21 @@ class PSICQUIC:
 
     def _get_registry_resturl(self):
         res = self.registry
-        data = [x.findAll("resturl")[0].text for x in res.findAll("service")]
+        data = [x.findAll("restUrl")[0].text for x in res.findAll("service")]
         return data
 
     registry_resturls = property(_get_registry_resturl, doc="returns URL of REST services")
 
     def _get_registry_restex(self):
         res = self.registry
-        data = [x.findAll("restexample")[0].text for x in res.findAll("service")]
+        data = [x.findAll("restExample")[0].text for x in res.findAll("service")]
         return data
 
     registry_restexamples = property(_get_registry_restex, doc="retuns REST example for each service")
 
     def _get_registry_soapurl(self):
         res = self.registry
-        return [x.findAll("soapurl")[0].text for x in res.findAll("service")]
+        return [x.findAll("soapUrl")[0].text for x in res.findAll("service")]
 
     registry_soapurls = property(_get_registry_soapurl, doc="returns URL of WSDL service")
 
@@ -462,7 +461,9 @@ class PSICQUIC:
         try:
             index = names.index(service)
         except ValueError:
-            self.services.logging.error("The service you gave (%s) is not registered. See self.registery_names" % service)
+            self.services.logging.error(
+                "The service you gave (%s) is not registered. See self.registery_names" % service
+            )
             raise ValueError
 
         # get the base url according to the service requested
@@ -788,7 +789,9 @@ class PSICQUIC:
                     DBname = self._mapping_uniprot[k]
 
                     if DBname is not None:
-                        self.services.logging.warning("Request sent to uniprot for %s database (%s/%s)" % (DBname, counter, N))
+                        self.services.logging.warning(
+                            "Request sent to uniprot for %s database (%s/%s)" % (DBname, counter, N)
+                        )
                         res = self.uniprot.mapping(fr=DBname, to="ID", query=" ".join(this_query))
                         for x in this_query:
                             if x not in res:  # was not found
@@ -801,7 +804,9 @@ class PSICQUIC:
                                 if len(res[x]) == 1:
                                     mapping[x] = res[x][0]
                                 else:
-                                    self.services.logging.warning("psicquic mapping found more than 1 id. keep first one")
+                                    self.services.logging.warning(
+                                        "psicquic mapping found more than 1 id. keep first one"
+                                    )
                                     mapping[x] = res[x][0]
                     else:
                         for x in this_query:
@@ -935,7 +940,7 @@ class AppsPPI(object):
 
         """
         try:
-            from pylab import pie, clf, title, show, legend
+            from pylab import clf, legend, pie, show, title
         except ImportError:
             from bioservices import BioServicesError
 

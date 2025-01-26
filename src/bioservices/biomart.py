@@ -33,10 +33,10 @@ to all the BioModel service.
 
 .. note:: SOAP and REST are available. We use REST for the wrapping.
 """
-from io import StringIO
-from bioservices import REST, BioServicesError
 from functools import wraps
-from bioservices import logger
+from io import StringIO
+
+from bioservices import REST, BioServicesError, logger
 
 logger.name = __name__
 import pandas as pd
@@ -359,8 +359,9 @@ class BioMart(REST):
             scrofa,Taeniopygia guttata ,Xenopus tropicalis]
 
         """
-        if dataset not in [x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]]:
-            raise ValueError("provided dataset (%s) is not found. see valid_attributes" % dataset)
+        valid_attributes = sorted([x for k in self.valid_attributes.keys() for x in self.valid_attributes[k]])
+        if dataset not in valid_attributes:
+            raise ValueError(f"provided dataset ({dataset}) is not found. see valid_attributes {valid_attributes}")
         ret = self.http_get("?type=filters&dataset=%s" % dataset, frmt="txt")
         ret = [x for x in ret.split("\n") if len(x)]
         results = {}

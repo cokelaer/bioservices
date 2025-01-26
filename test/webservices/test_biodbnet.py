@@ -1,5 +1,6 @@
-from bioservices import BioDBNet
 import pytest
+
+from bioservices import BioDBNet
 
 
 @pytest.fixture
@@ -13,7 +14,8 @@ def test_db2db(biodbnet):
     assert df.loc["P43403"].values[0] == "7535"
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail(reason="too slow")
+@pytest.mark.timeout(10)
 def test_dbfind(biodbnet):
     df = biodbnet.dbFind("Gene ID", ["ZMYM6_HUMAN", "NP_710159", "ENSP00000305919"])
     assert len(df["Gene ID"]) == 3

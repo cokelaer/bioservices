@@ -32,8 +32,8 @@
 
 
 """
-from bioservices.services import REST
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
@@ -189,13 +189,13 @@ class Ensembl:
     def get_genetree_by_member_id(
         self,
         identifier,
+        species,
         frmt="json",
         aligned=False,
         db_type="core",
         object_type=None,
         nh_format="simple",
         sequence="protein",
-        species="homo_sapiens",
         compara="multi",
     ):
         """Retrieves a gene tree containing the gene identified by a symbol
@@ -211,7 +211,7 @@ class Ensembl:
 
         :
 
-            get_genetree_by_member_id('ENSG00000157764', frmt='phyloxml')
+            get_genetree_by_member_id('ENSG00000157764', 'human', frmt='phyloxml')
 
 
         """
@@ -222,7 +222,7 @@ class Ensembl:
         self.check_sequence(sequence)
 
         res = self.services.http_get(
-            "genetree/member/id/" + identifier,
+            f"genetree/member/id/{species}/{identifier}",
             frmt=frmt,
             headers=self.services.get_headers(content=frmt),
             params={
@@ -356,15 +356,15 @@ class Ensembl:
         )
         return res
 
-    def get_homology_by_id(
+    def get_homology_by_species_and_id(
         self,
         identifier,
+        species,
         frmt="json",
         aligned=True,
         compara="multi",
         format=None,
         sequence=None,
-        species=None,
         target_species=None,
         target_taxon=None,
         type="all",
@@ -372,7 +372,7 @@ class Ensembl:
         """Retrieves homology information (orthologs) by Ensembl gene id"""
         self._check_frmt(frmt, ["xml"])
         res = self.services.http_get(
-            "homology/id/{0}".format(identifier),
+            f"homology/id/{species}/{identifier}",
             frmt=frmt,
             headers=self.services.get_headers(content=frmt),
             params={
@@ -381,7 +381,6 @@ class Ensembl:
                 "compara": compara,
                 "format": format,
                 "sequence": sequence,
-                "species": species,
                 "target_species": target_species,
                 "target_taxon": target_taxon,
                 "type": type,

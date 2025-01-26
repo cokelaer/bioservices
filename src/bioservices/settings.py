@@ -3,12 +3,12 @@ Created on Fri Aug  8 15:31:34 2014
 
 @author: cokelaer
 """
-import os
-from easydev import DynamicConfigParser, underline
 import copy
+import os
 import shutil
 
 import appdirs
+from easydev import DynamicConfigParser, underline
 
 __all__ = ["defaultParams", "BioServicesConfig"]
 
@@ -154,7 +154,7 @@ class ConfigReadOnly(object):
     home = property(_get_home)
 
     def _mkdirs(self, newdir, mode=0o777):
-        """from matplotlib mkdirs
+        """
 
         make directory *newdir* recursively, and set *mode*.  Equivalent to ::
 

@@ -1,5 +1,6 @@
-from bioservices import Ensembl
 import pytest
+
+from bioservices import Ensembl
 
 
 @pytest.fixture
@@ -34,7 +35,7 @@ def test_genetree_by_id(ensembl):
 
 @pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_get_genetree_by_member_id(ensembl):
-    res = ensembl.get_genetree_by_member_id("ENSG00000157764", frmt="json", nh_format="phylip")
+    res = ensembl.get_genetree_by_member_id("ENSG00000157764", "human", frmt="json", nh_format="phylip")
     assert len(res) > 1000
 
 
@@ -56,11 +57,13 @@ def __test_get_alignment_by_region(ensembl):
 
 
 @pytest.mark.flaky(max_runs=3, min_passes=1)
-def test_get_homology_by_id(ensembl):
-    res = ensembl.get_homology_by_id("ENSG00000157764")
+def test_get_homology_by_species_and_id(ensembl):
+    res = ensembl.get_homology_by_species_and_id("ENSG00000157764", "human")
     assert res.keys()
-    res = ensembl.get_homology_by_id("ENSG00000157764", frmt="xml")
-    res = ensembl.get_homology_by_id("ENSG00000157764", format="condensed", type="orthologues", target_taxon="10090")
+    res = ensembl.get_homology_by_species_and_id("ENSG00000157764", "human", frmt="xml")
+    res = ensembl.get_homology_by_species_and_id(
+        "ENSG00000157764", "human", format="condensed", type="orthologues", target_taxon="10090"
+    )
     assert "homologies" in res["data"][0].keys()
 
 

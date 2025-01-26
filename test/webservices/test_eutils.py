@@ -1,5 +1,6 @@
-from bioservices.eutils import EUtilsParser, EUtils
 import pytest
+
+from bioservices.eutils import EUtils, EUtilsParser
 
 
 @pytest.fixture
@@ -66,7 +67,7 @@ def test_einfo(eutils):
     alldbs = eutils.EInfo()
     for db in ["pubmed", "genome", "dbvar", "gene"]:
         assert db in alldbs
-    assert len(alldbs) > 40  # 52 Aug 2014 but let us be on the safe side
+    assert len(alldbs) > 10  # 52 Aug 2014, 40 in 2025
 
 
 def test_einfo_pubmed(eutils):
@@ -81,7 +82,8 @@ def test_einfo_pubmed(eutils):
     assert ret["fieldlist"][0]["fullname"], "All Fields"
 
 
-def test_gquery(eutils):
+# See Issue #272
+def _test_gquery(eutils):
     ret = eutils.EGQuery("asthma")
     [(x.DbName, x.Count) for x in ret.eGQueryResult.ResultItem if x.Count != "0"]
 
