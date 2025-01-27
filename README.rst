@@ -20,7 +20,7 @@ BIOSERVICES: access to biological web services programmatically
 .. image:: https://static.pepy.tech/personalized-badge/bioservices?period=month&units=international_system&left_color=black&right_color=orange&left_text=Downloads
     :target: https://pepy.tech/project/bioservices
 
-.. image:: https://anaconda.org/conda-forge/bioservices/badges/version.svg   
+.. image:: https://anaconda.org/conda-forge/bioservices/badges/version.svg
     :target: https://anaconda.org/conda-forge/bioservices
 
 
@@ -29,14 +29,14 @@ BIOSERVICES: access to biological web services programmatically
 
 
 :Python_version_available: BioServices is tested for Python 3.9, 3.10, 3.11, 3.12
-:Contributions: Please join https://github.com/cokelaer/bioservices 
+:Contributions: Please join https://github.com/cokelaer/bioservices
 :Issues: Please use https://github.com/cokelaer/bioservices/issues
 :How to cite: Cokelaer et al. *BioServices: a common Python package to access biological Web Services programmatically*
      `Bioinformatics <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ (2013) 29 (24): 3241-3242
 :Documentation: `RTD documentation <http://bioservices.readthedocs.io/>`_.
 
 **Bioservices** is a Python package that provides access to many Bioinformatices Web Services (e.g.,
-UniProt) and a framework to easily implement Web Services wrappers (based on 
+UniProt) and a framework to easily implement Web Services wrappers (based on
 WSDL/SOAP or REST protocols).
 
 
@@ -48,12 +48,12 @@ One of the main philosophy of **BioServices** is to make use of the existing
 biological databases (not to re-invent new databases) and to alleviates the
 needs for expertise in Web Services for the developers/users.
 
-BioServices provides access to about 40 Web Services. 
+BioServices provides access to about 40 Web Services.
 
 Contributors
 ============
 
-Maintaining BioServices would not have been possible without users and contributors. 
+Maintaining BioServices would not have been possible without users and contributors.
 Each contribution has been an encouragement to pursue this project. Thanks to all:
 
 .. image:: https://contrib.rocks/image?repo=cokelaer/bioservices
@@ -68,7 +68,7 @@ organism::
 
     >>> from bioservices import UniProt
     >>> u = UniProt(verbose=False)
-    >>> data = u.search("zap70+and+taxonomy_id:9606", frmt="tsv", limit=3, 
+    >>> data = u.search("zap70+and+taxonomy_id:9606", frmt="tsv", limit=3,
     ...                 columns="id,length,accession, gene_names")
     >>> print(data)
     Entry name   Length  Entry   Gene names
@@ -80,10 +80,10 @@ organism::
 .. note:: major changes of UniProt API changed all columns names in June 2022. The code above is valid for bioservices
    versions >1.10. Earlier version used::
 
-        >>> data = u.search("zap70+and+taxonomy:9606", frmt="tab", limit=3, 
+        >>> data = u.search("zap70+and+taxonomy:9606", frmt="tab", limit=3,
         ...                 columns="entry name,length,id, genes")
 
-   Note that columns names have changed, the frmt was changed from tab to tsv 
+   Note that columns names have changed, the frmt was changed from tab to tsv
    and taxonomy is now taxonomy_id. Names correspondences can be found in::
 
         u._legacy_names
@@ -177,7 +177,7 @@ wikipathway           .. image:: https://github.com/cokelaer/bioservices/actions
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/wikipathway.yml
 ==================== ================================================================================================
 
-.. note:: Contributions to implement new wrappers are more than welcome. 
+.. note:: Contributions to implement new wrappers are more than welcome.
     See `BioServices github page <https://github.com/cokelaer/bioservices/>`_
     to join the development, and the Developer guide on how to implement new
     wrappers.
@@ -187,7 +187,7 @@ Bioservices command
 
 In version 1.8.2, we included a bioservices command. For now it has only one subcommand to download a NCBI accession number and possibly it genbank or GFF file (if available)::
 
-    bioservices download-accession --accession K01711.1 --with-gbk 
+    bioservices download-accession --accession K01711.1 --with-gbk
 
 
 Changelog
@@ -197,16 +197,15 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
-1.13.0    * Fix pyproject missing requirements
+1.12.0    * Fix pyproject missing requirements
           * Fix pkg_resources warning
           * drop python 3.8, add py3.12
-1.12.0    * migrating to pyproject
 1.11.2    * Update COG service to be more user-friendly and return all pages
             by default
           * uniprot set progress to False in the search method
-          * Merged #250 and #249 user PRs (compress option in uniprot module 
+          * Merged #250 and #249 user PRs (compress option in uniprot module
             and logging issue in biodbnet)
-1.11.1    * Fix regression i uniprot.mapping 
+1.11.1    * Fix regression i uniprot.mapping
             (https://github.com/cokelaer/bioservices/issues/245)
 1.11.0    * Fix uniprot limitation of 25 results only (
           * For developers: all services are now refactorised to use services
@@ -218,7 +217,7 @@ Version   Description
           * remove biocarta (website not accesible anymore)
           * Update Chembl (no API changes)
 1.10.2    * Fix #226 and applied PR from Fix from @GianArauz
-            https://github.com/cokelaer/bioservices/pull/232 about UniProt 
+            https://github.com/cokelaer/bioservices/pull/232 about UniProt
             error
           * Update MANIFEST to fix #232
 1.10.1    * allow command line to download genbank and GFF
@@ -229,7 +228,7 @@ Version   Description
 1.8.4     * biomodels. Fix #208
           * KEGG: fixed #204 #202 and #203
 1.8.3     * Eutils: remove warning due to unreachable URL. Set REST as
-            attribute rather and inheritance. 
+            attribute rather and inheritance.
           * NEW biocontainers module
           * KEGG: add save_pathway method. Fix parsing of structure/pdb entry
           * remove deprecated function from Reactome
@@ -237,22 +236,22 @@ Version   Description
 1.8.1     * Integrated a change made in KEGG service (DEFINITON was changed to
             ORG_CODE)
           * for developers: applied black on all modules
-          * switch suds-jurko to new suds community 
-1.8.0     * add main standalone application. 
+          * switch suds-jurko to new suds community
+1.8.0     * add main standalone application.
           * moved chemspider and clinvitae to the attic
           * removed picr service, not active anymore
 1.4.X     * NEW RNAseq from EBI in rnaseq_ebi module
           * Replaced deprecated HGNC with the official web service from genenames.org
           * Fully updated EUtils since WSDL is now down; implementation uses REST now.
-          * Removed the apps/taxonomy module now part of http://github.com/biokit. 
+          * Removed the apps/taxonomy module now part of http://github.com/biokit.
 1.3.X     * CACHE files are now stored in a general directory in the home
-          * New REST class to use **requests** package instead of urllib2. 
+          * New REST class to use **requests** package instead of urllib2.
           * Creation of a global configuration file in .config/bioservice/bioservices.cfg
           * NEW services: Reactome, Readseq, Ensembl, EUtils
 1.2.X     * NEW services: BioDBnet, BioDBNet, MUSCLE, PathwayCommons, GeneProf
 1.1.X     * NEW services: biocarta, pfam, ChEBI, UniChem
 1.0.0:    * first stable release
-0.9.X:    * NEW services: BioModels, Kegg, Reactome, Chembl, PICR, QuickGO, 
+0.9.X:    * NEW services: BioModels, Kegg, Reactome, Chembl, PICR, QuickGO,
             Rhea, UniProt,WSDbfetch, NCBIblast, PSICQUIC, Wikipath
 ========= ====================================================================
 
