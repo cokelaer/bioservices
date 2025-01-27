@@ -19,7 +19,7 @@ Get a unique identifier and gene names from a name
 ----------------------------------------------------
 
 From **Uniprot**, we can obtain the unique accession number of ZAP70, which may be
-useful later on. Let us try to use the :meth:`~bioservices.uniprot.UniProt.search` method:: 
+useful later on. Let us try to use the :meth:`~bioservices.uniprot.UniProt.search` method::
 
     >>> from bioservices import *
     >>> u = UniProt(verbose=False)
@@ -47,7 +47,7 @@ So here we got the Entry P43403. Entry and Gene names can be saved in two
 variables as follows::
 
     >>> res = u.search("ZAP70_HUMAN", frmt="tab", columns="id,genes")
-    >>> entry, gene_names = res.split("\n")[1].split("\t") 
+    >>> entry, gene_names = res.split("\n")[1].split("\t")
 
 
 Getting the fasta sequence
@@ -78,12 +78,12 @@ method from the UniProt class called :meth:`~bioservices.uniprot.UniProt.retriev
 .. note:: There are many services that provides access to the FASTA sequence. We chose
    uniprot but you could use the Entrez utilities as well as other services.
 
-Using BLAST on the sequence 
+Using BLAST on the sequence
 ------------------------------
 
 You can then analyse this sequence with your favorite tool. As an example, within **BioServices** you can use :class:`~bioservices.services.nciblast.NCIBlast` but first let us extract the sequence itself (without the header)::
 
-    sequence = sequence.split("\n", 1)[1].strip("\n") 
+    sequence = sequence.split("\n", 1)[1].strip("\n")
 
 then, ::
 
@@ -94,15 +94,15 @@ then, ::
     BLASTP 2.2.26 [Sep-21-2011]
 
 
-    Reference: Altschul, Stephen F., Thomas L. Madden, Alejandro A. Schaffer, 
-    Jinghui Zhang, Zheng Zhang, Webb Miller, and David J. Lipman (1997), 
+    Reference: Altschul, Stephen F., Thomas L. Madden, Alejandro A. Schaffer,
+    Jinghui Zhang, Zheng Zhang, Webb Miller, and David J. Lipman (1997),
     "Gapped BLAST and PSI-BLAST: a new generation of protein database search
     programs",  Nucleic Acids Res. 25:3389-3402.
 
     Query= EMBOSS_001
              (619 letters)
 
-    Database: uniprotkb 
+    Database: uniprotkb
                32,727,302 sequences; 10,543,978,207 total letters
 
     Searching..................................................done
@@ -112,10 +112,10 @@ then, ::
                                                                      Score    E
     Sequences producing significant alignments:                      (bits) Value
 
-    SP:ZAP70_HUMAN P43403 Tyrosine-protein kinase ZAP-70 OS=Homo sap...  1279   0.0  
-    TR:H2QIE3_PANTR H2QIE3 Tyrosine-protein kinase OS=Pan troglodyte...  1278   0.0  
-    TR:G3QGN8_GORGO G3QGN8 Tyrosine-protein kinase OS=Gorilla gorill...  1278   0.0  
-    TR:G1QLX3_NOMLE G1QLX3 Tyrosine-protein kinase OS=Nomascus leuco...  1249   0.0  
+    SP:ZAP70_HUMAN P43403 Tyrosine-protein kinase ZAP-70 OS=Homo sap...  1279   0.0
+    TR:H2QIE3_PANTR H2QIE3 Tyrosine-protein kinase OS=Pan troglodyte...  1278   0.0
+    TR:G3QGN8_GORGO G3QGN8 Tyrosine-protein kinase OS=Gorilla gorill...  1278   0.0
+    TR:G1QLX3_NOMLE G1QLX3 Tyrosine-protein kinase OS=Nomascus leuco...  1249   0.0
     TR:F6SWY7_CALJA F6SWY7 Tyrosin
 
 The last command waits for the job to be finised before printing the results,
@@ -247,10 +247,11 @@ or a subset of all databases using the queryAll and convertAll functions::
 
 However, extra cleaning is required to remove entries that are not relevant (no match
 to uniprot ID, redundant, not a protein, self interactions, ...). In order to
-ease this tast, the psicquic.AppsPPI class is very useful. 
+ease this tast, the psicquic.AppsPPI class is very useful.
 
 
-.. plot::
+.. fails on sphinx
+.. .. plot::
     :width: 80%
     :include-source:
 
@@ -265,9 +266,9 @@ ease this tast, the psicquic.AppsPPI class is very useful.
 The summary function print a useful summary about the number of found
 interactions and overlap between databases:
 
-.. doctest:: 
+.. doctest::
    :options: +SKIP
- 
+
     >>> s.summary()
     Found 8 interactions within intact database
     Found 124 interactions within reactome-fis database
@@ -279,10 +280,10 @@ interactions and overlap between databases:
     Found 0 interactions in 3 common databases
     Found 1 interactions in 4 common databases
 
-This may be different depending on the available databases.    
+This may be different depending on the available databases.
 Finally, you can obtain the relation that was found in the 4 databases:
 
-.. doctest:: 
+.. doctest::
    :options: +SKIP
 
     >>> s.relevant_interactions[4]
@@ -313,34 +314,34 @@ and so on.
     =========== =============== ===================================
     Status              name      number of interactions
     =========== =============== ===================================
-    ONLINE      APID            123,427  
-    ONLINE      BAR             0    
-    ONLINE      BIND            38,419   
-    ONLINE      BindingDB       74,082   
-    ONLINE      BioGrid         182,911  
-    ONLINE      ChEMBL          399,482  
-    ONLINE      DIP             18,434   
-    OFFLINE     DrugBank      
-    OFFLINE     GeneMANIA 
-    OFFLINE     I2D     
-    ONLINE      I2D-IMEx        915  
-    ONLINE      InnateDB        14,734   
-    ONLINE      InnateDB-IMEx   352  
-    ONLINE      IntAct          84,692   
-    ONLINE      Interoporc      17,284   
-    ONLINE      iRefIndex       396,368  
-    ONLINE      MatrixDB        604  
-    ONLINE      MBInfo          307  
-    ONLINE      MINT            36,741   
-    ONLINE      MolCon          242  
-    ONLINE      MPIDB           28   
-    ONLINE      Reactome        113,204  
-    ONLINE      Reactome-FIs    209,988  
-    ONLINE      Spike           36,248   
-    ONLINE      STRING          656,493  
-    ONLINE      TopFind         4,986    
-    ONLINE      UniProt         5,564    
-    OFFLINE     VirHostNet      
+    ONLINE      APID            123,427
+    ONLINE      BAR             0
+    ONLINE      BIND            38,419
+    ONLINE      BindingDB       74,082
+    ONLINE      BioGrid         182,911
+    ONLINE      ChEMBL          399,482
+    ONLINE      DIP             18,434
+    OFFLINE     DrugBank
+    OFFLINE     GeneMANIA
+    OFFLINE     I2D
+    ONLINE      I2D-IMEx        915
+    ONLINE      InnateDB        14,734
+    ONLINE      InnateDB-IMEx   352
+    ONLINE      IntAct          84,692
+    ONLINE      Interoporc      17,284
+    ONLINE      iRefIndex       396,368
+    ONLINE      MatrixDB        604
+    ONLINE      MBInfo          307
+    ONLINE      MINT            36,741
+    ONLINE      MolCon          242
+    ONLINE      MPIDB           28
+    ONLINE      Reactome        113,204
+    ONLINE      Reactome-FIs    209,988
+    ONLINE      Spike           36,248
+    ONLINE      STRING          656,493
+    ONLINE      TopFind         4,986
+    ONLINE      UniProt         5,564
+    OFFLINE     VirHostNet
     =========== =============== ===================================
     res = p.queryAll("species:9606", databases=["uniprot", "apid"])
     data1 = res['uniprot']
@@ -370,6 +371,3 @@ and so on.
     >>> labels = range(1, p.N + 1 )
     >>> counting = [len(p.relevant_interactions[i]) for i in labels]
     >>> pie(counting, labels = [str(x) for x in labels])
-
-
-
