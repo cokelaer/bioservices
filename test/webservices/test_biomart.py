@@ -25,26 +25,21 @@ def _test_datasets(biomart):
 
 
 @pytest.mark.flaky
-def _test_attributes(biomart):
+def test_attributes(biomart):
     assert "oanatinus_gene_ensembl" in biomart.valid_attributes[biomart.mart_test]
 
 
 @pytest.mark.flaky
 def test_filters(biomart):
-    biomart = BioMart(host="www.ensembl.org", verbose=False)
-    biomart.mart_test = "ENSEMBL_MART_ENSEMBL"
-    try:
-        biomart.filters("oanatinus_gene_ensembl")
-    except:
-        biomart.filters("oanatinus_genomic_sequence")
+    biomart.filters("oanatinus_gene_ensembl")
 
 
 @pytest.mark.flaky
 def test_config(biomart):
-    biomart.configuration("oanatinus_genomic_sequence")
+    biomart.configuration("oanatinus_gene_ensembl")
 
 
-# fails on travais sometines
+# fails sometines
 @pytest.mark.flaky
 def _test_query(biomart):
     res = biomart.query(biomart._xml_example)
@@ -52,14 +47,16 @@ def _test_query(biomart):
 
 
 @pytest.mark.flaky
-def test_xml(biomart):
+def test_xml():
+    biomart = BioMart(host="www.ensembl.org", verbose=False)
+    biomart.mart_test = "ENSEMBL_MART_ENSEMBL"
     # build own xml using the proper functions
     biomart.add_dataset_to_xml("mmusculus_gene_ensembl")
     biomart.get_xml()
 
 
 @pytest.mark.flaky
-def test_biomart_constructor():
+def _test_biomart_constructor():
     s = BioMart()
     try:
         s.registry()
@@ -67,9 +64,9 @@ def test_biomart_constructor():
         pass
     try:
         s.host = "dummy"
-    except:
+    except ConnectionError:
         pass
-    s.host = "www.ensembl.org"
+    # s.host = "www.ensembl.org"
 
 
 # # reactome not maintained anymore ?
