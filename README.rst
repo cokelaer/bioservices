@@ -197,6 +197,7 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.12.1    * fix pyproject to use python>3.9 and pandas/numpy>2.2
 1.12.0    * Fix pyproject missing requirements
           * Fix pkg_resources warning
           * drop python 3.8, add py3.12

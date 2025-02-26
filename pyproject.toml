@@ -19,7 +19,6 @@ classifiers = [
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: BSD License",
         "Operating System :: POSIX :: Linux",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
@@ -29,11 +28,11 @@ classifiers = [
         "Topic :: Scientific/Engineering :: Information Analysis",
 ]
 
-requires-python = ">=3.8,<4.0"
+requires-python = ">=3.9,<4.0"
 dependencies = [
     "click (>=8.1.8,<9.0.0)",
     "appdirs (>=1.4.4,<2.0.0)",
-    "matplotlib (<4)",
+    "matplotlib (>=3.9)",
     "easydev (>=0.13.3,<0.14.0)",
     "tqdm (>=4.67.1,<5.0.0)",
     "rich-click (>=1.8.5,<2.0.0)",
@@ -46,7 +45,7 @@ dependencies = [
     "suds-community (>=1.2.0,<2.0.0)",
     "wrapt (>=1.17.2,<2.0.0)",
     "xmltodict (>=0.14.2,<0.15.0)",
-    "pandas (<2.2)"
+    "pandas (>2.2)"
 
 ]
 
