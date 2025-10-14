@@ -32,8 +32,8 @@
 """
 import pandas as pd
 
-from bioservices.services import REST
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
@@ -52,7 +52,7 @@ class Biocontainers:
 
     """
 
-    _url = "https://api.biocontainers.pro/ga4gh/trs/v2/"
+    _url = "https://api.biocontainers.pro/ga4gh/trs/v2"
 
     def __init__(self, verbose=True, cache=False):
         """**Constructor**

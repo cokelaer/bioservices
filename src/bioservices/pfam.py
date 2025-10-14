@@ -30,8 +30,8 @@
 
 
 """
-from bioservices.services import REST
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
@@ -70,6 +70,6 @@ class Pfam:
         url = self._url + "/protein/" + Id
         self.services.on_web(url)
 
-    def get_protein(self, ID):
-        res = self.services.http_get("protein", params={"id": ID, "output": "xml"})
+    def get_protein(self, ID, output="json"):
+        res = self.services.http_get("protein", params={"id": ID, "output": output})
         return res.content
