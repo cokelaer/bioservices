@@ -2,7 +2,7 @@
 
 .. testsetup:: mapping
 
-    from bioservices import *
+    from bioservices import KEGG
     k = KEGG(verbose=False)
     u = UniProt()
 
@@ -17,7 +17,7 @@ Convert from KEGG ID to ChEBI (compound)
 
 .. doctest::
 
-    >>> from bioservices import *
+    >>> from bioservices import KEGG
     >>> k = KEGG(verbose=False)
     >>> map_kegg_chebi = k.conv("chebi", "compound")
     >>> map_kegg_chebi['cpd:C11222']
@@ -32,7 +32,7 @@ use the UniProt web service from BioServices as follows:
 
 .. doctest::
 
-    >>> from bioservices import *
+    >>> from bioservices import UniProt
     >>> u = UniProt()
     >>> u.mapping(fr="UniProtKB_AC-ID", to="KEGG", query='P43403')
     {'results': [{'from': 'P43403', 'to': 'hsa:7535'}]}
@@ -60,4 +60,3 @@ One can also use the :meth:`bioservices.kegg.KEGG.conv` method::
 
     >>> k = KEGG()
     >>> mapping_kegg_uniprot = k.conv("hsa", "uniprot")
-

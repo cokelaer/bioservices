@@ -2,7 +2,7 @@ Manipulating compound identifiers
 =======================================
 .. testsetup:: compound
 
-    from bioservices import *
+    from bioservices import KEGG
     k = KEGG(verbose=False)
 
 .. topic:: Application: retrieving information about a compound
@@ -15,19 +15,19 @@ Manipulating compound identifiers
 Retrieve a compound identifier from KEGG, ChEBI and ChEMBL
 --------------------------------------------------------------
 
-Let us look at a compound called **Geldanamycin** that inhibits Hsp90. 
-Let us search for information about that compound in several databases 
-and manipulate the different identifiers. 
+Let us look at a compound called **Geldanamycin** that inhibits Hsp90.
+Let us search for information about that compound in several databases
+and manipulate the different identifiers.
 
 First, let us retrieve information on KEGG database::
 
-    >>> from bioservices import *
+    >>> from bioservices import KEGG
     >>> k = KEGG(verbose=False)
 
 KEGG compounds have links to other databases. It is not systematic but the ChEBI
 database is often referenced. So we will want to convert the KEGG identifer to a
 ChEBI identifier. Later, we can convert a ChEBI to a ChEMBL identifier using
-another Web Service such as UniChem. 
+another Web Service such as UniChem.
 
 We can get a mapping dictionary from the KEGG compound to ChEBI as follows:
 
@@ -80,7 +80,7 @@ KEGG database::
 (2) In order to convert KEGG gene names into uniprot gene name, we can also use
 the UniProt web service from BioServices as follows::
 
-   >>> from bioservices import *
+   >>> from bioservices import UniProt
    >>> u = UniProt()
    >>> u.mapping(fr='ID', to='KEGG_ID', query="ZAP70_HUMAN")
    {'ZAP70_HUMAN':  'hsa:7535'}

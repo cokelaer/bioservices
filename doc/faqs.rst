@@ -7,9 +7,9 @@ FAQS
 General Errors
 ================
 
-The most common errors come from 
+The most common errors come from
 
-#. The web service that you are trying to access is down (temporarily or not) 
+#. The web service that you are trying to access is down (temporarily or not)
 #. The web service API has changed
 #. A request inside bioservices is incorrect
 #. A timeout occured.
@@ -71,7 +71,7 @@ You can use the Taxon class that uses Ensembl/UniProt/Eutils depending on the
 tasks. Here, we do not know the scientific name of taxonomy identifier of the
 mouse. We can use the search_by_name fuction:
 
-.. warning:: Taxon class is not part of BioServices but some 
+.. warning:: Taxon class is not part of BioServices but some
     utilities have been added to BioKit (github.com/biokit)
 
 .. versionchanged:: 1.3
@@ -99,13 +99,13 @@ Many web services provides convertors. In BioServices, you can access to Kegg
 and UniProt that both provides convertor. For instance with Kegg, you can
 convert all human (hsa) Kegg Id to uniprot Id with::
 
-    from bioservices import *
+    from bioservices import KEGG
     s = KEGG()
     kegg_ids, uniprot_ids = s.conv("hsa", "uniprot")
 
 Or you can use the uniprot mapping function::
 
-    from bioservices import *
+    from bioservices import UniProt
     u = UniProt()
     u.mapping(to="KEGG_ID", fr="ACC", query="ZAP70_HUMAN")
 
@@ -118,13 +118,13 @@ Why my uniprot request takes forever ?
 
 This may happen. Consider::
 
-    from bioservices import *
+    from bioservices import UniProt
     u = UniProt()
     u.search("P53")
 
 This request performed on UniProt web sites is actually pretty fast but there
 are 386 pages of results. In BioServices, the search commands reads the 386
-pages of results and then stores the result in a variable. So it may take a while. 
+pages of results and then stores the result in a variable. So it may take a while.
 
 More generally if a request returns a very long result, it may take a while.
 You can use the socket module::
@@ -173,5 +173,3 @@ The alternative to the GET method is the POST method. This method packages the
 name/value pairs inside the body of the HTTP request, which makes for a cleaner
 URL and imposes no size limitations on the forms output. It is also more
 secure.
-
-

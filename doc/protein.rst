@@ -12,7 +12,7 @@ about a specific protein. Let us focus on ZAP70 protein (homo sapiens).
 
 .. testsetup:: protein
 
-    from bioservices import *
+    from bioservices import UniProt
     u = UniProt(verbose=False)
 
 Get a unique identifier and gene names from a name
@@ -21,7 +21,7 @@ Get a unique identifier and gene names from a name
 From **Uniprot**, we can obtain the unique accession number of ZAP70, which may be
 useful later on. Let us try to use the :meth:`~bioservices.uniprot.UniProt.search` method::
 
-    >>> from bioservices import *
+    >>> from bioservices import UniProt
     >>> u = UniProt(verbose=False)
     >>> u.search("ZAP70_HUMAN") # could be lower case
 

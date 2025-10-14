@@ -2,15 +2,15 @@ BioMart service
 ====================
 
 BioMart provides a uniform interface to many services such as Cosmic, Ensembl
-and many more. In BioMart terminology a service is called a **mart**. As an 
+and many more. In BioMart terminology a service is called a **mart**. As an
 example, we will consider the COSMIC interface provided by
-BioMart (see `COSMIC <http://cancer.sanger.ac.uk/biomart/martview/>`_). You 
+BioMart (see `COSMIC <http://cancer.sanger.ac.uk/biomart/martview/>`_). You
 can play with the interface itself to get an idea of what can be selected (e.g.,
 datasets, filters, attributes). To help you, let us give a simple example that
-consists in converting the ensemble identifiers into entrez identifiers. 
+consists in converting the ensemble identifiers into entrez identifiers.
 
 First you create an instance. There are lots of services behind the scene. The
-ENSEMBL_MART_ENSEMBL provides the conversion we are looking for. 
+ENSEMBL_MART_ENSEMBL provides the conversion we are looking for.
 ::
 
 
@@ -20,7 +20,7 @@ ENSEMBL_MART_ENSEMBL provides the conversion we are looking for.
 
 In datasets, there is a hsapiens_gene_ensembl database. Let us add it to the
 request that will be send::
- 
+
     b.add_dataset_to_xml(dataset)
 
 We want to extract only the to following attributes::
@@ -48,26 +48,26 @@ You can obtain the attributes and filters of a dataset as follows::
 Here is another example with cosmic.
 
 .. note:: the cosmic mart was available at the time of 1.0 but not during
-    release 1.4.1 . This is not a BioServices issue but the COSMIC mart being 
+    release 1.4.1 . This is not a BioServices issue but the COSMIC mart being
     down. Hopefully, it will be available again soon. meanwhile this
     example should help you get a feeling of what can be done with a MART.
 
-In **BioServices**, you can create a biomart request (which is a XML document) but first 
+In **BioServices**, you can create a biomart request (which is a XML document) but first
 we need to figure out what are the datasets associated with the COSMIC mart. The tricky part is to know
 the names of the datasets/attributes/filters. BioServices provides a function
 that ease this task. First let create an instance of BioMart::
 
-    >>> from bioservices import *
+    >>> from bioservices import BioMart
     >>> s = BioMart()
 
 Then, let us use the :meth:`~bioservices.biomart.BioMart.lookfor` as follows::
 
     >>> s.lookfor("cosmic")
     Candidate:
-         database: cosp 
-        MART name: CosmicMart 
-      displayName: COSMIC (SANGER UK) 
-            hosts: www.sanger.ac.uk 
+         database: cosp
+        MART name: CosmicMart
+      displayName: COSMIC (SANGER UK)
+            hosts: www.sanger.ac.uk
 
 From the previous command, only one mart has been found. It is called
 CosmicMart, from which we can retrieve the datasets::
@@ -159,12 +159,6 @@ You can create the XML request that will be send::
 
     >>> xml = s.get_xml()
 
-And finally send the request:: 
+And finally send the request::
 
     >>> res = s.query(xml)
-
-
-
-
-
-
