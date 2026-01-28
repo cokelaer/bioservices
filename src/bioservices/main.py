@@ -11,12 +11,11 @@
 import functools
 import glob
 import os
-from pathlib import Path
 import subprocess
-
-import rich_click as click
+from pathlib import Path
 
 import colorlog
+import rich_click as click
 
 logger = colorlog.getLogger(__name__)
 
@@ -70,8 +69,8 @@ def download_accession(**kwargs):
         bioservices download-accession FN433596.1
     """
     from bioservices.apps.download_fasta import download_fasta
-    from bioservices.apps.download_gff3 import download_gff3
     from bioservices.apps.download_gbk import download_gbk
+    from bioservices.apps.download_gff3 import download_gff3
 
     prefix = kwargs["prefix"]
 
@@ -89,3 +88,26 @@ def download_accession(**kwargs):
         download_gbk(
             kwargs["accession"], output_filename=f"{prefix}.gbk" if prefix else prefix, method=kwargs["method"]
         )
+
+
+@main.command()
+# @click.option("--name", type=click.STRING, help="A valid accession number (e.g., FN433596.1)")
+@click.option("--id", type=click.STRING, help="A valid taxon ID (e.g., 9606)")
+@click.option(
+    "--method", type=click.STRING, default="EUtils", help="A method. EUtils only option implemented right now"
+)
+def taxonomy(**kwargs):
+    """Download Fasta related to an accession and possibly other type (e.g gff)
+
+    Input file can be gzipped or not. The --output-file
+
+        bioservices download-accession FN433596.1
+    """
+
+    if kwargs["method"] == "EUtils":
+        from bioservices import EUtils
+
+        eu = EUtils(email="bioservices")
+        ret = eu.ESummary("taxonomy", kwargs["id"])
+        for uid in ret["uids"]:
+            print(ret[uid])
