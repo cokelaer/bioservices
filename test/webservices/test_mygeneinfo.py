@@ -16,7 +16,6 @@ def test_get_all_genes():
     assert res[1]["_id"] == "22637"
     assert res[1]["taxid"] == 10090
 
-
 def test_get_one_gene():
     res = mgi.get_one_gene("301345")
     assert res["_id"] == "301345"
@@ -29,6 +28,8 @@ def test_get_one_query():
 
 def test_get_queries():
     res = mgi.get_queries("zap70,zap70", dotfield=True)
+    print(res)
+    assert False
 
 
 def test_get_metadata():

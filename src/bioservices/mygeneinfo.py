@@ -101,7 +101,7 @@ class MyGeneInfo:
             mgi.get_genes("301345,22637", species="mouse")
 
         """
-        params = {"fields": fields}
+        params = {"ids": ids, "fields": fields}
         if email:  # pragma: no cover
             params["email"] = email
 
@@ -120,7 +120,6 @@ class MyGeneInfo:
                 "accept": "application/json",
                 "Content-Type": "application/x-www-form-urlencoded",
             },
-            body={"ids": ids}
         )
         return res
 
