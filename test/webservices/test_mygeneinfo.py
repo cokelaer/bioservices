@@ -7,7 +7,7 @@ def test_get_all_genes():
     res = mgi.get_genes("301345,22637")
     assert len(res) == 2
     assert res[0]["_id"] == "301345"
-
+    
     mgi.get_genes(("301345,22637"))
     # first one is rat, second is mouse. This will return a 'notfound'
     # entry and the second entry as expected.
@@ -15,6 +15,7 @@ def test_get_all_genes():
     assert "_id" not in res[0]
     assert res[1]["_id"] == "22637"
     assert res[1]["taxid"] == 10090
+
 
 def test_get_one_gene():
     res = mgi.get_one_gene("301345")
@@ -24,6 +25,20 @@ def test_get_one_gene():
 
 def test_get_one_query():
     res = mgi.get_one_query("zap70", size=10, dotfield=True, sort="taxid")
+    
+    # sort by taxid to make sure we always test against the same object
+    res["hits"] = sorted(res["hits"], key=lambda x: x.get("taxid", 0))
+    hit = res["hits"][0]
+    
+    assert isinstance(res["took"], int)
+    assert res["total"] == 401
+    assert res["max_score"] is None
+    assert hit["_id"] == "24590835"
+    assert hit["_score"] is None
+    assert hit["entrezgene"] == "24590835"
+    assert hit["name"] == "Tyrosine-protein kinase ZAP-70"
+    assert hit["symbol"] == "ZAP70"
+    assert hit["taxid"] == 6185
 
 
 def test_get_queries():
