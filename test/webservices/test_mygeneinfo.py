@@ -43,8 +43,15 @@ def test_get_one_query():
 
 def test_get_queries():
     res = mgi.get_queries("zap70,zap70", dotfield=True)
-    print(res)
-    assert False
+    
+    # sort by taxid to make sure we always test against the same object
+    res = sorted(res, key=lambda x: x["taxid"])
+    assert len(res) == 20
+    assert res[0]["query"] == "zap70"
+    assert res[0]["_id"] == "ENSIPUG00015013332"
+    assert 12 <= res[0]["_score"] <= 13
+    assert res[0]["symbol"] == "ZAP70"
+    assert res[0]["taxid"] == 7998
 
 
 def test_get_metadata():
