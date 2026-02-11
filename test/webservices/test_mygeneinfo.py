@@ -56,5 +56,18 @@ def test_get_queries():
 
 def test_get_metadata():
     res = mgi.get_metadata()
+    assert res["biothing_type"] == "gene"
+    assert "human" in res["genome_assembly"]
+    
+    
+def test_get_taxonomy():
     res = mgi.get_taxonomy()
-    assert "human" in res
+    assert res["human"] == 9606
+    assert res["mouse"] == 10090
+    assert res["rat"] == 10116
+    assert res["fruitfly"] == 7227
+    assert res["nematode"] == 6239
+    assert res["zebrafish"] == 7955
+    assert res["thale-cress"] == 3702
+    assert res["frog"] == 8364
+    assert res["pig"] == 9823
