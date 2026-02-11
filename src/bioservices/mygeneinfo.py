@@ -284,13 +284,13 @@ class MyGeneInfo:
         res = self.services.http_post(
             "query",
             params=params,
+            data={"q": query},
             frmt="json",
             headers={
                 "User-Agent": self.services.getUserAgent(),
                 "accept": "application/json",
                 "Content-Type": "application/x-www-form-urlencoded",
             },
-            body={"q": query}
         )
         return res
 
