@@ -1,71 +1,290 @@
+import pytest
 from bioservices import PDBe
 
 
-def test_pdbe():
-    p = PDBe(verbose=False)
-    res = p.get_summary("1cbs")
-    assert len(res) == 1
-    res = p.get_summary("1cbs,2kv8")
-    assert len(res) == 2
-    res = p.get_summary(["1cbs", "2kv8"])
-    assert len(res) == 2
+@pytest.fixture(scope="module")
+def pdbe():
+    return PDBe(verbose=False)
 
-    p.get_molecules("1cbs")
-    p.get_molecules("1cbs,2kv8")
 
-    p.get_related_publications("1cbs")
-    p.get_related_publications("1cbs")
+class TestGetSummary:
+    def test_single(self, pdbe):
+        res = pdbe.get_summary("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
 
-    p.get_experiment("1cbs")
-    p.get_experiment("1cbs,2kv8")
+    def test_comma_separated(self, pdbe):
+        res = pdbe.get_summary("1cbs,2kv8")
+        assert isinstance(res, dict)
+        assert len(res) >= 2
 
-    p.get_nmr_resources("1cbs")
-    p.get_nmr_resources("1cbs,2kv8")
+    def test_list(self, pdbe):
+        res = pdbe.get_summary(["1cbs", "2kv8"])
+        assert isinstance(res, dict)
+        assert len(res) >= 2
 
-    p.get_ligand_monomers("1cbs")
-    p.get_ligand_monomers("1cbs,2kv8")
 
-    p.get_modified_residues("4v5j")
-    p.get_modified_residues("4v5j,1cbs")
+class TestGetMolecules:
+    def test_single(self, pdbe):
+        res = pdbe.get_molecules("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
 
-    p.get_mutated_residues("1bgj")
-    p.get_mutated_residues("1bgj,4v5j")
+    def test_multi(self, pdbe):
+        res = pdbe.get_molecules("1cbs,2kv8")
+        assert isinstance(res, dict)
+        assert len(res) >= 2
 
-    p.get_release_status("1cbs")
-    p.get_release_status("1cbs,4v5j")
 
-    p.get_observed_ranges("1cbs")
-    p.get_observed_ranges("1cbs,4v5j")
+class TestGetEntities:
+    def test_single(self, pdbe):
+        res = pdbe.get_entities("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
 
-    p.get_observed_ranges_in_pdb_chain("1cbs", "A")
+    def test_multi(self, pdbe):
+        res = pdbe.get_entities("1cbs,2kv8")
+        assert isinstance(res, dict)
+        assert len(res) >= 2
 
-    p.get_secondary_structure("1cbs")
-    p.get_secondary_structure("1cbs,4v5j")
 
-    p.get_residue_listing("1cbs")
+class TestGetPublications:
+    def test_single(self, pdbe):
+        res = pdbe.get_publications("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
 
-    p.get_residue_listing_in_pdb_chain("1cbs", "A")
+    def test_multi(self, pdbe):
+        res = pdbe.get_publications("1cbs,2kv8")
+        assert isinstance(res, dict)
+        assert len(res) >= 2
 
-    p.get_binding_sites("1cbs")
-    p.get_binding_sites("1cbs,4v5j")
 
-    p.get_files("1cbs")
-    p.get_files("1cbs,4v5j")
+class TestGetRelatedPublications:
+    def test_single(self, pdbe):
+        res = pdbe.get_related_publications("1cbs")
+        assert isinstance(res, dict)
 
-    p.get_observed_residues_ratio("1cbs")
-    p.get_observed_residues_ratio("1cbs,4v5j")
+    def test_multi(self, pdbe):
+        res = pdbe.get_related_publications("1cbs,2kv8")
+        assert isinstance(res, dict)
 
-    p.get_assembly("1cbs")
-    p.get_assembly("1cbs,4v5j")
 
-    p.get_electron_density_statistics("1cbs")
-    p.get_electron_density_statistics("1cbs,4v5j")
+class TestGetExperiment:
+    def test_single(self, pdbe):
+        res = pdbe.get_experiment("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
 
-    p.get_drugbank_annotation("5hht")
-    p.get_drugbank_annotation("5hht,5hht")
+    def test_multi(self, pdbe):
+        res = pdbe.get_experiment("1cbs,2kv8")
+        assert isinstance(res, dict)
+        assert len(res) >= 2
 
-    p.get_functional_annotation("1cbs,1cbs")
-    p.get_functional_annotation("1cbs")
 
-    p.get_related_dataset("5o8b")
-    p.get_related_dataset("5o8b,5o8b")
+class TestGetLigandMonomers:
+    def test_single(self, pdbe):
+        res = pdbe.get_ligand_monomers("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
+
+    def test_multi(self, pdbe):
+        res = pdbe.get_ligand_monomers("1cbs,2kv8")
+        assert isinstance(res, dict)
+
+
+class TestGetModifiedResidues:
+    def test_single(self, pdbe):
+        res = pdbe.get_modified_residues("4v5j")
+        assert isinstance(res, dict)
+        assert "4v5j" in res
+
+    def test_multi(self, pdbe):
+        res = pdbe.get_modified_residues("4v5j,1cbs")
+        assert isinstance(res, dict)
+
+
+class TestGetMutatedResidues:
+    def test_single(self, pdbe):
+        res = pdbe.get_mutated_residues("1bgj")
+        assert isinstance(res, dict)
+        assert "1bgj" in res
+
+    def test_multi(self, pdbe):
+        res = pdbe.get_mutated_residues("1bgj,4v5j")
+        assert isinstance(res, dict)
+
+
+class TestGetReleaseStatus:
+    def test_single(self, pdbe):
+        res = pdbe.get_release_status("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
+
+    def test_multi(self, pdbe):
+        res = pdbe.get_release_status("1cbs,4v5j")
+        assert isinstance(res, dict)
+        assert len(res) >= 2
+
+
+class TestGetObservedRanges:
+    def test_single(self, pdbe):
+        res = pdbe.get_observed_ranges("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
+
+    def test_multi(self, pdbe):
+        res = pdbe.get_observed_ranges("1cbs,4v5j")
+        assert isinstance(res, dict)
+        assert len(res) >= 2
+
+
+class TestGetObservedRangesInPdbChain:
+    def test_single(self, pdbe):
+        res = pdbe.get_observed_ranges_in_pdb_chain("1cbs", "A")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
+
+
+class TestGetSecondaryStructure:
+    def test_single(self, pdbe):
+        res = pdbe.get_secondary_structure("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
+
+    def test_multi(self, pdbe):
+        res = pdbe.get_secondary_structure("1cbs,4v5j")
+        assert isinstance(res, dict)
+        assert len(res) >= 2
+
+
+class TestGetResidueListing:
+    def test_single(self, pdbe):
+        res = pdbe.get_residue_listing("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
+
+
+class TestGetResidueListingInPdbChain:
+    def test_single(self, pdbe):
+        res = pdbe.get_residue_listing_in_pdb_chain("1cbs", "A")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
+
+
+class TestGetBindingSites:
+    def test_single(self, pdbe):
+        res = pdbe.get_binding_sites("1cbs", 1)
+        assert isinstance(res, dict)
+        assert "1cbs" in res
+
+
+class TestGetFiles:
+    def test_single(self, pdbe):
+        res = pdbe.get_files("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
+
+    def test_multi(self, pdbe):
+        res = pdbe.get_files("1cbs,4v5j")
+        assert isinstance(res, dict)
+        assert len(res) >= 2
+
+
+class TestGetObservedResiduesRatio:
+    def test_single(self, pdbe):
+        res = pdbe.get_observed_residues_ratio("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
+
+    def test_multi(self, pdbe):
+        res = pdbe.get_observed_residues_ratio("1cbs,4v5j")
+        assert isinstance(res, dict)
+        assert len(res) >= 2
+
+
+class TestGetAssembly:
+    def test_single(self, pdbe):
+        res = pdbe.get_assembly("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
+
+    def test_multi(self, pdbe):
+        res = pdbe.get_assembly("1cbs,4v5j")
+        assert isinstance(res, dict)
+        assert len(res) >= 2
+
+
+class TestGetElectronDensityStatistics:
+    def test_single(self, pdbe):
+        res = pdbe.get_electron_density_statistics("1cbs")
+        assert isinstance(res, dict)
+        assert "1cbs" in res
+
+    def test_multi(self, pdbe):
+        res = pdbe.get_electron_density_statistics("1cbs,4v5j")
+        assert isinstance(res, dict)
+
+
+class TestGetFunctionalAnnotation:
+    def test_single(self, pdbe):
+        res = pdbe.get_functional_annotation("1cbs")
+        assert isinstance(res, dict)
+
+
+class TestGetDrugbankAnnotation:
+    def test_single(self, pdbe):
+        res = pdbe.get_drugbank_annotation("5hht")
+        assert isinstance(res, dict)
+
+
+class TestGetRelatedDataset:
+    def test_single(self, pdbe):
+        res = pdbe.get_related_dataset("5o8b")
+        assert isinstance(res, dict)
+
+    def test_multi(self, pdbe):
+        res = pdbe.get_related_dataset("5o8b,5o8b")
+        assert isinstance(res, dict)
+
+
+class TestGetBranchedEntities:
+    def test_single(self, pdbe):
+        res = pdbe.get_branched_entities("3d12")
+        assert isinstance(res, dict)
+
+    def test_multi(self, pdbe):
+        res = pdbe.get_branched_entities("3d12,7v7u")
+        assert isinstance(res, dict)
+
+
+class TestGetCarbohydratePolymer:
+    def test_single(self, pdbe):
+        res = pdbe.get_carbohydrate_polymer("3d12")
+        assert isinstance(res, dict)
+
+    def test_multi(self, pdbe):
+        res = pdbe.get_carbohydrate_polymer("3d12,7v7u")
+        assert isinstance(res, dict)
+
+
+class TestInvalidInput:
+    def test_id_too_long(self, pdbe):
+        with pytest.raises(AssertionError):
+            pdbe.get_summary("sdklfjslkdfj")
+
+    def test_id_too_short(self, pdbe):
+        with pytest.raises(AssertionError):
+            pdbe.get_summary("1c")
+
+    def test_wrong_type(self, pdbe):
+        with pytest.raises(TypeError):
+            pdbe.get_summary(12345)
+
+    def test_invalid_id_in_list(self, pdbe):
+        with pytest.raises(AssertionError):
+            pdbe.get_summary(["1cbs", "bad"])
+
+    def test_invalid_id_in_comma_separated(self, pdbe):
+        with pytest.raises(AssertionError):
+            pdbe.get_summary("1cbs,bad")
