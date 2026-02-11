@@ -58,7 +58,7 @@ class MyGeneInfo:
 
         """
         url = "https://mygene.info/v3"
-        self.services = REST(name="PDBe", url=url, verbose=verbose, cache=cache)
+        self.services = REST(name="MyGeneInfo", url=url, verbose=verbose, cache=cache)
 
     def get_genes(
         self,
