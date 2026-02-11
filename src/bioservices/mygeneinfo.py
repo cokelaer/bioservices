@@ -101,7 +101,7 @@ class MyGeneInfo:
             mgi.get_genes("301345,22637", species="mouse")
 
         """
-        params = {"ids": ids, "fields": fields}
+        params = {"fields": fields}
         if email:  # pragma: no cover
             params["email"] = email
 
@@ -120,6 +120,7 @@ class MyGeneInfo:
                 "accept": "application/json",
                 "Content-Type": "application/x-www-form-urlencoded",
             },
+            body={"ids": ids}
         )
         return res
 
@@ -275,7 +276,7 @@ class MyGeneInfo:
         :param str scopes: not documented. Set to 'all'
 
         """
-        params = {"q": query, "fields": fields, "scopes": scopes}
+        params = {"fields": fields, "scopes": scopes}
         if email:  # pragma: no cover
             params["email"] = email
         assert dotfield in [True, False]
@@ -290,6 +291,7 @@ class MyGeneInfo:
                 "accept": "application/json",
                 "Content-Type": "application/x-www-form-urlencoded",
             },
+            body={"q": query}
         )
         return res
 
