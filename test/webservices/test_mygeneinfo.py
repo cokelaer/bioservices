@@ -7,7 +7,7 @@ def test_get_all_genes():
     res = mgi.get_genes("301345,22637")
     assert len(res) == 2
     assert res[0]["_id"] == "301345"
-    
+
     mgi.get_genes(("301345,22637"))
     # first one is rat, second is mouse. This will return a 'notfound'
     # entry and the second entry as expected.
