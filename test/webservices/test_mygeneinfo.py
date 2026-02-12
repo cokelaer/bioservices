@@ -25,11 +25,11 @@ def test_get_one_gene():
 
 def test_get_one_query():
     res = mgi.get_one_query("zap70", size=10, dotfield=True, sort="taxid")
-    
+
     # sort by taxid to make sure we always test against the same object
     res["hits"] = sorted(res["hits"], key=lambda x: x.get("taxid", 0))
     hit = res["hits"][0]
-    
+
     assert isinstance(res["took"], int)
     assert res["total"] == 401
     assert res["max_score"] is None
@@ -43,7 +43,7 @@ def test_get_one_query():
 
 def test_get_queries():
     res = mgi.get_queries("zap70,zap70", dotfield=True)
-    
+
     # sort by taxid to make sure we always test against the same object
     res = sorted(res, key=lambda x: x["taxid"])
     assert len(res) == 20
@@ -58,8 +58,8 @@ def test_get_metadata():
     res = mgi.get_metadata()
     assert res["biothing_type"] == "gene"
     assert "human" in res["genome_assembly"]
-    
-    
+
+
 def test_get_taxonomy():
     res = mgi.get_taxonomy()
     assert res["human"] == 9606
