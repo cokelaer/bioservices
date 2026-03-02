@@ -19,8 +19,7 @@
 
 .. topic:: What is EVA ?
 
-    :URL: http://www.uniprot.org
-    :Citation:
+    :URL: https://www.ebi.ac.uk/eva/
 
     .. highlights::
 
@@ -29,7 +28,7 @@
         access to highly detailed, granular, raw variant data from human, with
         other species to follow."
 
-        -- From Uniprot web site (help/about) , Dec 2012
+        -- From EVA web site (help/about)
 
 
 """

@@ -1,0 +1,38 @@
+{
+ "bioservices.KEGG": [
+  [
+   "plot_kegg_relations.py",
+   "/home/runner/work/bioservices/bioservices/doc/../examples",
+   "/home/runner/work/bioservices/bioservices/doc/auto_examples",
+   "Histogram of KEGG pathways relations",
+   "KEGG module example"
+  ]
+ ],
+ "bioservices.KEGG.organism": [
+  [
+   "plot_kegg_relations.py",
+   "/home/runner/work/bioservices/bioservices/doc/../examples",
+   "/home/runner/work/bioservices/bioservices/doc/auto_examples",
+   "Histogram of KEGG pathways relations",
+   "KEGG module example"
+  ]
+ ],
+ "bioservices.KEGG.parse_kgml_pathway": [
+  [
+   "plot_kegg_relations.py",
+   "/home/runner/work/bioservices/bioservices/doc/../examples",
+   "/home/runner/work/bioservices/bioservices/doc/auto_examples",
+   "Histogram of KEGG pathways relations",
+   "KEGG module example"
+  ]
+ ],
+ "bioservices.KEGG.pathwayIds": [
+  [
+   "plot_kegg_relations.py",
+   "/home/runner/work/bioservices/bioservices/doc/../examples",
+   "/home/runner/work/bioservices/bioservices/doc/auto_examples",
+   "Histogram of KEGG pathways relations",
+   "KEGG module example"
+  ]
+ ]
+}
