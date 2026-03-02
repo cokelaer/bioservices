@@ -61,19 +61,19 @@ Form which, there is a link to other databases in particular ChEBI
 Unfortunately, there is no mapping function from KEGG to ChEMBL in KEGG Web Service.
 
 However, BioServices provides access to the :mod:`bioservices.unichem` service.
-This service provides a useful mapping function from kegg to chembl::
+This service provides a useful function to retrieve compound information across
+databases. Note that the ``get_mapping`` function is no longer available in the
+UniChem API (deprecated since 2022). The equivalent using the current API is::
 
+    >>> from bioservices import UniChem
     >>> uni = UniChem()
-    >>> mapping = uni.get_mapping("kegg_ligand", "chembl")
-    >>> mapping['C11222']
+    >>> res = uni.get_compounds('C11222', 'kegg_ligand')
+    >>> sources = res['compounds'][0]['sources']
+    >>> chembl_id = [s['compoundID'] for s in sources if s['shortName'] == 'ChEMBL'][0]
+    >>> chembl_id
     'CHEMBL278315'
-
-For sanity check, let us see that the ChEBI is indeed 5292 as given within the
-KEGG database::
-
-    >>> uni = UniChem()
-    >>> mapping = uni.get_mapping("kegg_ligand", "chebi")
-    >>> mapping['C11222']
+    >>> chebi_id = [s['compoundID'] for s in sources if s['shortName'] == 'ChEBI'][0]
+    >>> chebi_id
     '5292'
 
 
