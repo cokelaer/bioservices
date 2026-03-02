@@ -24,20 +24,10 @@ import traceback
 
 from bioservices.settings import BioServicesConfig
 
-# fixing compatiblity python 2 and 3 related to merging or urllib and urllib2 in python 3
-try:
-    # python 3
-    from urllib.request import urlopen
-    from urllib.parse import urlparse, urlencode
-    from urllib.error import HTTPError
-    from urllib.request import Request
-except:
-    from urllib import urlencode
-    from urllib2 import urlopen, Request, HTTPError
-
-# fixing compatibility issue of input/raw_input
-if "raw_input" in __builtins__:
-    input = raw_input
+from urllib.request import urlopen
+from urllib.parse import urlparse, urlencode
+from urllib.error import HTTPError
+from urllib.request import Request
 
 # Indded, we want suds_jurko instead
 sys.path = [x for x in sys.path if "suds-" not in x]
