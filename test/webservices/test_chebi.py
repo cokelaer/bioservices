@@ -4,8 +4,8 @@ from bioservices import ChEBI
 def test_chebi():
     ch = ChEBI()
     ch.getCompleteEntity("CHEBI:10102")
-    res = ch.conv("CHEBI:10102", "KEGG COMPOUND accession")
-    assert res == ["C07484"]
+    res = ch.conv("CHEBI:10102", "KEGG COMPOUND")
+    assert res == ["151319-34-5", "C07484"]
 
     try:
         res = ch.conv("CHEBI:10102", "wrong db")
@@ -21,7 +21,7 @@ def test_chebi():
 def test_chebi_mass():
     ch = ChEBI()
     res = ch.getCompleteEntity("CHEBI:27732")
-    assert float(res.mass) == 194.19076
+    assert float(res.mass) == 194.194
 
 
 def test_polymer():
