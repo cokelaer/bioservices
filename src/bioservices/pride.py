@@ -34,8 +34,8 @@
 """
 import tqdm
 
-from bioservices.services import REST
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
@@ -100,7 +100,7 @@ class PRIDE:
 
         """
         res = self.services.http_get(f"projects/{identifier}")
-        if res == 400:
+        if res in (400, 404):
             logger.warning(f"Nothing found for {identifier}. may be this is not a valid identifier. Use get_projects")
             return {}
         return res

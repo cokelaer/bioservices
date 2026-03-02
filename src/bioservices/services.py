@@ -16,26 +16,23 @@
 ##############################################################################
 """Modules with common tools to access web resources"""
 import os
+import platform
+import socket
 import sys
 import time
-import socket
-import platform
 import traceback
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode, urlparse
+from urllib.request import Request, urlopen
 
 from bioservices.settings import BioServicesConfig
-
-from urllib.request import urlopen
-from urllib.parse import urlparse, urlencode
-from urllib.error import HTTPError
-from urllib.request import Request
 
 # Indded, we want suds_jurko instead
 sys.path = [x for x in sys.path if "suds-" not in x]
 
 
-from easydev import DevTools
 import colorlog
-
+from easydev import DevTools
 
 __all__ = ["Service", "WSDLService", "BioServicesError", "REST"]
 
@@ -270,8 +267,8 @@ class WSDLService(Service):
 
         try:
             #: attribute to access to the methods provided by this WSDL service
-            from suds.client import Client
             from suds.cache import ObjectCache
+            from suds.client import Client
 
             oc = ObjectCache(self.settings.user_config_dir, days=0)
             if self.CACHING is True:
@@ -372,8 +369,8 @@ class RESTbase(Service):
 
 
 import requests  # replacement for urllib2 (2-3 times faster)
-from requests.models import Response
 import requests_cache  # use caching wihh requests
+from requests.models import Response
 
 # import grequests        # use asynchronous requests with gevent
 # Note that grequests should be imported after requests_cache. Otherwise,

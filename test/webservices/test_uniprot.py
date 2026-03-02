@@ -1,6 +1,6 @@
-from bioservices.uniprot import UniProt
 import pytest
 
+from bioservices.uniprot import UniProt
 
 protein_queries = [
     "Q89B22",
@@ -101,20 +101,18 @@ def test_uniref(uniprot):
 
 
 def test_get_df(uniprot):
-    df = uniprot.get_df("P43403", limit=10)
+    df = uniprot.get_df("acc:P43403", limit=10)
 
 
 def test_fasta(uniprot):
     "Q9Y617" in uniprot.get_fasta(["Q9Y617-1"])
 
 
-#https://github.com/cokelaer/bioservices/issues/245
+# https://github.com/cokelaer/bioservices/issues/245
 def test_mapping_regression(uniprot):
     # P123456 is a failed ID
     res = uniprot.mapping("UniProtKB_AC-ID", "KEGG", "P43403,P123456")
-    assert res['failedIds']
+    assert res["failedIds"]
     # here no failedId but we expect an empty failedIds in the returned dictionary (empty list)
     res = uniprot.mapping("UniProtKB_AC-ID", "KEGG", "P43403")
-    assert res['failedIds'] == []
-
-
+    assert res["failedIds"] == []
