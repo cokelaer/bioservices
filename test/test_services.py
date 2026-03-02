@@ -2,6 +2,7 @@ from unittest.mock import patch
 from urllib.error import HTTPError, URLError
 
 import pytest
+import requests
 
 from bioservices.services import REST, Service, WSDLService
 
@@ -54,3 +55,31 @@ def test_service_url_error_warns(caplog):
     with patch("bioservices.services.urlopen", side_effect=URLError("connection refused")):
         svc = Service("test", "http://example.com/api", verbose=True)
     assert "cannot be reached" in caplog.text
+
+
+def test_cache_session_fallback_on_error(caplog):
+    """When CachedSession creation fails, fall back to a regular session with a warning."""
+    import requests_cache
+
+    with patch("bioservices.services.urlopen", side_effect=URLError("connection refused")):
+        with patch.object(requests_cache, "CachedSession", side_effect=Exception("You must install the python package: sqlite3")):
+            svc = REST("test", "http://example.com/api", verbose=True, cache=True)
+            # Reset session so _create_cache_session creates a new one
+            svc._session = None
+            session = svc._create_cache_session()
+
+    assert session is not None
+    assert "Could not create a cached session" in caplog.text
+    assert "Falling back to a regular session" in caplog.text
+
+
+def test_install_cache_fallback_on_error(caplog):
+    """When install_cache fails, caching is disabled gracefully with a warning."""
+    import requests_cache
+
+    with patch("bioservices.services.urlopen", side_effect=URLError("connection refused")):
+        with patch.object(requests_cache, "install_cache", side_effect=Exception("sqlite3 not available")):
+            svc = REST("test", "http://example.com/api", verbose=True, cache=True)
+
+    assert "Could not install cache" in caplog.text
+    assert svc.CACHING is False

@@ -494,7 +494,13 @@ class REST(RESTbase):
         if self.CACHING:
             # import requests_cache
             self.logging.info("Using local cache %s" % self.CACHE_NAME)
-            requests_cache.install_cache(self.CACHE_NAME)
+            try:
+                requests_cache.install_cache(self.CACHE_NAME)
+            except Exception as err:
+                self.logging.warning(
+                    "Could not install cache ({}). Caching will be disabled.".format(err)
+                )
+                self.CACHING = False
 
     def delete_cache(self):
         cache_file = self.CACHE_NAME + ".sqlite"
@@ -555,9 +561,15 @@ class REST(RESTbase):
         if not self._session:
             # import requests_cache
             self.logging.debug("No cached session created yet. Creating one")
-            self._session = requests_cache.CachedSession(
-                self.CACHE_NAME, backend="sqlite", fast_save=self.settings.FAST_SAVE
-            )
+            try:
+                self._session = requests_cache.CachedSession(
+                    self.CACHE_NAME, backend="sqlite", fast_save=self.settings.FAST_SAVE
+                )
+            except Exception as err:
+                self.logging.warning(
+                    "Could not create a cached session ({}). Falling back to a regular session.".format(err)
+                )
+                self._session = self._create_session()
         return self._session
 
     def _get_timeout(self):
