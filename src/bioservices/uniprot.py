@@ -303,9 +303,7 @@ class UniProt:
         # Miscellaneous ==========================
         "annotation_score",
         "cc_caution",
-        "comment_count",
         # "feature",
-        "feature_count",
         "keyword",
         "keywordid",
         "cc_miscellaneous",
@@ -710,7 +708,7 @@ class UniProt:
         # + are interpreted and have a meaning. See arrayexpress module for details
         query = query.replace("+", " ")
         params["query"] = query
-        del params["sort"]
+        params.pop("sort", None)
 
         res = self.services.http_get(f"{database}/search", frmt="txt", params=params)
 
@@ -854,7 +852,7 @@ class UniProt:
             else:
                 break
 
-            if len(res) == 0:
+            if res is None or len(res) == 0:
                 self.services.logging.warning("some entries %s not found" % entries)
             else:
                 df = pd.read_csv(io.StringIO(str(res)), sep="\t")
