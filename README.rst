@@ -35,20 +35,32 @@ BIOSERVICES: access to biological web services programmatically
      `Bioinformatics <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_ (2013) 29 (24): 3241-3242
 :Documentation: `RTD documentation <http://bioservices.readthedocs.io/>`_.
 
-**Bioservices** is a Python package that provides access to many Bioinformatices Web Services (e.g.,
+**Bioservices** is a Python package that provides access to many Bioinformatics Web Services (e.g.,
 UniProt) and a framework to easily implement Web Services wrappers (based on
 WSDL/SOAP or REST protocols).
 
 
 The primary goal of **BioServices** is to use Python as a glue language to provide
-a programmatic access to several Bioinformatics Web Services. By doing so, elaboration of  new
+a programmatic access to several Bioinformatics Web Services. By doing so, elaboration of new
 applications that combine several of the wrapped Web Services is fostered.
 
-One of the main philosophy of **BioServices** is to make use of the existing
-biological databases (not to re-invent new databases) and to alleviates the
-needs for expertise in Web Services for the developers/users.
+One of the main philosophies of **BioServices** is to make use of the existing
+biological databases (not to re-invent new databases) and to alleviate the
+need for expertise in Web Services for developers and users.
 
 BioServices provides access to about 40 Web Services.
+
+Installation
+============
+
+Install the latest stable release from `PyPI <https://pypi.python.org/pypi/bioservices>`_::
+
+    pip install bioservices
+
+or from `conda-forge <https://anaconda.org/conda-forge/bioservices>`_::
+
+    conda install conda-forge::bioservices
+
 
 Contributors
 ============
