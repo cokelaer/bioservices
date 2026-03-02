@@ -78,7 +78,7 @@ downloaded :download:`notebooks/Gene_Mapping.ipynb` or view its results on
 BioMart
 =======
 Here is a ipython notebook dedicated to BioMart, which can be 
-downloaded :download:`notebooks/BioMart` or view its results on 
+downloaded :download:`notebooks/BioMart.ipynb` or view its results on 
 `chembl biomiart <https://nbviewer.ipython.org/url/github.com/cokelaer/bioservices/blob/master/doc/notebooks/BioMart.ipynb>`_
 
 Ensembl

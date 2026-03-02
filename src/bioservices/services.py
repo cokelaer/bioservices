@@ -113,11 +113,15 @@ class Service:
 
         self._url = url
         try:
-            if self.url is not None:
-                urlopen(self.url)
-        except Exception as err:
+            if self._url is not None:
+                urlopen(self._url)
+        except HTTPError:
+            # The server returned an HTTP error code (4xx or 5xx),
+            # but it is reachable, so no warning is needed.
+            pass
+        except URLError as err:
             if url_defined_later is False:
-                self.logging.warning("The URL (%s) provided cannot be reached." % self.url)
+                self.logging.warning("The URL (%s) provided cannot be reached." % self._url)
         self._easyXMLConversion = True
 
         self.devtools = DevTools()

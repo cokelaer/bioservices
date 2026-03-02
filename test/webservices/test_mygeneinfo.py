@@ -1,6 +1,46 @@
+from unittest.mock import patch
+
 from bioservices.mygeneinfo import MyGeneInfo
 
 mgi = MyGeneInfo()
+
+
+def test_get_genes_uses_post_with_data():
+    """Verify that get_genes sends ids in the POST body (data), not as URL params."""
+    mock_response = [{"_id": "301345"}, {"_id": "22637"}]
+    with patch.object(mgi.services, "http_post", return_value=mock_response) as mock_post:
+        result = mgi.get_genes("301345,22637")
+        assert result == mock_response
+        mock_post.assert_called_once()
+        _, kwargs = mock_post.call_args
+        assert "data" in kwargs
+        assert kwargs["data"]["ids"] == "301345,22637"
+        # params should not be passed (ids should be in data, not URL params)
+        assert kwargs.get("params") is None
+
+
+def test_get_genes_uses_post_with_data_species():
+    """Verify that species is also sent in the POST body when provided."""
+    mock_response = [{"notfound": True}, {"_id": "22637"}]
+    with patch.object(mgi.services, "http_post", return_value=mock_response) as mock_post:
+        result = mgi.get_genes("301345,22637", species="mouse")
+        assert result == mock_response
+        mock_post.assert_called_once()
+        _, kwargs = mock_post.call_args
+        assert "data" in kwargs
+        assert kwargs["data"]["species"] == "mouse"
+
+
+def test_get_queries_uses_post_with_data():
+    """Verify that get_queries sends the query in the POST body (data)."""
+    mock_response = [{"_id": "1017", "query": "zap70"}]
+    with patch.object(mgi.services, "http_post", return_value=mock_response) as mock_post:
+        result = mgi.get_queries("zap70")
+        assert result == mock_response
+        mock_post.assert_called_once()
+        _, kwargs = mock_post.call_args
+        assert "data" in kwargs
+        assert kwargs["data"] == {"q": "zap70"}
 
 
 def test_get_all_genes():

@@ -1,3 +1,5 @@
+from unittest.mock import patch
+from urllib.error import HTTPError, URLError
 from bioservices.services import Service, WSDLService,  REST
 import pytest
 
@@ -53,3 +55,17 @@ class test_REST(REST):
 def test_rest():
     this = test_REST()
     this.test_request()
+
+
+def test_service_http_error_no_warning(caplog):
+    """HTTPError (4xx/5xx) should not trigger an 'unreachable' warning (issue #285)."""
+    with patch("bioservices.services.urlopen", side_effect=HTTPError(None, 404, "Not Found", {}, None)):
+        svc = Service("test", "http://example.com/api", verbose=True)
+    assert "cannot be reached" not in caplog.text
+
+
+def test_service_url_error_warns(caplog):
+    """URLError (connection failure) should trigger an 'unreachable' warning."""
+    with patch("bioservices.services.urlopen", side_effect=URLError("connection refused")):
+        svc = Service("test", "http://example.com/api", verbose=True)
+    assert "cannot be reached" in caplog.text
