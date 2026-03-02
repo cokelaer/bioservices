@@ -57,7 +57,7 @@ bioservices = "bioservices.main:main"
 Homepage = "https://bioservices.readthedocs.io"
 Repository = "https://github.com/cokelaer/bioservices"
 Issues = "https://github.com/cokelaer/bioservices/issues"
-Documentation =  "https://bioesrvices.readthedocs.io"
+Documentation =  "https://bioservices.readthedocs.io"
 
 
 
