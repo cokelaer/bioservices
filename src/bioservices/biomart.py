@@ -449,6 +449,8 @@ class BioMart(REST):
             valid_filters = self.filters(dataset).keys()
             if name not in valid_filters:
                 raise BioServicesError("Invalid filter name. ")
+        if isinstance(value, list):
+            value = ",".join(str(v) for v in value)
         _filter = ""
         if "=" in value:
             _filter = """        <Filter name = "%s" %s/>""" % (name, value)
