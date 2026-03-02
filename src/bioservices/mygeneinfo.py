@@ -42,7 +42,7 @@ __all__ = ["MyGeneInfo"]
 
 
 class MyGeneInfo:
-    """Interface to `mygene.infoe <http://mygene.info>`_ service
+    """Interface to `mygene.info <http://mygene.info>`_ service
 
     .. doctest::
 

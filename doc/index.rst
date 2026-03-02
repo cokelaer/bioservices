@@ -2,8 +2,9 @@
 
 
 
-
 .. topic:: BioServices |version| (|today|)
+
+    BioServices provides programmatic access to biological web services from Python.
 
 
 
@@ -35,11 +36,11 @@ Installation
 If not, please see the external `pip installation page <http://www.pip-installer.org/en/latest/installing.html>`_ or `pip installation <http://thomas-cokelaer.info/blog/2013/02/python-pip-installation/>`_ entry. You may also find information in the :ref:`troubleshootings page <troubleshootings>` section about known issues.
 
 Regarding the dependencies, BioServices depends on the following
-packages: **BeautifulSoup4** (for parsing XML), **SOAPpy** and **suds** (to access to
-SOAP/WSDL services; suds is used by ChEBI only for which SOAPpy fails to
-correctly fetch the service) and **easydev**. All those packages should be
-installed automatically when using **pip** installer. Since version 1.6.0, we
-also make use of pandas and matplotlib to offer some extra functionalities. 
+packages: **BeautifulSoup4** (for parsing XML), **suds-community** (to access
+SOAP/WSDL services; used by ChEBI), **requests** (for REST services) and
+**easydev**. All those packages should be installed automatically when using
+**pip** installer. BioServices also makes use of **pandas** and **matplotlib**
+to offer some extra functionalities.
 
 
 .. toctree::
@@ -63,3 +64,4 @@ User guide
     external_references.rst
     faqs
     contributors
+    ChangeLog

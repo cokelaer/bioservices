@@ -116,6 +116,22 @@ ENA
     :members:
     :undoc-members:
 
+Ensembl
+==========
+
+.. automodule:: bioservices.ensembl
+    :members:
+    :undoc-members:
+    :synopsis:
+
+EVA
+==========
+
+.. automodule:: bioservices.eva
+    :members:
+    :undoc-members:
+    :synopsis:
+
 EUtils
 ==========
 
@@ -233,6 +249,23 @@ PRIDE module
 =====================================
 
 .. automodule:: bioservices.pride
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
+Pfam
+====
+
+.. automodule:: bioservices.pfam
+    :members:
+    :undoc-members:
+    :synopsis:
+
+PubChem
+=======
+
+.. automodule:: bioservices.pubchem
     :members:
     :undoc-members:
     :synopsis:

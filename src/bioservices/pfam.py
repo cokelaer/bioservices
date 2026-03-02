@@ -19,14 +19,14 @@
 
 .. topic:: What is Pfam ?
 
-    :URL: http://www.uniprot.org
-    :Citation:
+    :URL: https://www.ebi.ac.uk/interpro/
 
     .. highlights::
 
+        "Pfam is a large collection of protein families, each represented by
+        multiple sequence alignments and hidden Markov models (HMMs)."
 
-        -- From Pfam  web site (help/about), Aug 2013
-
+        -- From Pfam web site (help/about)
 
 
 """
@@ -39,14 +39,14 @@ __all__ = ["Pfam"]
 
 
 class Pfam:
-    """Interface to `Pfam <http://pfam.sanger.ac.uk>`_ pages
+    """Interface to `Pfam <https://www.ebi.ac.uk/interpro/>`_ pages
 
     This is not a REST interface actually but rather a parser to some of the
-    HTML pages relatd to pathways.
+    HTML pages related to pathways.
 
     One can retrieve the pathways names and their list of proteins.
 
-        >>> from bioservics import *
+        >>> from bioservices import *
         >>> p = Pfam()
 
     """

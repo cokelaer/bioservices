@@ -13,9 +13,9 @@
 
 import os
 import sys
+from importlib.metadata import version as get_version
 
 import sphinx
-import sphinx_gallery
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -30,18 +30,14 @@ matplotlib.use("Agg")
 
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
-
-import pkg_resources
-
-version = pkg_resources.require(pkg_name)[0].version
+version = get_version(pkg_name)
 release = version
 author = "Thomas Cokelaer, Lea M. Harder, Jordi Serra-Musach, \nDennis Pultz"
 title = "BioServices"
-copyright = author + ", 2012-2020"
+copyright = author + ", 2012-2026"
 project = pkg_name
 
 import easydev
-from easydev import get_path_sphinx_themes
 
 # -- General configuration -----------------------------------------------------
 
@@ -53,11 +49,7 @@ from easydev import get_path_sphinx_themes
 
 extensions = [
     "sphinx.ext.autodoc",
-    (
-        "sphinx.ext.imgmath"  # only available for sphinx >= 1.4
-        if sphinx.version_info[:2] >= (1, 4)
-        else "sphinx.ext.pngmath"
-    ),
+    "sphinx.ext.imgmath",
     "sphinx.ext.coverage",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
@@ -116,8 +108,7 @@ release = release
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_trees = ["build"]
-exclude_patterns = []
+exclude_patterns = ["build", "_build"]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 # default_role = None
@@ -147,12 +138,14 @@ modindex_common_prefix = ["bioservices."]
 
 plot_gallery = "True"
 
-# sphinx_gallery_conf = {
-#    "doc_module": "bioservices",
-#    'backreferences_dir': os.path.join("modules", "generated"),
-#    #"examples_dirs": "examples",
-#    #"gallery_dirs": "auto_examples",
-# }
+sphinx_gallery_conf = {
+    "doc_module": "bioservices",
+    "backreferences_dir": os.path.join("modules", "generated"),
+    "examples_dirs": "../examples",
+    "gallery_dirs": "auto_examples",
+    "abort_on_example_error": False,
+    "expected_failing_examples": ["../examples/plot_kegg_relations.py"],
+}
 
 # Get rid of spurious warnings due to some interaction between
 # autosummary and numpydoc. See
@@ -179,10 +172,7 @@ def touch_example_backreferences(app, what, name, obj, options, lines):
 html_theme = "standard"
 on_rtd = os.environ.get("READTHEDOCS", None) == True
 if not on_rtd:
-    import sphinx_rtd_theme
-
     html_theme = "sphinx_rtd_theme"
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 else:
     html_theme = "default"
 
@@ -232,7 +222,7 @@ html_index = "index.html"
 # Custom sidebar templates, maps page names to templates.
 html_sidebars = {
     "index": ["indexsidebar.html"],
-    "contents": "indexsidebar.html",
+    "contents": ["indexsidebar.html"],
 }
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -240,7 +230,7 @@ html_sidebars = {
 
 
 # If false, no module index is generated.
-html_use_modindex = True
+html_domain_indices = True
 
 # If false, no index is generated.
 html_use_index = True
