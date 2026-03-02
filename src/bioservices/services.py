@@ -29,11 +29,11 @@ try:
     # python 3
     from urllib.request import urlopen
     from urllib.parse import urlparse, urlencode
-    from urllib.error import HTTPError
+    from urllib.error import HTTPError, URLError
     from urllib.request import Request
 except:
     from urllib import urlencode
-    from urllib2 import urlopen, Request, HTTPError
+    from urllib2 import urlopen, Request, HTTPError, URLError
 
 # fixing compatibility issue of input/raw_input
 if "raw_input" in __builtins__:
@@ -123,11 +123,15 @@ class Service:
 
         self._url = url
         try:
-            if self.url is not None:
-                urlopen(self.url)
-        except Exception as err:
+            if self._url is not None:
+                urlopen(self._url)
+        except HTTPError:
+            # The server returned an HTTP error code (4xx or 5xx),
+            # but it is reachable, so no warning is needed.
+            pass
+        except URLError as err:
             if url_defined_later is False:
-                self.logging.warning("The URL (%s) provided cannot be reached." % self.url)
+                self.logging.warning("The URL (%s) provided cannot be reached." % self._url)
         self._easyXMLConversion = True
 
         self.devtools = DevTools()
