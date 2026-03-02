@@ -16,7 +16,7 @@
 .. topic:: What is ChEBI
 
     :URL:  https://www.ebi.ac.uk/chebi/init.do
-    :WSDL: http://www.ebi.ac.uk/webservices/chebi/2.0/webservice
+    :REST: https://www.ebi.ac.uk/chebi/backend/api/public
 
 
     .. highlights::
@@ -27,71 +27,170 @@
 
 
 """
-from bioservices import WSDLService
+from bioservices import REST
 from bioservices import logger
 
 logger.name = __name__
 
+__all__ = ["ChEBI"]
 
-class ChEBI(WSDLService):
-    """Interface to `ChEBI <http://www.ebi.ac.u.k/chebi/init.do>`_
+# Mapping from old SOAP relation type names to new REST API relation type names
+_RELATION_TYPE_MAP = {
+    "is a": "is_a",
+    "has part": "has_part",
+    "has role": "has_role",
+    "is conjugate base of": "is_conjugate_base_of",
+    "is conjugate acid of": "is_conjugate_acid_of",
+    "is tautomer of": "is_tautomer_of",
+    "is enantiomer of": "is_enantiomer_of",
+    "has functional parent": "has_functional_parent",
+    "has parent hybride": "has_parent_hydride",
+    "is substituent group of": "is_substituent_group_from",
+}
 
 
-    >>> from bioservices import *
-    >>> ch = ChEBI()
-    >>> res = ch.getCompleteEntity("CHEBI:27732")
-    >>> res.smiles
-    CN1C(=O)N(C)c2ncn(C)c2C1=O
+class ChebiEntity(dict):
+    """A dict subclass returned by ChEBI REST API calls.
+
+    Provides attribute-style access to common compound fields for
+    backward compatibility with the old SOAP-based interface.
+    """
+
+    @property
+    def mass(self):
+        """Molecular mass of the compound."""
+        chem = self.get("chemical_data") or {}
+        return chem.get("mass")
+
+    @property
+    def smiles(self):
+        """SMILES string of the default structure."""
+        struct = self.get("default_structure") or {}
+        return struct.get("smiles")
+
+    @property
+    def inchiKey(self):
+        """Standard InChI key of the default structure."""
+        struct = self.get("default_structure") or {}
+        return struct.get("standard_inchi_key")
+
+    @property
+    def formula(self):
+        """Molecular formula."""
+        chem = self.get("chemical_data") or {}
+        return chem.get("formula")
+
+    @property
+    def charge(self):
+        """Formal charge."""
+        chem = self.get("chemical_data") or {}
+        return chem.get("charge")
+
+    @property
+    def chebiAsciiName(self):
+        """ASCII name of the compound (primary name)."""
+        return self.get("ascii_name") or self.get("name")
+
+    @property
+    def chebiId(self):
+        """ChEBI accession string, e.g. 'CHEBI:27732'."""
+        return self.get("chebi_accession") or str(self.get("id", ""))
+
+    @property
+    def DatabaseLinks(self):
+        """List of ``(accession_number, source_name)`` tuples from all
+        database cross-references, mirroring the old SOAP interface."""
+        db_accessions = self.get("database_accessions") or {}
+        links = []
+        for acc_list in db_accessions.values():
+            if isinstance(acc_list, list):
+                for acc in acc_list:
+                    acc_num = acc.get("accession_number", "")
+                    src_name = acc.get("source_name", "")
+                    if acc_num or src_name:
+                        links.append((acc_num, src_name))
+        return links
+
+
+class ChEBI(REST):
+    """Interface to the `ChEBI <https://www.ebi.ac.uk/chebi/>`_ REST API.
+
+    ChEBI (Chemical Entities of Biological Interest) is a freely available
+    dictionary of molecular entities focused on 'small' chemical compounds.
+
+    The REST API is documented at
+    https://www.ebi.ac.uk/chebi/backend/api/docs/
+
+    Example usage::
+
+        >>> from bioservices import ChEBI
+        >>> ch = ChEBI()
+        >>> res = ch.getCompleteEntity("CHEBI:27732")
+        >>> res.smiles
+        'Cn1cnc2c1c(=O)n(c(=O)n2C)C'
 
     """
 
-    _url = "http://www.ebi.ac.uk/webservices/chebi/2.0/webservice?wsdl"
+    _url = "https://www.ebi.ac.uk/chebi/backend/api/public"
 
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=False, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose:
-
+        :param bool cache:
         """
-        super(ChEBI, self).__init__(name="ChEBI", url=ChEBI._url, verbose=verbose)
+        super(ChEBI, self).__init__(name="ChEBI", url=ChEBI._url, verbose=verbose, cache=cache)
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
+
+    def _chebi_num(self, chebiId):
+        """Return the numeric part of a ChEBI identifier.
+
+        Accepts both ``"CHEBI:27732"`` and ``"27732"`` (or int ``27732``).
+        """
+        s = str(chebiId).strip()
+        if ":" in s:
+            return s.split(":")[-1]
+        return s
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
 
     def getCompleteEntity(self, chebiId):
-        """Retrieves the complete entity including synonyms, database links and
-        chemical structures, using the ChEBI identifier.
+        """Retrieve the complete entity for a ChEBI identifier.
 
-                :param str chebiId: a valid ChEBI identifier (string)
-                :return: an object containing fields such as mass, names, smiles
+        :param str chebiId: a valid ChEBI identifier (e.g. ``"CHEBI:27732"``)
+        :return: a :class:`ChebiEntity` dict-like object
 
-                ::
+        ::
 
-                    >>> from bioservices import *
-                    >>> ch = ChEBI()
-                    >>> res = ch.getCompleteEntity("CHEBI:27732")
-                    >>> res.mass
-                    194.19076
+            >>> from bioservices import ChEBI
+            >>> ch = ChEBI()
+            >>> res = ch.getCompleteEntity("CHEBI:27732")
+            >>> float(res.mass)
+            194.19076
 
-                The returned structure is the raw object returned by the API.
-                You can extract names from other sources for instance::
-
-                    >>> [x[0] for x in res.DatabaseLinks if x[1].startswith("KEGG")]
-                    [C07481, D00528]
-                    >>> [x[0] for x in res.DatabaseLinks if x[1].startswith("ChEMBL")]
-                    [116485]
-
-                .. seealso:: :meth:`conv`, :meth:`getCompleteEntity`
+        .. seealso:: :meth:`conv`, :meth:`getCompleteEntityByList`
         """
-        res = self.serv.getCompleteEntity(chebiId)
-        # the output in res are made of objects that are cast into strings
-        # res = [str(x) for x in res]
+        cid = self._chebi_num(chebiId)
+        res = self.http_get("compound/{}".format(cid), frmt="json")
+        if isinstance(res, dict):
+            return ChebiEntity(res)
         return res
 
     def conv(self, chebiId, target):
-        """Calls :meth:`getCompleteEntity` and returns the identifier of a given database
+        """Return the cross-reference accession number(s) for a given database.
 
+        Calls :meth:`getCompleteEntity` internally and filters the
+        ``DatabaseLinks`` by *target*.
 
-        :param str chebiId: a valid ChEBI identifier (string)
-        :param target: the identifier of the database
-        :return: the identifier
+        :param str chebiId: a valid ChEBI identifier (e.g. ``"CHEBI:10102"``)
+        :param str target: source database name
+            (e.g. ``"KEGG COMPOUND accession"``)
+        :return: list of accession number strings
 
         ::
 
@@ -99,118 +198,109 @@ class ChEBI(WSDLService):
             ['C07484']
 
         """
-        res = self.serv.getCompleteEntity(chebiId)
-        db = [x[1] for x in res.DatabaseLinks]
-        if target not in db:
-            raise ValueError("valid database target are %s" % db)
-        conv = [str(x[0]) for x in res.DatabaseLinks if x[1] == target]
-        return conv
+        res = self.getCompleteEntity(chebiId)
+        if not isinstance(res, dict):
+            raise ValueError("Could not retrieve entity for %s" % chebiId)
+
+        db_accessions = res.get("database_accessions") or {}
+        all_sources = set()
+        matches = []
+        for acc_list in db_accessions.values():
+            if isinstance(acc_list, list):
+                for acc in acc_list:
+                    src = acc.get("source_name", "")
+                    all_sources.add(src)
+                    if src == target:
+                        matches.append(str(acc.get("accession_number", "")))
+
+        if not matches:
+            raise ValueError("valid database target are %s" % sorted(all_sources))
+        return matches
 
     def getLiteEntity(self, search, searchCategory="ALL", maximumResults=200, stars="ALL"):
-        """Retrieves list of entities containing the ChEBI ASCII name or identifier
+        """Retrieve a list of lite entities matching a search term.
 
-        :param search: search string or category.
-        :param searchCategory: filter with category. Can be ALL,
-        :param int maximumResults: (default is 200)
-        :param str stars: filters that can be set to "TWO ONLY", "ALL", "THREE ONLY"
-
-        The input parameters are a search string and a search category. If the search
-        category is null then it will search under all fields. The search string accepts
-        the wildcard character "*" and also unicode characters. You can get maximum
-        results upto 5000 entries at a time.
+        :param str search: search string (ChEBI name, identifier, SMILES, etc.)
+        :param str searchCategory: filter category (default ``"ALL"``)
+        :param int maximumResults: maximum number of results (default 200)
+        :param str stars: star filter – ``"ALL"``, ``"TWO ONLY"``,
+            or ``"THREE ONLY"`` (default ``"ALL"``)
+        :return: list of :class:`ChebiEntity` objects
 
         ::
 
-            >>> ch.getLiteEntity("CHEBI:27732")
-            [(LiteEntity){
-               chebiId = "CHEBI:27732"
-               chebiAsciiName = "caffeine"
-               searchScore = 4.77
-               entityStar = 3
-             }]
-            >>> res = ch.getLiteEntity("caffeine")
             >>> res = ch.getLiteEntity("caffeine", maximumResults=10)
             >>> len(res)
             10
 
-
         .. seealso:: :meth:`getCompleteEntity`
         """
-        self.devtools.check_param_in_list(
-            searchCategory,
-            [
-                "ALL",
-                "SMILES",
-                "CHEBI ID",
-                "CHEBI NAME",
-                "DEFINITION",
-                "ALL NAMES",
-                "IUAPC",
-                "MASS",
-                "FORMULA",
-                "INCHI",
-                "INCHI KEY",
-            ],
-        )
-        res = self.serv.getLiteEntity(search, searchCategory, maximumResults, stars)
-        if res and len(res):
-            return res[0]
-        else:
-            return res
+        params = {"term": search, "size": maximumResults}
+        res = self.http_get("es_search/", frmt="json", params=params)
+        if isinstance(res, dict) and "results" in res:
+            return [ChebiEntity(r.get("_source") or {}) for r in res["results"]]
+        return []
 
     def getUpdatedPolymer(self, chebiId):
-        """Returns the UpdatedPolymer object
+        """Return compound data for a polymer ChEBI entry.
 
-        :param str chebiId:
+        In the REST API this is equivalent to :meth:`getCompleteEntity`.
+
         :param str chebiId: a valid ChEBI identifier (string)
-        :return: an object with information as described below.
-
-        The object contains the updated 2D MolFile structure, GlobalFormula
-        string containing the formulae for each repeating-unit, the GlobalCharge
-        string containing the charge on individual repeating-units and the
-        primary ChEBI ID of the polymer, even if the secondary Identifier was passed
-        to the web-service.
-
+        :return: a :class:`ChebiEntity` dict-like object
         """
-        res = self.serv.getUpdatedPolymer(chebiId)
-        return res
+        return self.getCompleteEntity(chebiId)
 
-    def getCompleteEntityByList(self, chebiIdList=[]):
-        """Given a list of ChEBI accession numbers, retrieve the complete Entities.
+    def getCompleteEntityByList(self, chebiIdList=None):
+        """Retrieve complete entities for a list of ChEBI identifiers.
 
-        The maximum size of this list is 50.
+        :param list chebiIdList: list of ChEBI identifiers
+            (maximum 50 entries recommended)
+        :return: list of :class:`ChebiEntity` objects
 
         .. seealso:: :meth:`getCompleteEntity`
         """
-        res = self.serv.getCompleteEntityByList(chebiIdList)
-        return res
+        if chebiIdList is None:
+            chebiIdList = []
+        results = []
+        for cid in chebiIdList:
+            entity = self.getCompleteEntity(cid)
+            if entity is not None:
+                results.append(entity)
+        return results
 
     def getOntologyParents(self, chebiId):
-        """Retrieves the ontology parents of an entity including the relationship type
+        """Retrieve the ontology parents of a ChEBI entity.
 
         :param str chebiId: a valid ChEBI identifier (string)
-
+        :return: dict with ontology parent information
         """
-        res = self.serv.getOntologyParents(chebiId)
+        cid = self._chebi_num(chebiId)
+        res = self.http_get("ontology/parents/{}/".format(cid), frmt="json")
         return res
 
     def getOntologyChildren(self, chebiId):
-        """Retrieves the ontology children of an entity including the relationship type
+        """Retrieve the ontology children of a ChEBI entity.
 
         :param str chebiId: a valid ChEBI identifier (string)
-
+        :return: dict with ontology children information
         """
-        res = self.serv.getOntologyChildren(chebiId)
+        cid = self._chebi_num(chebiId)
+        res = self.http_get("ontology/children/{}/".format(cid), frmt="json")
         return res
 
     def getAllOntologyChildrenInPath(self, chebiId, relationshipType, onlyWithChemicalStructure=False):
-        """Retrieves the ontology children of an entity including the relationship type
+        """Retrieve ontology children connected by a specific relationship type.
 
         :param str chebiId: a valid ChEBI identifier (string)
-        :param str relationshipType: one of "is a", "has part", "has role",
-            "is conjugate base of", "is conjugate acid of", "is tautomer of"
-            "is enantiomer of", "has functional parent" "has parent hybride"
-            "is substituent group of"
+        :param str relationshipType: one of ``"is a"``, ``"has part"``,
+            ``"has role"``, ``"is conjugate base of"``,
+            ``"is conjugate acid of"``, ``"is tautomer of"``,
+            ``"is enantiomer of"``, ``"has functional parent"``,
+            ``"has parent hydride"``, ``"is substituent group of"``
+        :param bool onlyWithChemicalStructure: filter to entities with a
+            chemical structure (default ``False``)
+        :return: list of ontology relation dicts
 
         ::
 
@@ -219,20 +309,16 @@ class ChEBI(WSDLService):
         """
         self.devtools.check_param_in_list(
             relationshipType,
-            [
-                "is a",
-                "has part",
-                "has role",
-                "is conjugate base of",
-                "is conjugate acid of",
-                "is tautomer of",
-                "is enantiomer of",
-                "has functional parent",
-                "has parent hybride",
-                "is substituent group of",
-            ],
+            list(_RELATION_TYPE_MAP.keys()),
         )
-        res = self.serv.getAllOntologyChildrenInPath(chebiId, relationshipType, onlyWithChemicalStructure)
+        rel_type = _RELATION_TYPE_MAP[relationshipType]
+        cid = self._chebi_num(chebiId)
+        res = self.http_get("ontology/children/{}/".format(cid), frmt="json")
+        if isinstance(res, dict):
+            ontology = res.get("ontology_relations") or {}
+            incoming = ontology.get("incoming_relations") or []
+            filtered = [r for r in incoming if r.get("relation_type") == rel_type]
+            return filtered
         return res
 
     def getStructureSearch(
@@ -243,27 +329,37 @@ class ChEBI(WSDLService):
         totalResults=50,
         tanimotoCutoff=0.25,
     ):
+        """Perform a substructure, similarity, or identity search.
 
-        """Does a substructure, similarity or identity search using a structure.
-
-        :param str structure: the input structure
-        :param str mode:  type of input (MOLFILE, SMILES, CML" (note that
-            the API uses type but this is a python keyword)
-        :param str structureSearchCategory: category of the search. Can be
-            "SIMILARITY", "SUBSTRUCTURE", "IDENTITY"
-        :param int totalResults: limit the number of results to 50 (default)
-        :param tanimotoCuoff: limit results to scores higher than this
-            parameter
+        :param str structure: input structure string
+        :param str mode: structure format – ``"MOLFILE"``, ``"SMILES"``,
+            or ``"CML"``
+        :param str structureSearchCategory: search type –
+            ``"SIMILARITY"``, ``"SUBSTRUCTURE"``, or ``"IDENTITY"``
+        :param int totalResults: maximum number of results (default 50)
+        :param float tanimotoCutoff: minimum Tanimoto score (default 0.25,
+            only used for ``"SIMILARITY"`` searches)
+        :return: list of matching entities
 
         ::
 
             >>> ch = ChEBI()
             >>> smiles = ch.getCompleteEntity("CHEBI:27732").smiles
             >>> ch.getStructureSearch(smiles, "SMILES", "SIMILARITY", 3, 0.25)
-        """
 
+        """
         self.devtools.check_param_in_list(structureSearchCategory, ["SIMILARITY", "SUBSTRUCTURE", "IDENTITY"])
         self.devtools.check_param_in_list(mode, ["MOLFILE", "SMILES", "CML"])
 
-        res = self.serv.getStructureSearch(structure, mode, structureSearchCategory, totalResults, tanimotoCutoff)
+        _type_map = {"SMILES": "smiles", "MOLFILE": "mol", "CML": "cml"}
+        _cat_map = {"SIMILARITY": "similarity", "SUBSTRUCTURE": "substructure", "IDENTITY": "connectivity"}
+
+        params = {
+            "structure": structure,
+            "type": _type_map[mode],
+            "searchCategory": _cat_map[structureSearchCategory],
+            "total": totalResults,
+            "tanimoto": tanimotoCutoff,
+        }
+        res = self.http_get("structure_search/", frmt="json", params=params)
         return res

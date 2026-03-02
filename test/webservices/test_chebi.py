@@ -20,26 +20,21 @@ def test_chebi():
 
 def test_chebi_mass():
     ch = ChEBI()
-    mass1 = ch.getCompleteEntity("CHEBI:27732").mass
-    assert float(mass1) == 194.19076
+    res = ch.getCompleteEntity("CHEBI:27732")
+    assert float(res.mass) == 194.19076
 
 
 def test_polymer():
     ch = ChEBI()
-    x = ch.serv.getUpdatedPolymer("CHEBI:27732")
-    x.chebiId
-    # Out[14]: 27732
-    x.globalCharge
-    # 0
-    x.globalFormula
-    # C8H10N4O2
-    x.updatedStructure
+    x = ch.getUpdatedPolymer("CHEBI:27732")
+    assert x is not None
+    assert x.chebiId is not None
 
 
 def test_completelist():
     ch = ChEBI()
-    names = [x.chebiAsciiName for x in ch.getCompleteEntityByList(["CHEBI:27732", "CHEBI:36707"])]
-
+    entities = ch.getCompleteEntityByList(["CHEBI:27732", "CHEBI:36707"])
+    names = [x.chebiAsciiName for x in entities]
     names = [str(x) for x in names]
     assert names == ["caffeine", "2-acetyl-1-alkyl-sn-glycero-3-phosphocholine"]
 
@@ -47,7 +42,8 @@ def test_completelist():
 def test_search():
     ch = ChEBI()
     smiles = ch.getCompleteEntity("CHEBI:27732").smiles
-    ch.serv.getStructureSearch(smiles, "SMILES", "SIMILARITY", 3, 0.25)
+    assert smiles is not None
+    ch.getStructureSearch(smiles, "SMILES", "SIMILARITY", 3, 0.25)
 
 
 def test_ontology():
@@ -58,4 +54,5 @@ def test_ontology():
 def test_structure():
     ch = ChEBI()
     smiles = ch.getCompleteEntity("CHEBI:27732").smiles
+    assert smiles is not None
     ch.getStructureSearch(smiles, "SMILES", "SIMILARITY", 3, 0.25)
