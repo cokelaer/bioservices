@@ -59,36 +59,11 @@ Form which, there is a link to other databases in particular ChEBI
     'chebi:5292'
 
 Unfortunately, there is no mapping function from KEGG to ChEMBL in KEGG Web Service.
-
-However, BioServices provides access to the :mod:`bioservices.unichem` service.
-This service provides a useful mapping function from kegg to chembl::
-
-    >>> uni = UniChem()
-    >>> mapping = uni.get_mapping("kegg_ligand", "chembl")
-    >>> mapping['C11222']
-    'CHEMBL278315'
-
-For sanity check, let us see that the ChEBI is indeed 5292 as given within the
-KEGG database::
-
-    >>> uni = UniChem()
-    >>> mapping = uni.get_mapping("kegg_ligand", "chebi")
-    >>> mapping['C11222']
-    '5292'
-
-
-(2) In order to convert KEGG gene names into uniprot gene name, we can also use
+There was a mapping function in  :mod:`bioservices.unichem` servive that was dropped
+in 2022. We can still use another service. In order to convert KEGG gene names into uniprot gene name, we can also use
 the UniProt web service from BioServices as follows::
 
    >>> from bioservices import UniProt
    >>> u = UniProt()
-   >>> u.mapping(fr='ID', to='KEGG_ID', query="ZAP70_HUMAN")
+   >>> u.mapping(fr='UniProtKB_AC-ID', to='KEGGD', query="ZAP70_HUMAN")
    {'ZAP70_HUMAN':  'hsa:7535'}
-
-You can get accession number or protein name identifier from the KEGG identifier
-as follows::
-
-   >>> u.mapping(fr='KEGG_ID', to='ID', query='hsa:7535')
-   {'hsa7535': 'ZAP70_HUMAN'}
-   >>> u.mapping(fr='KEGG_ID', to='ACC', query='hsa:7535')
-   {'hsa7535': 'P43403'}
