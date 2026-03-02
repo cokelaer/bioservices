@@ -58,7 +58,7 @@ class MyGeneInfo:
 
         """
         url = "https://mygene.info/v3"
-        self.services = REST(name="PDBe", url=url, verbose=verbose, cache=cache)
+        self.services = REST(name="MyGeneInfo", url=url, verbose=verbose, cache=cache)
 
     def get_genes(
         self,
@@ -88,7 +88,7 @@ class MyGeneInfo:
             the returned data object contains a single "refseq.rna" field, otherwise
             (False), a single "refseq" field with a sub-field of "rna". Default:
             True.
-        :param str email": If you are regular users of this services, the
+        :param str email: If you are regular users of this services, the
             mygeneinfo maintainers/authors encourage you to provide an email,
             so that we can better track the usage or follow up with you.
 
@@ -144,7 +144,7 @@ class MyGeneInfo:
             the returned data object contains a single "refseq.rna" field, otherwise
             (False), a single "refseq" field with a sub-field of "rna". Default:
             True.
-        :param str email": If you are regular users of this services, the
+        :param str email: If you are regular users of this services, the
             mygeneinfo maintainers/authors encourage you to provide an email,
             so that we can better track the usage or follow up with you.
 
@@ -205,14 +205,14 @@ class MyGeneInfo:
             facets, for example, "facets=taxid", "facets=taxid,type_of_gene".
         :param bool entrezonly: when passed as True, the query returns only the hits
             with valid Entrez gene ids. Default: False.
-        :param bool ensembleonly: when passed as True, the query returns only the hits
+        :param bool ensemblonly: when passed as True, the query returns only the hits
             with valid Ensembl gene ids. Default: False.
         :param dotfield: control the format of the returned fields when passed
             "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If True
             the returned data object contains a single "refseq.rna" field, otherwise
             (False), a single "refseq" field with a sub-field of "rna". Default:
             True.
-        :param str email": If you are regular users of this services, the
+        :param str email: If you are regular users of this services, the
             mygeneinfo maintainers/authors encourage you to provide an email,
             so that we can better track the usage or follow up with you.
 
@@ -269,13 +269,13 @@ class MyGeneInfo:
              the returned data object contains a single "refseq.rna" field, otherwise
              (False), a single "refseq" field with a sub-field of "rna". Default:
              True.
-        :param str email": If you are regular users of this services, the
+        :param str email: If you are regular users of this services, the
             mygeneinfo maintainers/authors encourage you to provide an email,
             so that we can better track the usage or follow up with you.
         :param str scopes: not documented. Set to 'all'
 
         """
-        params = {"q": query, "fields": fields, "scopes": scopes}
+        params = {"fields": fields, "scopes": scopes}
         if email:  # pragma: no cover
             params["email"] = email
         assert dotfield in [True, False]
@@ -284,6 +284,7 @@ class MyGeneInfo:
         res = self.services.http_post(
             "query",
             params=params,
+            data={"q": query},
             frmt="json",
             headers={
                 "User-Agent": self.services.getUserAgent(),
