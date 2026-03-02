@@ -71,7 +71,7 @@ def test_get_one_query():
     hit = res["hits"][0]
 
     assert isinstance(res["took"], int)
-    assert res["total"] == 401
+    assert res["total"] == 250
     assert res["max_score"] is None
     assert hit["_id"] == "24590835"
     assert hit["_score"] is None

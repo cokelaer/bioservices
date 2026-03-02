@@ -26,17 +26,17 @@ def _test_datasets(biomart):
 
 @pytest.mark.flaky
 def test_attributes(biomart):
-    assert "oanatinus_gene_ensembl" in biomart.valid_attributes[biomart.mart_test]
+    assert "drerio_gene_ensembl" in biomart.valid_attributes[biomart.mart_test]
 
 
 @pytest.mark.flaky
 def test_filters(biomart):
-    biomart.filters("oanatinus_gene_ensembl")
+    biomart.filters("drerio_gene_ensembl")
 
 
 @pytest.mark.flaky
 def test_config(biomart):
-    biomart.configuration("oanatinus_gene_ensembl")
+    biomart.configuration("drerio_gene_ensembl")
 
 
 # fails sometines
