@@ -97,11 +97,9 @@ def download_accession(**kwargs):
     "--method", type=click.STRING, default="EUtils", help="A method. EUtils only option implemented right now"
 )
 def taxonomy(**kwargs):
-    """Download Fasta related to an accession and possibly other type (e.g gff)
+    """Download information related to a taxid
 
-    Input file can be gzipped or not. The --output-file
-
-        bioservices download-accession FN433596.1
+    bioservices taxonomy --id 9606
     """
 
     if kwargs["method"] == "EUtils":

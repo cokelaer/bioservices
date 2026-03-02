@@ -209,6 +209,7 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.12.2    * add subcommand 'taxonomy' that uses eutils to search for taxon IDs
 1.12.1    * fix pyproject to use python>3.9 and pandas/numpy>2.2
 1.12.0    * Fix pyproject missing requirements
           * Fix pkg_resources warning
