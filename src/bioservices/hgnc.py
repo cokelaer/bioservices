@@ -42,10 +42,7 @@ from bioservices import logger
 logger.name = __name__
 
 
-try:
-    from urllib.error import HTTPError
-except:
-    from urllib2 import HTTPError
+from urllib.error import HTTPError
 
 
 __all__ = ["HGNC"]

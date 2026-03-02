@@ -19,11 +19,8 @@ import xml.etree.ElementTree as ET
 
 import bs4
 
-try:
-    from urllib.error import HTTPError
-    from urllib.request import urlopen
-except:
-    from urllib2 import HTTPError, urlopen
+from urllib.error import HTTPError
+from urllib.request import urlopen
 
 __all__ = ["easyXML", "readXML"]
 
