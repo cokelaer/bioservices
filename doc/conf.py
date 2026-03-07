@@ -28,8 +28,6 @@ import matplotlib
 
 matplotlib.use("Agg")
 
-on_rtd = os.environ.get("READTHEDOCS", None) == "True"
-
 version = get_version(pkg_name)
 release = version
 author = "Thomas Cokelaer, Lea M. Harder, Jordi Serra-Musach, \nDennis Pultz"
@@ -169,12 +167,7 @@ def touch_example_backreferences(app, what, name, obj, options, lines):
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = "standard"
-on_rtd = os.environ.get("READTHEDOCS", None) == True
-if not on_rtd:
-    html_theme = "sphinx_rtd_theme"
-else:
-    html_theme = "default"
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
