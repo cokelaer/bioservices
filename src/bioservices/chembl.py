@@ -897,15 +897,13 @@ class ChEMBL:
         :param bool view: show the image if set to True.
         :return: the path (list of paths) used to save the figure (figures) (different from Chembl API)
 
-        .. plot::
-            :include-source:
-            :width: 50%
+        .. code-block:: python
 
-            >>> from pylab import imread, imshow
-            >>> from bioservices import *
-            >>> s = ChEMBL(verbose=False)
-            >>> res = s.get_image(31863)
-            >>> imshow(imread(res['filenames'][0]))
+            from pylab import imread, imshow
+            from bioservices import ChEMBL
+            s = ChEMBL(verbose=False)
+            res = s.get_image(31863)
+            imshow(imread(res['filenames'][0]))
 
         .. todo:: ignorecoords option
         """

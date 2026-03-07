@@ -53,7 +53,7 @@ BioServices provides access to about 40 Web Services.
 Installation
 ============
 
-Install the latest stable release from `PyPI <https://pypi.python.org/pypi/bioservices>`_::
+Install the latest stable release from `PyPI <https://pypi.python.org/pypi/bioservices>`__::
 
     pip install bioservices
 
