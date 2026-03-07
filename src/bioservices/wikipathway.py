@@ -353,10 +353,12 @@ class WikiPathways:
         with open(filename, "wb") as f:
             import binascii
 
+            if isinstance(res, list):
+                res = "".join(str(item) for item in res)
             try:
                 # python3
                 newres = binascii.a2b_base64(bytes(res, "utf-8"))
-            except:
+            except TypeError:
                 newres = binascii.a2b_base64(res)
             f.write(newres)
 
