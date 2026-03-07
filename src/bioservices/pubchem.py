@@ -31,6 +31,8 @@
 
 
 """
+import time
+
 from bioservices.services import REST
 
 __all__ = ["PubChem", "COMPOUND_PROPERTIES", "XREF_TYPES"]
@@ -142,6 +144,40 @@ class PubChem:
     # Internal helpers
     # ------------------------------------------------------------------
 
+    def _wait_for_result(self, res, path, frmt, max_attempts=10, interval=3):
+        """Poll for asynchronous results when PubChem returns a Waiting response.
+
+        Some PubChem requests (e.g. formula searches or large cross-domain
+        look-ups) may return a ``Waiting`` response containing a ``ListKey``.
+        This method retries the request using the ``listkey`` endpoint until
+        the real results are available.
+
+        :param res: initial response (may be a Waiting dict)
+        :param str path: original request path
+        :param str frmt: response format
+        :param int max_attempts: maximum polling attempts before giving up
+        :param int interval: seconds to wait between polling attempts
+        :return: final result dict (or the last Waiting response if timed out)
+        """
+        attempt = 0
+        while isinstance(res, dict) and "Waiting" in res and attempt < max_attempts:
+            waiting = res["Waiting"]
+            if not isinstance(waiting, dict) or "ListKey" not in waiting:
+                break
+            list_key = waiting["ListKey"]
+            parts = path.rstrip("/").split("/")
+            if len(parts) < 2:
+                break
+            domain = parts[0]
+            # The output operation is always the second-to-last path segment
+            # (the last segment is the format: JSON, XML, etc.)
+            output = parts[-2]
+            poll_path = f"{domain}/listkey/{list_key}/{output}/{frmt.upper()}"
+            time.sleep(interval)
+            res = self.services.http_get(poll_path, frmt=frmt)
+            attempt += 1
+        return res
+
     def _get(self, path, frmt="json"):
         """Perform a GET request to the PUG REST API.
 
@@ -149,7 +185,8 @@ class PubChem:
         :param str frmt: response format (json, xml, txt, …)
         :return: parsed response
         """
-        return self.services.http_get(path, frmt=frmt)
+        res = self.services.http_get(path, frmt=frmt)
+        return self._wait_for_result(res, path, frmt)
 
     def _post(self, path, data, frmt="json"):
         """Perform a POST request to the PUG REST API.
@@ -162,7 +199,7 @@ class PubChem:
         :param str frmt: response format (json, xml, …)
         :return: parsed response
         """
-        return self.services.http_post(
+        res = self.services.http_post(
             path,
             frmt=frmt,
             data=data,
@@ -172,6 +209,7 @@ class PubChem:
                 "Content-Type": "application/x-www-form-urlencoded",
             },
         )
+        return self._wait_for_result(res, path, frmt)
 
     # ------------------------------------------------------------------
     # Compound lookup – return CIDs
