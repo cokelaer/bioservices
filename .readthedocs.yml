@@ -12,8 +12,6 @@ build:
 
 formats: []
 python:
-    # install doc/requirements at the end to make sure pillow 9.5.0 is used
-    # also needs sphinx <7
     install:
         - method: pip
           path: .
