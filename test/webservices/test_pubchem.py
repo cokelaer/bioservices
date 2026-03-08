@@ -1,4 +1,5 @@
 import pytest
+
 from bioservices import PubChem
 
 # Aspirin CID / SMILES / InChIKey used throughout
@@ -114,14 +115,14 @@ def test_get_description_by_name(pubchem):
 def test_get_sids_by_cid(pubchem):
     res = pubchem.get_sids_by_cid(ASPIRIN_CID)
     assert isinstance(res, dict)
-    assert "IdentifierList" in res
-    assert len(res["IdentifierList"]["SID"]) > 0
+    assert "InformationList" in res
+    assert len(res["InformationList"]["Information"]) > 0
 
 
 def test_get_aids_by_cid(pubchem):
     res = pubchem.get_aids_by_cid(ASPIRIN_CID)
     assert isinstance(res, dict)
-    assert "IdentifierList" in res
+    assert "InformationList" in res
 
 
 # ------------------------------------------------------------------
@@ -138,7 +139,7 @@ def test_get_substance_by_sid(pubchem):
 def test_get_cids_by_sid(pubchem):
     res = pubchem.get_cids_by_sid(10)
     assert isinstance(res, dict)
-    assert "IdentifierList" in res
+    assert "InformationList" in res
 
 
 # ------------------------------------------------------------------
@@ -147,7 +148,7 @@ def test_get_cids_by_sid(pubchem):
 
 
 def test_get_assay(pubchem):
-    res = pubchem.get_assay(1)
+    res = pubchem.get_assay(2244)
     assert isinstance(res, dict)
 
 
@@ -159,10 +160,10 @@ def test_get_assay_description(pubchem):
 def test_get_cids_by_aid(pubchem):
     res = pubchem.get_cids_by_aid(1)
     assert isinstance(res, dict)
-    assert "IdentifierList" in res
+    assert "InformationList" in res
 
 
 def test_get_sids_by_aid(pubchem):
     res = pubchem.get_sids_by_aid(1)
     assert isinstance(res, dict)
-    assert "IdentifierList" in res
+    assert "InformationList" in res
