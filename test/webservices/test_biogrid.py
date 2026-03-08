@@ -1,6 +1,8 @@
 from bioservices import BioGRID
+import pytest
 
 
+@pytest.mark.xfail
 def test_biogrid():
     b = BioGRID(query=["map2k4", "akt1"], taxId="9606")
     b.interactors

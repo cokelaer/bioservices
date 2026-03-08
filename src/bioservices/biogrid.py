@@ -65,11 +65,14 @@ class BioGRID(PSICQUIC):
     def __init__(self, query=None, taxId=None, exP=None):
         super(BioGRID, self).__init__(verbose="ERROR")
         searchString = self._biogridSearch(query=query, taxid=taxId, exp=exP)
-        if "biogrid" in self.activeDBs:
-            self.output = self.query("biogrid", searchString)
-        else:
-            self.services.logging.warning("BioGrid is not active")
-            self.output = []
+        self.output = []
+        try:
+            if "biogrid" in self.activeDBs:
+                self.output = self.query("biogrid", searchString)
+            else:
+                self.services.logging.warning("BioGrid is not active")
+        except Exception as err:
+            self.services.logging.warning("BioGrid service unavailable: %s" % err)
         self.interactors = self._get_interactors()
 
     def _get_interactors(self):
