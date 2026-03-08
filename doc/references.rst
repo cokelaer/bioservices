@@ -11,7 +11,7 @@ Service module (REST or WSDL)
 .. automodule:: bioservices.services
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 xmltools module
 ========================
@@ -59,13 +59,6 @@ BioDBnet
     :undoc-members:
     :synopsis:
 
-BioGrid
-====================
-
-.. automodule:: bioservices.biogrid
-    :members:
-    :undoc-members:
-    :synopsis:
 
 BioMart
 ====================
@@ -153,7 +146,7 @@ QuickGO
 .. automodule:: bioservices.quickgo
     :members:
     :undoc-members:
-    :synopsis: 
+    :synopsis:
 
 Kegg
 ===================================================================
@@ -340,7 +333,7 @@ Wikipathway
 Applications and extra tools
 ##################################
 
-Web services have lots of overlap amongst themselves. For instance, fetching a FASTA sequence 
+Web services have lots of overlap amongst themselves. For instance, fetching a FASTA sequence
 can be done using many different services. Yet, once a FASTA is retrieved, one may want to perform additional tasks or save the FASTA into a file or whatever repetitive functionalities not included in Web Services anymore.
 
 The goal of this sub-package is to provide convenient tools, which are not web services per se but that makes use of one or several Web Services already available within BioServices.
