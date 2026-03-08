@@ -4,4 +4,3 @@ sphinx_rtd_theme
 pillow<=12.1.1
 sphinx_gallery
 sphinx_copybutton
-sphinxcontrib_googleanalytics
