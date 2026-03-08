@@ -1,4 +1,3 @@
-
 from importlib import metadata
 
 
@@ -16,7 +15,6 @@ version = get_package_version("bioservices")
 from easydev import CustomConfig
 from easydev.logging_tools import Logging
 
-
 logger = Logging("bioservices", "WARNING", text_color="green")
 
 
@@ -32,130 +30,83 @@ bspath = configuration.user_config_dir
 # import bioservices.uniprot
 # bioservices.uniprot  # Stop flake8 error
 
-from . import settings
-from .settings import *
-
-from . import services
-from .services import *
-
-from . import biodbnet
-from .biodbnet import *
-
-from . import biomodels
-from .biomodels import *
-
-from . import biocontainers
+# sub packages inside bioservices.
+from . import (
+    apps,
+    arrayexpress,
+    bigg,
+    biocontainers,
+    biodbnet,
+    biomart,
+    biomodels,
+    chebi,
+    chembl,
+    cog,
+    dbfetch,
+    ena,
+    ensembl,
+    eutils,
+    eva,
+    hgnc,
+    intact,
+    kegg,
+    muscle,
+    ncbiblast,
+    omicsdi,
+    omnipath,
+    pathwaycommons,
+    pdb,
+    pdbe,
+    pfam,
+    pride,
+    pubchem,
+    quickgo,
+    reactome,
+    rhea,
+    services,
+    settings,
+    unichem,
+    uniprot,
+    wikipathway,
+    xmltools,
+)
+from .arrayexpress import *
+from .bigg import BiGG
 from .biocontainers import Biocontainers
-
-from . import cog
-from .cog import *
-
-from . import chebi
+from .biodbnet import *
+from .biomart import *
+from .biomodels import *
 from .chebi import *
-
-from . import ena
+from .chembl import *
+from .cog import *
+from .dbfetch import *
 from .ena import ENA
-
-from . import eva
-from .eva import *
-
-from . import ensembl
 from .ensembl import *
+from .eutils import *
+from .eva import *
+from .hgnc import *
+from .intact import *
+from .kegg import *
+from .muscle import *
+from .ncbiblast import *
+from .omicsdi import OmicsDI
+from .omnipath import *
+from .pathwaycommons import *
+from .pdb import *
+from .pdbe import *
+from .pfam import *
+from .pride import *
+from .pubchem import *
+from .quickgo import *
+from .reactome import *
+from .rhea import *
+from .services import *
+from .settings import *
+from .unichem import *
+from .uniprot import *
+from .wikipathway import *
+from .xmltools import *
 
 # moved to attic in bioservices v1.6
 # from . import geneprof
 # from .geneprof import *
-
-from . import kegg
-from .kegg import *
-
-from . import hgnc
-from .hgnc import *
-
-from . import intact
-from .intact import *
-
-from . import pubchem
-from .pubchem import *
-
-from . import pfam
-from .pfam import *
-
-from . import rhea
-from .rhea import *
-
-from . import xmltools
-from .xmltools import *
-
-from . import wikipathway
-from .wikipathway import *
-
-from . import omnipath
-from .omnipath import *
-
-from . import pdb
-from .pdb import *
-
-from . import pdbe
-from .pdbe import *
-
-from . import pride
-from .pride import *
-
-from . import uniprot
-from .uniprot import *
-
-from . import unichem
-from .unichem import *
-
-from . import reactome
-from .reactome import *
-
-from . import quickgo
-from .quickgo import *
-
-
-from . import chembl
-from .chembl import *
-
-# from . import picr
-# from .picr import *
-
-from . import psicquic
-from .psicquic import *
-
-from . import ncbiblast
-from .ncbiblast import *
-
-# from . import readseq
-# from .readseq import *
-
-from . import biogrid
-from .biogrid import *
-
-from . import arrayexpress
-from .arrayexpress import *
-
-from . import biomart
-from .biomart import *
-
-from . import eutils
-from .eutils import *
-
-from . import pathwaycommons
-from .pathwaycommons import *
-
-from . import muscle
-from .muscle import *
-
-from . import dbfetch
-from .dbfetch import *
-
-from . import bigg
-from .bigg import BiGG
-
-from . import omicsdi
-from .omicsdi import OmicsDI
-
-# sub packages inside bioservices.
-from . import apps
