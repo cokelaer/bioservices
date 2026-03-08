@@ -1,4 +1,4 @@
-from bioservices import UniProt
+from bioservices.uniprot import UniProt
 import re
 
 
