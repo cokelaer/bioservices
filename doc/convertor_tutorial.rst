@@ -38,10 +38,7 @@ use the UniProt web service from BioServices as follows:
     {'results': [{'from': 'P43403', 'to': 'hsa:7535'}]}
 
 
-You can get accession number or protein name identifier from the KEGG
-identifier as follows::
-
-Due to an API change in 2022 and for back compatiblity, the mapping from KEGG to e.g. uniprot is a bit more complex than it used to be. First, the conversion::
+Due to an API change in 2022 and for back compatibility, the mapping from KEGG to e.g. uniprot is a bit more complex than it used to be. First, the conversion::
 
     >>> res = u.mapping(fr='KEGG', to='UniProtKB', query='hsa:7535')
 

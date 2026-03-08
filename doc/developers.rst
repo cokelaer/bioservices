@@ -153,6 +153,6 @@ Continuous integration
 
 1. add a test in ./test/webservices/test_**yourmodule**.py
 2. add a continous integration file named after **yourmodule**.yml. See example
-in .github/workflows/template.txt and replace **__name__** by your module name
+   in .github/workflows/template.txt and replace **__name__** by your module name
 
 
