@@ -119,8 +119,6 @@ biocontainers         .. image:: https://github.com/cokelaer/bioservices/actions
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/biocontainers.yml
 biodbnet              .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biodbnet.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/biodbnet.yml
-biogrid               .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biogrid.yml/badge.svg
-                         :target: https://github.com/cokelaer/bioservices/actions/workflows/biogrid.yml
 biomart               .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biomart.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/biomart.yml
 biomodels             .. image:: https://github.com/cokelaer/bioservices/actions/workflows/biomodels.yml/badge.svg
@@ -169,8 +167,6 @@ pfam                  .. image:: https://github.com/cokelaer/bioservices/actions
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/pfam.yml
 pride                 .. image:: https://github.com/cokelaer/bioservices/actions/workflows/pride.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/pride.yml
-psicquic              .. image:: https://github.com/cokelaer/bioservices/actions/workflows/psicquic.yml/badge.svg
-                         :target: https://github.com/cokelaer/bioservices/actions/workflows/psicquic.yml
 pubchem               .. image:: https://github.com/cokelaer/bioservices/actions/workflows/pubchem.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/pubchem.yml
 quickgo               .. image:: https://github.com/cokelaer/bioservices/actions/workflows/quickgo.yml/badge.svg
