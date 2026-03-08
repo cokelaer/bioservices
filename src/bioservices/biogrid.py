@@ -41,44 +41,20 @@ logger.name = __name__
 __all__ = ["BioGRID"]
 
 
-class Search(PSICQUIC):
-    """Class that carries out the actual search via psicquic.
-
-
-    .. todo:: to be removed"""
-
-    def __init__(self, data):
-        super(Search, self).__init__(verbose="ERROR")
-        self.data = data
-        if "biogrid" in self.activeDBs:
-            self.output = self.query("biogrid", self.data)
-        else:
-            self.logging.warning("BioGrid is not active")
-            self.output = []
-        self.interactors = self.get_interactors()
-
-    def get_interactors(self):
-        out = []
-        for element in self.output:
-            x = (re.sub(".*:", "", element[2:4][0]), re.sub(".*:", "", element[2:4][1]))
-            out.append(tuple(sorted(x)))
-        return list(set(out))
-
-
-class BioGRID(object):
+class BioGRID(PSICQUIC):
     """Interface to BioGRID.
 
     .. doctest::
 
       >>> from bioservices import BioGRID
       >>> b = BioGRID(query=["map2k4","akt1"],taxId = "9606")
-      >>> interactors = b.biogrid.interactors
+      >>> interactors = b.interactors
 
     Examples::
 
         >>> from bioservices import BioGRID
         >>> b = BioGRID(query=["mtor","akt1"],taxId="9606",exP="two hybrid")
-        >>> b.biogrid.interactors
+        >>> b.interactors
 
     One can also query an entire organism, by using the taxid as the query::
 
@@ -87,12 +63,21 @@ class BioGRID(object):
     """
 
     def __init__(self, query=None, taxId=None, exP=None):
+        super(BioGRID, self).__init__(verbose="ERROR")
+        searchString = self._biogridSearch(query=query, taxid=taxId, exp=exP)
+        if "biogrid" in self.activeDBs:
+            self.output = self.query("biogrid", searchString)
+        else:
+            self.services.logging.warning("BioGrid is not active")
+            self.output = []
+        self.interactors = self._get_interactors()
 
-        self.query = query
-        self.taxId = taxId
-        self.exP = exP
-        self.searchString = self._biogridSearch()
-        self.biogrid = Search(self.searchString)
+    def _get_interactors(self):
+        out = []
+        for element in self.output:
+            x = (re.sub(".*:", "", element[2:4][0]), re.sub(".*:", "", element[2:4][1]))
+            out.append(tuple(sorted(x)))
+        return list(set(out))
 
     def _biogridSearch(self, query=None, taxid=None, exp=None):
         """Creates a search string for the biogrid database.
@@ -102,13 +87,6 @@ class BioGRID(object):
             all organisms are choosen.
         :param str exp: the experimental protocol used to identify the interactions.
         :return: a search string for biogrid."""
-
-        if query is None:
-            query = self.query
-        if taxid is None:
-            taxid = self.taxId
-        if exp is None:
-            exp = self.exP
 
         asepNone = "%20AND%20None"
         if exp is not None:
