@@ -264,14 +264,6 @@ PubChem
     :synopsis:
 
 
-PSICQUIC
-================
-
-.. automodule:: bioservices.psicquic
-    :members:
-    :undoc-members:
-    :synopsis:
-
 Rhea
 ==============
 
