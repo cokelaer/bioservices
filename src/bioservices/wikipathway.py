@@ -308,63 +308,53 @@ class WikiPathways:
         """Download a pathway in the specified file format.
 
         :param str pathwayId: the pathway identifier.
-        :param str filetype: the file format (default is .owl).
-        :param int revision: the revision number of the pathway (use '0' for most recent version - this is default).
-        :return: The file contents
+        :param str filetype: the file format (png, svg, pdf, or gpml).
+        :param int revision: deprecated, kept for backwards compatibility.
+        :return: The file contents as bytes.
 
         .. versionchanged:: 1.3.0 return raw output of the service without any parsing
+        .. versionchanged:: 1.10 fetch from wikipathways-assets instead of the
+            retired getPathwayAs web service endpoint.
 
         .. note:: use :meth:`savePathwayAs` to save into a file.
         """
-        valids = ["gpml", "png", "svg", "pdf", "txt", "pwf", "owl"]
+        valids = ["gpml", "png", "svg", "pdf"]
         assert filetype in valids, f"filetype must be in {valids}"
 
-        url = f"getPathwayAs?fileType={filetype}&pwId={pathwayId}"
-        url += f"&revision={revision}&format=json"
-        res = self.services.http_get(url)
-        try:
-            return res["data"]
-        except (TypeError, AttributeError):
-            return res
+        url = f"https://www.wikipathways.org/wikipathways-assets/pathways/{pathwayId}/{pathwayId}.{filetype}"
+        res = self.services.http_get(url, frmt="txt")
+        return res
 
     def savePathwayAs(self, pathwayId, filename, revision=0, display=True):
         """Save a pathway.
 
         :param str pathwayId: the pathway identifier.
         :param str filename: the name of the file. If a filename extension
-            is not provided the pathway will be saved as a pdf (default).
-        :param int revisionNumb: the revision number of the pathway (use
-            '0 for most recent version).
+            is not provided the pathway will be saved as a png (default).
+        :param int revision: deprecated, kept for backwards compatibility.
         :param bool display: if True the pathway will be displayed in your
             browser.
 
         .. note:: Method from bioservices. Not a WikiPathways function
         .. versionchanged:: 1.7 return PNG by default instead of PDF. PDF
             not working as of 20 Feb 2020 even on wikipathway website.
+        .. versionchanged:: 1.10 fetch from wikipathways-assets instead of the
+            retired getPathwayAs web service endpoint.
         """
         if filename.find(".") == -1:
-            filename = "%s.%s" % (filename, "pdf")
+            filename = "%s.%s" % (filename, "png")
         filetype = filename.split(".")[-1]
-
-        print(filetype)
 
         res = self._getPathwayAs(pathwayId, filetype=filetype, revision=revision)
 
         with open(filename, "wb") as f:
-            import binascii
-
-            if isinstance(res, list):
-                res = "".join(str(item) for item in res)
-            try:
-                # python3
-                newres = binascii.a2b_base64(bytes(res, "utf-8"))
-            except TypeError:
-                newres = binascii.a2b_base64(res)
-            f.write(newres)
+            if isinstance(res, bytes):
+                f.write(res)
+            else:
+                f.write(res.encode("utf-8"))
 
         if display:
             webbrowser.open(filename)
-        f.close()
 
     def updatePathway(self, pathwayId, describeChanges, gpmlCode, revision=0):
         """Update a pathway on WikiPathways website with a given GPML code.
