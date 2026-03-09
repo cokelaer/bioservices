@@ -1,11 +1,12 @@
 #
-#  This file is part of BioServices
+#  This file is part of bioservices software
 #
-#  Distributed under the terms of the 3-clause BSD license.
-#  The full license is in the LICENSE file, distributed with this software.
+#  Distributed under the GPLv3 License.
+#  See accompanying file LICENSE.txt or copy at
+#      http://www.gnu.org/licenses/gpl-3.0.html
 #
-#  website: https://github.com/sequana/sequana
-#  documentation: http://sequana.readthedocs.io
+#  website: https://github.com/cokelaer/bioservices
+#  documentation: http://bioservices.readthedocs.io
 #
 ##############################################################################
 import functools
