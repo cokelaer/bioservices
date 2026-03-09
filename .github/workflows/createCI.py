@@ -3,6 +3,7 @@ services = [
     "bigg",
     "biodbnet",
     "biomart",
+    "biocontainers",
     "biomodels",
     "chebi",
     "chembl",
