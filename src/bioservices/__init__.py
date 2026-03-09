@@ -66,6 +66,7 @@ from . import (
     pdbe,
     pfam,
     pride,
+    proteins,
     pubchem,
     quickgo,
     reactome,
@@ -101,6 +102,7 @@ from .pdb import *
 from .pdbe import *
 from .pfam import *
 from .pride import *
+from .proteins import *
 from .pubchem import *
 from .quickgo import *
 from .reactome import *

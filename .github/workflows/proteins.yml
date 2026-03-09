@@ -1,0 +1,42 @@
+name: proteins Testing
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - src/bioservices/proteins.py
+  pull_request:
+    branches-ignore: []
+    paths:
+      - src/bioservices/proteins.py
+  schedule:
+    - cron: '0 0 1 * *'
+
+permissions:
+  contents: read
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+      matrix:
+        python: [3.9,'3.10', '3.11', '3.12']
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.X
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install the package itself and dependencies
+      run: |
+          pip install poetry
+          poetry install --with dev
+
+    - name: Test with pytest
+      run: |
+        poetry run pytest --cov-report term --cov=bioservices.proteins test/webservices/test_proteins.py
