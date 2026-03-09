@@ -206,6 +206,16 @@ Changelog
 Version   Description
 ========= ====================================================================
 1.14.0    * Add EBI Proteins API service (new ``proteins`` module)
+          * Update PubChem module to current PUG REST API; fix async listkey polling
+          * Fix caching fallback when sqlite3/requests_cache fails in REST services
+          * WikiPathways: fix savePathwayAs (TypeError) and switch to assets URL
+          * Remove deprecated BioGRID and PSICQUIC services
+          * Fix circular import regression in services/apps/peptides
+          * Fix ReadTheDocs build: add sphinx_copybutton, fix docstring warnings
+          * Fix license: align pyproject.toml classifier and main.py to GPLv3
+          * Fix PRIDE service: handle list API responses and correct stats URL
+          * Fix Python 3.11/3.12 CI: numpy <2.4 constraint, lxml build deps
+          * Fix #297: clean up compound tutorial documentation
 1.13.0    * New ChEBI API (rest instead of SOAP)
 1.12.2    * add subcommand 'taxonomy' that uses eutils to search for taxon IDs
 1.12.1    * fix pyproject to use python>3.9 and pandas/numpy>2.2
