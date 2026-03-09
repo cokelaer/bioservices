@@ -823,7 +823,7 @@ class UniProt:
 
             df = u.get_df('P62988')
 
-        Note that you may preceed the accesion by the keyword **sec_acc) to access secondary accessions numbers::
+        Note that you may precede the accession by the keyword **sec_acc** to access secondary accessions numbers::
 
             df = u.get_df('sec_acc:P62988')
 
