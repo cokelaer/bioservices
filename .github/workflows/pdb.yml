@@ -36,7 +36,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        poetry run pytest -n 1  --cov-report term --cov=bioservices.pdb test/webservices/test_pdb.py
+        poetry run pytest --cov-report term --cov=bioservices.pdb test/webservices/test_pdb.py
 
 
 
