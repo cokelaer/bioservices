@@ -33,7 +33,6 @@ def _test_pride_protein():
 
 
 def test_stats():
-    assert "SUBMISSIONS_PER_YEAR" in p.get_stats()
     p.get_stats("SUBMISSIONS_PER_YEAR")
 
 

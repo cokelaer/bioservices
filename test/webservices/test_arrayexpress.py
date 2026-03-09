@@ -1,5 +1,6 @@
-from bioservices import ArrayExpress
 import pytest
+
+from bioservices import ArrayExpress
 
 
 @pytest.fixture
@@ -63,12 +64,12 @@ def test_extra2(array):
     res = array.queryFiles(keywords="cancer+breast", wholewords=True, gxa="true")
 
 
-@pytest.mark.xfail
+# @pytest.mark.xfail
 def test_extra3(array):
     res = array.queryFiles(keywords="cancer+breast", wholewords=True, directsub="false")
 
 
-@pytest.mark.xfail
+# @pytest.mark.xfail
 def test_extra4():
     ae = ArrayExpress(verbose=False)
     ae.TIMEOUT = 60

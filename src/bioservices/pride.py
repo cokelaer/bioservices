@@ -274,21 +274,12 @@ class PRIDE:
         res = self.services.http_get(f"peptideevidences", params=params)
         return res
 
-    def get_stats(self, name=None):
+    def get_stats(self, name):
         """Retrieve statistics by Name
 
-        If you do not have the name, just type::
-
-            p.get_stats()
-
-        and then, e.g., ::
-
-            p.get_stats("SUBMISSIONS_PER_YEAR")
+        p.get_stats("SUBMISSIONS_PER_YEAR")
 
         """
 
-        if name is None:
-            res = self.services.http_get("stats")
-        else:
-            res = self.services.http_get(f"stats/{name}")
+        res = self.services.http_get(f"stats/{name}")
         return res
