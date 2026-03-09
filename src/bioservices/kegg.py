@@ -1022,15 +1022,26 @@ class KEGG:
         :return: a dictionary with relations and entries as keys. Values
             of relations is a list of relations, each relation being
             dictionary with entry1, entry2, link, value, name. The
-            list os entries is a list of dictionary as well.
-            Entry contains contains more details about the entry found in the
+            list of entries is a list of dictionaries as well.
+            Entry contains more details about the entry found in the
             relation. See example below for details.
 
+            Relation ``name`` values include e.g. ``activation``,
+            ``inhibition``, ``phosphorylation``, ``binding/association``.
+            Relations that carry no subtype information have ``name`` and
+            ``value`` set to ``None``.
+
+            Entries with ``type`` equal to ``"map"`` represent links to
+            sub-pathways embedded in the current map. Their ``name`` field
+            contains the KEGG pathway identifier (e.g. ``"path:hsa04010"``).
 
         ::
 
             >>> res = s.parse_kgml_pathway("hsa04660")
+
+            >>> # inspect the name field of each relation
             >>> set([x['name'] for x in res['relations']])
+
             >>> res['relations'][-1]
             {'entry1': u'15',
              'entry2': u'13',
@@ -1041,8 +1052,17 @@ class KEGG:
             >>> set([x['link'] for x in res['relations']])
             set([u'PPrel', u'PCrel'])
 
-            >>> # get information about an entry :
+            >>> # get information about an entry
             >>> res['entries'][4]
+
+            >>> # look up the gene names for entry1/entry2 in a relation
+            >>> entry_map = {e['id']: e for e in res['entries']}
+            >>> rel = res['relations'][0]
+            >>> entry_map[rel['entry1']]['gene_names']
+
+            >>> # find sub-pathway (map) entries embedded in this pathway
+            >>> sub_pathways = [e for e in res['entries'] if e['type'] == 'map']
+            >>> [e['name'] for e in sub_pathways]
 
 
         .. seealso:: `KEGG API <http://www.kegg.jp/kegg/xml/docs/>`_
@@ -1057,13 +1077,14 @@ class KEGG:
         # read and parse the entries
         entries = [x for x in res.findAll("entry")]
         for entry in entries:
+            graphics = entry.find("graphics")
             output["entries"].append(
                 {
                     "id": entry.get("id"),
                     "name": entry.get("name"),
                     "type": entry.get("type"),
                     "link": entry.get("link"),
-                    "gene_names": entry.find("graphics").get("name"),
+                    "gene_names": graphics.get("name") if graphics else None,
                 }
             )
 
@@ -1073,8 +1094,16 @@ class KEGG:
         assert len(subtypes) == len(relations)
 
         for relation, subtype in zip(relations, subtypes):
-            if len(subtype) == 0:  # nothing to do with the species ??? TODO
-                pass
+            if len(subtype) == 0:
+                output["relations"].append(
+                    {
+                        "entry1": relation[0],
+                        "entry2": relation[1],
+                        "link": relation[2],
+                        "value": None,
+                        "name": None,
+                    }
+                )
             else:
                 for this in subtype:
                     value = this.get("value")
