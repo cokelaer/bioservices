@@ -326,6 +326,7 @@ class EUtils:
         :return: depends on retmode parameter.
 
         .. note:: addition to NCBI: settings rettype to "dict" returns a dictionary
+
         ::
 
             >>> ret = s.EFetch("omim", "269840")  --> ZAP70
@@ -657,7 +658,7 @@ class EUtils:
             and it will be included in the output.
 
             all spaces must be replaced by + symbols and that citation
-            strings should end with a final vertical bar |.
+            strings should end with a final vertical bar \|.
 
 
         Only xml supported at the time of this implementation.
