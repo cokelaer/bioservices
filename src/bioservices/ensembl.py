@@ -321,7 +321,7 @@ class Ensembl:
         :param str mask: Request the sequence masked for repeat sequences.
             Hard will mask all repeats as N's and soft will mask repeats
             as lowercased characters.
-        :param str method:The alignment method amongst Enum(EPO,
+        :param str method: The alignment method amongst Enum(EPO,
             EPO_LOW_COVERAGE, PECAN, LASTZ_NET, BLASTZ_NET, TRANSLATED_BLAT_NET)
         :param str species_set: the set of species used to define the pairwise
             alignment (multiple values). Should not be used with the
@@ -1446,12 +1446,12 @@ class Ensembl:
             for a gene but using a type such as protein.
         :param str object_type: Filter by feature type (e.g., gene)
         :param str species: Species name/alias (e.g., homo_sapiens)
-        :param str type:. could be genomic, cds, cdna, protein (homo_sapiens).
+        :param str type: could be genomic, cds, cdna, protein (homo_sapiens).
             Requesting a gene and kind not equal to genomic may result in
             multiple sequence, which required the parameter multi_sequences
             to be set to True
 
-        ::
+        Example::
 
             >>> # Default format is fasta, let us use parameter frmt to overwrite it
             >>> sequence = e.get_sequence('ENSG00000157764', frmt='text')
@@ -1467,7 +1467,6 @@ class Ensembl:
             ATGGCGGCGCTGAGCGGTGGCGGTGGTGGCGGCGCGGAGCCGGGCCAGGCTCTGTTCAAC
             GGGGACATGGAGCCCGAGGCCGGCGCC
 
-            >>>
 
 
         """
@@ -1604,7 +1603,7 @@ class Ensembl:
         :param str species: Species name/alias
         :param bool canonical: Include a flag indicating the canonical transcript for a gene
         :param bool ccds: Include CCDS transcript identifiers
-        :param bool domains:Include names of overlapping protein domains
+        :param bool domains: Include names of overlapping protein domains
         :param bool hgvs: Include HGVS nomenclature based on Ensembl stable identifiers
         :param bool numbers: Include affected exon and intron positions within the transcript
         :param bool protein: Include Ensembl protein identifiers
@@ -1612,6 +1611,7 @@ class Ensembl:
             transcript. NB: theRefSeq and Ensembl transcripts aligned in this
             way MAY NOT, AND FREQUENTLY WILL NOT, match exactly in sequence,
             exon structure and protein product
+
         """
         self._check_frmt(frmt, ["xml"])
         res = self.services.http_get(
@@ -1668,7 +1668,7 @@ class Ensembl:
         :param str species: Species name/alias
         :param bool canonical: Include a flag indicating the canonical transcript for a gene
         :param bool ccds: Include CCDS transcript identifiers
-        :param bool domains:Include names of overlapping protein domains
+        :param bool domains: Include names of overlapping protein domains
         :param bool hgvs: Include HGVS nomenclature based on Ensembl stable identifiers
         :param bool numbers: Include affected exon and intron positions within the transcript
         :param bool protein: Include Ensembl protein identifiers

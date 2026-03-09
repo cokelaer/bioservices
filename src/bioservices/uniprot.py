@@ -810,24 +810,23 @@ class UniProt:
         return res
 
     def get_df(self, entries, nChunk=100, organism=None, limit=10, columns=None, progress=False):
-        """Given a list of uniprot entries, this method returns a dataframe with all possible columns
-
+        """Given a list of uniprot entries, returns a dataframe with all possible columns
 
         :param entries: list of valid entry name. if list is too large (about
             >200), you need to split the list
-        :param chunk:
+        :param chunk: queries are processed by chunks
         :param limit: limit number of entries per identifier to 10. You can
             set it to None to keep all entries but this will be very slow
         :return: dataframe with indices being the uniprot id (e.g. DIG1_YEAST)
 
-        To get about 100 columns related to the accession P62988, type:
+        To get about 100 columns related to the accession P62988, type::
 
             df = u.get_df('P62988')
 
-        Note that you may preceed the accesion by the keyword **sec_acc) to access secondary
-        accessions numbers::
+        Note that you may preceed the accesion by the keyword **sec_acc) to access secondary accessions numbers::
 
             df = u.get_df('sec_acc:P62988')
+
 
         """
         if isinstance(entries, str):
