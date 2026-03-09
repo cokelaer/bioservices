@@ -58,6 +58,7 @@ extensions = [
     "matplotlib.sphinxext.plot_directive",
     "sphinx.ext.autosummary",
     "sphinx_gallery.gen_gallery",
+    "sphinx_copybutton",
 ]
 # note that the numpy directives is buggy. Example: class and init are not recognised as two entities for the autoclass_content=both here below
 
