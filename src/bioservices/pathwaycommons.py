@@ -37,7 +37,6 @@ Data is freely available, under the license terms of each contributing database.
 """
 from bioservices.services import REST, BioServicesError
 
-
 __all__ = ["PathwayCommons"]
 
 
@@ -614,7 +613,7 @@ class PathwayCommons:
 
         :param source: set of gene identifiers (HGNC symbol). Can be a list of
             identifiers or just one string(if only one identifier)
-        param target: A target set of gene identifiers.
+        :param target: A target set of gene identifiers.
         :param int limit: Graph traversal depth. Limit > 1 value can result
             in very large data or error.
         :param str pattern: Filter by binary relationship (SIF edge) type(s).
