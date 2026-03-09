@@ -205,6 +205,7 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.14.0    * Add EBI Proteins API service (new ``proteins`` module)
 1.13.0    * New ChEBI API (rest instead of SOAP)
 1.12.2    * add subcommand 'taxonomy' that uses eutils to search for taxon IDs
 1.12.1    * fix pyproject to use python>3.9 and pandas/numpy>2.2
