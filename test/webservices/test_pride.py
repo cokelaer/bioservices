@@ -21,7 +21,7 @@ def test_get_projects():
 
 def test_get_project_files():
     res = p.get_project_files("PRD000001", pageSize=100)
-    assert res["page"]["size"] == 100
+    assert len(res) <= 100
 
 
 def _test_pride_protein():

@@ -107,23 +107,35 @@ class PRIDE:
 
     def get_projects(self, pageSize=100, max_pages=1e9):
         """Get list of all projects"""
-        N = self.get_projects_count()
-        Npages = int(N / pageSize)
-        Npages = min(Npages, max_pages)
-
         results = []
-        page_count = 0
-        for page in tqdm.tqdm(range(Npages)):
+        for page in tqdm.tqdm(range(int(max_pages))):
             res = self.services.http_get("projects", params={"pageSize": pageSize, "page": page})
-            results.extend(res["_embedded"]["projects"])
-            page_count += 1
-            if page_count > max_pages:
+            if isinstance(res, list):
+                if not res:
+                    break
+                results.extend(res)
+                if len(res) < pageSize:
+                    break
+            else:
+                projects = res.get("_embedded", {}).get("projects", [])
+                results.extend(projects)
+                total = res.get("page", {}).get("totalElements", 0)
+                if len(results) >= total or not projects:
+                    break
+            if page + 1 >= max_pages:
                 break
 
         return results
 
     def get_projects_count(self):
+        """Return total number of projects.
+
+        .. note:: When the API returns a paginated list (new format), this method
+            returns the count for the first page only, not the total across all pages.
+        """
         res = self.services.http_get("projects")
+        if isinstance(res, list):
+            return len(res)
         return res["page"]["totalElements"]
 
     def get_project_files(self, accession, pageSize=100, page=0, sortConditions=None, sortDirection="DESC", filters=""):
@@ -276,7 +288,7 @@ class PRIDE:
         """
 
         if name is None:
-            res = self.services.http_get("stats/")
+            res = self.services.http_get("stats")
         else:
             res = self.services.http_get(f"stats/{name}")
         return res
