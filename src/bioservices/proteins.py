@@ -25,8 +25,8 @@
 
         The Proteins API provides access to key biological data from UniProt
         and data from Large Scale Studies (LSS) mapped to UniProt. This
-        includes variation data, proteomics data, antigen data, and genome
-        coordinates, as well as taxonomy information.
+        includes sequence features, mutagenesis data, gene-centric information,
+        and taxonomy information.
 
         -- From EBI Proteins API web site
 
@@ -44,8 +44,8 @@ class Proteins:
     """Interface to the `EBI Proteins API <https://www.ebi.ac.uk/proteins/api/doc/>`_
 
     This service provides access to protein sequences and functional
-    information, variation data, proteomics data, antigen data, genome
-    coordinates, and taxonomy.
+    information, sequence features, mutagenesis data, gene-centric information,
+    and taxonomy.
 
     ::
 
@@ -176,66 +176,6 @@ class Proteins:
         return res
 
     # ------------------------------------------------------------------
-    # Variation
-    # ------------------------------------------------------------------
-
-    def get_variation(self, accession):
-        """Retrieve natural variants for a protein
-
-        :param str accession: a valid UniProt accession (e.g. 'P12345')
-        :return: variation data as a dictionary
-
-        ::
-
-            >>> from bioservices import Proteins
-            >>> p = Proteins()
-            >>> res = p.get_variation("P12345")
-
-        """
-        res = self.services.http_get(f"variation/{accession}", frmt="json")
-        return res
-
-    # ------------------------------------------------------------------
-    # Proteomics
-    # ------------------------------------------------------------------
-
-    def get_proteomics(self, accession):
-        """Retrieve proteomics peptide evidence for a protein
-
-        :param str accession: a valid UniProt accession (e.g. 'P12345')
-        :return: proteomics data as a dictionary
-
-        ::
-
-            >>> from bioservices import Proteins
-            >>> p = Proteins()
-            >>> res = p.get_proteomics("P12345")
-
-        """
-        res = self.services.http_get(f"proteomics/{accession}", frmt="json")
-        return res
-
-    # ------------------------------------------------------------------
-    # Antigen
-    # ------------------------------------------------------------------
-
-    def get_antigen(self, accession):
-        """Retrieve antibody binding information for a protein
-
-        :param str accession: a valid UniProt accession (e.g. 'P12345')
-        :return: antigen data as a dictionary
-
-        ::
-
-            >>> from bioservices import Proteins
-            >>> p = Proteins()
-            >>> res = p.get_antigen("P12345")
-
-        """
-        res = self.services.http_get(f"antigen/{accession}", frmt="json")
-        return res
-
-    # ------------------------------------------------------------------
     # Mutagenesis
     # ------------------------------------------------------------------
 
@@ -253,26 +193,6 @@ class Proteins:
 
         """
         res = self.services.http_get(f"mutagenesis/{accession}", frmt="json")
-        return res
-
-    # ------------------------------------------------------------------
-    # Genome coordinates
-    # ------------------------------------------------------------------
-
-    def get_coordinates(self, accession):
-        """Retrieve genome coordinates for a protein
-
-        :param str accession: a valid UniProt accession (e.g. 'P12345')
-        :return: coordinate data as a dictionary
-
-        ::
-
-            >>> from bioservices import Proteins
-            >>> p = Proteins()
-            >>> res = p.get_coordinates("P12345")
-
-        """
-        res = self.services.http_get(f"coordinates/{accession}", frmt="json")
         return res
 
     # ------------------------------------------------------------------
@@ -356,65 +276,6 @@ class Proteins:
         """
         res = self.services.http_get(f"taxonomy/lineage/{tax_id}", frmt="json")
         return res
-
-    def get_taxonomy_relationship(self, id1, id2):
-        """Retrieve the taxonomic relationship (path) between two taxonomy nodes
-
-        :param int id1: NCBI taxonomy ID of the first node
-        :param int id2: NCBI taxonomy ID of the second node
-        :return: list of taxonomy records connecting the two nodes
-
-        ::
-
-            >>> from bioservices import Proteins
-            >>> p = Proteins()
-            >>> res = p.get_taxonomy_relationship(9606, 10090)
-
-        """
-        params = {"id": f"{id1},{id2}"}
-        res = self.services.http_get("taxonomy/relationship", frmt="json", params=params)
-        return res
-
-    def get_taxonomy_path(self, tax_id, direction="TOP", pageNumber=1, pageSize=200):
-        """Retrieve the path through the taxonomy tree from/to a node
-
-        :param int tax_id: NCBI taxonomy ID
-        :param str direction: traversal direction: 'TOP' (towards root) or
-            'BOTTOM' (towards leaves). Default is 'TOP'.
-        :param int pageNumber: page number for paginated results (default 1)
-        :param int pageSize: number of results per page (default 200, max 200)
-        :return: taxonomy path information
-
-        ::
-
-            >>> from bioservices import Proteins
-            >>> p = Proteins()
-            >>> res = p.get_taxonomy_path(9606)
-
-        """
-        params = {"direction": direction, "pageNumber": pageNumber, "pageSize": pageSize}
-        res = self.services.http_get(f"taxonomy/path/{tax_id}", frmt="json", params=params)
-        return res
-
-    def get_taxonomy_children(self, tax_id, pageNumber=1, pageSize=200):
-        """Retrieve the direct children of a taxonomy node
-
-        This is a convenience wrapper around :meth:`get_taxonomy_path` with
-        ``direction='BOTTOM'``.
-
-        :param int tax_id: NCBI taxonomy ID
-        :param int pageNumber: page number for paginated results (default 1)
-        :param int pageSize: number of results per page (default 200, max 200)
-        :return: taxonomy path data with children of the specified node
-
-        ::
-
-            >>> from bioservices import Proteins
-            >>> p = Proteins()
-            >>> res = p.get_taxonomy_children(9606)
-
-        """
-        return self.get_taxonomy_path(tax_id, direction="BOTTOM", pageNumber=pageNumber, pageSize=pageSize)
 
     def get_taxonomy_siblings(self, tax_id, pageNumber=1, pageSize=200):
         """Retrieve the siblings (nodes at the same level) of a taxonomy node

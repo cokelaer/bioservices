@@ -1,5 +1,3 @@
-import pytest
-
 from bioservices import Proteins
 
 p = Proteins()
@@ -24,26 +22,6 @@ def test_get_features():
     assert "accession" in res
 
 
-def test_get_variation():
-    res = p.get_variation("P12345")
-    assert isinstance(res, dict)
-
-
-def test_get_proteomics():
-    res = p.get_proteomics("P12345")
-    assert isinstance(res, (dict, list))
-
-
-def test_get_antigen():
-    res = p.get_antigen("P12345")
-    assert isinstance(res, (dict, list))
-
-
-def test_get_coordinates():
-    res = p.get_coordinates("P12345")
-    assert isinstance(res, (dict, list))
-
-
 def test_get_taxonomy():
     res = p.get_taxonomy(9606)
     assert isinstance(res, dict)
@@ -57,14 +35,4 @@ def test_get_taxonomy_by_name():
 
 def test_get_taxonomy_lineage():
     res = p.get_taxonomy_lineage(9606)
-    assert isinstance(res, (dict, list))
-
-
-def test_get_taxonomy_relationship():
-    res = p.get_taxonomy_relationship(9606, 10090)
-    assert isinstance(res, (dict, list))
-
-
-def test_get_taxonomy_path():
-    res = p.get_taxonomy_path(9606)
     assert isinstance(res, (dict, list))
