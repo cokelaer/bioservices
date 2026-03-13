@@ -173,6 +173,14 @@ Intact (complex)
     :undoc-members:
     :synopsis:
 
+InterPro
+========
+
+.. automodule:: bioservices.interpro
+    :members:
+    :undoc-members:
+    :synopsis:
+
 
 MUSCLE
 ==============

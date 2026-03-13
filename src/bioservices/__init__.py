@@ -56,6 +56,7 @@ from . import (
     eva,
     hgnc,
     intact,
+    interpro,
     kegg,
     muscle,
     ncbiblast,
@@ -92,6 +93,7 @@ from .eutils import *
 from .eva import *
 from .hgnc import *
 from .intact import *
+from .interpro import *
 from .kegg import *
 from .muscle import *
 from .ncbiblast import *
