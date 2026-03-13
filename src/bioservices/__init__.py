@@ -58,9 +58,11 @@ from . import (
     intact,
     kegg,
     muscle,
+    mygeneinfo,
     ncbiblast,
     omicsdi,
     omnipath,
+    panther,
     pathwaycommons,
     pdb,
     pdbe,
@@ -71,6 +73,7 @@ from . import (
     quickgo,
     reactome,
     rhea,
+    stringdb,
     unichem,
     uniprot,
     wikipathway,
@@ -94,9 +97,11 @@ from .hgnc import *
 from .intact import *
 from .kegg import *
 from .muscle import *
+from .mygeneinfo import *
 from .ncbiblast import *
 from .omicsdi import OmicsDI
 from .omnipath import *
+from .panther import *
 from .pathwaycommons import *
 from .pdb import *
 from .pdbe import *
@@ -109,6 +114,7 @@ from .reactome import *
 from .rhea import *
 from .services import *
 from .settings import *
+from .stringdb import *
 from .unichem import *
 from .uniprot import *
 from .wikipathway import *
