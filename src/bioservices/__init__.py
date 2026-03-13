@@ -76,7 +76,6 @@ from . import (
     reactome,
     rhea,
     string,
-    stringdb,
     unichem,
     uniprot,
     wikipathway,
@@ -120,7 +119,6 @@ from .rhea import *
 from .services import *
 from .settings import *
 from .string import *
-from .stringdb import *
 from .unichem import *
 from .uniprot import *
 from .wikipathway import *
