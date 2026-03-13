@@ -54,6 +54,7 @@ from . import (
     ensembl,
     eutils,
     eva,
+    geo,
     hgnc,
     intact,
     kegg,
@@ -71,6 +72,7 @@ from . import (
     quickgo,
     reactome,
     rhea,
+    string,
     unichem,
     uniprot,
     wikipathway,
@@ -90,6 +92,7 @@ from .ena import ENA
 from .ensembl import *
 from .eutils import *
 from .eva import *
+from .geo import *
 from .hgnc import *
 from .intact import *
 from .kegg import *
@@ -109,6 +112,7 @@ from .reactome import *
 from .rhea import *
 from .services import *
 from .settings import *
+from .string import *
 from .unichem import *
 from .uniprot import *
 from .wikipathway import *
