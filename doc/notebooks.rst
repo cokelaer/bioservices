@@ -88,3 +88,31 @@ Here is a ipython notebook dedicated to Ensembl, which can be
 downloaded :download:`notebooks/Ensembl.ipynb` or view its results on 
 `ensembl nbviewer <https://nbviewer.ipython.org/url/github.com/cokelaer/bioservices/blob/master/doc/notebooks/Ensembl.ipynb>`_
 
+InterPro
+========
+
+Here is a ipython notebook dedicated to InterPro, which can be 
+downloaded :download:`notebooks/InterPro.ipynb` or view its results on 
+`interpro nbviewer <https://nbviewer.ipython.org/url/github.com/cokelaer/bioservices/blob/master/doc/notebooks/InterPro.ipynb>`_
+
+ENA
+===
+
+Here is a ipython notebook dedicated to ENA (European Nucleotide Archive), which can be
+downloaded :download:`notebooks/ENA.ipynb` or view its results on
+`ENA nbviewer <https://nbviewer.ipython.org/url/github.com/cokelaer/bioservices/blob/master/doc/notebooks/ENA.ipynb>`_
+
+EUtils
+======
+
+Here is a ipython notebook dedicated to EUtils, which can be
+downloaded :download:`notebooks/EUtils.ipynb` or view its results on
+`EUtils nbviewer <https://nbviewer.ipython.org/url/github.com/cokelaer/bioservices/blob/master/doc/notebooks/EUtils.ipynb>`_
+
+Overview
+========
+
+Here is an introductory ipython notebook providing a BioServices overview, which can be
+downloaded :download:`notebooks/Overview.ipynb` or view its results on
+`overview nbviewer <https://nbviewer.ipython.org/url/github.com/cokelaer/bioservices/blob/master/doc/notebooks/Overview.ipynb>`_
+
