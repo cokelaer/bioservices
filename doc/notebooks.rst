@@ -88,3 +88,10 @@ Here is a ipython notebook dedicated to Ensembl, which can be
 downloaded :download:`notebooks/Ensembl.ipynb` or view its results on 
 `ensembl nbviewer <https://nbviewer.ipython.org/url/github.com/cokelaer/bioservices/blob/master/doc/notebooks/Ensembl.ipynb>`_
 
+InterPro
+========
+
+Here is a ipython notebook dedicated to InterPro, which can be 
+downloaded :download:`notebooks/InterPro.ipynb` or view its results on 
+`interpro nbviewer <https://nbviewer.ipython.org/url/github.com/cokelaer/bioservices/blob/master/doc/notebooks/InterPro.ipynb>`_
+
