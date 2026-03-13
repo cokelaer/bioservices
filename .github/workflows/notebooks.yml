@@ -1,0 +1,70 @@
+name: Notebook Testing
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - doc/notebooks/**
+      - src/bioservices/**
+  pull_request:
+    branches-ignore: []
+    paths:
+      - doc/notebooks/**
+
+  schedule:
+    - cron: '0 0 1 * *'
+
+jobs:
+  test-notebooks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      max-parallel: 1
+      matrix:
+        python: ['3.11']
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxml2-dev libxslt1-dev
+
+    - name: Install the package and notebook testing dependencies
+      run: |
+        pip install .[testing]
+        pip install jupyter ipykernel
+        python -m ipykernel install --user --name python3
+
+    - name: Test notebooks with nbmake
+      run: |
+        pytest --nbmake --nbmake-timeout=120 doc/notebooks/Overview.ipynb \
+          doc/notebooks/UniProt.ipynb \
+          doc/notebooks/KEGG.ipynb \
+          doc/notebooks/ChEMBL.ipynb \
+          doc/notebooks/ENA.ipynb \
+          doc/notebooks/BioModels.ipynb \
+          doc/notebooks/InterPro.ipynb \
+          doc/notebooks/WikiPathway.ipynb \
+          doc/notebooks/MUSCLE.ipynb \
+          doc/notebooks/NCBIBlast.ipynb \
+          doc/notebooks/Gene_Mapping.ipynb
+      continue-on-error: true
+
+    - name: Upload notebook test artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: notebook-results
+        path: doc/notebooks/*.ipynb
+        retention-days: 7

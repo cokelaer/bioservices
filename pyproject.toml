@@ -61,6 +61,7 @@ testing = [
     "pytest-timeout>=2.2.0",
     "coveralls>=3.3.1",
     "flaky>=3.7.0",
+    "nbmake>=1.5",
 ]
 
 [project.scripts]
@@ -86,7 +87,11 @@ coveralls = "^3.3.1"
 flaky = "^3.7.0"
 
 
-[tool.poetry.group.doc.dependencies]
+[tool.pytest.ini_options]
+markers = [
+    "notebook: marks tests as notebook execution tests (deselect with '-m \"not notebook\"')",
+]
+
 sphinx = ">3"
 sphinx-rtd-theme = "^2.0.0"
 sphinx-gallery = "^0.15.0"
