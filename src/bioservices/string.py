@@ -4,14 +4,15 @@
 #  Copyright (c) 2013-2014 - EBI-EMBL
 #
 #  File author(s):
+#      Thomas Cokelaer <cokelaer@ebi.ac.uk>
 #      https://github.com/cokelaer/bioservices
 #
 #  Distributed under the GPLv3 License.
 #  See accompanying file LICENSE.txt or copy at
 #      http://www.gnu.org/licenses/gpl-3.0.html
 #
-#  source: http://github.com/cokelaer/bioservices
-#  documentation: http://packages.python.org/bioservices
+#  website: https://github.com/cokelaer/bioservices
+#  documentation: http://bioservices.readthedocs.io
 #
 ##############################################################################
 """Interface to the STRING protein interaction database web service.
@@ -25,18 +26,11 @@
 
         STRING is a database of known and predicted protein-protein interactions.
         The interactions include direct (physical) and indirect (functional)
-        associations; they are derived from four sources:
+        associations; they stem from computational prediction, from knowledge
+        transfer between organisms, and from interactions aggregated from other
+        (primary) databases. STRING covers proteins from thousands of organisms.
 
-        - Genomic Context Predictions
-        - High-throughput Lab Experiments
-        - (Conserved) Co-Expression
-        - Previous Knowledge
-
-        STRING quantitatively integrates interaction data from these sources for a
-        large number of organisms, and transfers information between these organisms
-        where applicable.
-
-        -- From STRING home page (https://string-db.org/cgi/about)
+        -- string-db.org home page
 
     The Bioconductor R package ``STRINGdb`` provides a similar interface to the
     STRING database. This module provides an equivalent Python interface.
@@ -57,131 +51,170 @@ __all__ = ["STRING"]
 
 
 class STRING:
-    """Interface to the `STRING <https://string-db.org>`_ protein interaction database.
+    """Interface to the `STRING <https://string-db.org>`_ database.
 
-    STRING is a database of known and predicted protein-protein interactions
-    covering over 14,000 organisms. This class provides access to the STRING
-    REST API for retrieving protein interaction networks, enrichment analyses,
-    and functional annotations.
+    STRING is a database of known and predicted protein-protein interactions.
+    It covers both direct (physical) and indirect (functional) associations
+    derived from genomic context, high-throughput experiments, co-expression,
+    and the literature.
 
-    The Bioconductor R package ``STRINGdb`` provides an equivalent interface to
-    the same database.
+    ::
 
-    Example usage::
-
-        from bioservices import STRING
-        s = STRING()
-
-        # Get interaction network for human TP53
-        res = s.get_network("TP53", species=9606)
-
-        # Get functional enrichment for a set of proteins
-        res = s.get_enrichment(["TP53", "BRCA1", "BRCA2"], species=9606)
-
-        # Get interaction partners with high confidence score
-        res = s.get_interaction_partners("TP53", species=9606, required_score=700)
+        >>> from bioservices import STRING
+        >>> s = STRING()
+        >>> interactions = s.get_interactions("ZAP70", species=9606)
+        >>> partners = s.get_interaction_partners("ZAP70", species=9606)
 
     """
 
     _url = "https://string-db.org/api"
 
-    def __init__(self, verbose=False, cache=False):
+    def __init__(self, verbose=True, cache=False):
         """**Constructor**
 
-        :param bool verbose: print informative messages (default False)
-        :param bool cache: use caching (default False)
+        :param bool verbose: set to False to prevent informative messages
+        :param bool cache: set to True to enable caching of requests
         """
-        self.services = REST(name="STRING", url=STRING._url, verbose=verbose, cache=cache)
-        self.version = None
+        self.services = REST(
+            name="STRING",
+            url=STRING._url,
+            verbose=verbose,
+            cache=cache,
+            url_defined_later=True,
+        )
 
     def _identifiers_to_str(self, identifiers):
-        """Convert a list or string of identifiers to newline-separated string.
+        """Convert a list or string of identifiers to a ``%0d``-separated string.
 
-        The STRING API accepts newline-separated identifiers in POST request bodies.
+        The STRING API accepts ``%0d``-separated (URL-encoded newline) identifiers
+        in POST request bodies.
         """
         if isinstance(identifiers, (list, tuple)):
-            return "\n".join(identifiers)
+            return "%0d".join(identifiers)
         return str(identifiers)
 
     def get_version(self):
-        """Get the current version of the STRING API.
+        """Return the current STRING API version information.
 
-        :return: dict with version information
-        :rtype: dict
+        :return: dict with version details.
 
         ::
 
             >>> from bioservices import STRING
             >>> s = STRING()
-            >>> version = s.get_version()
+            >>> ver = s.get_version()
+            >>> "string_version" in ver
+            True
 
         """
         res = self.services.http_get("json/version", frmt="json")
-        if isinstance(res, list) and len(res) > 0:
-            self.version = res[0].get("string_version")
+        if isinstance(res, list) and len(res) == 1:
+            return res[0]
         return res
 
-    def get_string_ids(self, identifiers, species=9606, limit=1, echo_query=True, caller_identity=None):
-        """Map protein identifiers to STRING database identifiers.
+    def get_string_ids(self, identifiers, species=None, limit=1, echo_query=True, caller_identity=None):
+        """Resolve identifiers to STRING identifiers.
 
-        :param identifiers: protein name(s) to map. Can be a string or list
-            of strings.
-        :param int species: NCBI taxon ID (default: 9606 for human)
-        :param int limit: maximum number of STRING identifiers per query protein
-            (default: 1)
-        :param bool echo_query: include the query identifier in the output
-            (default: True)
-        :param str caller_identity: optional string to identify the caller
-            application (e.g. your website URL or application name)
-        :return: list of dicts with STRING identifiers for each input protein
-        :rtype: list
+        Maps gene/protein names or other identifiers to their STRING IDs.
+
+        :param identifiers: identifier(s) to resolve. Multiple identifiers
+            should be separated by ``%0d`` or provided as a list.
+        :param int species: NCBI taxonomy ID. For example, 9606 for *Homo sapiens*.
+            If ``None``, STRING will search across all species.
+        :param int limit: maximum number of results per input identifier.
+            Default is 1 (best match).
+        :param bool echo_query: if True, include the query identifier in the response.
+        :param str caller_identity: optional application name for tracking.
+
+        :return: list of dicts with STRING identifier mappings.
 
         ::
 
             >>> from bioservices import STRING
             >>> s = STRING()
-            >>> res = s.get_string_ids("TP53", species=9606)
+            >>> res = s.get_string_ids("ZAP70", species=9606)
+            >>> res[0]["stringId"]
+            '9606.ENSP00000379990'
+
+        """
+        params = {"identifiers": self._identifiers_to_str(identifiers), "echo_query": 1 if echo_query else 0, "limit": limit}
+        if species is not None:
+            params["species"] = species
+        if caller_identity:
+            params["caller_identity"] = caller_identity
+
+        res = self.services.http_post("json/get_string_ids", data=params, frmt="json")
+        return res
+
+    def get_interactions(self, identifiers, species=None, required_score=None, network_type="functional",
+                         add_nodes=0, show_query_node_labels=0, caller_identity=None):
+        """Retrieve protein-protein interactions for the given identifiers.
+
+        Returns the STRING interaction network for a set of proteins. Each
+        interaction record includes scores for different evidence channels
+        (neighbourhood, co-occurrence, co-expression, experimental, database,
+        text-mining) as well as a combined interaction score.
+
+        :param identifiers: gene/protein name(s). Use ``%0d`` as separator for
+            multiple identifiers, or provide a list.
+        :param int species: NCBI taxonomy ID (e.g. 9606 for human). Required
+            when identifiers are gene symbols.
+        :param int required_score: minimum combined interaction score (0–1000).
+            Interactions below this threshold are excluded.
+        :param str network_type: either ``"functional"`` (default) or
+            ``"physical"``.
+        :param int add_nodes: number of additional white-list nodes to add to
+            the network.
+        :param int show_query_node_labels: set to 1 to display labels for input
+            nodes even when they are not directly connected.
+        :param str caller_identity: optional application name for tracking.
+
+        :return: list of dicts, each representing one interaction with scores.
+
+        ::
+
+            >>> from bioservices import STRING
+            >>> s = STRING()
+            >>> res = s.get_interactions("ZAP70", species=9606)
+            >>> len(res) > 0
+            True
 
         """
         params = {
             "identifiers": self._identifiers_to_str(identifiers),
-            "species": species,
-            "limit": limit,
-            "echo_query": 1 if echo_query else 0,
-            "format": "json",
+            "network_type": network_type,
+            "add_nodes": add_nodes,
+            "show_query_node_labels": show_query_node_labels,
         }
+        if species is not None:
+            params["species"] = species
+        if required_score is not None:
+            params["required_score"] = required_score
         if caller_identity:
             params["caller_identity"] = caller_identity
-        res = self.services.http_post("json/get_string_ids", frmt="json", data=params)
+
+        res = self.services.http_post("json/network", data=params, frmt="json")
         return res
 
-    def get_network(
-        self,
-        identifiers,
-        species=9606,
-        required_score=None,
-        add_nodes=0,
-        network_type="functional",
-        show_query_node_labels=0,
-        caller_identity=None,
-    ):
-        """Get protein interaction network data for a set of proteins.
+    def get_network(self, identifiers, species=None, required_score=None, network_type="functional",
+                    add_nodes=0, show_query_node_labels=0, caller_identity=None):
+        """Retrieve protein-protein interactions for the given identifiers.
 
-        :param identifiers: protein name(s). Can be a string or list of strings.
-        :param int species: NCBI taxon ID (default: 9606 for human)
-        :param int required_score: minimum required interaction score (0-1000).
-            Higher values yield higher-confidence interactions. If None, uses
-            STRING default.
-        :param int add_nodes: number of additional nodes to add to the network
-            (default: 0)
-        :param str network_type: type of network to retrieve. Either
-            ``"functional"`` (default) or ``"physical"``.
-        :param int show_query_node_labels: whether to show labels for query
-            nodes (0 or 1, default: 0)
-        :param str caller_identity: optional identifier for the caller
-        :return: list of interaction records, each containing the interacting
-            proteins and their interaction scores
-        :rtype: list
+        This is an alias for :meth:`get_interactions`.
+
+        :param identifiers: gene/protein name(s). Use ``%0d`` as separator for
+            multiple identifiers, or provide a list.
+        :param int species: NCBI taxonomy ID (e.g. 9606 for human).
+        :param int required_score: minimum combined interaction score (0–1000).
+        :param str network_type: either ``"functional"`` (default) or
+            ``"physical"``.
+        :param int add_nodes: number of additional white-list nodes to add to
+            the network.
+        :param int show_query_node_labels: set to 1 to display labels for input
+            nodes.
+        :param str caller_identity: optional application name for tracking.
+
+        :return: list of dicts, each representing one interaction with scores.
 
         ::
 
@@ -190,133 +223,149 @@ class STRING:
             >>> res = s.get_network(["TP53", "BRCA1"], species=9606)
 
         """
-        params = {
-            "identifiers": self._identifiers_to_str(identifiers),
-            "species": species,
-            "add_nodes": add_nodes,
-            "network_type": network_type,
-            "show_query_node_labels": show_query_node_labels,
-        }
+        return self.get_interactions(
+            identifiers,
+            species=species,
+            required_score=required_score,
+            network_type=network_type,
+            add_nodes=add_nodes,
+            show_query_node_labels=show_query_node_labels,
+            caller_identity=caller_identity,
+        )
+
+    def get_interaction_partners(self, identifiers, species=None, required_score=None, limit=None,
+                                  network_type="functional", caller_identity=None):
+        """Retrieve interaction partners for the given proteins.
+
+        Returns proteins that interact with the query proteins. Compared to
+        :meth:`get_interactions`, this method returns partners even if they are
+        not in the original query set.
+
+        :param identifiers: gene/protein name(s). Separate multiple identifiers
+            with ``%0d`` or provide a list.
+        :param int species: NCBI taxonomy ID (e.g. 9606 for human).
+        :param int required_score: minimum combined interaction score (0–1000).
+        :param int limit: maximum number of interaction partners to return per
+            input protein.
+        :param str network_type: either ``"functional"`` (default) or
+            ``"physical"``.
+        :param str caller_identity: optional application name for tracking.
+
+        :return: list of dicts, each representing one interaction.
+
+        ::
+
+            >>> from bioservices import STRING
+            >>> s = STRING()
+            >>> partners = s.get_interaction_partners("ZAP70", species=9606, limit=5)
+            >>> len(partners) > 0
+            True
+
+        """
+        params = {"identifiers": self._identifiers_to_str(identifiers), "network_type": network_type}
+        if species is not None:
+            params["species"] = species
+        if required_score is not None:
+            params["required_score"] = required_score
+        if limit is not None:
+            params["limit"] = limit
+        if caller_identity:
+            params["caller_identity"] = caller_identity
+
+        res = self.services.http_post("json/interaction_partners", data=params, frmt="json")
+        return res
+
+    def get_homology(self, identifiers, species=None, species_b=None, required_score=None,
+                      caller_identity=None):
+        """Retrieve homology data for a set of proteins.
+
+        Returns homologous protein pairs between the query species and
+        ``species_b`` (or within the query species if ``species_b`` is not
+        given).
+
+        :param identifiers: gene/protein name(s). Separate multiple identifiers
+            with ``%0d`` or provide a list.
+        :param int species: NCBI taxonomy ID of the query species.
+        :param int species_b: NCBI taxonomy ID of the second species. If
+            ``None``, homologs are retrieved within ``species``.
+        :param int required_score: minimum combined interaction score (0–1000).
+        :param str caller_identity: optional application name for tracking.
+
+        :return: list of dicts describing homology relationships.
+
+        ::
+
+            >>> from bioservices import STRING
+            >>> s = STRING()
+            >>> res = s.get_homology("ZAP70", species=9606, species_b=10090)
+
+        """
+        params = {"identifiers": self._identifiers_to_str(identifiers)}
+        if species is not None:
+            params["species"] = species
+        if species_b is not None:
+            params["species_b"] = species_b
         if required_score is not None:
             params["required_score"] = required_score
         if caller_identity:
             params["caller_identity"] = caller_identity
-        res = self.services.http_post("json/network", frmt="json", data=params)
+
+        res = self.services.http_post("json/homology", data=params, frmt="json")
         return res
 
-    def get_interaction_partners(
-        self,
-        identifiers,
-        species=9606,
-        required_score=None,
-        limit=10,
-        network_type="functional",
-        caller_identity=None,
-    ):
-        """Get interaction partners for a set of proteins.
+    def get_enrichment(self, identifiers, species=None, background_string_identifiers=None,
+                        caller_identity=None):
+        """Perform functional enrichment analysis on a set of proteins.
 
-        :param identifiers: protein name(s). Can be a string or list of strings.
-        :param int species: NCBI taxon ID (default: 9606 for human)
-        :param int required_score: minimum required interaction score (0-1000).
-            If None, uses STRING default.
-        :param int limit: maximum number of interaction partners per query
-            protein (default: 10)
-        :param str network_type: type of network. Either ``"functional"``
-            (default) or ``"physical"``.
-        :param str caller_identity: optional identifier for the caller
-        :return: list of interaction records with partner proteins and scores
-        :rtype: list
+        Tests whether the input proteins are significantly enriched for
+        Gene Ontology (GO) terms, KEGG pathways, Pfam domains, InterPro
+        signatures, and other annotation categories.
+
+        :param identifiers: gene/protein name(s). Separate multiple identifiers
+            with ``%0d`` or provide a list.
+        :param int species: NCBI taxonomy ID (e.g. 9606 for human). Required
+            when identifiers are gene symbols.
+        :param background_string_identifiers: optional set of proteins to use
+            as the statistical background. Defaults to the entire proteome.
+        :param str caller_identity: optional application name for tracking.
+
+        :return: list of dicts, each representing an enriched annotation term
+            with fields such as ``category``, ``term``, ``description``,
+            ``number_of_genes``, ``p_value``, and ``fdr``.
 
         ::
 
             >>> from bioservices import STRING
             >>> s = STRING()
-            >>> res = s.get_interaction_partners("TP53", species=9606, limit=5)
+            >>> res = s.get_enrichment("ZAP70,LCK,CD3E,CD3D", species=9606)
+            >>> len(res) > 0
+            True
 
         """
-        params = {
-            "identifiers": self._identifiers_to_str(identifiers),
-            "species": species,
-            "limit": limit,
-            "network_type": network_type,
-        }
-        if required_score is not None:
-            params["required_score"] = required_score
+        params = {"identifiers": self._identifiers_to_str(identifiers)}
+        if species is not None:
+            params["species"] = species
+        if background_string_identifiers is not None:
+            params["background_string_identifiers"] = self._identifiers_to_str(background_string_identifiers)
         if caller_identity:
             params["caller_identity"] = caller_identity
-        res = self.services.http_post("json/interaction_partners", frmt="json", data=params)
+
+        res = self.services.http_post("json/enrichment", data=params, frmt="json")
         return res
 
-    def get_homology(self, identifiers, species=9606, caller_identity=None):
-        """Get homology information for a set of proteins.
-
-        :param identifiers: protein name(s). Can be a string or list of strings.
-        :param int species: NCBI taxon ID (default: 9606 for human)
-        :param str caller_identity: optional identifier for the caller
-        :return: list of homology records
-        :rtype: list
-
-        ::
-
-            >>> from bioservices import STRING
-            >>> s = STRING()
-            >>> res = s.get_homology("TP53", species=9606)
-
-        """
-        params = {
-            "identifiers": self._identifiers_to_str(identifiers),
-            "species": species,
-        }
-        if caller_identity:
-            params["caller_identity"] = caller_identity
-        res = self.services.http_post("json/homology", frmt="json", data=params)
-        return res
-
-    def get_enrichment(self, identifiers, species=9606, background_identifiers=None, caller_identity=None):
-        """Get functional enrichment analysis for a set of proteins.
-
-        Performs over-representation analysis against Gene Ontology (GO),
-        KEGG pathways, UniProt keywords, and other annotation databases.
-
-        :param identifiers: protein name(s). Can be a string or list of strings.
-        :param int species: NCBI taxon ID (default: 9606 for human)
-        :param background_identifiers: optional background gene set for
-            enrichment calculation. Can be a string or list of strings.
-        :param str caller_identity: optional identifier for the caller
-        :return: list of enrichment records with category, description, p-value,
-            and FDR-corrected p-value
-        :rtype: list
-
-        ::
-
-            >>> from bioservices import STRING
-            >>> s = STRING()
-            >>> proteins = ["TP53", "BRCA1", "BRCA2", "ATM", "CHEK2"]
-            >>> res = s.get_enrichment(proteins, species=9606)
-
-        """
-        params = {
-            "identifiers": self._identifiers_to_str(identifiers),
-            "species": species,
-        }
-        if background_identifiers is not None:
-            params["background_string_identifiers"] = self._identifiers_to_str(background_identifiers)
-        if caller_identity:
-            params["caller_identity"] = caller_identity
-        res = self.services.http_post("json/enrichment", frmt="json", data=params)
-        return res
-
-    def get_functional_annotation(self, identifiers, species=9606, allow_pubmed=0, caller_identity=None):
+    def get_functional_annotation(self, identifiers, species=None, allow_pubmed=0, caller_identity=None):
         """Get functional annotations for a set of proteins.
 
         Returns GO terms, KEGG pathway membership, and other annotations
         for the queried proteins.
 
-        :param identifiers: protein name(s). Can be a string or list of strings.
-        :param int species: NCBI taxon ID (default: 9606 for human)
-        :param int allow_pubmed: include PubMed references (0 or 1, default: 0)
-        :param str caller_identity: optional identifier for the caller
-        :return: list of functional annotation records
+        :param identifiers: gene/protein name(s). Separate multiple identifiers
+            with ``%0d`` or provide a list.
+        :param int species: NCBI taxonomy ID (e.g. 9606 for human).
+        :param int allow_pubmed: include PubMed references (0 or 1, default: 0).
+        :param str caller_identity: optional application name for tracking.
+
+        :return: list of functional annotation records.
         :rtype: list
 
         ::
@@ -328,51 +377,57 @@ class STRING:
         """
         params = {
             "identifiers": self._identifiers_to_str(identifiers),
-            "species": species,
             "allow_pubmed": allow_pubmed,
         }
+        if species is not None:
+            params["species"] = species
         if caller_identity:
             params["caller_identity"] = caller_identity
-        res = self.services.http_post("json/functional_annotation", frmt="json", data=params)
+
+        res = self.services.http_post("json/functional_annotation", data=params, frmt="json")
         return res
 
-    def get_ppi_enrichment(
-        self, identifiers, species=9606, required_score=None, background_identifiers=None, caller_identity=None
-    ):
-        """Get protein-protein interaction (PPI) enrichment statistics.
+    def get_ppi_enrichment(self, identifiers, species=None, required_score=None,
+                            background_string_identifiers=None, caller_identity=None):
+        """Test whether the input proteins are enriched in interactions.
 
-        Tests whether the number of interactions among the queried proteins is
-        statistically higher than expected for a random set of proteins of the
-        same size.
+        Returns a single record indicating the observed number of interactions,
+        expected number, *p*-value, and the average interaction score for the
+        input protein set.
 
-        :param identifiers: protein name(s). Can be a string or list of strings.
-        :param int species: NCBI taxon ID (default: 9606 for human)
-        :param int required_score: minimum required interaction score (0-1000).
+        :param identifiers: gene/protein name(s). Separate multiple identifiers
+            with ``%0d`` or provide a list.
+        :param int species: NCBI taxonomy ID (e.g. 9606 for human).
+        :param int required_score: minimum combined interaction score (0–1000).
             If None, uses STRING default.
-        :param background_identifiers: optional background gene set for
-            enrichment calculation. Can be a string or list of strings.
-        :param str caller_identity: optional identifier for the caller
-        :return: dict with PPI enrichment statistics (observed interactions,
-            expected interactions, p-value, etc.)
-        :rtype: dict or list
+        :param background_string_identifiers: optional background gene set for
+            enrichment calculation.
+        :param str caller_identity: optional application name for tracking.
+
+        :return: dict with keys ``number_of_nodes``, ``number_of_edges``,
+            ``average_node_degree``, ``local_clustering_coefficient``,
+            ``expected_number_of_edges``, and ``p_value``.
 
         ::
 
             >>> from bioservices import STRING
             >>> s = STRING()
-            >>> proteins = ["TP53", "BRCA1", "BRCA2", "ATM", "CHEK2"]
-            >>> res = s.get_ppi_enrichment(proteins, species=9606)
+            >>> res = s.get_ppi_enrichment("ZAP70,LCK,CD3E", species=9606)
+            >>> "p_value" in res
+            True
 
         """
-        params = {
-            "identifiers": self._identifiers_to_str(identifiers),
-            "species": species,
-        }
+        params = {"identifiers": self._identifiers_to_str(identifiers)}
+        if species is not None:
+            params["species"] = species
         if required_score is not None:
             params["required_score"] = required_score
-        if background_identifiers is not None:
-            params["background_string_identifiers"] = self._identifiers_to_str(background_identifiers)
+        if background_string_identifiers is not None:
+            params["background_string_identifiers"] = self._identifiers_to_str(background_string_identifiers)
         if caller_identity:
             params["caller_identity"] = caller_identity
-        res = self.services.http_post("json/ppi_enrichment", frmt="json", data=params)
+
+        res = self.services.http_post("json/ppi_enrichment", data=params, frmt="json")
+        if isinstance(res, list) and len(res) == 1:
+            return res[0]
         return res
