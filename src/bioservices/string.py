@@ -86,11 +86,12 @@ class STRING:
     def _identifiers_to_str(self, identifiers):
         """Convert a list or string of identifiers to a ``%0d``-separated string.
 
-        The STRING API accepts ``%0d``-separated (URL-encoded newline) identifiers
-        in POST request bodies.
+        The STRING API accepts newline-separated identifiers in POST request
+        bodies. Using ``\\n`` ensures ``requests`` correctly URL-encodes the
+        separator to ``%0A`` when submitting form data.
         """
         if isinstance(identifiers, (list, tuple)):
-            return "%0d".join(identifiers)
+            return "\n".join(identifiers)
         return str(identifiers)
 
     def get_version(self):

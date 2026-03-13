@@ -16,7 +16,7 @@ def test_identifiers_to_str_list():
     result = s._identifiers_to_str(["ZAP70", "LCK"])
     assert "ZAP70" in result
     assert "LCK" in result
-    assert "%0d" in result
+    assert "\n" in result
 
 
 def test_identifiers_to_str_string():
@@ -38,12 +38,12 @@ def test_get_string_ids_post():
 
 
 def test_get_string_ids_list_input():
-    """Verify that a list of identifiers is joined with %0d separator."""
+    """Verify that a list of identifiers is joined with newline separator."""
     mock_response = []
     with patch.object(s.services, "http_post", return_value=mock_response) as mock_post:
         s.get_string_ids(["ZAP70", "LCK"], species=9606)
         _, kwargs = mock_post.call_args
-        assert "%0d" in kwargs["data"]["identifiers"]
+        assert "\n" in kwargs["data"]["identifiers"]
 
 
 def test_get_interactions_post():
@@ -136,7 +136,7 @@ def test_get_string_ids():
 
 
 def test_get_interactions():
-    res = s.get_interactions("ZAP70", species=9606, required_score=700)
+    res = s.get_interactions(["ZAP70", "LCK"], species=9606, required_score=700)
     assert isinstance(res, list)
     assert len(res) > 0
     first = res[0]
@@ -160,7 +160,7 @@ def test_get_interaction_partners():
 
 
 def test_get_enrichment():
-    res = s.get_enrichment("ZAP70,LCK,CD3E,CD3D", species=9606)
+    res = s.get_enrichment(["ZAP70", "LCK", "CD3E", "CD3D"], species=9606)
     assert isinstance(res, list)
     assert len(res) > 0
     assert "category" in res[0]
@@ -173,7 +173,7 @@ def test_get_functional_annotation():
 
 
 def test_get_ppi_enrichment():
-    res = s.get_ppi_enrichment("ZAP70,LCK,CD3E", species=9606)
+    res = s.get_ppi_enrichment(["ZAP70", "LCK", "CD3E"], species=9606)
     assert isinstance(res, dict)
     assert "p_value" in res
     assert "number_of_edges" in res
