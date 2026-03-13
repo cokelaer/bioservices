@@ -133,6 +133,14 @@ EUtils
     :undoc-members:
     :synopsis:
 
+GEO (NCBI Gene Expression Omnibus)
+====================================
+
+.. automodule:: bioservices.geo
+    :members:
+    :undoc-members:
+    :synopsis:
+
 GeneProf
 ============
 
@@ -292,6 +300,15 @@ Readseq
 ============
 
 .. automodule:: bioservices.seqret
+    :members:
+    :undoc-members:
+    :synopsis:
+
+
+STRING
+======
+
+.. automodule:: bioservices.string
     :members:
     :undoc-members:
     :synopsis:

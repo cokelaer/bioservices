@@ -206,6 +206,10 @@ Changelog
 Version   Description
 ========= ====================================================================
 1.14.0    * Add EBI Proteins API service (new ``proteins`` module)
+          * Add STRING protein interaction database service (new ``string`` module)
+            equivalent to the ``STRINGdb`` Bioconductor package
+          * Add NCBI GEO (Gene Expression Omnibus) service (new ``geo`` module)
+            equivalent to the ``GEOquery`` Bioconductor package
           * Update PubChem module to current PUG REST API; fix async listkey polling
           * Fix caching fallback when sqlite3/requests_cache fails in REST services
           * WikiPathways: fix savePathwayAs (TypeError) and switch to assets URL
