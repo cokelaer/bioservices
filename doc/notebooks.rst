@@ -116,3 +116,11 @@ Here is an introductory ipython notebook providing a BioServices overview, which
 downloaded :download:`notebooks/Overview.ipynb` or view its results on
 `overview nbviewer <https://nbviewer.ipython.org/url/github.com/cokelaer/bioservices/blob/master/doc/notebooks/Overview.ipynb>`_
 
+Drug Discovery Pipeline
+=======================
+
+Here is a multi-service notebook demonstrating an integrated drug discovery
+pipeline (ChEMBL → UniProt → PDB → IntAct → Reactome / KEGG), which can be
+downloaded :download:`notebooks/DrugDiscovery.ipynb` or view its results on
+`drug discovery nbviewer <https://nbviewer.ipython.org/url/github.com/cokelaer/bioservices/blob/master/doc/notebooks/DrugDiscovery.ipynb>`_
+
