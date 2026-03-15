@@ -103,6 +103,52 @@ organism::
 
 More examples and tutorials are available in the `On-line documentation <http://bioservices.readthedocs.io/>`_
 
+Notebooks
+=========
+
+The following Jupyter notebooks provide worked examples for many of the
+services. They can be viewed directly on `nbviewer <https://nbviewer.org>`_ or
+downloaded and run locally.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Notebook
+     - Description
+   * - `Overview <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/Overview.ipynb>`_
+     - Introduction and overview of BioServices
+   * - `UniProt <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/UniProt.ipynb>`_
+     - Searching and retrieving data from UniProt
+   * - `BioModels <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/BioModels.ipynb>`_
+     - Accessing BioModels database
+   * - `ChEMBL <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/ChEMBL.ipynb>`_
+     - Drug and compound data from ChEMBL
+   * - `Entrez/EUtils <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/Entrez_EUtils.ipynb>`_
+     - NCBI Entrez utilities cookbook (ESearch, EFetch, EPost, ELink)
+   * - `EUtils <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/EUtils.ipynb>`_
+     - EUtils quick example (ESummary and ESearch)
+   * - `KEGG <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/KEGG.ipynb>`_
+     - KEGG pathways and databases
+   * - `MUSCLE <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/MUSCLE.ipynb>`_
+     - Multiple sequence alignment with MUSCLE
+   * - `NCBIBlast <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/NCBIBlast.ipynb>`_
+     - Running BLAST searches via NCBI
+   * - `WikiPathway <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/WikiPathway.ipynb>`_
+     - WikiPathways data access
+   * - `Gene Mapping <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/Gene_Mapping.ipynb>`_
+     - Mapping gene identifiers across databases
+   * - `BioMart <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/BioMart.ipynb>`_
+     - Querying BioMart data warehouses
+   * - `Ensembl <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/Ensembl.ipynb>`_
+     - Ensembl genome browser REST API
+   * - `InterPro <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/InterPro.ipynb>`_
+     - Protein families and domains from InterPro
+   * - `ENA <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/ENA.ipynb>`_
+     - European Nucleotide Archive
+   * - `Drug Discovery Pipeline <https://nbviewer.org/github/cokelaer/bioservices/blob/main/doc/notebooks/DrugDiscovery.ipynb>`_
+     - Integrated multi-service drug discovery workflow
+
 Current services
 ================
 Here is the list of services available and their testing status.
