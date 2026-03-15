@@ -352,3 +352,264 @@ def map_id(**kwargs):
         print(_json.dumps(result, indent=2))
     else:
         logger.warning("No mapping found for %s (%s -> %s)", identifier, from_db, to_db)
+
+
+# ---------------------------------------------------------------------------
+# gene command group
+# ---------------------------------------------------------------------------
+
+# Map user-friendly database names to UniProt ID-mapping identifiers for genes
+_GENE_ID_MAP_NAMES = {
+    "uniprot": "UniProtKB_AC-ID",
+    "kegg": "KEGG",
+    "ensembl": "Ensembl",
+    "refseq": "RefSeq_NT",
+    "genename": "Gene_Name",
+    "entrez": "GeneID",
+    "ncbi-geneid": "GeneID",
+}
+
+
+@main.group()
+def gene(**kwargs):
+    """Commands for querying gene data across multiple databases
+
+    \b
+    Examples:
+        bioservices gene info --gene-id 1017
+        bioservices gene name --symbol BRAF
+        bioservices gene ontology --query GO:0003824
+        bioservices gene expression --query cancer
+        bioservices gene pathway --query TP53
+        bioservices gene ortholog --gene zap70 --taxid 9606
+        bioservices gene map-id --from uniprot --to kegg --id P43403
+    """
+    pass
+
+
+@gene.command()
+@click.option("--gene-id", required=True, type=click.STRING, help="Gene ID to look up (e.g. 1017 for CDK2)")
+@click.option(
+    "--fields",
+    default="symbol,name,taxid,entrezgene,ensemblgene",
+    type=click.STRING,
+    help="Comma-separated fields to return (default: symbol,name,taxid,entrezgene,ensemblgene)",
+)
+def info(**kwargs):
+    """Retrieve gene information from MyGene.info.
+
+    \b
+    Examples:
+        bioservices gene info --gene-id 1017
+        bioservices gene info --gene-id 1017 --fields symbol,name,taxid
+    """
+    import json as _json
+
+    from bioservices import MyGeneInfo
+
+    mgi = MyGeneInfo(verbose=False)
+    result = mgi.get_one_gene(kwargs["gene_id"], fields=kwargs["fields"])
+    if result:
+        print(_json.dumps(result, indent=2))
+    else:
+        logger.warning("No gene found for ID %s", kwargs["gene_id"])
+
+
+@gene.command()
+@click.option("--symbol", required=True, type=click.STRING, help="Gene symbol to look up (e.g. BRAF, ZNF3)")
+def name(**kwargs):
+    """Look up HGNC-approved gene names and symbols.
+
+    \b
+    Examples:
+        bioservices gene name --symbol BRAF
+        bioservices gene name --symbol ZNF3
+    """
+    import json as _json
+
+    from bioservices import HGNC
+
+    h = HGNC(verbose=False)
+    result = h.fetch("symbol", kwargs["symbol"])
+    if result:
+        print(_json.dumps(result, indent=2))
+    else:
+        logger.warning("No HGNC entry found for symbol %s", kwargs["symbol"])
+
+
+@gene.command()
+@click.option(
+    "--query",
+    required=True,
+    type=click.STRING,
+    help="GO term ID (e.g. GO:0003824) or free-text search term (e.g. kinase)",
+)
+def ontology(**kwargs):
+    """Retrieve Gene Ontology annotations from QuickGO.
+
+    Provide a GO term ID (e.g. GO:0003824) to fetch term details, or a
+    free-text query (e.g. kinase) to search for matching GO terms.
+
+    \b
+    Examples:
+        bioservices gene ontology --query GO:0003824
+        bioservices gene ontology --query kinase
+    """
+    import json as _json
+
+    from bioservices import QuickGO
+
+    go = QuickGO(verbose=False)
+    query = kwargs["query"]
+    if query.upper().startswith("GO:"):
+        result = go.get_go_terms(query.upper())
+    else:
+        result = go.go_search(query)
+    if result:
+        print(_json.dumps(result, indent=2))
+    else:
+        logger.warning("No GO terms found for %s", query)
+
+
+@gene.command()
+@click.option("--query", required=True, type=click.STRING, help="Search keywords (e.g. cancer, TP53)")
+@click.option(
+    "--species",
+    default=None,
+    type=click.STRING,
+    help="Organism filter (e.g. homo sapiens)",
+)
+def expression(**kwargs):
+    """Search ArrayExpress for gene expression experiments.
+
+    \b
+    Examples:
+        bioservices gene expression --query cancer
+        bioservices gene expression --query TP53 --species homo sapiens
+    """
+    import json as _json
+
+    from bioservices import ArrayExpress
+
+    ae = ArrayExpress(verbose=False)
+    query_params = {"keywords": kwargs["query"]}
+    if kwargs["species"]:
+        query_params["species"] = kwargs["species"]
+    result = ae.queryAE(**query_params)
+    if result:
+        print(_json.dumps(result, indent=2))
+    else:
+        logger.warning("No ArrayExpress experiments found for %s", kwargs["query"])
+
+
+@gene.command()
+@click.option("--query", required=True, type=click.STRING, help="Gene name or pathway search term (e.g. TP53)")
+@click.option(
+    "--source",
+    default="reactome",
+    type=click.Choice(["reactome", "kegg"]),
+    help="Pathway database to query (default: reactome)",
+)
+def pathway(**kwargs):
+    """Find pathways associated with a gene using Reactome or KEGG.
+
+    \b
+    Examples:
+        bioservices gene pathway --query TP53
+        bioservices gene pathway --query TP53 --source kegg
+    """
+    import json as _json
+
+    source = kwargs["source"]
+    query = kwargs["query"]
+
+    if source == "reactome":
+        from bioservices import Reactome
+
+        r = Reactome(verbose=False)
+        result = r.search_query(query)
+        if result:
+            print(_json.dumps(result, indent=2))
+        else:
+            logger.warning("No Reactome pathways found for %s", query)
+    else:
+        from bioservices import KEGG
+
+        k = KEGG(verbose=False)
+        result = k.find("pathway", query)
+        if result:
+            print(result)
+        else:
+            logger.warning("No KEGG pathways found for %s", query)
+
+
+@gene.command()
+@click.option("--gene", "gene_name", required=True, type=click.STRING, help="Gene name or ID (e.g. zap70)")
+@click.option(
+    "--taxid",
+    default=9606,
+    type=click.INT,
+    help="NCBI taxonomy ID of the query organism (default: 9606 for Homo sapiens)",
+)
+def ortholog(**kwargs):
+    """Search for orthologs of a gene using the Panther database.
+
+    \b
+    Examples:
+        bioservices gene ortholog --gene zap70
+        bioservices gene ortholog --gene zap70 --taxid 9606
+    """
+    import json as _json
+
+    from bioservices import Panther
+
+    p = Panther(verbose=False)
+    result = p.get_mapping(kwargs["gene_name"], kwargs["taxid"])
+    if result:
+        print(_json.dumps(result, indent=2))
+    else:
+        logger.warning("No orthologs found for %s (taxid=%s)", kwargs["gene_name"], kwargs["taxid"])
+
+
+@gene.command(name="map-id")
+@click.option(
+    "--from",
+    "from_db",
+    required=True,
+    type=click.STRING,
+    help="Source database (e.g. uniprot, ncbi-geneid, ensembl)",
+)
+@click.option(
+    "--to",
+    "to_db",
+    required=True,
+    type=click.STRING,
+    help="Target database (e.g. kegg, uniprot, ensembl)",
+)
+@click.option("--id", "identifier", required=True, type=click.STRING, help="Identifier to convert (e.g. P43403)")
+def gene_map_id(**kwargs):
+    """Convert gene identifiers between databases via UniProt ID mapping.
+
+    \b
+    Examples:
+        bioservices gene map-id --from uniprot --to kegg --id P43403
+        bioservices gene map-id --from ncbi-geneid --to uniprot --id 7535
+        bioservices gene map-id --from ensembl --to uniprot --id ENSG00000145675
+    """
+    import json as _json
+
+    from bioservices import UniProt
+
+    from_db = kwargs["from_db"].lower()
+    to_db = kwargs["to_db"].lower()
+    identifier = kwargs["identifier"]
+
+    fr = _GENE_ID_MAP_NAMES.get(from_db, from_db)
+    to = _GENE_ID_MAP_NAMES.get(to_db, to_db)
+
+    u = UniProt(verbose=False)
+    result = u.mapping(fr=fr, to=to, query=identifier)
+    if result:
+        print(_json.dumps(result, indent=2))
+    else:
+        logger.warning("No mapping found for %s (%s -> %s)", identifier, from_db, to_db)
