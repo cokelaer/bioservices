@@ -86,12 +86,12 @@ class STRING:
     def _identifiers_to_str(self, identifiers):
         """Convert a list or string of identifiers to a ``%0d``-separated string.
 
-        The STRING API accepts newline-separated identifiers in POST request
-        bodies. Using ``\\n`` ensures ``requests`` correctly URL-encodes the
-        separator to ``%0A`` when submitting form data.
+        The STRING API requires identifiers to be separated by a carriage
+        return character ``\\r`` (``%0d``) in POST request bodies, as documented
+        in the official STRING API examples.
         """
         if isinstance(identifiers, (list, tuple)):
-            return "\n".join(identifiers)
+            return "\r".join(identifiers)
         return str(identifiers)
 
     def get_version(self):
@@ -138,17 +138,29 @@ class STRING:
             '9606.ENSP00000379990'
 
         """
-        params = {"identifiers": self._identifiers_to_str(identifiers), "echo_query": 1 if echo_query else 0, "limit": limit}
+        params = {
+            "identifiers": self._identifiers_to_str(identifiers),
+            "echo_query": 1 if echo_query else 0,
+            "limit": limit,
+        }
         if species is not None:
             params["species"] = species
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_post("json/get_string_ids", data=params, frmt="json")
+        res = self.services.http_get("json/get_string_ids", frmt="json", params=params)
         return res
 
-    def get_interactions(self, identifiers, species=None, required_score=None, network_type="functional",
-                         add_nodes=0, show_query_node_labels=0, caller_identity=None):
+    def get_interactions(
+        self,
+        identifiers,
+        species=None,
+        required_score=None,
+        network_type="functional",
+        add_nodes=0,
+        show_query_node_labels=0,
+        caller_identity=None,
+    ):
         """Retrieve protein-protein interactions for the given identifiers.
 
         Returns the STRING interaction network for a set of proteins. Each
@@ -184,21 +196,35 @@ class STRING:
         params = {
             "identifiers": self._identifiers_to_str(identifiers),
             "network_type": network_type,
-            "add_nodes": add_nodes,
-            "show_query_node_labels": show_query_node_labels,
         }
         if species is not None:
             params["species"] = species
         if required_score is not None:
             params["required_score"] = required_score
+        # Only send add_nodes / show_query_node_labels when explicitly requested;
+        # for a single-protein query the STRING API automatically sets add_nodes=10
+        # when the parameter is absent, returning the interaction neighbourhood.
+        # Sending add_nodes=0 would override that and produce an empty result.
+        if add_nodes:
+            params["add_nodes"] = add_nodes
+        if show_query_node_labels:
+            params["show_query_node_labels"] = show_query_node_labels
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_post("json/network", data=params, frmt="json")
+        res = self.services.http_get("json/network", frmt="json", params=params)
         return res
 
-    def get_network(self, identifiers, species=None, required_score=None, network_type="functional",
-                    add_nodes=0, show_query_node_labels=0, caller_identity=None):
+    def get_network(
+        self,
+        identifiers,
+        species=None,
+        required_score=None,
+        network_type="functional",
+        add_nodes=0,
+        show_query_node_labels=0,
+        caller_identity=None,
+    ):
         """Retrieve protein-protein interactions for the given identifiers.
 
         This is an alias for :meth:`get_interactions`.
@@ -234,8 +260,15 @@ class STRING:
             caller_identity=caller_identity,
         )
 
-    def get_interaction_partners(self, identifiers, species=None, required_score=None, limit=None,
-                                  network_type="functional", caller_identity=None):
+    def get_interaction_partners(
+        self,
+        identifiers,
+        species=None,
+        required_score=None,
+        limit=None,
+        network_type="functional",
+        caller_identity=None,
+    ):
         """Retrieve interaction partners for the given proteins.
 
         Returns proteins that interact with the query proteins. Compared to
@@ -273,11 +306,10 @@ class STRING:
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_post("json/interaction_partners", data=params, frmt="json")
+        res = self.services.http_get("json/interaction_partners", frmt="json", params=params)
         return res
 
-    def get_homology(self, identifiers, species=None, species_b=None, required_score=None,
-                      caller_identity=None):
+    def get_homology(self, identifiers, species=None, species_b=None, required_score=None, caller_identity=None):
         """Retrieve homology data for a set of proteins.
 
         Returns homologous protein pairs between the query species and
@@ -311,11 +343,10 @@ class STRING:
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_post("json/homology", data=params, frmt="json")
+        res = self.services.http_get("json/homology", frmt="json", params=params)
         return res
 
-    def get_enrichment(self, identifiers, species=None, background_string_identifiers=None,
-                        caller_identity=None):
+    def get_enrichment(self, identifiers, species=None, background_string_identifiers=None, caller_identity=None):
         """Perform functional enrichment analysis on a set of proteins.
 
         Tests whether the input proteins are significantly enriched for
@@ -351,7 +382,7 @@ class STRING:
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_post("json/enrichment", data=params, frmt="json")
+        res = self.services.http_get("json/enrichment", frmt="json", params=params)
         return res
 
     def get_functional_annotation(self, identifiers, species=None, allow_pubmed=0, caller_identity=None):
@@ -385,11 +416,12 @@ class STRING:
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_post("json/functional_annotation", data=params, frmt="json")
+        res = self.services.http_get("json/functional_annotation", frmt="json", params=params)
         return res
 
-    def get_ppi_enrichment(self, identifiers, species=None, required_score=None,
-                            background_string_identifiers=None, caller_identity=None):
+    def get_ppi_enrichment(
+        self, identifiers, species=None, required_score=None, background_string_identifiers=None, caller_identity=None
+    ):
         """Test whether the input proteins are enriched in interactions.
 
         Returns a single record indicating the observed number of interactions,
@@ -428,7 +460,7 @@ class STRING:
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_post("json/ppi_enrichment", data=params, frmt="json")
+        res = self.services.http_get("json/ppi_enrichment", frmt="json", params=params)
         if isinstance(res, list) and len(res) == 1:
             return res[0]
         return res

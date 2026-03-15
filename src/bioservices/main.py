@@ -197,9 +197,7 @@ def search(**kwargs):
 
 
 @protein.command()
-@click.option(
-    "--uniprot-id", required=True, type=click.STRING, help="UniProt accession ID (e.g. P43403)"
-)
+@click.option("--uniprot-id", required=True, type=click.STRING, help="UniProt accession ID (e.g. P43403)")
 def sequence(**kwargs):
     """Fetch the FASTA sequence for a protein from UniProt.
 
@@ -216,9 +214,7 @@ def sequence(**kwargs):
 
 
 @protein.command()
-@click.option(
-    "--uniprot-id", required=True, type=click.STRING, help="UniProt accession ID (e.g. P43403)"
-)
+@click.option("--uniprot-id", required=True, type=click.STRING, help="UniProt accession ID (e.g. P43403)")
 def structure(**kwargs):
     """Find PDB 3D structures for a protein given its UniProt accession ID.
 
@@ -235,8 +231,7 @@ def structure(**kwargs):
             "service": "text",
             "parameters": {
                 "attribute": (
-                    "rcsb_polymer_entity_container_identifiers"
-                    ".reference_sequence_identifiers.database_accession"
+                    "rcsb_polymer_entity_container_identifiers" ".reference_sequence_identifiers.database_accession"
                 ),
                 "operator": "in",
                 "value": [kwargs["uniprot_id"]],
@@ -245,7 +240,7 @@ def structure(**kwargs):
         "return_type": "entry",
     }
     result = p.search(query)
-    if result and "result_set" in result:
+    if isinstance(result, dict) and "result_set" in result:
         for entry in result["result_set"]:
             print(entry["identifier"])
     else:
@@ -253,9 +248,7 @@ def structure(**kwargs):
 
 
 @protein.command()
-@click.option(
-    "--uniprot-id", required=True, type=click.STRING, help="UniProt accession ID (e.g. P43403)"
-)
+@click.option("--uniprot-id", required=True, type=click.STRING, help="UniProt accession ID (e.g. P43403)")
 @click.option(
     "--format",
     "frmt",
