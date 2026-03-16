@@ -87,12 +87,27 @@ class STRING:
         """Convert a list or string of identifiers to a ``%0d``-separated string.
 
         The STRING API requires identifiers to be separated by a carriage
-        return character ``\\r`` (``%0d``) in POST request bodies, as documented
+        return character ``\\r`` (``%0d``) in GET query strings, as documented
         in the official STRING API examples.
         """
         if isinstance(identifiers, (list, tuple)):
             return "\r".join(identifiers)
         return str(identifiers)
+
+    def _get(self, endpoint, params):
+        """Issue a raw GET request to the STRING API.
+
+        Unlike :meth:`services.http_get`, this method does **not** add an
+        ``Accept`` header. Sending ``Accept: application/json`` to the STRING
+        server causes the request to hang indefinitely; the server returns
+        JSON when the ``/json/`` path prefix is used, regardless of headers.
+        """
+        import requests as _requests
+
+        url = f"{STRING._url}/{endpoint}"
+        resp = _requests.get(url, params=params)
+        resp.raise_for_status()
+        return resp.json()
 
     def get_version(self):
         """Return the current STRING API version information.
@@ -108,7 +123,7 @@ class STRING:
             True
 
         """
-        res = self.services.http_get("json/version", frmt="json")
+        res = self._get("json/version", params={})
         if isinstance(res, list) and len(res) == 1:
             return res[0]
         return res
@@ -148,7 +163,7 @@ class STRING:
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_get("json/get_string_ids", frmt="json", params=params)
+        res = self._get("json/get_string_ids", params=params)
         return res
 
     def get_interactions(
@@ -212,7 +227,7 @@ class STRING:
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_get("json/network", frmt="json", params=params)
+        res = self._get("json/network", params=params)
         return res
 
     def get_network(
@@ -306,7 +321,7 @@ class STRING:
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_get("json/interaction_partners", frmt="json", params=params)
+        res = self._get("json/interaction_partners", params=params)
         return res
 
     def get_homology(self, identifiers, species=None, species_b=None, required_score=None, caller_identity=None):
@@ -343,7 +358,7 @@ class STRING:
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_get("json/homology", frmt="json", params=params)
+        res = self._get("json/homology", params=params)
         return res
 
     def get_enrichment(self, identifiers, species=None, background_string_identifiers=None, caller_identity=None):
@@ -382,7 +397,7 @@ class STRING:
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_get("json/enrichment", frmt="json", params=params)
+        res = self._get("json/enrichment", params=params)
         return res
 
     def get_functional_annotation(self, identifiers, species=None, allow_pubmed=0, caller_identity=None):
@@ -416,7 +431,7 @@ class STRING:
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_get("json/functional_annotation", frmt="json", params=params)
+        res = self._get("json/functional_annotation", params=params)
         return res
 
     def get_ppi_enrichment(
@@ -460,7 +475,7 @@ class STRING:
         if caller_identity:
             params["caller_identity"] = caller_identity
 
-        res = self.services.http_get("json/ppi_enrichment", frmt="json", params=params)
+        res = self._get("json/ppi_enrichment", params=params)
         if isinstance(res, list) and len(res) == 1:
             return res[0]
         return res

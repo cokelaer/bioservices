@@ -19,19 +19,25 @@
 
 .. topic:: What is ArrayExpress ?
 
-    :URL: http://www.ebi.ac.uk/arrayexpress/
-    :REST: http://www.ebi.ac.uk/arrayexpress/xml/v2/experiments
+    :URL: https://www.ebi.ac.uk/biostudies/arrayexpress
+    :REST: https://www.ebi.ac.uk/biostudies/api/v1/search?collection=arrayexpress
 
     .. highlights::
 
-        ArrayExpress is a database of functional genomics experiments that can be queried and the data downloaded. It includes gene expression data from microarray and high throughput sequencing studies. Data is collected to MIAME and MINSEQE standards. Experiments are submitted directly to ArrayExpress or are imported from the NCBI GEO database.
+        ArrayExpress is a database of functional genomics experiments that can be
+        queried and the data downloaded. It includes gene expression data from
+        microarray and high throughput sequencing studies. Data is collected to
+        MIAME and MINSEQE standards. Experiments are submitted directly to
+        ArrayExpress or are imported from the NCBI GEO database.
 
-        -- ArrayExpress home page, Jan 2013
+        ArrayExpress data is now hosted on the BioStudies platform at EBI.
+
+        -- ArrayExpress/BioStudies, EBI
 
 """
 
-from bioservices.services import REST
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
@@ -40,343 +46,426 @@ __all__ = ["ArrayExpress"]
 
 
 class ArrayExpress:
-    """Interface to the `ArrayExpress <http://www.ebi.ac.uk/arrayexpress>`_ service
+    """Interface to the `ArrayExpress <https://www.ebi.ac.uk/biostudies/arrayexpress>`_ service.
 
-    ArrayExpress allows to retrieve data sets used in various experiments.
+    ArrayExpress data is now hosted via the BioStudies platform at EBI.
+    This class provides access to the ArrayExpress collection using the
+    BioStudies REST API.
 
-    **QuickStart** Given an experiment name (e.g., E-MEXP-31), type::
-
-        s = ArrayExpress()
-        s.getAE('E-MEXP-31')
-
-    You can also quickyl retrieve experiments matching some search queries as
-    follows::
-
-        a.queryAE(keywords="pneumonia", species='homo+sapiens')
-
-    Now let us look at other methods.If you know the file and experiment
-    name, you can retrieve a specific file as follows::
+    **Quick start**::
 
         >>> from bioservices import ArrayExpress
         >>> s = ArrayExpress()
-        >>> # retrieve a specific file from a experiment
-        >>> res = s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")
+        >>> results = s.search("breast cancer")
+        >>> results["totalHits"]  # total experiments found
+        >>> study = s.get_study("E-MEXP-31")
+        >>> files = s.get_files("E-MEXP-31")
 
-    The main issue is that you may not know the experiment you are looking for.
-    You can query experiments by keyword::
+    You can also search by keyword and retrieve accessions::
 
-        >>> # Search for experiments
-        >>> res = s.queryExperiments(keywords="cancer+breast", wholewords=True)
+        >>> accessions = s.queryAE("pneumonia homo sapiens")
 
-    keywords used in queries follows these rules:
+    .. note:: ArrayExpress was migrated from ``http://www.ebi.ac.uk/arrayexpress``
+        to the BioStudies platform in 2021. The new API base URL is
+        ``https://www.ebi.ac.uk/biostudies``.
 
-    * Accession number and keyword searches are case insensitive
-    * More than one keyword can be searched for using the + sign (e.g. keywords="cancer+breast")
-    * Use an asterisk as a multiple character wild card (e.g. keywords="colo*")
-    * use a question mark ? as a single character wild card (e.g. keywords="te?t")
-
-    More complex queries can be constructed using the operators AND, OR or NOT.
-    AND is the default if no operator is specified. Either experiments or
-    files can be searched for. Examples are::
-
-        keywords="prostate+AND+breast"
-        keywords="prostate+breast"      # same as above
-        keywords="prostate+OR+breast"
-        keywords="prostate+NOT+breast "
-
-    The returned objects are XML parsed with beautifulSoup. You can get all
-    experiments using the getChildren method:
-
-    .. doctest::
-        :options: +SKIP
-
-        >>> res = s.queryExperiments(keywords="breast+cancer")
-        >>> len(res.getchildren())
-        1487
-
-
-    If you know what you are looking for, you can give the experiment name::
-
-        >>> res = s.retrieveExperiment("E-MEXP-31")
-        >>> exp = res.getchildren()[0]   # it contains only one experiment
-        >>> [x.text for x in exp.getchildren() if x.tag == "name"]
-        ['Transcription profiling of mammalian male germ cells undergoing mitotic
-        growth, meiosis and gametogenesis in highly enriched cell populations']
-
-    Using the same example, you can retrieve the names of the files related to
-    the experiment::
-
-        >>> files = [x.getchildren() for x in exp.getchildren() if x.tag == "files"]
-        >>> [x.get("name") for x in files[0]]
-        ['E-MEXP-31.raw.1.zip',
-         'E-MEXP-31.processed.1.zip',
-         'E-MEXP-31.idf.txt',
-         'E-MEXP-31.sdrf.txt']
-
-    New in version 1.3.7 you can use the method :meth:`getEA`
-
-    Then, you may want to download a particular file::
-
-        >>> s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")
-
-
-    .. seealso:: :meth:`queryFiles` for more details about the parameters to be
-        used in queries.
-
-    .. warning:: supports only new style (v2). You can still use the old style by
-        setting the request manually using the :meth:`version`.
-
-    .. warning:: some syntax requires the + character, which is a special character
-        for http requests. It is replaced internally by spaces if found
-    .. warning:: filtering is not implemented (e.g., assaycount:[x TO y]syntax.)
+    .. seealso:: :meth:`search` for the primary search method.
     """
+
+    _SORT_BY_VALUES = ["relevance", "release_date", "views"]
+    _SORT_ORDER_VALUES = ["ascending", "descending"]
+    _COLLECTION = "arrayexpress"
 
     def __init__(self, verbose=False, cache=False):
         """.. rubric:: Constructor
 
         :param bool verbose: prints informative messages
+        :param bool cache: use HTTP cache
 
         """
         self.services = REST(
             name="ArrayExpress",
-            url="http://www.ebi.ac.uk/arrayexpress",
+            url="https://www.ebi.ac.uk/biostudies",
             cache=cache,
             verbose=verbose,
         )
 
-        self.version = "v2"
+    # ------------------------------------------------------------------
+    # Primary (new-style) methods
+    # ------------------------------------------------------------------
 
-    def _search(self, mode, **kargs):
-        """common function to search for files or experiments"""
-        assert mode in ["experiments", "files"]
-        url = "{0}/{1}/{2}".format("json", self.version, mode)
+    def search(self, query, page=1, page_size=20, sort_by="relevance", sort_order="descending"):
+        """Search ArrayExpress experiments.
 
-        defaults = {
-            "accession": None,  # ex: E-MEXP-31
-            "keywords": None,
-            "species": None,
-            "wholewords": "on",
-            "expdesign": None,
-            "exptype": None,
-            "gxa": "true",
-            "pmid": None,
-            "sa": None,
-            "ef": None,  # e.g., CellType
-            "efv": None,  # e.g., HeLa
-            "array": None,  # ex: A-AFFY-33
-            "expandfo": "on",
-            "directsub": "true",
-            "sortby": [
-                "accession",
-                "name",
-                "assays",
-                "species",
-                "releasedate",
-                "fgem",
-                "raw",
-                "atlas",
-            ],
-            "sortorder": ["ascending", "descending"],
-        }
+        :param str query: Free-text search query. Supports keywords, accession
+            numbers, species names, and boolean operators (AND, OR, NOT).
+        :param int page: Page number for paginated results (default: 1).
+        :param int page_size: Number of results per page (default: 20).
+        :param str sort_by: Field to sort by. One of: ``relevance``,
+            ``release_date``, ``views`` (default: ``relevance``).
+        :param str sort_order: Sort direction. One of: ``ascending``,
+            ``descending`` (default: ``descending``).
+        :return: dict with keys ``page``, ``pageSize``, ``totalHits``, ``hits``.
 
-        for k in kargs.keys():
-            if k not in defaults.keys():
-                raise ValueError(
-                    "Incorrect value provided ({}). Correct values are {}".format(k, sorted(defaults.keys()))
-                )
+        Each entry in ``hits`` contains: ``accession``, ``title``, ``author``,
+        ``release_date``, ``files`` (count), ``links`` (count).
 
-        # if len(kargs.keys()):
-        #    url += "?"
-        params = {}
-
-        for k, v in kargs.items():
-            if k in ["expandfo", "wholewords"]:
-                if v in ["on", True, "true", "TRUE", "True"]:
-                    # params.append(k + "=on")
-                    params[k] = "on"
-            elif k in ["gxa", "directsub"]:
-                if v in ["on", True, "true", "TRUE", "True"]:
-                    # params.append(k + "=true")
-                    params[k] = "true"
-                elif v in [False, "false", "False"]:
-                    # params.append(k + "=false")
-                    params[k] = "false"
-                else:
-                    raise ValueError("directsub must be true or false")
-            else:
-                if k in ["sortby", "sortorder"]:
-                    self.services.devtools.check_param_in_list(v, defaults[k])
-                # params.append(k + "=" + v)
-                params[k] = v
-
-        # NOTE: + is a special character that is replaced by %2B
-        # The + character is the proper encoding for a space when quoting
-        # GET or POST data. Thus, a literal + character needs to be escaped
-        # as well, lest it be decoded to a space on the other end
-        for k, v in params.items():
-            params[k] = v.replace("+", " ")
-
-        self.services.logging.info(url)
-        res = self.services.http_get(url, frmt="json", params=params)
-        return res
-
-    def queryFiles(self, **kargs):
-        """Retrieve a list of files associated with a set of experiments
-
-        The following parameters are used to search for experiments/files:
-
-        :param str accession: experiment primary or secondary accession e.g. E-MEXP-31
-        :param str array: array design accession or name e.g., A-AFFY-33
-        :param str ef: Experimental factor, the name of the main variables in an
-            experiment. (e.g., CellType)
-        :param str efv:  Experimental factor value. Has EFO expansion. (e.g.,
-            HeLa)
-        :param str expdesign: Experiment design type  (e.g., "dose+response")
-        :param str exptype:  Experiment type. Has EFO expansion. (e.g.,
-            "RNA-seq")
-        :param str gxa: Presence in the Gene Expression Atlas. Only value is gxa=true.
-        :param str keywords: e.g. "cancer+breast"
-        :param str pmid: PubMed identifier (e.g., 16553887)
-        :param str sa: Sample attribute values. Has EFO expansion. fibroblast
-        :param str species: Species of the samples.Has EFO expansion. (e.g., "homo+sapiens")
-        :param bool wholewords:
-
-        The following parameters can filter the experiments:
-
-        :param str directsub: only experiments directly submitted to
-            ArrayExpress (true) or only imported from GEO databae (false)
-
-
-        The following parameters can sort the results:
-
-        :param str sortby: sorting by grouping (can be accession, name, assays,
-            species, releasedata, fgem, raw, atlas)
-        :param str sortorder: sorting by orderering. Can be either ascending or
-            descending (default)
-
-        .. doctest::
-            :options: +SKIP
+        Example::
 
             >>> from bioservices import ArrayExpress
             >>> s = ArrayExpress()
-            >>> res = s.queryFiles(keywords="cancer+breast", wholewords=True)
-            >>> res = s.queryExperiments(array="A-AFFY-33", species="Homo Sapiens")
-            >>> res = s.queryExperiments(array="A-AFFY-33", species="Homo Sapiens",
-            ...                          sortorder="releasedate")
-            >>> res = s.queryExperiments(array="A-AFFY-33", species="Homo+Sapiens",
-            ...     expdesign="dose response", sortby="releasedate", sortorder="ascending")
-            >>> dates = [x.findall("releasedate")[0].text for x in res.getchildren()]
+            >>> res = s.search("breast cancer")
+            >>> res["totalHits"]  # doctest: +SKIP
+            1152
+            >>> res["hits"][0]["accession"]  # doctest: +SKIP
+            'E-GEOD-17155'
+            >>> res2 = s.search("Homo sapiens", sort_by="release_date", sort_order="ascending")
 
         """
-        res = self._search("files", **kargs)
-        return res
+        if sort_by not in self._SORT_BY_VALUES:
+            raise ValueError("sort_by must be one of {}".format(self._SORT_BY_VALUES))
+        if sort_order not in self._SORT_ORDER_VALUES:
+            raise ValueError("sort_order must be one of {}".format(self._SORT_ORDER_VALUES))
 
-    def queryExperiments(self, **kargs):
-        """Retrieve experiments
+        params = {
+            "query": query,
+            "collection": self._COLLECTION,
+            "page": page,
+            "pageSize": page_size,
+            "sortBy": sort_by,
+            "sortOrder": sort_order,
+        }
+        return self.services.http_get("api/v1/search", frmt="json", params=params)
 
-        .. seealso:: :meth:`~bioservices.arrayexpress.ArrayExpress.queryFiles` for
-            all possible keywords
+    def get_study(self, accession):
+        """Retrieve full metadata for a specific ArrayExpress study.
 
-        .. doctest::
-            :options: +SKIP
+        :param str accession: Study accession number (e.g., ``"E-MEXP-31"``).
+        :return: dict containing study metadata, sections, and file listings.
 
-            >>> res = s.queryExperiments(keywords="cancer+breast", wholewords=True)
+        The returned dict has keys ``accno``, ``attributes``, ``section``,
+        and ``type``. Files are nested within ``section["subsections"]``.
 
-        """
-        res = self._search("experiments", **kargs)
-        return res
-
-    def retrieveExperiment(self, experiment):
-        """alias to queryExperiments if you know the experiment name
-
-        ::
-
-            >>> s.retrieveExperiment("E-MEXP-31")
-            >>> # equivalent to
-            >>> s.queryExperiments(accession="E-MEXP-31")
-
-        """
-        res = self.queryExperiments(keywords=experiment)
-        return res
-
-    def retrieveFile(self, experiment, filename, save=False):
-        """Retrieve a specific file from an experiment
-
-        :param str filename:
-
-        ::
-
-            >>> s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")
-        """
-        files = self.retrieveFilesFromExperiment(experiment)
-
-        assert (
-            filename in files
-        ), """Error. Provided filename does not seem to be correct.
-            Files available for %s experiment are %s """ % (
-            experiment,
-            files,
-        )
-
-        url = "files/" + experiment + "/" + filename
-
-        if save:
-            res = self.services.http_get(url, frmt="txt")
-            f = open(filename, "w")
-            f.write(res)
-            f.close()
-        else:
-            res = self.services.http_get(url, frmt="txt")
-            return res
-
-    def retrieveFilesFromExperiment(self, experiment):
-        """Given an experiment, returns the list of files found in its description
-
-
-        :param str experiment: a valid experiment name
-        :return: the experiment files
-
-        .. doctest::
+        Example::
 
             >>> from bioservices import ArrayExpress
-            >>> s = ArrayExpress(verbose=False)
-            >>> s.retrieveFilesFromExperiment("E-MEXP-31")
-            ['E-MEXP-31.raw.1.zip', 'E-MEXP-31.processed.1.zip', 'E-MEXP-31.idf.txt', 'E-MEXP-31.sdrf.txt']
-
+            >>> s = ArrayExpress()
+            >>> study = s.get_study("E-MEXP-31")
+            >>> study["accno"]
+            'E-MEXP-31'
+            >>> # Get the study title
+            >>> [a["value"] for a in study["attributes"] if a["name"] == "Title"][0]  # doctest: +SKIP
+            'Transcription profiling of mammalian male germ cells...'
 
         """
-        res = self.queryExperiments(keywords=experiment)
-        exp = res["experiments"]["experiment"]
-        files = exp["files"]
-        output = [v["name"] for k, v in files.items() if k]
-        return output
+        return self.services.http_get("api/v1/studies/{}".format(accession), frmt="json")
 
-    def queryAE(self, **kargs):
-        """Returns list of experiments
+    def get_files(self, accession):
+        """Retrieve the list of file paths for a specific study.
 
-        See :meth:`queryExperiments` for parameters and usage
+        :param str accession: Study accession number (e.g., ``"E-MEXP-31"``).
+        :return: list of file path strings.
 
-        This is a wrapper around :meth:`queryExperiments` that returns only
-        the accession values.
+        Example::
 
-        ::
+            >>> from bioservices import ArrayExpress
+            >>> s = ArrayExpress()
+            >>> files = s.get_files("E-MEXP-31")
+            >>> "E-MEXP-31.idf.txt" in files  # doctest: +SKIP
+            True
 
-            a.queryAE(keywords="pneumonia", species='homo+sapiens')
         """
-        sets = self.queryExperiments(**kargs)
-        return [x["accession"] for x in sets["experiments"]["experiment"]]
+        study = self.get_study(accession)
+        return self._extract_files(study)
 
-    def getAE(self, accession, type="full"):
-        """retrieve all files from an experiments and save them locally"""
-        filenames = self.retrieveFilesFromExperiment(accession)
+    def retrieve_file(self, accession, filename, save=False):
+        """Download a specific file from an ArrayExpress study.
+
+        Files are served via the BioStudies file store (redirecting to the EBI
+        FTP). For large files such as ``.zip`` archives the content is returned
+        as bytes; plain-text files are returned as strings.
+
+        :param str accession: Study accession number (e.g., ``"E-MEXP-31"``).
+        :param str filename: Name of the file to download (e.g., ``"E-MEXP-31.idf.txt"``).
+        :param bool save: If ``True``, write the file to disk in the current
+            working directory (default: ``False``).
+        :return: file content (``str`` or ``bytes``), or ``None`` when *save* is ``True``.
+
+        Example::
+
+            >>> from bioservices import ArrayExpress
+            >>> s = ArrayExpress()
+            >>> content = s.retrieve_file("E-MEXP-31", "E-MEXP-31.idf.txt")  # doctest: +SKIP
+
+        """
+        available = self.get_files(accession)
+        if filename not in available:
+            raise ValueError(
+                "File '{}' not found for experiment '{}'. Available files: {}".format(filename, accession, available)
+            )
+
+        url = "files/{}/{}".format(accession, filename)
+        res = self.services.http_get(url, frmt="txt")
+
+        if save:
+            mode = "wb" if isinstance(res, bytes) else "w"
+            with open(filename, mode) as fout:
+                fout.write(res)
+            return None
+        return res
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
+
+    def _extract_files(self, study):
+        """Recursively extract all file paths from a study dict.
+
+        :param dict study: study dict as returned by :meth:`get_study`.
+        :return: list of file path strings.
+        """
+        files = []
+
+        def _recurse(obj):
+            if isinstance(obj, dict):
+                if obj.get("type") == "file" and "path" in obj:
+                    files.append(obj["path"])
+                for v in obj.values():
+                    _recurse(v)
+            elif isinstance(obj, list):
+                for item in obj:
+                    _recurse(item)
+
+        _recurse(study)
+        return files
+
+    def _build_query(self, kargs):
+        """Build a search query string from legacy keyword arguments.
+
+        :param dict kargs: keyword arguments as passed to legacy methods.
+        :return: tuple (query_str, sort_by, sort_order, page_size).
+        """
+        valid_keys = {
+            "accession",
+            "keywords",
+            "species",
+            "wholewords",
+            "expdesign",
+            "exptype",
+            "gxa",
+            "pmid",
+            "sa",
+            "ef",
+            "efv",
+            "array",
+            "expandfo",
+            "directsub",
+            "sortby",
+            "sortorder",
+            "pagesize",
+        }
+        for k in kargs:
+            if k not in valid_keys:
+                raise ValueError("Unknown parameter '{}'. Valid parameters are: {}".format(k, sorted(valid_keys)))
+
+        # Map old sortby values to new API values
+        sortby_map = {
+            "accession": "relevance",
+            "name": "relevance",
+            "assays": "relevance",
+            "species": "relevance",
+            "releasedate": "release_date",
+            "fgem": "relevance",
+            "raw": "relevance",
+            "atlas": "relevance",
+        }
+
+        sort_by = "relevance"
+        sort_order = "descending"
+        page_size = 20
+
+        if "sortby" in kargs:
+            sort_by = sortby_map.get(kargs["sortby"], "relevance")
+        if "sortorder" in kargs:
+            sort_order = kargs["sortorder"]
+        if "pagesize" in kargs:
+            page_size = int(kargs["pagesize"])
+
+        # Build combined query string from search parameters
+        query_parts = []
+        for key in ("accession", "keywords", "species", "expdesign", "exptype", "pmid", "sa", "ef", "efv", "array"):
+            if kargs.get(key):
+                # Replace + with space (old API used + as separator)
+                query_parts.append(kargs[key].replace("+", " "))
+
+        query = " ".join(query_parts) if query_parts else "*"
+        return query, sort_by, sort_order, page_size
+
+    # ------------------------------------------------------------------
+    # Backward-compatible methods (legacy names kept for compatibility)
+    # ------------------------------------------------------------------
+
+    def queryExperiments(self, **kargs):
+        """Search ArrayExpress experiments.
+
+        This method accepts the same keyword arguments as the original
+        ArrayExpress v2 API for backward compatibility and maps them to the
+        current BioStudies API.
+
+        :param str accession: Experiment accession (e.g., ``"E-MEXP-31"``).
+        :param str keywords: Search keywords (e.g., ``"cancer breast"``).
+            Separate multiple terms with ``+`` or spaces.
+        :param str species: Species filter (e.g., ``"homo sapiens"``).
+        :param str expdesign: Experiment design type (e.g., ``"dose response"``).
+        :param str exptype: Experiment type (e.g., ``"RNA-seq"``).
+        :param str array: Array design accession (e.g., ``"A-AFFY-33"``).
+        :param str pmid: PubMed identifier (e.g., ``"16553887"``).
+        :param str sa: Sample attribute value (e.g., ``"fibroblast"``).
+        :param str ef: Experimental factor name (e.g., ``"CellType"``).
+        :param str efv: Experimental factor value (e.g., ``"HeLa"``).
+        :param str sortby: Sort field. One of: ``accession``, ``name``,
+            ``assays``, ``species``, ``releasedate``, ``fgem``, ``raw``,
+            ``atlas``.
+        :param str sortorder: Sort direction: ``ascending`` or ``descending``.
+        :param int pagesize: Number of results per page (default: 20).
+        :return: dict with keys ``page``, ``pageSize``, ``totalHits``, ``hits``.
+
+        Example::
+
+            >>> from bioservices import ArrayExpress
+            >>> s = ArrayExpress()
+            >>> res = s.queryExperiments(keywords="breast cancer")  # doctest: +SKIP
+            >>> res["totalHits"]  # doctest: +SKIP
+            1152
+            >>> res = s.queryExperiments(array="A-AFFY-33", species="Homo sapiens")  # doctest: +SKIP
+            >>> res = s.queryExperiments(keywords="pneumonia", sortby="releasedate",
+            ...                          sortorder="ascending")  # doctest: +SKIP
+
+        .. seealso:: :meth:`search` for the primary search interface.
+        """
+        query, sort_by, sort_order, page_size = self._build_query(kargs)
+        return self.search(query, page_size=page_size, sort_by=sort_by, sort_order=sort_order)
+
+    def queryFiles(self, **kargs):
+        """Search ArrayExpress experiments and return results including file counts.
+
+        Accepts the same keyword arguments as :meth:`queryExperiments`.
+        Each hit in the result includes a ``files`` field with the file count.
+        Use :meth:`get_files` to retrieve the actual file paths for a specific
+        experiment.
+
+        :return: dict with keys ``page``, ``pageSize``, ``totalHits``, ``hits``.
+
+        Example::
+
+            >>> from bioservices import ArrayExpress
+            >>> s = ArrayExpress()
+            >>> res = s.queryFiles(keywords="breast cancer")  # doctest: +SKIP
+            >>> res["hits"][0]["files"]  # number of files in first hit  # doctest: +SKIP
+            78
+
+        .. seealso:: :meth:`get_files` to retrieve file paths for a study.
+        """
+        return self.queryExperiments(**kargs)
+
+    def retrieveExperiment(self, experiment):
+        """Retrieve metadata for a specific experiment by accession.
+
+        This is an alias for :meth:`get_study`.
+
+        :param str experiment: Experiment accession (e.g., ``"E-MEXP-31"``).
+        :return: dict with full study metadata.
+
+        Example::
+
+            >>> from bioservices import ArrayExpress
+            >>> s = ArrayExpress()
+            >>> study = s.retrieveExperiment("E-MEXP-31")  # doctest: +SKIP
+            >>> study["accno"]  # doctest: +SKIP
+            'E-MEXP-31'
+
+        """
+        return self.get_study(experiment)
+
+    def retrieveFilesFromExperiment(self, experiment):
+        """Return the list of file paths for a given experiment.
+
+        This is an alias for :meth:`get_files`.
+
+        :param str experiment: Experiment accession (e.g., ``"E-MEXP-31"``).
+        :return: list of file path strings.
+
+        Example::
+
+            >>> from bioservices import ArrayExpress
+            >>> s = ArrayExpress()
+            >>> files = s.retrieveFilesFromExperiment("E-MEXP-31")  # doctest: +SKIP
+            >>> "E-MEXP-31.idf.txt" in files  # doctest: +SKIP
+            True
+
+        """
+        return self.get_files(experiment)
+
+    def retrieveFile(self, experiment, filename, save=False):
+        """Download a specific file from an experiment.
+
+        This is an alias for :meth:`retrieve_file`.
+
+        :param str experiment: Experiment accession (e.g., ``"E-MEXP-31"``).
+        :param str filename: Name of the file to download.
+        :param bool save: If ``True``, save the file to disk.
+        :return: file content as ``str`` or ``bytes``, or ``None`` if *save* is ``True``.
+
+        Example::
+
+            >>> from bioservices import ArrayExpress
+            >>> s = ArrayExpress()
+            >>> content = s.retrieveFile("E-MEXP-31", "E-MEXP-31.idf.txt")  # doctest: +SKIP
+
+        """
+        return self.retrieve_file(experiment, filename, save=save)
+
+    def queryAE(self, query, **kargs):
+        """Search ArrayExpress and return a list of experiment accessions.
+
+        :param str query: Search query (keywords, species, etc.).
+        :param kargs: Additional arguments passed to :meth:`search`
+            (``page``, ``page_size``, ``sort_by``, ``sort_order``).
+        :return: list of accession strings.
+
+        Example::
+
+            >>> from bioservices import ArrayExpress
+            >>> s = ArrayExpress()
+            >>> accessions = s.queryAE("pneumonia homo sapiens")  # doctest: +SKIP
+            >>> accessions[:3]  # doctest: +SKIP
+            ['E-GEOD-12345', 'E-MEXP-67890', 'E-MTAB-11111']
+
+        """
+        results = self.search(query, **kargs)
+        return [hit["accession"] for hit in results.get("hits", [])]
+
+    def getAE(self, accession):
+        """Download all files from an experiment and save them locally.
+
+        :param str accession: Experiment accession (e.g., ``"E-MEXP-31"``).
+
+        Files are written to the current working directory. Binary files
+        (e.g., ``.zip``) are written in binary mode; text files in text mode.
+
+        Example::
+
+            >>> from bioservices import ArrayExpress
+            >>> s = ArrayExpress()
+            >>> s.getAE("E-MEXP-31")  # doctest: +SKIP
+
+        """
+        filenames = self.get_files(accession)
         self.services.logging.info("Found %s files" % len(filenames))
-        for i, filename in enumerate(filenames):
-            res = self.retrieveFile(accession, filename)
-            if filename.endswith(".zip"):
-                with open(filename, "wb") as fout:
-                    self.services.logging.info("Downloading %s" % filename)
-                    fout.write(res)
-            else:
-                with open(filename, "w") as fout:
-                    self.services.logging.info("Downloading %s" % filename)
-                    fout.write(res)
+        for filename in filenames:
+            url = "files/{}/{}".format(accession, filename)
+            res = self.services.http_get(url, frmt="txt")
+            mode = "wb" if isinstance(res, bytes) else "w"
+            with open(filename, mode) as fout:
+                self.services.logging.info("Downloading %s" % filename)
+                fout.write(res)
