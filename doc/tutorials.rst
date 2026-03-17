@@ -6,12 +6,19 @@
 
 
 Tutorials
-============
+=========
 
-This section present the KEGG and BioModels services in more details.  The
-Protein test case study illustrates how several services can be used to get lots
-of information about a specific protein. New Contributino to this section are
-welcomed.
+The tutorials go deeper than the Quick Start: each one focuses on a specific
+service or use-case and shows realistic, end-to-end workflows.
+
+* **KEGG** — pathway retrieval, KGML parsing, and gene/compound look-up
+* **BioModels** — searching and downloading curated SBML models
+* **Protein** — combining multiple services to profile a single protein
+* **Compound** — exploring chemical entities via ChEBI, ChEMBL, and Rhea
+* **Convertor** — ID mapping across databases
+* **BioMart** — building queries and retrieving genomic data
+
+Contributions of new tutorials are welcome.
 
 .. toctree::
 

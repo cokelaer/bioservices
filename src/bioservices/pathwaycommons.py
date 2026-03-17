@@ -35,7 +35,7 @@
 Data is freely available, under the license terms of each contributing database.
 
 """
-from bioservices.services import REST, BioServicesError
+from bioservices.services import REST
 
 __all__ = ["PathwayCommons"]
 
@@ -80,7 +80,7 @@ class PathwayCommons:
         :param bool verbose: prints informative messages
 
         """
-        self.easyXMLConversion = False
+        pass
         self._default_extension = "json"
 
         self.services = REST(name="PathwayCommons", url=PathwayCommons._url, verbose=verbose, cache=cache)
@@ -200,7 +200,9 @@ class PathwayCommons:
         # if self.default_extension == "json":
         #    res = json.loads(res)
         if self.default_extension == "xml":
-            res = self.easyXML(res)
+            import bs4
+
+            res = bs4.BeautifulSoup(res, "xml")
 
         return res
 
@@ -249,7 +251,7 @@ class PathwayCommons:
         # validates the URIs
         if isinstance(uri, str):
             url = "pc2/get?uri=" + uri
-        elif instance(uri, list):
+        elif isinstance(uri, list):
             url = "pc2/get?uri=" + uri[0]
             if len(uri) > 1:
                 for u in uri[1:]:
@@ -309,7 +311,9 @@ class PathwayCommons:
         res = self.services.http_get(url, frmt=self.default_extension, params=params)
 
         if self.default_extension == "xml":
-            res = self.easyXML(res)
+            import bs4
+
+            res = bs4.BeautifulSoup(res, "xml")
         return res
 
     def graph(
@@ -566,7 +570,7 @@ class PathwayCommons:
         )
         try:
             return res.content
-        except:
+        except Exception:
             # if no match, returns code 406 and ""
             return None
 

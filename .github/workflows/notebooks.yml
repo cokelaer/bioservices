@@ -48,7 +48,8 @@ jobs:
 
     - name: Test notebooks with nbmake
       run: |
-        pytest --nbmake --nbmake-timeout=120 doc/notebooks/Overview.ipynb \
+        pytest --nbmake --nbmake-timeout=120 \
+          doc/notebooks/Overview.ipynb \
           doc/notebooks/UniProt.ipynb \
           doc/notebooks/KEGG.ipynb \
           doc/notebooks/ChEMBL.ipynb \
@@ -58,7 +59,13 @@ jobs:
           doc/notebooks/WikiPathway.ipynb \
           doc/notebooks/MUSCLE.ipynb \
           doc/notebooks/NCBIBlast.ipynb \
-          doc/notebooks/Gene_Mapping.ipynb
+          doc/notebooks/Gene_Mapping.ipynb \
+          doc/notebooks/ArrayExpress.ipynb \
+          doc/notebooks/BioMart.ipynb \
+          doc/notebooks/DrugDiscovery.ipynb \
+          doc/notebooks/Ensembl.ipynb \
+          doc/notebooks/Entrez_EUtils.ipynb \
+          doc/notebooks/EUtils.ipynb
 
     - name: Upload notebook test artifacts
       if: always()

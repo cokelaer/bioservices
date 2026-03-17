@@ -3,7 +3,7 @@ import pytest
 from bioservices import Ensembl
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def ensembl():
     return Ensembl(verbose=False)
 

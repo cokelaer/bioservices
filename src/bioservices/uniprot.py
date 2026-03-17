@@ -62,7 +62,7 @@ class UniProt:
         >>> from bioservices import UniProt
         >>> u = UniProt(verbose=False)
         >>> u.mapping("UniProtKB_AC-ID", "KEGG", query='P43403')
-        defaultdict(<type 'list'>, {'P43403': ['hsa:7535']})
+        {'results': [{'from': 'P43403', 'to': 'hsa:7535'}]}
         >>> res = u.search("P43403")
 
         # Returns sequence on the ZAP70_HUMAN accession Id
@@ -342,8 +342,8 @@ class UniProt:
     def __init__(self, verbose=False, cache=False):
         """**Constructor**
 
-        :param verbose: set to False to prevent informative messages
-        :param cache: set to True to cache request
+        :param bool verbose: set to False to prevent informative messages
+        :param bool cache: set to True to cache request
         """
 
         self.services = REST(name="UniProt", url=UniProt._url, verbose=verbose, cache=cache, url_defined_later=True)
@@ -405,8 +405,8 @@ class UniProt:
     ):
         """This is an interface to the UniProt mapping service
 
-        :param fr: the source database identifier. See :attr:`valid_mapping`.
-        :param to: the targetted database identifier. See :attr:`valid_mapping`.
+        :param str fr: the source database identifier. See :attr:`valid_mapping`.
+        :param str to: the target database identifier. See :attr:`valid_mapping`.
         :param query: a string containing one or more IDs separated by a comma
             It can also be a list of strings.
         :param polling_interval_seconds: the number of seconds between each status check of the current job
@@ -420,7 +420,7 @@ class UniProt:
             {'results': [{'from': 'P43403', 'to': 'hsa:7535'}]}
 
         The output is a dictionary. Identifiers that were not found are stored in the keys
-        'failedIds'. Succesful queries are stored in the 'results' key that is a list
+        'failedIds'. Successful queries are stored in the 'results' key that is a list
         of dictionaries with two keys set to 'from' and 'to'. The 'from' key should be in your input list.
         The 'to' key is the result. Here we have the KEGG identifier recognised by its prefix 'hsa:', which is for human.
         Sometimes the output ('to') it is more complicated. Consider the following  example::
@@ -497,13 +497,13 @@ class UniProt:
     def retrieve(self, uniprot_id, frmt="json", database="uniprot", include=False):
         """Search for a uniprot ID in UniProtKB database
 
-        :param str uniprot: a valid UniProtKB ID, or uniref, uniparc or taxonomy.
+        :param str uniprot_id: a valid UniProtKB ID, or uniref, uniparc or taxonomy.
         :param str frmt: expected output format amongst xml, txt, fasta, gff, rdf
-        :param str database:  database name in (uniprot, uniparc, uniref, taxonomy)
+        :param str database: database name in (uniprot, uniparc, uniref, taxonomy)
         :param bool include: include data with RDF format.
-        :return: if the parameter uniprot_id is string, the output will be a a list of identifiers is provided, the output is also a list
-            otherwise, a string. The content of the string of items in the list
-            depends on the value of **frmt**.
+        :return: if ``uniprot_id`` is a string, returns the entry directly;
+            if a list of identifiers is provided, returns a list of results.
+            The content depends on the value of **frmt**.
 
         ::
 
@@ -547,7 +547,7 @@ class UniProt:
             for i, x in enumerate(res):
                 try:
                     res[i] = json.loads(x)
-                except:
+                except Exception:
                     pass
 
         if isinstance(res, list) and len(res) == 1:
@@ -586,12 +586,12 @@ class UniProt:
         :param str frmt: a valid format amongst xlsx, fasta, gff,
             tsv and json. OTher format are not available within bioservices (rss, obo, rdf, xml)
             (default is tsv)
-        :param str columns: comma-separated list of values. Works only if fomat
+        :param str columns: comma-separated list of values. Works only if format
             is tsv or xlsx. For UnitProtKB, some possible columns are:
             id, entry name, length, organism.
             See also :attr:`~bioservices.uniprot.UniProt.valid_mapping`
             for the full list of column keywords.
-        :param bool include_isoform: include isoform sequences when the frmt
+        :param bool include_isoforms: include isoform sequences when the frmt
             parameter is fasta. Include description when frmt is rdf.
         :param str sort: by score by default. Set to None to bypass this behaviour
         :param bool compress: gzip the results
@@ -632,7 +632,7 @@ class UniProt:
 
         Finally, note that when you search for a query, you may have several hits::
 
-            >>> u.search("P12345)
+            >>> u.search("P12345")
 
         including the ID P12345 but also related entries. If you
         need only the entry that perfectly match the query, use::
@@ -764,7 +764,7 @@ class UniProt:
             u = uniprot.UniProt()
             u.search(query, frmt='tsv', sort="score", limit=1)
 
-        :returns: a dictionary.
+        :return: a dictionary.
 
         """
         res = self.search(query, "tsv", include_isoforms=False, sort="score", limit=limit, progress=False)
@@ -814,7 +814,7 @@ class UniProt:
 
         :param entries: list of valid entry name. if list is too large (about
             >200), you need to split the list
-        :param chunk: queries are processed by chunks
+        :param int nChunk: queries are processed by chunks of this size
         :param limit: limit number of entries per identifier to 10. You can
             set it to None to keep all entries but this will be very slow
         :return: dataframe with indices being the uniprot id (e.g. DIG1_YEAST)

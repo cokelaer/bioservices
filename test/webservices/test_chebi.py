@@ -1,58 +1,57 @@
+import pytest
+
 from bioservices import ChEBI
 
 
-def test_chebi():
-    ch = ChEBI()
-    ch.getCompleteEntity("CHEBI:10102")
-    res = ch.conv("CHEBI:10102", "KEGG COMPOUND")
+@pytest.fixture(scope="module")
+def chebi():
+    return ChEBI(verbose=False)
+
+
+def test_chebi(chebi):
+    chebi.getCompleteEntity("CHEBI:10102")
+    res = chebi.conv("CHEBI:10102", "KEGG COMPOUND")
     assert res == ["151319-34-5", "C07484"]
 
     try:
-        res = ch.conv("CHEBI:10102", "wrong db")
+        res = chebi.conv("CHEBI:10102", "wrong db")
         assert False
     except:
         assert True
 
-    ch.getOntologyChildren("CHEBI:27732")
-    ch.getOntologyParents("CHEBI:27732")
-    ch.getUpdatedPolymer("CHEBI:27732")
+    chebi.getOntologyChildren("CHEBI:27732")
+    chebi.getOntologyParents("CHEBI:27732")
+    chebi.getUpdatedPolymer("CHEBI:27732")
 
 
-def test_chebi_mass():
-    ch = ChEBI()
-    res = ch.getCompleteEntity("CHEBI:27732")
+def test_chebi_mass(chebi):
+    res = chebi.getCompleteEntity("CHEBI:27732")
     assert float(res.mass) == 194.194
 
 
-def test_polymer():
-    ch = ChEBI()
-    x = ch.getUpdatedPolymer("CHEBI:27732")
+def test_polymer(chebi):
+    x = chebi.getUpdatedPolymer("CHEBI:27732")
     assert x is not None
     assert x.chebiId is not None
 
 
-def test_completelist():
-    ch = ChEBI()
-    entities = ch.getCompleteEntityByList(["CHEBI:27732", "CHEBI:36707"])
-    names = [x.chebiAsciiName for x in entities]
-    names = [str(x) for x in names]
+def test_completelist(chebi):
+    entities = chebi.getCompleteEntityByList(["CHEBI:27732", "CHEBI:36707"])
+    names = [str(x.chebiAsciiName) for x in entities]
     assert names == ["caffeine", "2-acetyl-1-alkyl-sn-glycero-3-phosphocholine"]
 
 
-def test_search():
-    ch = ChEBI()
-    smiles = ch.getCompleteEntity("CHEBI:27732").smiles
+def test_search(chebi):
+    smiles = chebi.getCompleteEntity("CHEBI:27732").smiles
     assert smiles is not None
-    ch.getStructureSearch(smiles, "SMILES", "SIMILARITY", 3, 0.25)
+    chebi.getStructureSearch(smiles, "SMILES", "SIMILARITY", 3, 0.25)
 
 
-def test_ontology():
-    ch = ChEBI()
-    ch.getAllOntologyChildrenInPath("CHEBI:27732", "has part")
+def test_ontology(chebi):
+    chebi.getAllOntologyChildrenInPath("CHEBI:27732", "has part")
 
 
-def test_structure():
-    ch = ChEBI()
-    smiles = ch.getCompleteEntity("CHEBI:27732").smiles
+def test_structure(chebi):
+    smiles = chebi.getCompleteEntity("CHEBI:27732").smiles
     assert smiles is not None
-    ch.getStructureSearch(smiles, "SMILES", "SIMILARITY", 3, 0.25)
+    chebi.getStructureSearch(smiles, "SMILES", "SIMILARITY", 3, 0.25)

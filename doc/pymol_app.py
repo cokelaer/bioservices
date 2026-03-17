@@ -8,16 +8,16 @@ if os.path.isfile("bioservices_pdb.png"):
     os.remove("bioservices_pdb.png")
 
 # BioServices 1: obtain the PDB ID from a given uniprot ID (P43403 i.e. ZAP70)
-from bioservices import UniProt
+from bioservices import PDBe, UniProt
 
 print("Retrieving PDB ID")
 u = UniProt(verbose=False)
 res = u.mapping(fr="UniProtKB_AC-ID", to="PDB", query="P43403")
-pdb_id = res["results"]["P43403"][0]  # e.g, "1FBV"
+pdb_id = res["results"][0]["to"]  # e.g, "1FBV"
 
 # BioServices 2: Download the PDB file from the PDB Web Service
 print("Fetching PDB file")
-p = pdbe.PDBe()
+p = PDBe()
 res = p.get_files(pdb_id)
 
 # General: save the fetched file in a temporary file

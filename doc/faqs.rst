@@ -1,5 +1,5 @@
-FAQS
-########
+Help & Credits
+##############
 
 
 .. _troubleshootings:
@@ -29,36 +29,6 @@ To set the debug level on on a web service::
     u.logging.level = 'DEBUG'
 
 
-Installation issues
-=======================
-
-ValueError: unknown locale: UTF-8  under Mac OS X 10.7 - Lion
------------------------------------------------------------------
-
-The installation with PIP is succesful but I get a *"ValueError: unknown locale: UTF-8"* under Mac OS X 10.7 - Lion when typing **from bioservices import ***.
-
-On solution is to fix your environment by typing the following code in a shell::
-
-    export LANG="it_IT.UTF-8"
-    export LC_COLLATE="it_IT.UTF-8"
-    export LC_CTYPE="it_IT.UTF-8"
-    export LC_MESSAGES="it_IT.UTF-8"
-    export LC_MONETARY="it_IT.UTF-8"
-    export LC_NUMERIC="it_IT.UTF-8"
-    export LC_TIME="it_IT.UTF-8"
-    export LC_ALL=
-
-
-You can check if it works by typing ::
-
-    python -c 'import locale; print(locale.getdefaultlocale());'
-
-If this works without error, then it is fixed and you should be able to import
-bioservices. If so, make this solution persistent by adding the
-code into your environment. For that, just copy and paste the code in a file called
-.bashrc_profile (or .bashrc)
-
-:reference: `blog entry <http://patrick.arminio.info/blog/2012/02/fix-valueerror-unknown-locale-utf8/>`_
 
 
 General questions
@@ -67,29 +37,16 @@ General questions
 How can I figure out the taxonomy identifier of the mouse ?
 -------------------------------------------------------------
 
-You can use the Taxon class that uses Ensembl/UniProt/Eutils depending on the
-tasks. Here, we do not know the scientific name of taxonomy identifier of the
-mouse. We can use the search_by_name fuction:
+You can use the `EUtils` class to search the NCBI taxonomy database. Here is how
+to find the taxonomy identifier of the mouse ("mouse")::
 
-.. warning:: Taxon class is not part of BioServices but some
-    utilities have been added to BioKit (github.com/biokit)
+    >>> from bioservices import EUtils
+    >>> e = EUtils()
+    >>> res = e.ESearch(db="taxonomy", term="mouse")
+    >>> res['idlist']
+    ['10090']
 
-.. versionchanged:: 1.3
-
-In earlier version of BioServices, you could use::
-
-    >>> from bioservices import Taxon
-    >>> t = Taxon()
-    >>> t.search_by_name("mouse")
-    u'10090'
-
-But this is now in BioKit::
-
-    >>> from biokit import Taxonomy
-    >>> t = Taxonomy()
-    >>> results = t.fetch_by_name('mouse')
-    >>> results[0]['id']
-    u'10090'
+This returns the identifiers, where `10090` is the taxon ID for *Mus musculus*.
 
 
 How to convert ID from one database to another ?
@@ -123,17 +80,17 @@ This may happen. Consider::
     u.search("P53")
 
 This request performed on UniProt web sites is actually pretty fast but there
-are 386 pages of results. In BioServices, the search commands reads the 386
-pages of results and then stores the result in a variable. So it may take a while.
+may be hundreds of pages of results. In BioServices, the search command reads all
+pages and stores the result in a variable. So it may take a while.
 
-More generally if a request returns a very long result, it may take a while.
-You can use the socket module::
+More generally, if a request takes too long, you can configure a timeout for the
+underlying REST service rather than for the whole python environment::
 
-    import socket
-    socket.setdefaulttimeout(5.)
+    from bioservices import UniProt
+    u = UniProt()
+    u.services.TIMEOUT = 5.0 # seconds
 
-After 5 seconds, the read() call will stop returning whatever has been read so
-far.
+After 5 seconds, the request will raise a Timeout error if it hasn't completed.
 
 
 KEGG service
@@ -155,8 +112,8 @@ code for 2 proteins::
 There are 2 pathways containing the proteins 7535 and 6885.
 
 
-Interest of the BioServices classes REST and WSDL ?
-====================================================
+Interest of the BioServices REST base class
+============================================
 
 There are a few technical aspects covered by BioServices to ease our life when
 adding new modules such as timeout, long request, headers, and so on.
@@ -173,3 +130,27 @@ The alternative to the GET method is the POST method. This method packages the
 name/value pairs inside the body of the HTTP request, which makes for a cleaner
 URL and imposes no size limitations on the forms output. It is also more
 secure.
+
+
+.. _contributors:
+
+Credits
+=======
+
+Contributors are the authors who started the development of BioServices
+(and authors of this reference on `BioInformatics <http://bioinformatics.oxfordjournals.org/content/29/24/3241>`_).
+
+In addition to the main authors of the papers the following developers have
+implemented modules now available in BioServices:
+
+ * Achilles Rasquinha implemented the BiGG models service :class:`bioservices.bigg` module
+ * Sven-Maurice Althoff, Christian Knauth implemented the :class:`bioservices.muscle` module.
+ * Patrick Short implemented the :class:`bioservices.clinvitae` module
+
+And thank you also to the contributions from users who have sent communication
+via emails or via the `ticket system <https://github.com/cokelaer/bioservices/issues>`_.
+
+Special thanks to Thoba Lose (https://github.com/thobalose) and
+https://github.com/jsmusach for various pull requests.
+
+Note that originally code (and earlier tickets) were hosted `elsewhere <https://www.assembla.com/spaces/bioservices/tickets>`_.

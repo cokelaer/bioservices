@@ -41,10 +41,8 @@
         -- from Rhea Home page, Dec 2012 (http://www.ebi.ac.uk/rhea/about.xhtml)
 
 """
-from collections import defaultdict
-
-from bioservices.services import REST
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
@@ -77,7 +75,7 @@ class Rhea:
         r = Rhea()
         response = r.search("a?e?o*")
 
-    The :meth:`search` :meth:`entry` methods require a list of valid columns.
+    The :meth:`search` and :meth:`query` methods accept a list of valid columns.
     By default all columns are used but you can restrict to only a few. Here is
     the description of the columns::
 
@@ -118,7 +116,8 @@ class Rhea:
     def __init__(self, verbose=True, cache=False):
         """.. rubric:: Rhea constructor
 
-        :param bool verbose: True by default
+        :param bool verbose: set to True to get informative messages (default True)
+        :param bool cache: set to True to enable HTTP caching
 
         ::
 
@@ -130,10 +129,12 @@ class Rhea:
     def search(self, query, columns=None, limit=None, frmt="tsv"):
         """Search for Rhea (mimics https://www.rhea-db.org/)
 
-        :param str query: the search term using format parameter
-        :param str format: the biopax2 or cmlreact format (default)
-
-        :Returns: A pandas DataFrame.
+        :param str query: the search term (e.g., ``"caffeine"``, ``"caffe*"``)
+        :param str columns: comma-separated column names to include in the result.
+            Defaults to all columns (see :attr:`_valid_columns`).
+        :param int limit: maximum number of results to return
+        :param str frmt: result format (default ``"tsv"``)
+        :return: a pandas DataFrame if pandas is installed, otherwise the raw TSV string
 
         ::
 
@@ -155,22 +156,25 @@ class Rhea:
         response = self.services.http_get("rhea/?query={}".format(query), frmt="txt", params=params)
 
         try:
-            import pandas as pd
             import io
+
+            import pandas as pd
 
             df = pd.read_csv(io.StringIO(response), sep="\t")
             return df
-        except Exception as err:
+        except Exception:
             return response
 
     def query(self, query, columns=None, frmt="tsv", limit=None):
         """Retrieve a concrete reaction for the given id in a given format
 
         :param str query: the entry to retrieve
-        :param str frmt: the result format (tsv); only tsv accepted for now (Nov
-            2020).
+        :param str query: the query string (e.g., ``"uniprot:*"``, ``""`` for all)
+        :param str columns: comma-separated column names to include in the result.
+            Defaults to all columns (see :attr:`_valid_columns`).
+        :param str frmt: result format (default ``"tsv"``; only TSV is currently supported)
         :param int limit: maximum number of results to retrieve
-        :Returns: dataframe
+        :return: a pandas DataFrame if pandas is installed, otherwise the raw TSV string
 
 
         Retrieve Rhea reaction identifiers and equation text::
@@ -205,12 +209,13 @@ class Rhea:
 
         response = self.services.http_get("rhea?".format(query), frmt="txt", params=params)
         try:
-            import pandas as pd
             import io
+
+            import pandas as pd
 
             df = pd.read_csv(io.StringIO(response), sep="\t")
             return df
-        except Exception as err:
+        except Exception:
             return response
 
     def get_metabolites(self, rxn_id):
@@ -219,8 +224,8 @@ class Rhea:
 
         e.g. '2 H + 1 O2 = 1 H2O' would be represented ad {'H': -2, 'O2': -1, 'H2O': 1}.
 
-        :param rxn_id: Rhea reaction id
-        :return: dict of participant metabolites.
+        :param str rxn_id: Rhea reaction ID (e.g., ``"RHEA:10661"``)
+        :return: dict with ``"reactants"`` and ``"products"`` keys, each a list of metabolite names
         """
         response = self.entry(rxn_id, frmt="cmlreact")
 

@@ -1,8 +1,9 @@
-from bioservices.quickgo import QuickGO
 import pytest
 
+from bioservices.quickgo import QuickGO
 
-@pytest.fixture
+
+@pytest.fixture(scope="module")
 def quickgo():
     return QuickGO(verbose=False, cache=False)
 
@@ -44,6 +45,7 @@ def test_go_chart(quickgo):
     res = quickgo.get_go_chart("GO:0022804")
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_go_paths(quickgo):
     res = quickgo.get_go_paths("GO:0022804", "GO:0005215")
     assert len(res)

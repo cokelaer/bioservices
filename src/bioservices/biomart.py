@@ -13,8 +13,8 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-"""This module provides a class :class:`~BioModels` that allows an easy access
-to all the BioModel service.
+"""This module provides a class :class:`~BioMart` that allows easy access
+to the BioMart service.
 
 
 .. topic:: What is BioMart ?
@@ -48,7 +48,7 @@ def require_host(f):
     @wraps(f)
     def wrapper(*args, **kargs):
         if args[0].host is None:
-            print("You must set the host (e.g. f.host='www.ensembl.org' ")
+            logger.error("You must set the host (e.g. f.host='www.ensembl.org')")
             return
         return f(*args, **kargs)
 
@@ -273,11 +273,10 @@ class BioMart(REST):
 
         """
         ret = self.http_get("?type=registry", frmt="xml")
-        ret = self.easyXML(ret)
-        # the XML contains list of children called MartURLLocation made
-        # of attributes. We parse the xml to return a list of dictionary.
-        # each dictionary correspond to one MART.
-        ret = [x.attrib for x in ret.getchildren()]
+        import xml.etree.ElementTree as ET
+
+        root = ET.fromstring(ret)
+        ret = [x.attrib for x in root]
         return ret
 
     @require_host
@@ -301,7 +300,7 @@ class BioMart(REST):
             try:
                 ret2 = [x.split("\t") for x in ret.split("\n") if len(x.strip())]
                 ret = [x[1] for x in ret2]
-            except:
+            except Exception:
                 ret = ["?"]
         return ret
 
@@ -311,8 +310,6 @@ class BioMart(REST):
             raise BioServicesError("Provided mart name (%s) is not valid. see 'names' attribute" % mart)
 
         ret = self.http_get("?type=datasets&mart=%s" % mart, frmt="txt")
-        import pandas as pd
-
         df = pd.read_csv(
             StringIO(ret),
             sep="\t",
@@ -378,8 +375,9 @@ class BioMart(REST):
 
         """
         ret = self.http_get("?type=configuration&dataset=%s" % dataset, frmt="xml")
-        ret = self.easyXML(ret)
-        return ret
+        import bs4
+
+        return bs4.BeautifulSoup(ret, "xml")
 
     @require_host
     def version(self, mart):
@@ -389,11 +387,24 @@ class BioMart(REST):
 
         """
         ret = self.http_get("?type=version&mart=%s" % mart, frmt="xml")
-        ret = self.easyXML(ret)
-        return ret.root.strip()
+        return ret.strip()
 
     @require_host
     def new_query(self):
+        """Reset the current query, clearing all datasets, filters and attributes.
+
+        Call this before building a new BioMart XML query from scratch.
+
+        Example::
+
+            >>> from bioservices import BioMart
+            >>> s = BioMart(host="www.ensembl.org", verbose=False)
+            >>> s.new_query()
+            >>> s.add_dataset_to_xml("mmusculus_gene_ensembl")
+            >>> s.add_attribute_to_xml("ensembl_gene_id")
+            >>> xml = s.get_xml()
+
+        """
         self._biomartQuery.reset()
 
     @require_host
@@ -451,6 +462,7 @@ class BioMart(REST):
                 raise BioServicesError("Invalid filter name. ")
         if isinstance(value, list):
             value = ",".join(str(v) for v in value)
+        value = str(value)
         _filter = ""
         if "=" in value:
             _filter = """        <Filter name = "%s" %s/>""" % (name, value)
@@ -544,7 +556,7 @@ class BioMart(REST):
             for i, name in enumerate(self.names):
                 try:
                     res[name] = [x.split("\t")[1] for x in results[i].split("\n") if len(x.strip()) > 1]
-                except:
+                except Exception:
                     res[name] = "?"
             self._valid_attributes = res.copy()
         return self._valid_attributes
@@ -553,6 +565,19 @@ class BioMart(REST):
 
     @require_host
     def lookfor(self, pattern, verbose=True):
+        """Search the registry for MARTs whose name, database, or displayName matches *pattern*.
+
+        :param str pattern: case-insensitive substring to search for
+            (e.g., ``"interpro"``, ``"ensembl"``).
+        :param bool verbose: if ``True`` (default), print each matching entry.
+
+        Example::
+
+            >>> from bioservices import BioMart
+            >>> s = BioMart(host="www.ensembl.org", verbose=False)
+            >>> s.lookfor("ensembl")
+
+        """
         for a, x, y, z in zip(self.hosts, self.databases, self.names, self.displayNames):
             found = False
             if pattern.lower() in x.lower():
@@ -570,6 +595,16 @@ class BioMart(REST):
 
 
 class BioMartQuery(object):
+    """Builder for BioMart XML queries.
+
+    Accumulates dataset, filter, and attribute XML fragments and renders
+    them into a complete BioMart query document via :meth:`get_xml`.
+
+    Normally used indirectly through :class:`BioMart` helper methods
+    (:meth:`~BioMart.add_dataset_to_xml`, :meth:`~BioMart.add_filter_to_xml`,
+    :meth:`~BioMart.add_attribute_to_xml`, :meth:`~BioMart.get_xml`).
+    """
+
     def __init__(
         self,
         version="1.0",

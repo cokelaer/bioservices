@@ -1,4 +1,3 @@
-from bioservices.ena import ENA
 from bioservices.eutils import EUtils
 
 
@@ -45,5 +44,3 @@ def _download_gbk_ncbi(accession, output_filename, service=None):
     # Save to local file
     with open(output_filename, "w") as fout:
         fout.write(data)
-
-

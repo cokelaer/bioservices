@@ -41,10 +41,10 @@ __all__ = ["Pfam"]
 class Pfam:
     """Interface to `Pfam <https://www.ebi.ac.uk/interpro/>`_ pages
 
-    This is not a REST interface actually but rather a parser to some of the
-    HTML pages related to pathways.
+    This is not a REST interface but rather a parser to some of the
+    HTML pages related to Pfam families.
 
-    One can retrieve the pathways names and their list of proteins.
+    One can retrieve protein family information and associated sequences.
 
         >>> from bioservices import *
         >>> p = Pfam()
@@ -56,20 +56,30 @@ class Pfam:
     def __init__(self, verbose=True):
         """**Constructor**
 
-        :param verbose: set to False to prevent informative messages
+        :param bool verbose: set to False to prevent informative messages
         """
         self.services = REST(name="Pfam", url=Pfam._url, verbose=verbose)
 
     def show(self, Id):
-        """Just an example of opening a web page with a uniprot Id
+        """Open the Pfam protein page for a UniProt ID in a web browser.
 
-        p = Pfam()
-        p.show("P43403")
+        :param str Id: a UniProt accession (e.g., ``"P43403"``)
+
+        ::
+
+            p = Pfam()
+            p.show("P43403")
 
         """
         url = self._url + "/protein/" + Id
         self.services.on_web(url)
 
     def get_protein(self, ID, output="json"):
+        """Retrieve protein information from Pfam.
+
+        :param str ID: a UniProt accession (e.g., ``"P43403"``)
+        :param str output: response format (default ``"json"``)
+        :return: raw response content
+        """
         res = self.services.http_get("protein", params={"id": ID, "output": output})
         return res.content

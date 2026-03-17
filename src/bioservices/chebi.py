@@ -21,14 +21,13 @@
 
     .. highlights::
 
-        "The database and ontology of Chemical Entities of Biological Interest
+        "The database and ontology of Chemical Entities of Biological Interest"
 
-        -- From ChEBI web page June 2013
+        -- From ChEBI web page
 
 
 """
-from bioservices import REST
-from bioservices import logger
+from bioservices import REST, logger
 
 logger.name = __name__
 
@@ -44,7 +43,7 @@ _RELATION_TYPE_MAP = {
     "is tautomer of": "is_tautomer_of",
     "is enantiomer of": "is_enantiomer_of",
     "has functional parent": "has_functional_parent",
-    "has parent hybride": "has_parent_hydride",
+    "has parent hydride": "has_parent_hydride",
     "is substituent group of": "is_substituent_group_from",
 }
 
@@ -221,10 +220,12 @@ class ChEBI(REST):
         """Retrieve a list of lite entities matching a search term.
 
         :param str search: search string (ChEBI name, identifier, SMILES, etc.)
-        :param str searchCategory: filter category (default ``"ALL"``)
+        :param str searchCategory: filter category (default ``"ALL"``);
+            currently unused by the REST backend – all categories are searched
         :param int maximumResults: maximum number of results (default 200)
         :param str stars: star filter – ``"ALL"``, ``"TWO ONLY"``,
-            or ``"THREE ONLY"`` (default ``"ALL"``)
+            or ``"THREE ONLY"`` (default ``"ALL"``);
+            currently unused by the REST backend
         :return: list of :class:`ChebiEntity` objects
 
         ::
@@ -298,6 +299,7 @@ class ChEBI(REST):
             ``"is conjugate acid of"``, ``"is tautomer of"``,
             ``"is enantiomer of"``, ``"has functional parent"``,
             ``"has parent hydride"``, ``"is substituent group of"``
+            (see module-level ``_RELATION_TYPE_MAP`` for the full list)
         :param bool onlyWithChemicalStructure: filter to entities with a
             chemical structure (default ``False``)
         :return: list of ontology relation dicts

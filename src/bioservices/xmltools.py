@@ -16,11 +16,9 @@
 ##############################################################################
 """This module includes common tools to manipulate XML files"""
 import xml.etree.ElementTree as ET
+from urllib.request import urlopen
 
 import bs4
-
-from urllib.error import HTTPError
-from urllib.request import urlopen
 
 __all__ = ["easyXML", "readXML"]
 
@@ -75,7 +73,7 @@ class easyXML(object):
 
         try:
             self.root = ET.fromstring(self.data)
-        except:
+        except Exception:
             self.root = self.data[:]
         self._soup = None
         self.prettify = self.soup.prettify
@@ -125,7 +123,7 @@ class XMLObjectify(object):
 
         try:
             self.root = objectify.fromstring(obj.data)
-        except:
+        except Exception:
             # try something else
             self.root = objectify.fromstring(obj)
         self.obj = obj

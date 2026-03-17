@@ -305,7 +305,7 @@ class EUtils:
         """Alias to Efetch for the SNP database
 
 
-        :Return: a json data structure.
+        :return: a json data structure
 
         ::
 
@@ -329,7 +329,7 @@ class EUtils:
 
         ::
 
-            >>> ret = s.EFetch("omim", "269840")  --> ZAP70
+            >>> ret = s.EFetch("omim", "269840")  # ZAP70
             >>> ret = s.EFetch("taxonomy", "9606", retmode="xml")
             >>> [x.text for x in ret.getchildren()[0].getchildren() if x.tag=="ScientificName"]
             ['Homo sapiens']
@@ -390,9 +390,9 @@ class EUtils:
 
         params = self._get_efetch_params(**kargs)
 
-        if "strand" in params.keys() and params["strand"] != None:
+        if "strand" in params.keys() and params["strand"] is not None:
             self.devtools.check_param_in_list(params["strand"], [1, 2])
-        if "complexity" in params.keys() and params["complexity"] != None:
+        if "complexity" in params.keys() and params["complexity"] is not None:
             self.devtools.check_param_in_list(params["complexity"], [0, 1, 2, 3, 4])
 
         query = "efetch.fcgi?db=%s&id=%s&retmode=%s" % (db, sid, retmode)
@@ -400,7 +400,7 @@ class EUtils:
         ret = self.services.http_get(query, params=params)
         try:
             ret = ret.content
-        except:
+        except Exception:
             pass
 
         if _retmode == "dict" and isinstance(ret, (bytes, str)):
@@ -459,12 +459,12 @@ class EUtils:
         ret = self.services.http_get(query, frmt="json", params=params)
         try:
             ret = ret.content
-        except:
+        except Exception:
             pass
 
         try:
             return ret["einforesult"]["dbinfo"]
-        except:
+        except Exception:
             return ret
 
     def parse_xml(self, ret, method=None):
@@ -472,11 +472,13 @@ class EUtils:
             method = self._xmlparser
 
         if method == "EUtilsParser":
-            ret = self.services.easyXML(ret)
-            return EUtilsParser(ret)
-        elif method == "objectify":  # used in docstrings
-            from bioservices.xmltools import XMLObjectify
+            import xml.etree.ElementTree as ET
 
+            root = ET.fromstring(ret)
+            res = AttrDict()
+            res[root.tag] = EUtilsParser(root)
+            return res
+        elif method == "objectify":  # used in docstrings
             return XMLObjectify(ret)
         elif method == "dict":
             import xmltodict
@@ -520,7 +522,7 @@ class EUtils:
         ret = self.services.http_get(query, frmt="json", params=params)
         try:
             return ret["result"]
-        except:
+        except Exception:
             return ret
 
     def EGQuery(self, term, **kargs):
@@ -556,7 +558,7 @@ class EUtils:
         try:
             ret = self.parse_xml(ret)["Result"]
             return ret
-        except:
+        except Exception:
             return ret
 
     def ESearch(self, db, term, **kargs):
@@ -572,7 +574,7 @@ class EUtils:
 
         ::
 
-            >>> ret = e.ESearch('protein', 'human', RetMax=5)
+            >>> ret = e.ESearch('protein', 'human', retmax=5)
             >>> ret = e.ESearch('taxonomy', 'Staphylococcus aureus[all names]')
             >>> ret = e.ESearch('pubmed', "cokelaer AND BioServices")
 
@@ -581,16 +583,16 @@ class EUtils:
             >>> identifiers = e.pubmed(ret['idlist'][0])
 
         More complex requests can be used. We will not cover all the
-        possiblities (see the NCBI website). Here is an example to tune
+        possibilities (see the NCBI website). Here is an example to tune
         the search term to look into PubMed for the journal PNAS
-        Volume 16, and retrieve.::
+        Volume 16::
 
             >>> e.ESearch("pubmed", "PNAS[ta] AND 16[vi]")
 
         You can then look more closely at a specific identifier using EFetch::
 
-            >>> e = EFetch("pubmed")
-            >>> e.Efetch(identifiers)
+            >>> e = EUtils()
+            >>> e.EFetch("pubmed", identifiers)
 
         .. note:: valid parameters can be found by calling
             :meth:`_get_esearch_params`
@@ -604,7 +606,7 @@ class EUtils:
         ret = self.services.http_get(query, frmt="json", params=params)
         try:
             return ret["esearchresult"]
-        except:
+        except Exception:
             return ret
 
     def ESpell(self, db, term, **kargs):
@@ -619,7 +621,8 @@ class EUtils:
 
             >>> ret = e.ESpell(db="pubmed", term="aasthma+OR+alergy")
             >>> ret = ret['eSpellResult']
-            >>> ret['Query']            'asthmaa OR alergies'
+            >>> ret['Query']
+            'asthmaa OR alergies'
             >>> ret['CorrectedQuery']
             'asthma or allergy'
             >>> ret = e.ESpell(db="pubmed", term="biosservices")
@@ -638,12 +641,11 @@ class EUtils:
             ret = ret.content
             ret = self.parse_xml(ret, "EUtilsParser")
             return ret
-        except:
+        except Exception:
             return ret
 
     def ECitMatch(self, bdata, **kargs):
-        r"""
-
+        r"""Retrieve PubMed IDs that correspond to a set of input citation strings.
 
         :param bdata: Citation strings. Each input citation must
             be represented by a citation string in the following format::
@@ -680,7 +682,7 @@ class EUtils:
         ret = self.services.http_get(query, None, params=params)
         try:
             ret = ret.content
-        except:
+        except Exception:
             pass
 
         return ret
@@ -800,15 +802,35 @@ class EUtils:
         ret = self.services.http_get(query, "xml", params=params)
         try:
             ret = ret.content
-        except:
+        except Exception:
             pass
-        ret = self.services.easyXML(ret)
-        for item in ret.getchildren():
+        import xml.etree.ElementTree as ET
+
+        root = ET.fromstring(ret)
+        for item in root:
             if item.tag == "QueryKey":
                 query_key = item.text
             elif item.tag == "WebEnv":
                 webenv = item.text
         return {"WebEnv": webenv, "QueryKey": query_key}
+
+
+class XMLObjectify(object):
+    def __init__(self, obj):
+        from lxml import objectify
+
+        try:
+            # easyXML compatibility
+            self.root = objectify.fromstring(obj.data)
+        except AttributeError:
+            self.root = objectify.fromstring(obj)
+        self.obj = obj
+
+    def __str__(self):
+        txt = ""
+        for child in self.root.getchildren():
+            txt += child.tag + "\n"
+        return txt
 
 
 class AttrDict(dict):
@@ -832,7 +854,7 @@ class EUtilsParser(AttrDict):
             children = []
             # children = xml.root.getchildren()[0].getchildren()
             # self.__name = xml.root.getchildren()[0].tag
-        except:
+        except Exception:
             children = [x for x in xml]
             if len(children) == 0:
                 self[xml.tag] = xml.text
@@ -842,7 +864,7 @@ class EUtilsParser(AttrDict):
                 if child.tag in self.keys():
                     try:
                         self[child.tag].append(child.text)
-                    except:
+                    except Exception:
                         self[child.tag] = [self[child.tag]]
                         self[child.tag].append(child.text)
                 else:
@@ -855,7 +877,7 @@ class EUtilsParser(AttrDict):
                 else:
                     try:
                         self[child.tag].append(e)
-                    except:
+                    except Exception:
                         self[child.tag] = [self[child.tag]]
                         self[child.tag].append(e)
 

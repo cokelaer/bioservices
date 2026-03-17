@@ -33,7 +33,6 @@
 
 
 """
-import sys
 import time
 
 from bioservices import logger
@@ -93,12 +92,14 @@ class NCBIblast:
 
         :returns: An XML document containing a list of parameter names.
 
+        :return: a list of parameter name strings
+
         ::
 
-            >>> from bioservices import ncbiblast
-            >>> n = ncbiblast.NCBIblast()
+            >>> from bioservices import NCBIblast
+            >>> n = NCBIblast()
             >>> res = n.get_parameters()
-            >>> [x.text for x in res.findAll("id")]
+            >>> print(res)
 
         .. seealso:: :attr:`parameters` to get a list of the parameters without
             need to process the XML output.
@@ -128,8 +129,8 @@ class NCBIblast:
     def get_parameter_details(self, parameterId):
         """Get detailed information about a parameter.
 
-        :returns: An XML document providing details about the parameter or a list
-            of values that can take the parameters if the XML could be parsed.
+        :param str parameterId: a valid parameter name (see :attr:`parameters`)
+        :return: a list of accepted values for the parameter
 
         For example::
 
@@ -160,7 +161,7 @@ class NCBIblast:
 
             try:
                 data = [x["value"] for x in res["values"]["values"]]
-            except:
+            except Exception:
                 data = res
             self._parametersDetails[parameterId] = data
         return self._parametersDetails[parameterId]
@@ -168,12 +169,7 @@ class NCBIblast:
     def run(self, program=None, database=None, sequence=None, stype="protein", email=None, **kargs):
         """Submit a job with the specified parameters.
 
-        .. python ncbiblast_urllib2.py -D ENSEMBL --email "test@yahoo.com" --sequence
-        .. MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS
-        .. --program blastp --database uniprotkb
-
-
-        .. rubric:: Compulsary arguments
+        .. rubric:: Compulsory arguments
 
         :param str program: BLAST program to use to perform the search (e.g., blastp)
         :param str sequence: query sequence. The use of fasta formatted sequence is recommended.
@@ -185,7 +181,7 @@ class NCBIblast:
 
         .. rubric:: Optional arguments. If not provided, a default value will be used
 
-        :param str type: query sequence type in 'dna', 'rna' or 'protein' (default is protein).
+        :param str stype: query sequence type in 'dna', 'rna' or 'protein' (default is protein).
         :param str matrix: scoring matrix to be used in the search (e.g., BLOSUM45).
         :param bool gapalign:  perform gapped alignments.
         :param int alignments:     maximum number of alignments displayed in the output.
@@ -203,8 +199,8 @@ class NCBIblast:
         :return: A jobid that can be analysed with :meth:`getResult`,
             :meth:`getStatus`, ...
 
-        The up to data values accepted for each of these parameters can be
-        retrieved from the :meth:`get_parameter_details`.
+        The up-to-date values accepted for each of these parameters can be
+        retrieved from :meth:`get_parameter_details`.
 
         For instance,::
 
@@ -225,7 +221,7 @@ class NCBIblast:
             database=["uniprotkb", "uniprotkb_swissprot"]
 
         The returned object is a jobid, which status can be checked. It must be
-        finished before analysing/geeting the results.
+        finished before analysing/getting the results.
 
         .. seealso:: :meth:`getResult`
 
@@ -309,9 +305,8 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
     def get_status(self, jobid):
         """Get status of a submitted job
 
-        :param str jobid:
         :param str jobid: a job identifier returned by :meth:`run`.
-        :return: A string giving the jobid status (e.g. FINISHED).
+        :return: a string giving the job status (e.g. ``"FINISHED"``).
 
          The values for the status are:
 
@@ -337,12 +332,7 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
         """Get available result types for a finished job.
 
         :param str jobid: a job identifier returned by :meth:`run`.
-        :param bool verbose: print the identifiers together with their label,
-            mediaTypes, description and filesuffix.
-
-        :return: A dictionary, which keys correspond to the identifiers. Each
-            identifier is itself a dictionary containing the label, description,
-            file suffix and mediaType of the identifier.
+        :return: a list of result type identifier strings
         """
         if self.get_status(jobid) != "FINISHED":
             self.services.logging.warning("waiting for the job to be finished. May take a while")
@@ -362,13 +352,13 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
         """Get the job result of the specified type.
 
 
-          :param str jobid: a job identifier returned by :meth:`run`.
-          :param str  result_type: type of result to retrieve. See :meth:`getResultTypes`.
+        :param str jobid: a job identifier returned by :meth:`run`.
+        :param str result_type: type of result to retrieve. See :meth:`get_result_types`.
+        :return: the raw result content for the given type.
 
-          The output from the tool itself.
-          Use the 'format' parameter to retireve the output in different formats,
-          the 'compressed' parameter to retrieve the xml output in compressed form.
-          Format options::
+        Use the ``format`` parameter to retrieve output in different formats and
+        ``compressed=true`` to retrieve XML output in compressed form.
+        Format options::
 
              0 = pairwise,
              1 = query-anchored showing identities,
@@ -419,8 +409,7 @@ parser.add_option('--resultTypes', action='store_true', help='get result types')
     def wait(self, jobId):
         """This function checks the status of a jobid while it is running
 
-        :param str jobid: a job identifier returned by :meth:`run`.
-        :param int checkInterval: interval between requests in seconds.
+        :param str jobId: a job identifier returned by :meth:`run`.
 
         """
 

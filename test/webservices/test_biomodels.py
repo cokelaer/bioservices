@@ -174,14 +174,6 @@ def test_getModelsIdByChEBIId(biomodels):
 def test_getSimpleModelsByChEBIIds(biomodels):
     biomodels.getSimpleModelsByChEBIIds('CHEBI:4978')
 
-# FIXME
-def _test_getSimpleModelsRelatedWithChEBI(biomodels):
-    res = biomodels.getSimpleModelsRelatedWithChEBI()
-    from bioservices import xmltools
-    res = xmltools.easyXML(res.encode('utf-8'))
-    modelIDs = set([x.findall('modelId')[0].text for x in res.getchildren()])
-    assert len(modelIDs) > 1
-
 def test_getPublicationByModelId(biomodels):
     res = biomodels.getPublicationByModelId("BIOMD0000000256")
     assert res == '16932741'

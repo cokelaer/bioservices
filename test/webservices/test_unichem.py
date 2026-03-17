@@ -1,5 +1,6 @@
-from bioservices import UniChem
 import pytest
+
+from bioservices import UniChem
 
 
 @pytest.fixture
@@ -35,6 +36,7 @@ def test_get_sources_by_inchikey(unichem):
     assert unichem.get_sources_by_inchikey(["AAOV"]) == {"AAOV": {}}
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_connectivity(unichem):
     res = unichem.get_connectivity("GZUITABIAKMVPG-UHFFFAOYSA-N", "inchikey")
     assert "sources" in res

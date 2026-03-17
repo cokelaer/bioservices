@@ -2,27 +2,6 @@
 
 
 
-Utilities
-##############
-
-Service module (REST or WSDL)
-===================================================================
-
-.. automodule:: bioservices.services
-    :members:
-    :undoc-members:
-    :synopsis:
-
-xmltools module
-========================
-
-.. automodule:: bioservices.xmltools
-    :members:
-    :undoc-members:
-    :synopsis:
-
-
-
 Services
 #############
 

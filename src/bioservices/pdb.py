@@ -32,7 +32,6 @@
 """
 from bioservices.services import REST
 
-
 __all__ = ["PDB"]
 
 
@@ -55,16 +54,16 @@ class PDB:
         ...                 }
         ...             },
         ...          "return_type": "entry"}
-        >>> res = s.search(query, return_type=return_type)
+        >>> res = s.search(query)
 
 
-    .. note:: as of December 2020, a new API has be set up by PDB.
-        some prevous functionalities such as return list of Ligand are not
-        supported anymore (Jan 2021). However, many more powerful searches as
+    .. note:: as of December 2020, a new API has been set up by PDB.
+        Some previous functionalities such as returning a list of Ligands are not
+        supported anymore (Jan 2021). However, many more powerful searches are
         available. I encourage everyone to look at the PDB page for complex
         examples: http://search.rcsb.org/#examples
 
-    As mentionnaed above, the PDB service provide one method called search available in
+    As mentioned above, the PDB service provides one method called search available in
     :meth:`~bioservices.pdb.PDB.search`. We will not cover all the power and
     capability of this search function. User should refer to the official PDB help
     for that. Yet, given examples from PDB should all work with this method.
@@ -74,7 +73,7 @@ class PDB:
     :meth:`~bioservices.pdb.PDB.get_similarity_sequence` that users may find useful.
 
     The main idea behind the PDB API is to create queries that can access to
-    different type of services. A query will need to at least two keys:
+    different type of services. A query will need at least two keys:
 
     - **query**
     - **return_type**
@@ -178,7 +177,7 @@ class PDB:
         }
 
     Here, the query searches for the polymer_entity that have a formula weight
-    above 500. Withe request_options pager set to 100, we will get the first 100
+    above 500. With the request_options pager set to 100, we will get the first 100
     hits.
 
     To return all hits, set this field in the request_options::
@@ -210,7 +209,7 @@ class PDB:
     Sorting is determined by the sort object in the request_options context.
     It allows you to add one or more sorting conditions to control the order of
     the search result hits. The sort operation is defined on a per field level, with
-    special field name for score to sort by score (the default)<
+    special field name for score to sort by score (the default).
 
     By default sorting is done in descending order ("desc"). The sort can be
     reversed by setting direction property to "asc". This example demonstrates how
@@ -246,6 +245,7 @@ class PDB:
         """.. rubric:: Constructor
 
         :param bool verbose: prints informative messages (default is off)
+        :param bool cache: set to True to enable HTTP caching
 
         """
         self.services = REST(name="PDB", verbose=verbose, cache=cache, url_defined_later=True)
@@ -260,14 +260,14 @@ class PDB:
         Note, however, that we have aliases methods in BioServices that will be
         added on demand for common searches.
 
-        :param str query: the search expression. Can be omitted if, instead of IDs retrieval,
+        :param dict query: the search expression. Can be omitted if, instead of IDs retrieval,
             facets or count operation should be performed. In this case the request must be
             configured via the request_options context.
-        :param str request_options: (optional) controls various aspects of the search request
+        :param dict request_options: (optional) controls various aspects of the search request
             including pagination, sorting, scoring and faceting.
-        :param str request_info: additional information about the query, e.g.
+        :param dict request_info: additional information about the query, e.g.
             query_id. (optional)
-        :param str return_type: type of results to return.
+        :param str return_type: type of results to return (e.g. ``"entry"``, ``"polymer_entity"``).
         :return: json results
 
         You must define a query as defined in the PDB web page. For example the
@@ -292,7 +292,7 @@ class PDB:
             }
 
         What is important is that the dictionary called **query** contains 2
-        compulsary keys namely **query** and **return_type**. The two other optional
+        compulsory keys namely **query** and **return_type**. The two other optional
         keys are **request_options** and **return_info**
 
         You would then call the PDB search as follows::
@@ -361,10 +361,14 @@ class PDB:
         return identifiers
 
     def get_similarity_sequence(self, seq):
-        """Search of seauence similarity search with protein sequence
+        """Search for sequence similarity with a protein sequence.
 
-        seq = "VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTAVAHVDDMPNAL"
-        results = p.get_similarity_sequence(seq)
+        :param str seq: protein sequence in single-letter amino acid code
+
+        ::
+
+            seq = "VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTAVAHVDDMPNAL"
+            results = p.get_similarity_sequence(seq)
 
         """
         res = self.search(

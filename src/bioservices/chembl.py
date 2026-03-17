@@ -32,15 +32,17 @@
 
 """
 import os
-from bioservices.services import REST
-from tqdm import tqdm
 import webbrowser
+
+from tqdm import tqdm
+
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name == __name__
 try:
     from urllib.parse import quote
-except:
+except Exception:
     from urllib import quote
 
 __all__ = ["ChEMBL"]
@@ -63,7 +65,7 @@ class ChEMBL:
         >>> c = ChEMBL()
         >>> res = c.get_molecule(limit=1000)
 
-    The returned objet is a list of 1000 records, each of them being a
+    The returned object is a list of 1000 records, each of them being a
     dictionary. The **molecule** resource is actually a very large one
     and one may want to skip some entries. This is possible using the **offset**
     parameter as follows::
@@ -142,7 +144,7 @@ class ChEMBL:
     For example, it is possible to return all ChEMBL targets that contain
     the term 'kinase' in the pref_name attribute::
 
-        c.get_target(filters='pref_name__contains=kinase")
+        c.get_target(filters='pref_name__contains=kinase')
 
     The pattern for applying a filter is as follows::
 
@@ -183,7 +185,7 @@ class ChEMBL:
     contains        wild card search with query
     startswith      starts with query
     endswith        ends with query
-    regex           regulqr expression query
+    regex           regular expression query
     gt (gte)        Greater than (or equal)
     lt (lte)        Less than (or equal)
     range           Within a range of values
@@ -308,7 +310,7 @@ class ChEMBL:
         >>> res = c.get_substructure("CHEMBL25")
 
 
-    Obtain he pChEMBL value for compound::
+    Obtain the pChEMBL value for compound::
 
         res = c.get_activity(filters=['pchembl_value__isnull=False',
                                       'molecule_chembl_id=CHEMBL25'])
@@ -355,6 +357,11 @@ class ChEMBL:
     _url = "https://www.ebi.ac.uk/chembl/api/data"
 
     def __init__(self, verbose=False, cache=False):
+        """.. rubric:: Constructor
+
+        :param bool verbose: set to True to get more logging output
+        :param bool cache: set to True to enable HTTP caching
+        """
         self.services = REST(name="ChEMBL", url=ChEMBL._url, verbose=verbose, cache=cache, url_defined_later=True)
         self.format = "json"
 
@@ -580,7 +587,7 @@ class ChEMBL:
         return self._get_this_service("chembl_id_lookup", query, params=params)
 
     def get_compound_record(self, query=None, limit=20, offset=0, filters=None):
-        """Occurence of a given compound in a spcecific document"""
+        """Occurrence of a given compound in a specific document"""
         params = {"limit": limit, "offset": offset, "filters": filters}
 
         return self._get_this_service("compound_record", query, params=params)
@@ -615,7 +622,8 @@ class ChEMBL:
     def get_approved_drugs(self, max_phase=4, maxdrugs=1000000):
         """Return all approved drugs
 
-        :param  max_phase: 4 by default for approved drugs.
+        :param int max_phase: development phase filter (default 4 = approved drugs)
+        :param int maxdrugs: upper cap on results returned (default 1000000, effectively all)
 
         """
         filters = "development_phase__exact={}".format(max_phase)
@@ -623,7 +631,7 @@ class ChEMBL:
         return data
 
     def get_drug(self, query=None, limit=20, offset=0, filters=None):
-        """Approved drugs information, icluding (but not limited to) applicants, patent numbers and research codes"""
+        """Approved drugs information, including (but not limited to) applicants, patent numbers and research codes"""
         params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("drug", query, params=params)
 
@@ -648,19 +656,19 @@ class ChEMBL:
         return self._get_this_service("metabolism", query, params=params)
 
     def search_molecule(self, query, limit=20, offset=0):
+        """Search molecules by synonym, SMILES, InChIKey, or ChEMBL ID"""
         params = {"limit": limit, "offset": offset}
         return self._search("molecule", query, params=params)
 
     def get_molecule(self, query=None, limit=20, offset=0, filters=None):
         """Returns some molecules
 
-        :param limit: number of molecules to retrieve
-        :param offset: molecules to ignore before retrieving molecules.
-        :return: a dictionary with keys *page_meta* and *molecules*.
+        :param int limit: number of molecules to retrieve
+        :param int offset: number of molecules to skip before retrieving
+        :return: a list of molecule dictionaries (or a single dict when querying by ID)
 
-        There are 1,800,000 molecules (Jan 2019). You can only retrieve
-        1,000 molecule at most using the *limit* parameter. With a loop
-        you can retrieve molecules in some range.
+        You can only retrieve 1,000 molecules at most per request using the *limit*
+        parameter. Use a loop with *offset* to retrieve molecules in batches.
 
         ::
 
@@ -691,6 +699,7 @@ class ChEMBL:
         return self._get_this_service("molecule_form", query, params=params)
 
     def get_organism(self, query=None, limit=20, offset=0, filters=None):
+        """Organism information for targets"""
         params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("organism", query, params=params)
 
@@ -707,6 +716,7 @@ class ChEMBL:
         return self._get_this_service("protein_class", query, params=params)
 
     """
+
     def get_substructure(self, structure, limit=20, offset=0, filters=None):
         """Molecule substructure search
 
@@ -749,7 +759,7 @@ class ChEMBL:
         chemical representation.
 
         """
-        # we use quote to formqt the SMILE/InChiKey for a URL parsing
+        # we use quote to format the SMILE/InChIKey for URL encoding
         structure = quote(structure)
         params = {"limit": limit, "offset": offset, "filters": filters}
         query = None
@@ -758,10 +768,9 @@ class ChEMBL:
     def get_similarity(self, structure, similarity=80, limit=20, offset=0, filters=None):
         """Molecule similarity search
 
-        :param structure: provide a valid / existing substructure in
-            SMILE format to look for in all molecules:
-        :param similarity: must be an integer greater than 70 and
-            less than 100
+        :param structure: SMILES, InChIKey, or ChEMBL ID of the query molecule
+        :param similarity: must be an integer greater than or equal to 70 and
+            less than or equal to 100
         :return: list of **molecules** corresponding to the search
 
         ::
@@ -797,7 +806,7 @@ class ChEMBL:
         ChEMBL database. The system does not try and convert InChI key to a chemical
         representation.
         """
-        # we use quote to formqt the SMILE/InChiKey for a URL parsing
+        # we use quote to format the SMILE/InChIKey for URL encoding
         structure = quote(structure)
 
         assert isinstance(similarity, int)
@@ -822,7 +831,7 @@ class ChEMBL:
 
         >>> from bioservices import *
         >>> s = ChEMBL(verbose=False)
-        >>> resjson = s.get_targetd('CHEMBL240')
+        >>> resjson = s.get_target('CHEMBL240')
 
         """
         params = {"limit": limit, "offset": offset, "filters": filters}
@@ -841,7 +850,7 @@ class ChEMBL:
         return self._get_this_service("target_component", query, params=params)
 
     def get_target_prediction(self, query=None, limit=20, offset=0, filters=None):
-        """Predictied binding of a molecule to a given biological target
+        """Predicted binding of a molecule to a given biological target
 
 
         ::
@@ -880,11 +889,12 @@ class ChEMBL:
         return self._get_this_service("tissue", query, params=params)
 
     def get_xref_source(self, query=None, limit=20, offset=0, filters=None):
+        """Cross-reference source information"""
         params = {"limit": limit, "offset": offset, "filters": filters}
         return self._get_this_service("xref_source", query, params=params)
 
     def get_image(self, query, dimensions=500, format="png", save=True, view=True, engine="indigo"):
-        r"""Get the image of a given compound in PNG png format.
+        r"""Get the image of a given compound in PNG format.
 
         :param str query: a valid compound ChEMBLId or a list/tuple
             of valid compound ChEMBLIds.
@@ -893,7 +903,7 @@ class ChEMBL:
             An integer z (:math:`1 \leq z \leq 500`)
         :param save:
         :param view:
-        :param engine: Defaults to rdkit. can be rdkit or indigo
+        :param engine: rendering engine; ``"rdkit"`` or ``"indigo"`` (default ``"indigo"``)
         :param bool view: show the image if set to True.
         :return: the path (list of paths) used to save the figure (figures) (different from Chembl API)
 
@@ -991,7 +1001,7 @@ class ChEMBL:
             self.services.logging.info("Looking at {}".format(this))
             try:
                 data[this] = _local_get(this)
-            except:
+            except Exception:
                 self.services.logging.warning("{} resources seems down".format(this))
         return data
 
@@ -1044,7 +1054,7 @@ class ChEMBL:
 
             # to speed up example
             drugs = drugs[0:20]
-            IDs = [x['molecule_chembl_id] for x in drugs]
+            IDs = [x['molecule_chembl_id'] for x in drugs]
 
             c.compounds2accession(IDs)
 

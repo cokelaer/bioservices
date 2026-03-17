@@ -32,7 +32,6 @@
 
 """
 import os
-from urllib.request import urlopen
 
 from bioservices import logger
 from bioservices.services import REST
@@ -142,8 +141,7 @@ class BioModels:
         Using your favorite image viewver, you should get a better resolution.
         Or just download the SVG version of the model.
 
-        .. plot::
-            :include-source:
+        .. code-block:: python
 
             from bioservices import BioModels
             bm = BioModels()

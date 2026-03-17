@@ -32,9 +32,9 @@
 """
 import json
 
-from bioservices import REST
-
 import colorlog
+
+from bioservices import REST
 
 logger = colorlog.getLogger(__name__)
 
@@ -85,7 +85,7 @@ class UniChem:
         get_src_compound_ids_all_from_obsolete  --> removed
 
         get_src_compound_ids_from_src_compound_id  --> removed; was obsolet
-        get_src_compound_ids_all_from_src_compound_id --> remoed was already obsolet
+        get_src_compound_ids_all_from_src_compound_id --> removed was already obsolet
         get_all_compound_ids_from_all_src_id   --> removed. no more API
         get_mapping                            --> removed. no more API
         get_auxiliary_mappings                 --> removed. no more API
@@ -106,7 +106,7 @@ class UniChem:
     def __init__(self, verbose=False, cache=False):
         """.. rubric:: **Constructor** UniChem
 
-        :param verbose: set to False to prevent informative messages
+        :param bool verbose: set to False to prevent informative messages
         """
         self.services = REST(name="UniChem", url=UniChem._url, verbose=verbose, cache=cache)
 
@@ -116,7 +116,7 @@ class UniChem:
         self.source_ids = {x["name"]: x["sourceID"] for x in self._data_source}
 
     def get_id_from_name(self, name):
-        """Return the ID a a source given its name.
+        """Return the ID of a source given its name.
 
         :param str name: a valid database name (e.g., chembl)
 
@@ -131,12 +131,13 @@ class UniChem:
 
     def get_sources(self):
         """Returns all information about all sources used in Unichem
+
         ::
 
             from bioservices import UniChem
             u = UniChem()
-            res = u.get_sources_information()
-            res['sources']
+            res = u.get_sources()
+            res[0]
         """
         return self._data_source
 
@@ -227,7 +228,7 @@ class UniChem:
     def get_source_info_by_name(self, src_name):
         """Description:  Obtain all information on a source by querying with a source id
 
-        :param int src_name: valid identifiers can be found in :attr:`source_ids` e.g.
+        :param str src_name: valid identifiers can be found in :attr:`source_ids` e.g.
             chebi, chembl)
         :return: dictionary (or list of dictionaries) with following keys:
 
@@ -249,7 +250,7 @@ class UniChem:
 
         ::
 
-            >>> res = get_source_by_name("chebi")
+            >>> res = u.get_source_info_by_name("chebi")
 
         """
         keys = sorted([x["name"] for x in self._data_source])
@@ -259,6 +260,16 @@ class UniChem:
         logger.warning(f"incorrect {src_name} source name. Use one of {keys}")
 
     def get_source_info_by_id(self, ID):
+        """Obtain all information on a source by querying with a source ID.
+
+        :param int ID: valid source ID (see :meth:`get_all_src_ids`)
+        :return: dictionary with source information (see :meth:`get_source_info_by_name` for keys)
+
+        ::
+
+            u.get_source_info_by_id(1)
+
+        """
         ids = sorted([x["sourceID"] for x in self._data_source])
 
         if ID in ids:
@@ -270,7 +281,7 @@ class UniChem:
         """Get matched compounds information
 
         :param str compound: InChI, InChIKey, Name, UCI or Compound Source ID
-        :param source_type: uci, inchi, inchikey, sourceID (e.g. chembl)
+        :param str source_type: uci, inchi, inchikey, sourceID (e.g. chembl)
         :param str sourceID: ID for the source assigned in UniChem when the type is "sourceID"
         :return: a list of matched compounds and their assigned sources
 
@@ -331,7 +342,7 @@ class UniChem:
         source, InChI, InChIkey or UCI
 
         :param str compound: InChI, InChIKey, Name, UCI or Compound Source ID (e.g. chembl)
-        :param source_type: uci, inchi, inchikey, sourceID
+        :param str source_type: uci, inchi, inchikey, sourceID
 
         The returned dictionary contains 5 keys:
 
@@ -378,7 +389,7 @@ class UniChem:
     def get_images(self, uci, filename=None):
         """Return / create compound image
 
-        :param uci: the UCI of the compound
+        :param str uci: the UCI of the compound
         :param filename: optional file name to save the SVG+XML output
         :return: the SVG+XML string
 

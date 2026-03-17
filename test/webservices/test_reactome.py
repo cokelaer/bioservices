@@ -1,12 +1,14 @@
-from bioservices import Reactome
+import os
+
 import pytest
 from easydev import TempFile
-import os
+
+from bioservices import Reactome
 
 skiptravis = pytest.mark.skipif("TRAVIS_PYTHON_VERSION" in os.environ, reason="On travis")
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def reactome():
     return Reactome(verbose=True)
 
@@ -139,4 +141,3 @@ def test_species_all(reactome):
 def test_species_main(reactome):
     res = reactome.get_species_main()
     assert len(res)
-

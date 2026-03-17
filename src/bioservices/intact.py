@@ -32,11 +32,16 @@
 """
 from bioservices import REST
 
-
 __all__ = ["IntactComplex"]
 
 
 class Intact(object):
+    """Placeholder for the full IntAct interaction database interface.
+
+    .. note:: Not yet implemented. Use :class:`IntactComplex` for the
+        Complex Portal REST API.
+    """
+
     def __init__(self):
         print("Not implemented yet. For Intact Complex, please use IntactComplex class")
 
@@ -67,9 +72,9 @@ class IntactComplex:
         :param str frmt: Defaults to json (could be a Pandas data frame if
             Pandas is installed; set frmt to 'pandas')
         :param str facets: lists of facets as a string (separated by comma)
-        :param int first:
-        :param int number:
-        :param str filter: list of filters. See examples here below.
+        :param int first: offset into results for pagination (default None = 0)
+        :param int number: number of results to return (default None = server default)
+        :param str filters: filter expression string (e.g., ``'species_f:("Homo sapiens")'``)
 
         .. code-block:: python
 
@@ -91,7 +96,7 @@ class IntactComplex:
 
             # Search for ndc80, facet with the species and biological role
             # fields and filter the species using human or mouse:
-            s.search('Ndc80, first=0, number=10,
+            s.search('Ndc80', first=0, number=10,
                 filters='species_f:("Homo sapiens" "Mus musculus")',
                 facets='species_f,ptype_f,pbiorole_f')
 
@@ -106,7 +111,7 @@ class IntactComplex:
             # the species, biological role and interactor type fields and filter
             # the interactor type using small molecule:
             s.search('*', facets='species_f,pbiorole_f,ptype_f',
-                filters='ptype_f:("small molecule")'
+                filters='ptype_f:("small molecule")')'
 
             # Search with a wildcard to retrieve all the information, facet with
             # the species, biological role and interactor type fields and filter

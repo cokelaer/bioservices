@@ -29,15 +29,14 @@
 Installation
 ===============
 
-**BioServices** is available on `PyPi <http://pypi.python.org/pypi/bioservices>`_, the Python package repository. The following command should install **BioServices** and its dependencies automatically provided you have **pip** on your system:: 
+**BioServices** is available on `PyPi <http://pypi.python.org/pypi/bioservices>`_, the Python package repository. The following command should install **BioServices** and its dependencies automatically provided you have **pip** on your system::
 
     pip install bioservices
 
 If not, please see the external `pip installation page <http://www.pip-installer.org/en/latest/installing.html>`_ or `pip installation <http://thomas-cokelaer.info/blog/2013/02/python-pip-installation/>`_ entry. You may also find information in the :ref:`troubleshootings page <troubleshootings>` section about known issues.
 
 Regarding the dependencies, BioServices depends on the following
-packages: **BeautifulSoup4** (for parsing XML), **suds-community** (to access
-SOAP/WSDL services; used by ChEBI), **requests** (for REST services) and
+packages: **BeautifulSoup4** (for parsing XML), **requests** (for REST services) and
 **easydev**. All those packages should be installed automatically when using
 **pip** installer. BioServices also makes use of **pandas** and **matplotlib**
 to offer some extra functionalities.
@@ -56,6 +55,7 @@ User guide
 
     quickstart.rst
     tutorials.rst
+    cli.rst
     applications.rst
     developers.rst
     auto_examples/index
@@ -63,5 +63,3 @@ User guide
     references
     external_references.rst
     faqs
-    contributors
-    ChangeLog

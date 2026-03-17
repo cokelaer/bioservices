@@ -10,10 +10,6 @@
 #
 ##############################################################################
 import functools
-import glob
-import os
-import subprocess
-from pathlib import Path
 
 import colorlog
 import rich_click as click
@@ -606,3 +602,172 @@ def gene_map_id(**kwargs):
         print(_json.dumps(result, indent=2))
     else:
         logger.warning("No mapping found for %s (%s -> %s)", identifier, from_db, to_db)
+
+
+# ---------------------------------------------------------------------------
+# compound command group
+# ---------------------------------------------------------------------------
+
+
+@main.group()
+def compound(**kwargs):
+    """Commands for querying chemical compound data across multiple databases
+
+    \b
+    Examples:
+        bioservices compound search --query aspirin
+        bioservices compound search --query caffeine --source chebi
+        bioservices compound structure --id CHEBI:27732
+        bioservices compound activity --chembl-id CHEMBL25
+        bioservices compound reaction --query caffeine
+    """
+    pass
+
+
+@compound.command(name="search")
+@click.option("--query", required=True, type=click.STRING, help="Compound name or keyword (e.g. aspirin)")
+@click.option(
+    "--source",
+    default="chembl",
+    type=click.Choice(["chembl", "chebi"]),
+    help="Database to search (default: chembl)",
+)
+@click.option("--limit", default=10, type=click.INT, help="Maximum number of results (default: 10)")
+def compound_search(**kwargs):
+    """Search for compounds by name or keyword.
+
+    \b
+    Examples:
+        bioservices compound search --query aspirin
+        bioservices compound search --query caffeine --source chebi --limit 5
+    """
+    import json as _json
+
+    query = kwargs["query"]
+    limit = kwargs["limit"]
+
+    if kwargs["source"] == "chembl":
+        from bioservices import ChEMBL
+
+        c = ChEMBL(verbose=False)
+        result = c.search_molecule(query, limit=limit)
+        if result:
+            print(_json.dumps(result, indent=2))
+        else:
+            logger.warning("No ChEMBL compounds found for %s", query)
+    else:
+        from bioservices import ChEBI
+
+        c = ChEBI(verbose=False)
+        result = c.getLiteEntity(query, maximumResults=limit)
+        if result:
+            print(_json.dumps(result, indent=2))
+        else:
+            logger.warning("No ChEBI compounds found for %s", query)
+
+
+@compound.command(name="structure")
+@click.option(
+    "--id",
+    "chebi_id",
+    required=True,
+    type=click.STRING,
+    help="ChEBI identifier (e.g. CHEBI:27732 or 27732)",
+)
+@click.option(
+    "--field",
+    default="all",
+    type=click.Choice(["all", "smiles", "formula", "inchikey"]),
+    help="Specific field to display (default: all)",
+)
+def compound_structure(**kwargs):
+    """Retrieve chemical structure data for a compound from ChEBI.
+
+    \b
+    Examples:
+        bioservices compound structure --id CHEBI:27732
+        bioservices compound structure --id CHEBI:27732 --field smiles
+        bioservices compound structure --id 27732 --field formula
+    """
+    import json as _json
+
+    from bioservices import ChEBI
+
+    c = ChEBI(verbose=False)
+    entity = c.getCompleteEntity(kwargs["chebi_id"])
+    if not entity:
+        logger.warning("No ChEBI entry found for %s", kwargs["chebi_id"])
+        return
+
+    field = kwargs["field"]
+    if field == "all":
+        print(_json.dumps(dict(entity), indent=2))
+    elif field == "smiles":
+        print(entity.smiles)
+    elif field == "formula":
+        print(entity.formula)
+    elif field == "inchikey":
+        print(entity.inchiKey)
+
+
+@compound.command()
+@click.option(
+    "--chembl-id",
+    required=True,
+    type=click.STRING,
+    help="ChEMBL compound identifier (e.g. CHEMBL25)",
+)
+@click.option("--limit", default=10, type=click.INT, help="Maximum number of results (default: 10)")
+@click.option(
+    "--type",
+    "activity_type",
+    default=None,
+    type=click.STRING,
+    help="Filter by activity type (e.g. IC50, Ki, EC50)",
+)
+def activity(**kwargs):
+    """Retrieve bioactivity data (IC50, Ki, etc.) for a compound from ChEMBL.
+
+    \b
+    Examples:
+        bioservices compound activity --chembl-id CHEMBL25
+        bioservices compound activity --chembl-id CHEMBL25 --limit 20
+        bioservices compound activity --chembl-id CHEMBL25 --type IC50
+    """
+    import json as _json
+
+    from bioservices import ChEMBL
+
+    c = ChEMBL(verbose=False)
+    chembl_id = kwargs["chembl_id"].upper()
+    filters = [f"molecule_chembl_id={chembl_id}"]
+    if kwargs["activity_type"]:
+        filters.append(f"standard_type={kwargs['activity_type']}")
+
+    result = c.get_activity(filters=filters, limit=kwargs["limit"])
+    if result:
+        print(_json.dumps(result, indent=2))
+    else:
+        logger.warning("No activity data found for %s", chembl_id)
+
+
+@compound.command()
+@click.option("--query", required=True, type=click.STRING, help="Compound name, ChEBI ID, EC number, or Rhea ID")
+@click.option("--limit", default=10, type=click.INT, help="Maximum number of results (default: 10)")
+def reaction(**kwargs):
+    """Search for biochemical reactions involving a compound using Rhea.
+
+    \b
+    Examples:
+        bioservices compound reaction --query caffeine
+        bioservices compound reaction --query "CHEBI:27732"
+        bioservices compound reaction --query caffeine --limit 20
+    """
+    from bioservices import Rhea
+
+    r = Rhea(verbose=False)
+    result = r.search(kwargs["query"], limit=kwargs["limit"])
+    if result is not None:
+        print(result)
+    else:
+        logger.warning("No Rhea reactions found for %s", kwargs["query"])

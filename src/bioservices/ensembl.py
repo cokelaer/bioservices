@@ -46,9 +46,9 @@ class Ensembl:
 
     For the BioServices documentation see the documentation of
     each method for the list of parameters. The API was copied
-    from the Ensemble API (http://rest.ensembl.org)
+    from the Ensembl API (http://rest.ensembl.org)
 
-    All methods have been tests using this BioServices
+    All methods have been tested using this BioServices
     `notebook <http://nbviewer.ipython.org/github/bioservices/notebooks/blob/master/ensembl/Ensembl.ipynb>`_
 
 
@@ -110,7 +110,7 @@ class Ensembl:
         """Uses the given identifier to return the archived sequence
 
         :param str identifier: An Ensembl stable ID
-        :param str frmt: output formart(json, xml or jsonp)
+        :param str frmt: output format (json, xml or jsonp)
 
         ::
 
@@ -198,18 +198,18 @@ class Ensembl:
         sequence="protein",
         compara="multi",
     ):
-        """Retrieves a gene tree containing the gene identified by a symbol
+        """Retrieves a gene tree containing the gene identified by its member ID
 
         :param str compara: Name of the compara database to use. Multiple
             comparas can exist on a server if you are accessing Ensembl
-            Genomes data. Defautl to 'multi'
-        :param db_type: Restrict the search to a database other than the
+            Genomes data. Default to 'multi'
+        :param str db_type: Restrict the search to a database other than the
             default. Useful if you need to use a DB other than core. Defaults
             to core
-        :param object_type: Filter by feature type. Default to None
+        :param str object_type: Filter by feature type. Default to None;
             examples are gene, transcript.
 
-        :
+        ::
 
             get_genetree_by_member_id('ENSG00000157764', 'human', frmt='phyloxml')
 
@@ -249,7 +249,7 @@ class Ensembl:
 
         :param str identifier: An Ensembl genetree ID
         :param str frmt: response formats: json, jsonp, nh, phyloxml
-        :param bool aligned: if true, return the aligned string otherwise, i
+        :param bool aligned: if true, return the aligned string otherwise
             return the original
             sequence (no insertions). Can be True/1 or False/0 and defaults to 0
         :param str compara: Name of the compara database to use. Multiple comparas can
@@ -900,6 +900,7 @@ class Ensembl:
 
         Output reflects forward orientation coordinates as returned from the Ensembl API.
 
+        ::
 
             get_map_cds_to_region('ENST00000288602', '1..1000')
         """
@@ -916,10 +917,9 @@ class Ensembl:
     def get_map_cdna_to_region(self, identifier, region, frmt="json", species=None):
         """Convert from cDNA coordinates to genomic coordinates.
 
-        :param str first: version of the input assembly
-        :param str first: version of the output assembly
-        :param str region:  query region (see example)
-        :param str species: default to human
+        :param str identifier: a stable Ensembl transcript ID (e.g., ENST00000288602)
+        :param str region: query region in the form ``start..end`` (e.g., ``100..300``)
+        :param str species: species name/alias (default human)
 
         Output reflects forward orientation coordinates as returned from the Ensembl API.
 
@@ -942,10 +942,10 @@ class Ensembl:
         """Convert the co-ordinates of one assembly to another
 
 
-        :param str first: version of the input assembly
-        :param str first: version of the output assembly
-        :param str region:  query region (see example)
-        :param str species: default to human
+        :param str first: version of the input assembly (e.g., GRCh37)
+        :param str second: version of the output assembly (e.g., GRCh38)
+        :param str region: query region (e.g., X:1000000..1000100:1)
+        :param str species: species name/alias (default human)
 
         ::
 
@@ -968,9 +968,9 @@ class Ensembl:
         Output reflects forward orientation coordinates as returned from the
         Ensembl API.
 
-        :param identifier: a stable Ensembl ID
-        :param str query: a query region
-        :param str species: Species name/alias (e.g., homo_sapiens)
+        :param str identifier: a stable Ensembl translation ID (e.g., ENSP00000288602)
+        :param str region: query region in the form ``start..end`` (e.g., ``100..300``)
+        :param str species: species name/alias (e.g., homo_sapiens)
 
         ::
 
@@ -994,15 +994,14 @@ class Ensembl:
         :param str identifier: An ontology term identifier (e.g., GO:0005667)
         :param bool simple: If set the API will avoid the fetching of parent and child terms
         :param str frmt: response formats in json, xml, yaml, jsonp
-        :param str simple: If set the API will avoid the fetching of parent and child terms
         :param str relation: The types of relationships to include in the output. Fetches
             all relations by default (e.g., is_a, part_of)
 
         ::
 
-            >>> from bioservices imoprt Ensembl
+            >>> from bioservices import Ensembl
             >>> e = Ensembl()
-            >>> res = e.get_ontology('GO:0005667')
+            >>> res = e.get_ontology_by_id('GO:0005667')
 
         """
         self._check_frmt(frmt, ["xml", "yaml"])
@@ -1033,7 +1032,7 @@ class Ensembl:
 
         ::
 
-            >>> from bioservices imoprt Ensembl
+            >>> from bioservices import Ensembl
             >>> e = Ensembl()
             >>> res = e.get_ontology_by_name('transcription factor')
             400
@@ -1081,7 +1080,7 @@ class Ensembl:
 
         ::
 
-            >>> from bioservices imoprt Ensembl
+            >>> from bioservices import Ensembl
             >>> e = Ensembl()
             >>> res = e.get_taxonomy_by_name('homo')
 
@@ -1109,7 +1108,7 @@ class Ensembl:
 
         ::
 
-            >>> from bioservices imoprt Ensembl
+            >>> from bioservices import Ensembl
             >>> e = Ensembl()
             >>> res = e.get_taxonomy_classification_by_id('9606')
 
@@ -1220,7 +1219,7 @@ class Ensembl:
         """Retrieves features (e.g. genes, transcripts, variations etc.)
         that overlap a region defined by the given identifier.
 
-        :param str identifier: An Ensemble stable ID
+        :param str identifier: An Ensembl stable ID
         :param str feature: The type of feature to retrieve. Multiple values
             are accepted. Value in Enum(gene, transcript, cds, exon, repeat,
             simple, misc, variation, somatic_variation, structural_variation,
@@ -1348,8 +1347,8 @@ class Ensembl:
         """Retrieve features related to a specific Translation as
         described by its stable ID (e.g. domains, variations).
 
-        :param str identifier:
-        :param str frmt:
+        :param str identifier: a stable Ensembl translation ID
+        :param str frmt: response formats in json, xml, jsonp
         :param str db_type: Restrict the search to a database other
             than the default. Useful if you need to use a DB other than core
         :param str feature: requested feature in: transcript_variation,
@@ -1389,8 +1388,8 @@ class Ensembl:
     ):
         """Returns a RegulatoryFeature given its stable ID
 
-        :param str identifier:
-        :param str species:
+        :param str identifier: a stable Ensembl regulatory feature ID
+        :param str species: species name/alias (e.g., homo_sapiens)
 
 
         """
@@ -1422,8 +1421,8 @@ class Ensembl:
     ):
         """Request multiple types of sequence by stable identifier.
 
-        :param str identifier:
-        :param str frmt: response formats: fasta, json, text, yam, jsonp
+        :param str identifier: a stable Ensembl ID
+        :param str frmt: response formats: fasta, json, text, yaml, jsonp
         :param str db_type: Restrict the search to a database other than the
             default. Useful if you need to use a DB other than core (e.g.,
             core)
@@ -1633,19 +1632,6 @@ class Ensembl:
 
     def post_vep_by_id(self, species, identifiers):
         raise NotImplementedError
-        # POST vep/:species/id/   Fetch variant consequences for multiple ids
-        self._check_frmt(frmt, ["xml"])
-        _ = self.services.http_get(
-            "variation/{0}/{1}".format(species, identifier),
-            frmt=frmt,
-            headers=self.services.get_headers(content=frmt),
-            params={
-                "genotypes": int(genotypes),
-                "phenotypes": int(phenotypes),
-                "pops": int(pops),
-            },
-        )
-        raise NotImplementeError
 
     def get_vep_by_region(
         self,
@@ -1698,7 +1684,7 @@ class Ensembl:
 
     def post_vep_by_region(self, species, region):
         # POST vep/:species/region/   Fetch variant consequences for multiple regions
-        raise NotImplementeError
+        raise NotImplementedError
 
 
 class EnsemblFTP(object):

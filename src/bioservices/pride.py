@@ -44,7 +44,7 @@ __all__ = ["PRIDE"]
 
 
 class PRIDE:
-    """Interface to the `PRIDE <http://rest.ensembl.org>`_ service
+    """Interface to the `PRIDE <https://www.ebi.ac.uk/pride/ws/archive/v2>`_ service
 
 
 
@@ -73,8 +73,8 @@ class PRIDE:
     def __init__(self, verbose=False, cache=False):
         """**Constructor**
 
-        :param verbose: set to False to prevent informative messages
-        :param cache: set to True to use caching. Not recommended for
+        :param bool verbose: set to False to prevent informative messages
+        :param bool cache: set to True to use caching. Not recommended for
             this service that evolves a lot
         """
         self.services = REST(name="PRIDE", url=PRIDE._url, verbose=verbose, cache=cache)
@@ -82,13 +82,13 @@ class PRIDE:
     def get_project(self, identifier):
         """Retrieve project information by accession
 
-        List of PRIDE Archive Projects. The following method do not allows
-        to perform search, for search functionality you will need to use
+        List of PRIDE Archive Projects. The following method does not allow
+        performing search; for search functionality you will need to use
         the search/projects. The result list is Paginated using the pageSize and page.
 
         :param str identifier: a valid PRIDE identifier e.g., PRD000001
 
-        :return: if identifier is invalid, returns an emppty dictionary {}
+        :return: if identifier is invalid, returns an empty dictionary {}
 
         .. doctest::
 
@@ -106,7 +106,12 @@ class PRIDE:
         return res
 
     def get_projects(self, pageSize=100, max_pages=1e9):
-        """Get list of all projects"""
+        """Retrieve all PRIDE projects, paginating automatically.
+
+        :param int pageSize: number of results per page (default 100)
+        :param max_pages: maximum number of pages to fetch (default: all pages)
+        :return: a list of project dictionaries
+        """
         results = []
         for page in tqdm.tqdm(range(int(max_pages))):
             res = self.services.http_get("projects", params={"pageSize": pageSize, "page": page})
@@ -176,7 +181,7 @@ class PRIDE:
         res = self.services.http_get(f"projects/{accession}/files", params=params)
         try:
             res = res["list"]
-        except:
+        except Exception:
             pass
         return res
 
@@ -193,14 +198,14 @@ class PRIDE:
 
         """Get all proteins evidence
 
-        :param project_accession:
-        :param assay_accession:
-        :param reported_accession:
-        :param int pageSize: how many results to return per page
+        :param str project_accession: filter by PRIDE project accession (optional)
+        :param str assay_accession: filter by assay accession (optional)
+        :param str reported_accession: filter by reported protein accession (optional)
+        :param int pageSize: how many results to return per page (default 100)
         :param int page: which page (starting from 0) of the result to return
-        :param str sortConditions: default is submission_date but more fields
-            can be separated by comma and passed. Example: submission_date,project_title
-        :param str sortDirection: the sorting order (ASC or DESC)
+        :param str sortConditions: field(s) to sort by, comma-separated
+            (default ``"projectAccession"``)
+        :param str sortDirection: the sorting order (``"ASC"`` or ``"DESC"``)
 
         ::
 
@@ -234,19 +239,18 @@ class PRIDE:
         sortDirection="DESC",
         sortConditions="projectAccession",
     ):
-        """Get all the peptide evidences for an specific protein evidence
+        """Get all the peptide evidences for a specific protein evidence.
 
-
-        :param project_accession:
-        :param assay_accession:
-        :param protein_accession:
-        :param peptide_evidence_accession:
-        :param peptide_sequence:
-        :param int pageSize: how many results to return per page
+        :param str project_accession: filter by PRIDE project accession (optional)
+        :param str assay_accession: filter by assay accession (optional)
+        :param str protein_accession: filter by protein accession (optional)
+        :param str peptide_evidence_accession: filter by peptide evidence accession (optional)
+        :param str peptide_sequence: filter by peptide sequence (optional)
+        :param int pageSize: how many results to return per page (default 100)
         :param int page: which page (starting from 0) of the result to return
-        :param str sortConditions: default is submission_date but more fields
-            can be separated by comma and passed. Example: submission_date,project_title
-        :param str sortDirection: the sorting order (ASC or DESC)
+        :param str sortConditions: field(s) to sort by, comma-separated
+            (default ``"projectAccession"``)
+        :param str sortDirection: the sorting order (``"ASC"`` or ``"DESC"``)
 
         Retrieving data from project accession should be fast::
 
@@ -275,9 +279,14 @@ class PRIDE:
         return res
 
     def get_stats(self, name):
-        """Retrieve statistics by Name
+        """Retrieve statistics by name.
 
-        p.get_stats("SUBMISSIONS_PER_YEAR")
+        :param str name: statistics name (e.g., ``"SUBMISSIONS_PER_YEAR"``)
+        :return: statistics data for the given name
+
+        ::
+
+            p.get_stats("SUBMISSIONS_PER_YEAR")
 
         """
 

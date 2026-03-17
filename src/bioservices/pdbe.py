@@ -59,6 +59,7 @@ class PDBe:
         """.. rubric:: Constructor
 
         :param bool verbose: prints informative messages (default is off)
+        :param bool cache: set to True to enable HTTP caching
 
         """
         url = "https://www.ebi.ac.uk/pdbe/api/v2"
@@ -118,7 +119,7 @@ class PDBe:
         date of release, date of latest revision, experimental method, list
         of related entries in case split entries, etc.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -136,7 +137,7 @@ class PDBe:
         of copies in the entry, sample preparation method, source organism(s)
         (if applicable), etc.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -151,7 +152,7 @@ class PDBe:
 
         This is an alias for :meth:`get_molecules` using the ``entities`` endpoint.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -168,7 +169,7 @@ class PDBe:
         of the article, journal name, year of publication, volume, pages, doi,
         pubmed_id, etc. Primary citation is listed first.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -185,7 +186,7 @@ class PDBe:
         open-access articles which mention the entry id without explicitly citing the
         primary citation of an entry.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -206,7 +207,7 @@ class PDBe:
         For EM, details of specimen, imaging, acquisition, reconstruction, fitting etc.
         are included.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -221,7 +222,7 @@ class PDBe:
 
         i.e. 'bound' molecules that are not waters.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -235,7 +236,7 @@ class PDBe:
         """Provides a list of modelled instances of modified amino acids or
         nucleotides in protein, DNA or RNA chains.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -249,7 +250,7 @@ class PDBe:
         """Provides a list of modelled instances of mutated amino acids or
         nucleotides in protein, DNA or RNA chains.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -264,7 +265,7 @@ class PDBe:
         along with some other information such as authors, title, experimental method,
         etc.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -278,7 +279,7 @@ class PDBe:
         """Provides observed ranges, i.e., segments of structural coverage of
         polymeric molecules that are modelled fully or partly.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -292,8 +293,8 @@ class PDBe:
         """Provides observed ranges, i.e., segments of structural coverage of
         polymeric molecules in a particular chain.
 
-        :param query: a 4-character PDB id code
-        :param chain_id: a PDB chain ID
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
+        :param str chain_id: a PDB chain ID (e.g., ``"A"``)
 
         ::
 
@@ -301,9 +302,7 @@ class PDBe:
 
         """
         query = self._check_id(query)
-        res = self.services.http_get(
-            "{}/polymer_coverage/{}/chain/{}".format(self._entry_prefix, query, chain_id)
-        )
+        res = self.services.http_get("{}/polymer_coverage/{}/chain/{}".format(self._entry_prefix, query, chain_id))
         return self._return(res)
 
     def get_secondary_structure(self, query):
@@ -312,7 +311,7 @@ class PDBe:
         (alpha helices and beta strands) found in protein chains of the entry.
         For strands, sheet id can be used to identify a beta sheet.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -328,7 +327,7 @@ class PDBe:
         Except waters, along with details of the fraction of expected atoms modelled for
         the residue and any alternate conformers.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -336,9 +335,7 @@ class PDBe:
 
         """
         query = self._check_id(query)
-        res = self.services.http_get(
-            "{}/residue_listing/{}".format(self._entry_prefix, query)
-        )
+        res = self.services.http_get("{}/residue_listing/{}".format(self._entry_prefix, query))
         return self._return(res)
 
     def get_residue_listing_in_pdb_chain(self, query, chain_id):
@@ -347,8 +344,8 @@ class PDBe:
         Except waters, along with details of the fraction of expected atoms
         modelled for the residue and any alternate conformers.
 
-        :param query: a 4-character PDB id code
-        :param chain_id: a PDB chain ID
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
+        :param str chain_id: a PDB chain ID (e.g., ``"A"``)
 
         ::
 
@@ -356,9 +353,7 @@ class PDBe:
 
         """
         query = self._check_id(query)
-        res = self.services.http_get(
-            "{}/residue_listing/{}/chain/{}".format(self._entry_prefix, query, chain_id)
-        )
+        res = self.services.http_get("{}/residue_listing/{}/chain/{}".format(self._entry_prefix, query, chain_id))
         return self._return(res)
 
     def get_binding_sites(self, query, entity_id):
@@ -367,8 +362,8 @@ class PDBe:
         STRUCT_SITE records in PDB files (or mmcif equivalent thereof), such as ligand,
         residues in the site, description of the site, etc.
 
-        :param query: a 4-character PDB id code
-        :param entity_id: an entity ID (integer or string)
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
+        :param entity_id: an entity ID (integer or string, e.g., ``1``)
 
         ::
 
@@ -376,9 +371,7 @@ class PDBe:
 
         """
         query = self._check_id(query)
-        res = self.services.http_get(
-            "{}/binding_sites/{}/{}".format(self._entry_prefix, query, entity_id)
-        )
+        res = self.services.http_get("{}/binding_sites/{}/{}".format(self._entry_prefix, query, entity_id))
         return self._return(res)
 
     def get_files(self, query):
@@ -388,7 +381,7 @@ class PDBe:
         SIFTS cross reference XML files, validation XML files, X-ray structure
         factor file, NMR experimental constraints files, etc.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -404,7 +397,7 @@ class PDBe:
         The list of chains within an entity is sorted by observed_ratio (descending order),
         partial_ratio (ascending order), and number_residues (descending order).
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -421,7 +414,7 @@ class PDBe:
         information given includes the molecule name, type and class, the chains where
         the molecule occur, and the number of copies of each entity in the assembly.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -434,7 +427,7 @@ class PDBe:
     def get_electron_density_statistics(self, query):
         """Provides statistics for electron density.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -447,7 +440,7 @@ class PDBe:
     def get_functional_annotation(self, query):
         """Provides functional annotation of all ligands, i.e. 'bound' molecules.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -455,15 +448,13 @@ class PDBe:
 
         """
         query = self._check_id(query)
-        res = self.services.http_get(
-            "{}/cofactor/{}".format(self._entry_prefix, query)
-        )
+        res = self.services.http_get("{}/cofactor/{}".format(self._entry_prefix, query))
         return self._return(res)
 
     def get_drugbank_annotation(self, query):
         """Provides DrugBank annotation of all ligands, i.e. 'bound' molecules.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -471,9 +462,7 @@ class PDBe:
 
         """
         query = self._check_id(query)
-        res = self.services.http_get(
-            "{}/drugbank/{}".format(self._entry_prefix, query)
-        )
+        res = self.services.http_get("{}/drugbank/{}".format(self._entry_prefix, query))
         return self._return(res)
 
     def get_related_dataset(self, query):
@@ -482,7 +471,7 @@ class PDBe:
         Includes diffraction image data, small-angle scattering data and
         electron micrographs.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -499,7 +488,7 @@ class PDBe:
         along with detailed information about each carbohydrate monomer within
         the branched entity.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 
@@ -512,7 +501,7 @@ class PDBe:
     def get_carbohydrate_polymer(self, query):
         """Provides data for carbohydrate polymers within an entry.
 
-        :param query: a 4-character PDB id code
+        :param str query: a 4-character PDB id code, comma-separated list of IDs, or Python list of IDs
 
         ::
 

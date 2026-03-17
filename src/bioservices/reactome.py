@@ -42,20 +42,30 @@ __all__ = ["Reactome"]
 
 
 class Reactome:
-    """
+    """Interface to the `Reactome <https://reactome.org>`_ knowledgebase.
 
+    Reactome is an open-source, manually curated and peer-reviewed pathway
+    database. This class wraps the Reactome ContentService REST API.
 
+    .. doctest::
 
-    .. todo:: interactors, orthology, particiapnts, person,
-        query, refernces, schema
+        >>> from bioservices import Reactome
+        >>> r = Reactome()
+        >>> r.get_species_main()
 
-
+    .. todo:: interactors, orthology, participants, person,
+        query, references, schema
 
     """
 
     _url = "https://reactome.org/ContentService"
 
     def __init__(self, verbose=True, cache=False):
+        """**Constructor**
+
+        :param bool verbose: set to False to prevent informative messages
+        :param bool cache: set to True to enable HTTP caching
+        """
         self.services = REST(name="Reactome", url=Reactome._url, verbose="ERROR", cache=False)
         self.debugLevel = verbose
 
@@ -75,9 +85,12 @@ class Reactome:
         schema.org (http). This is mainly used by search engines in
         order to index the data
 
+        :param str identifier: a Reactome stable identifier (e.g., ``"R-HSA-446203"``)
+        :return: schema.org JSON-LD representation of the event
+
         ::
 
-            r.data_discover("R-HSA-446203")
+            r.get_discover("R-HSA-446203")
 
         """
         res = self.services.http_get("data/discover/{}".format(identifier), frmt="json")
@@ -90,7 +103,7 @@ class Reactome:
     def get_diseases_doid(self):
         """retrieves the list of disease DOIDs annotated in Reactome
 
-        return: dictionary with DOID contained in the values()
+        :return: dictionary with DOID contained in the values()
         """
         res = self.services.http_get("data/diseases/doid", frmt="txt")
         res = dict([x.split() for x in res.split("\n")])
@@ -145,22 +158,14 @@ class Reactome:
         the diagram containing the reaction is exported and the reaction
         is selected.
 
-        :param identifier: Event identifier (it can be a pathway with
-            diagram, a subpathway or a reaction)
-        :param ext: File extension (defines the image format) in png,
-            jpeg, jpg, svg, gif
-        :param quality: Result image quality between [1 - 10]. It
-            defines the quality of the final image (Default 5)
-        :param flg: not implemented
-        :param sel: not implemented
-        :param diagramProfile: Diagram Color Profile
-        :param token: not implemented
-        :param analysisProfile: Analysis Color Profile
-        :param expColumn: not implemented
-        :param filename: if given, save the results in the provided filename
-
-        return: raw data if filename parameter is not set. Otherwise, the data
-            is saved in the filename and the function returns None
+        :param str identifier: event identifier (pathway with diagram, subpathway, or reaction)
+        :param str ext: file extension / image format — one of ``"png"``, ``"jpeg"``,
+            ``"jpg"``, ``"svg"``, ``"gif"``
+        :param int quality: result image quality between 1 and 10 (default 5)
+        :param str diagramProfile: diagram color profile (``"Modern"`` or ``"Standard"``)
+        :param str analysisProfile: analysis color profile
+        :param str filename: if given, save the result to this file path
+        :return: raw image data if *filename* is not set; ``None`` after saving otherwise
 
         """
         assert ext in ["png", "jpg", "jpeg", "svg", "gif"]
@@ -181,7 +186,7 @@ class Reactome:
                     fout.write(res)
             else:
                 with open(filename, "w") as fout:
-                    fout.write(content)
+                    fout.write(res)
         else:
             return res
 
@@ -194,9 +199,9 @@ class Reactome:
         PhysicalEntity. Contained complexes and entity sets can be
         excluded setting the ‘excludeStructures’ optional parameter to ‘true’
 
-        :param identifier: The complex for which subunits are requested
-        :param excludeStructures: Specifies whether contained complexes
-            and entity sets are excluded in the response
+        :param str identifier: a Reactome stable identifier for the complex
+        :param bool excludeStructuresSpecifies: if True, exclude contained complexes
+            and entity sets from the response
 
         ::
 
@@ -213,9 +218,8 @@ class Reactome:
         resource). The method deconstructs the complexes into all its
         participants to do so.
 
-        :param resource: The resource of the identifier for complexes are
-            requested (e.g. UniProt)
-        :param identifier: The identifier for which complexes are requested
+        :param str resources: the resource of the identifier (e.g., ``"UniProt"``)
+        :param str identifier: the identifier for which complexes are requested
 
         ::
 
@@ -270,7 +274,7 @@ class Reactome:
         a list of all possible paths from the requested event to the top
         level pathway(s).
 
-        :param identifier: The event for which the ancestors are requested
+        :param str identifier: a Reactome stable identifier for the event
 
         ::
 
@@ -292,8 +296,7 @@ class Reactome:
         the name, the species, the url, the type, and the diagram of the particular
         event.
 
-        :param species: Allowed species filter: SpeciesName (eg: Homo sapiens)
-            SpeciesTaxId (eg: 9606)
+        :param species: taxonomy ID (e.g., ``9606``) or species name (e.g., ``"Homo sapiens"``)
 
         ::
 
@@ -307,7 +310,7 @@ class Reactome:
         """Export given Pathway to SBML
 
 
-        :param identifier: DbId or StId of the requested database object
+        :param str identifier: DbId or StId of the requested pathway
 
         ::
 
@@ -346,7 +349,8 @@ class Reactome:
 
 
         :param identifier: The event for which the contained events are requested
-        :param attribute: Attrubute to be filtered
+        :param str identifier: the event for which the contained events are requested
+        :param str attribute: attribute to filter (e.g., ``"stId"``)
 
         ::
 
@@ -359,7 +363,7 @@ class Reactome:
         )
         try:
             res = [x.strip() for x in res[1:-1].split(",")]
-        except:
+        except Exception:
             pass
         return res
 
@@ -371,9 +375,7 @@ class Reactome:
         list of all lower level pathways that have a diagram and
         contain the given PhysicalEntity or Event.
 
-        :param identifier: The entity that has to be present in the pathways
-        :param species:  The species for which the pathways are requested.
-            Taxonomy identifier (eg: 9606) or species name (eg: ‘Homo sapiens’)
+        :param str identifier: the entity that has to be present in the pathways
 
         ::
 
@@ -384,7 +386,9 @@ class Reactome:
         return res
 
     def get_pathways_low_diagram_entity_allForms(self, identifier):
-        """
+        """A list of lower level pathways with diagram containing any form of a given entity.
+
+        :param str identifier: a Reactome stable identifier or accession
 
         ::
 
@@ -427,6 +431,11 @@ class Reactome:
         return res
 
     def get_pathways_top(self, species):
+        """Retrieve the list of top-level pathways for a given species.
+
+        :param species: taxonomy ID (e.g., ``9606``) or species name (e.g., ``"Homo sapiens"``)
+        :return: list of top-level pathway objects
+        """
         res = self.services.http_get("data/pathways/top/{}".format(species), frmt="json")
         return res
 
@@ -445,11 +454,24 @@ class Reactome:
         return res
 
     def get_mapping_identifier_pathways(self, resource, identifier):
+        """Retrieve pathways containing a mapped identifier.
+
+        :param str resource: the external resource (e.g., ``"UniProt"``)
+        :param str identifier: the identifier to map (e.g., ``"P43403"``)
+        :return: list of pathway objects
+        """
         res = self.services.http_get("data/mapping/{}/{}/pathways".format(resource, identifier), frmt="json")
         return res
 
     def get_mapping_identifier_reactions(self, resource, identifier):
+        """Retrieve reactions containing a mapped identifier.
+
+        :param str resource: the external resource (e.g., ``"UniProt"``)
+        :param str identifier: the identifier to map (e.g., ``"P43403"``)
+        :return: list of reaction objects
+        """
         res = self.services.http_get("data/mapping/{}/{}/reactions".format(resource, identifier), frmt="json")
+        return res
 
     def search_facet(self):
         """A list of facets corresponding to the whole Reactome search data
@@ -491,18 +513,20 @@ class Reactome:
         return res
 
     def search_suggest(self, query):
-        """Autosuggestions for a given query
-
+        """Autosuggestions for a given query.
 
         This method retrieves a list of suggestions for a given search term.
 
+        :param str query: search term (e.g., ``"apopt"``)
+        :return: list of suggestion strings
+
         ::
 
-            >>> r.http_get("search/suggest?query=apopt")
+            >>> r.search_suggest("apopt")
             ['apoptosis', 'apoptosome', 'apoptosome-mediated', 'apoptotic']
 
         """
-        res = self.services.http_get("search/suggest?query={}".format(identifier), frmt="json")
+        res = self.services.http_get("search/suggest?query={}".format(query), frmt="json")
         return res
 
     def get_species_all(self):

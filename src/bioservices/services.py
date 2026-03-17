@@ -17,24 +17,17 @@
 """Modules with common tools to access web resources"""
 import os
 import platform
-import socket
-import sys
 import time
 import traceback
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode, urlparse
-from urllib.request import Request, urlopen
-
-from bioservices.settings import BioServicesConfig
-
-# Indded, we want suds_jurko instead
-sys.path = [x for x in sys.path if "suds-" not in x]
-
+from urllib.request import urlopen
 
 import colorlog
 from easydev import DevTools
 
-__all__ = ["Service", "WSDLService", "BioServicesError", "REST"]
+from bioservices.settings import BioServicesConfig
+
+__all__ = ["Service", "BioServicesError", "REST"]
 
 
 class BioServicesError(Exception):
@@ -46,9 +39,9 @@ class BioServicesError(Exception):
 
 
 class Service:
-    """Base class for WSDL and REST classes
+    """Base class for REST service classes
 
-    .. seealso:: :class:`REST`, :class:`WSDLService`
+    .. seealso:: :class:`REST`
     """
 
     #: some useful response codes
@@ -116,10 +109,9 @@ class Service:
             # The server returned an HTTP error code (4xx or 5xx),
             # but it is reachable, so no warning is needed.
             pass
-        except URLError as err:
+        except URLError:
             if url_defined_later is False:
                 self.logging.warning("The URL (%s) provided cannot be reached." % self._url)
-        self._easyXMLConversion = True
 
         self.devtools = DevTools()
         self.settings = BioServicesConfig()
@@ -164,43 +156,6 @@ class Service:
 
     url = property(_get_url, _set_url, doc="URL of this service")
 
-    def _get_easyXMLConversion(self):
-        return self._easyXMLConversion
-
-    def _set_easyXMLConversion(self, value):
-        if isinstance(value, bool) is False:
-            raise TypeError("value must be a boolean value (True/False)")
-        self._easyXMLConversion = value
-
-    easyXMLConversion = property(
-        _get_easyXMLConversion,
-        _set_easyXMLConversion,
-        doc="""If True, xml output from a request are converted to easyXML object (Default behaviour).""",
-    )
-
-    def easyXML(self, res):
-        """Use this method to convert a XML document into an
-            :class:`~bioservices.xmltools.easyXML` object
-
-        The easyXML object provides utilities to ease access to the XML
-        tag/attributes.
-
-        Here is a simple example starting from the following XML
-
-        .. doctest::
-
-            >>> from bioservices import *
-            >>> doc = "<xml> <id>1</id> <id>2</id> </xml>"
-            >>> s = Service("name")
-            >>> res = s.easyXML(doc)
-            >>> res.findAll("id")
-            [<id>1</id>, <id>2</id>]
-
-        """
-        from bioservices import xmltools
-
-        return xmltools.easyXML(res)
-
     def __str__(self):
         txt = "This is an instance of %s service" % self.name
         return txt
@@ -233,111 +188,9 @@ class Service:
             try:
                 # python3
                 newres = binascii.a2b_base64(bytes(data, "utf-8"))
-            except:
+            except Exception:
                 newres = binascii.a2b_base64(data)
             f.write(newres)
-
-
-class WSDLService(Service):
-    """Class dedicated to the web services based on WSDL/SOAP protocol.
-
-    .. seealso:: :class:`RESTService`, :class:`Service`
-
-    """
-
-    _service = "WSDL"
-
-    def __init__(self, name, url, verbose=True, cache=False):
-        """.. rubric:: Constructor
-
-        :param str name: a name e.g. Kegg, Reactome, ...
-        :param str url: the URL of the WSDL service
-        :param bool verbose: prints informative messages
-
-        The :attr:`serv` give  access to all WSDL functionalities of the service.
-
-        The :attr:`methods` is an alias to self.serv.methods and returns
-        the list of functionalities.
-
-        """
-        super(WSDLService, self).__init__(name, url, verbose=verbose)
-
-        self.logging.info("Initialising %s service (WSDL)" % self.name)
-        self.CACHING = cache
-
-        try:
-            #: attribute to access to the methods provided by this WSDL service
-            from suds.cache import ObjectCache
-            from suds.client import Client
-
-            oc = ObjectCache(self.settings.user_config_dir, days=0)
-            if self.CACHING is True:
-                self.suds = Client(self.url, cache=oc, cachingpolicy=1)
-            else:
-                self.suds = Client(self.url)
-            # reference to the service
-            self.serv = self.suds.service
-            self._update_settings()
-        except Exception:
-            self.logging.error("Could not connect to the service %s " % self.url)
-            raise Exception
-
-    def _update_settings(self):
-        self.TIMEOUT = self.settings.TIMEOUT
-
-    def wsdl_methods_info(self):
-        methods = self.suds.wsdl.services[0].ports[0].methods.values()
-        for method in methods:
-            try:
-                print(
-                    "%s(%s) "
-                    % (
-                        method.name,
-                        ", ".join(
-                            "type:%s: %s - element %s" % (part.type, part.name, part.element)
-                            for part in method.soap.input.body.parts
-                        ),
-                    )
-                )
-            except:
-                print(method)
-
-    def _get_methods(self):
-        return [x.name for x in self.suds.wsdl.services[0].ports[0].methods.values()]
-
-    wsdl_methods = property(_get_methods, doc="returns methods available in the WSDL service")
-
-    def wsdl_create_factory(self, name, **kargs):
-        params = self.suds.factory.create(name)
-
-        # e.g., for eutils
-        if "email" in dict(params).keys():
-            params.email = self.settings.params["user.email"][0]
-
-        if "tool" in dict(params).keys():
-            import bioservices
-
-            params.tool = "BioServices, " + bioservices.__version__
-
-        for k, v in kargs.items():
-            from suds import sudsobject
-
-            keys = sudsobject.asdict(params).keys()
-            if k in keys:
-                params[k] = v
-            else:
-                msg = "{0} incorrect. Correct ones are {1}"
-                self.logging.error(msg.format(k, keys))
-        return params
-
-    def _get_timeout(self):
-        return self.suds.options.timeout
-
-    def _set_timeout(self, value):
-        self.suds.set_options(timeout=value)
-        self.settings.TIMEOUT = value
-
-    TIMEOUT = property(_get_timeout, _set_timeout)
 
 
 class RESTbase(Service):
@@ -497,9 +350,7 @@ class REST(RESTbase):
             try:
                 requests_cache.install_cache(self.CACHE_NAME)
             except Exception as err:
-                self.logging.warning(
-                    "Could not install cache ({}). Caching will be disabled.".format(err)
-                )
+                self.logging.warning("Could not install cache ({}). Caching will be disabled.".format(err))
                 self.CACHING = False
 
     def delete_cache(self):
@@ -601,7 +452,7 @@ class REST(RESTbase):
         if frmt == "json":
             try:
                 return res.json()
-            except:
+            except Exception:
                 return res
         # finally
         return res.content
@@ -707,7 +558,7 @@ class REST(RESTbase):
             try:
                 # for python 3 compatibility
                 res = res.decode()
-            except:
+            except Exception:
                 pass
             return res
         except Exception as err:
@@ -761,10 +612,10 @@ class REST(RESTbase):
             res = self._interpret_returned_request(res, frmt)
             try:
                 return res.decode()
-            except:
+            except Exception:
                 self.logging.debug("BioServices:: Could not decode the response")
                 return res
-        except Exception as err:
+        except Exception:
             traceback.print_exc()
             return None
 
@@ -826,11 +677,11 @@ class REST(RESTbase):
             res = self._interpret_returned_request(res, frmt)
             try:
                 return res.decode()
-            except:
+            except Exception:
                 self.debug("BioServices:: Could not decode the response")
                 return res
         except Exception as err:
             print(err)
             return None
-        except:
+        except Exception:
             pass

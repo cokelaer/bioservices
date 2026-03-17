@@ -15,7 +15,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-"""Interface to some part of the UniProt web service
+"""Interface to the COG (Clusters of Orthologous Genes) web service
 
 .. topic:: What is COG service?
 
@@ -30,16 +30,10 @@
 
 
 """
-import types
-import io
-import sys
-
 from tqdm import tqdm
 
-import pandas as pd
-
-from bioservices.services import REST
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
@@ -51,20 +45,20 @@ class COG:
     """Interface to the COG service
 
     Note that in addition to the original COG service from NCBI, this interface also
-    helps you in searching for orgamism, and retrieve all pages in a single command
-    (rather than scanning yourself all pages).
+    helps you in searching for organisms, and retrieves all pages in a single command
+    (rather than paginating manually).
 
-    Here is an example of getting the COG for ecoli. Your first the exact matching name.
-    Bioservices provices a function to serch for the exact organism name that will be understood
-    by the COG service (here Escherichia_coli_K-12_sub_MG1655 ... you cannot guess it really)
-    ::
+    Here is an example of getting the COGs for E. coli. You first need the exact
+    matching name. Bioservices provides a helper to search for the organism name
+    understood by the COG service (e.g. ``Escherichia_coli_K-12_sub_MG1655`` —
+    not easy to guess)::
 
         from bioservices import COG
         c = COG()
         c.search_organism('coli')
 
         # the output of the previous command gives you the name
-        c.get_cogs_by_orgnanism('Escherichia_coli_K-12_sub_MG1655')
+        c.get_cogs_by_organism('Escherichia_coli_K-12_sub_MG1655')
     """
 
     _url = "https://www.ncbi.nlm.nih.gov/research/cog/api"
@@ -157,7 +151,7 @@ class COG:
         return self.get_cogs(**{"cog": cog_id, "organism,": organism, "page": page})
 
     def get_all_cogs_definition(self, page=None):
-        """Get all COG Definitions:"""
+        """Get all COG definitions"""
         if page is None:
             res = self._get_all("cogdef")
         else:
@@ -201,8 +195,9 @@ class COG:
     def get_taxonomic_category_by_name(self, name, page=None):
         """Get specific Taxonomic Category by name
 
+        ::
 
-        c.get_taxonomic_category_by_name("ALPHAPROTEOBACTERIA")
+            c.get_taxonomic_category_by_name("ALPHAPROTEOBACTERIA")
         """
         if page is None:
             res = self._get_all("taxonomy", params={"name": name})
@@ -213,7 +208,7 @@ class COG:
     def search_organism(self, name):
         """Return candidates that match the input name.
 
-        :param str name:
+        :param str name: search string matched case-insensitively against genome names
         :return: list of items. Each item is a dictionary with genome name, assembly identifier and taxon identifier.
 
         """

@@ -1,9 +1,10 @@
 __version__ = "$Rev: 10 $"
-import pkg_resources
 
 try:
-    version = pkg_resources.require("biomapping")[0].version
-except:
+    from importlib.metadata import version
+
+    version = version("biomapping")
+except Exception:
     version = __version__
 
 

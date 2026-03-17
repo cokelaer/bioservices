@@ -1,4 +1,3 @@
-from bioservices.ena import ENA
 from bioservices.eutils import EUtils
 
 
@@ -36,6 +35,7 @@ def download_gff3(accession, output_filename=None, method="EUtils", service=None
 def _download_gff3_ena(accession, output_filename, service=None):
     raise NotImplementedError
 
+
 def _download_gff3_ncbi(accession, output_filename, service=None):
     if service is None:
         service = EUtils()
@@ -44,5 +44,3 @@ def _download_gff3_ncbi(accession, output_filename, service=None):
     # Save to local file
     with open(output_filename, "w") as fout:
         fout.write(data)
-
-

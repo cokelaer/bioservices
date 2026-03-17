@@ -5,20 +5,19 @@ Galaxy
 :Date: Aug 2013
 
 Galaxy is an open, web-based platform for accessible, reproducible, and transparent computational biomedical research.
-It provides worflows and plugins to many web resources. 
+It provides worflows and plugins to many web resources.
 
 This tutorial shows how to link bioservices and galaxy. Our tutorial will
 provide a plugin to Galaxy so that a user can retrieve a FASTA file via
-BioServices and the wrapping of UniProt Web Services. 
+BioServices and the wrapping of UniProt Web Services.
 
 We assume that you installed Galaxy on your system via the source code::
 
-    hg clone https://bitbucket.org/galaxy/galaxy-dist/
-    cd galaxy-dist
-    hg update stable
+    git clone https://github.com/galaxyproject/galaxy.git
+    cd galaxy
 
-The tree directory should therefore contains a directory called **tools/** and in
-the main directory, an XML file called **conf_tools.py**
+The tree directory should therefore contain a directory called **tools/** and in
+the config directory, an XML file called **tool_conf.xml**
 
 We will first create a plugin for bioservices. This is done by adding a
 directory called bioservices in ./tools::
@@ -30,7 +29,7 @@ will contain the actual code that calls bioservices and a second XML file that w
 allows us to design the plugin layout.
 
 Let us start with the plugin. It is very simple since only the UniProt Entry is
-required. The output will simply be the FASTA file that would have been fetched. 
+required. The output will simply be the FASTA file that would have been fetched.
 
 The XML file is:
 
@@ -45,9 +44,9 @@ contains the FASTA data:
     :language: python
     :lines: 16-36
 
-finally, you need to make Galaxy aware of this new plugin. this is done in the
-file called conf_tool.xml. Add bioservices plugin. The beginning of the file
-should look like::
+Finally, you need to make Galaxy aware of this new plugin. This is done in
+``config/tool_conf.xml``. Add the bioservices plugin entry. The beginning of
+the file should look like::
 
 
     <?xml version="1.0"?>
@@ -64,11 +63,11 @@ Once done. start you galaxy server. The following image show the outcome: in the
 left hand side, you can select the bioservices plugin. Then, in the center, you
 can enter a uniprot entry. Press the execute button and the new file should
 appear in the right hand side. From there you can use Galaxy other tools to
-analyse the file. 
+analyse the file.
 
 .. image:: galaxy/galaxy.png
     :width: 50%
 
 
 This example shows that it is possible to link Galaxy and BioServices to access
-to various Web Services that are available through Bioservices. 
+to various Web Services that are available through Bioservices.

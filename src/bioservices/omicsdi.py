@@ -13,15 +13,11 @@ Interface to the OmicsDI API Service
         -- OmicsDI Home Page, March 22, 2020.
 """
 
-import collections
-
 # imports - standard imports
 import re
 
 # imports - third-party imports
 import requests
-
-from bioservices._compat import iteritems, string_types
 
 # imports - module imports
 from bioservices.services import REST
@@ -47,7 +43,7 @@ def _omicsdi_path_to_method_name(path):
 
 class OmicsDIAuth(requests.auth.AuthBase):
     def __init__(self, token):
-        if not isinstance(token, string_types):
+        if not isinstance(token, str):
             raise TypeError("Authentication Token cannot be %s. Must be of type str." % token)
 
         self._token = token
@@ -60,10 +56,10 @@ class OmicsDIAuth(requests.auth.AuthBase):
     def token(self, value):
         if self.token == value:
             pass
-        elif not isinstance(value, string_types):
+        elif not isinstance(value, str):
             raise TypeError("Authentication Token must be of type str.")
         else:
-            self._token = token
+            self._token = value
 
     def __call__(self, r):
         r.headers["x-auth-token"] = self._token
@@ -71,6 +67,20 @@ class OmicsDIAuth(requests.auth.AuthBase):
 
 
 class OmicsDI:
+    """Interface to the `OmicsDI <https://www.omicsdi.org>`_ service.
+
+    Provides access to the Omics Discovery Index REST API for searching and
+    retrieving omics datasets across proteomics, genomics, transcriptomics and
+    metabolomics repositories.
+
+    ::
+
+        >>> from bioservices import OmicsDI
+        >>> omicsdi = OmicsDI()
+        >>> omicsdi.dataset_search(query="cancer")
+
+    """
+
     _url = "http://www.omicsdi.org/ws"
     _api = {
         "paths": [
@@ -525,6 +535,12 @@ class OmicsDI:
     }
 
     def __init__(self, token=None, verbose=False, cache=False):
+        """.. rubric:: Constructor
+
+        :param str token: optional authentication token for protected endpoints
+        :param bool verbose: set to True to get more logging output
+        :param bool cache: set to True to enable HTTP caching
+        """
         self.services = REST(name="OmicsDI", url=OmicsDI._url, verbose=verbose, cache=cache)
 
         self.set_auth_token(token)
@@ -539,12 +555,16 @@ class OmicsDI:
     def token(self, value):
         if self.token == value:
             pass
-        elif not isinstance(value, string_types):
+        elif not isinstance(value, str):
             raise TypeError("Authentication Token must be of type str.")
         else:
-            self._token = token
+            self._token = value
 
     def set_auth_token(self, token):
+        """Set the authentication token for protected API endpoints.
+
+        :param str token: a valid OmicsDI authentication token
+        """
         self.token = token
 
     def _create_api_function(self, api):
@@ -563,7 +583,6 @@ class OmicsDI:
             query = api["path"]
             params = api.get("params")
             method = api.get("method", "GET")
-            auth_required = api.get("auth", False)
 
             if params:
                 parameters = []
@@ -574,7 +593,7 @@ class OmicsDI:
                     from collections.abc import Mapping
 
                 if isinstance(params, Mapping):
-                    for param, info in iteritems(params):
+                    for param, info in params.items():
                         type_ = info.get("type", "param")
                         required = info.get("required")
                         argument = info.get("argument", param)

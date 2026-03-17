@@ -37,8 +37,9 @@
 """
 import sys
 import time
-from bioservices.services import REST
+
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
@@ -54,9 +55,9 @@ class MUSCLE:
         >>> from bioservices import *
         >>> m = MUSCLE(verbose=False)
         >>> sequencesFasta = open('filename','r')
-        >>> jobid = n.run(frmt="fasta", sequence=sequencesFasta.read(),
+        >>> jobid = m.run(frmt="fasta", sequence=sequencesFasta.read(),
                         email="name@provider")
-        >>> s.getResult(jobid, "out")
+        >>> m.getResult(jobid, "out")
 
     .. warning:: It is very important to provide a real e-mail address as your
         job otherwise very likely will be killed and your IP, Organisation or
@@ -94,10 +95,10 @@ class MUSCLE:
 
         ::
 
-            >>> from bioservices import muscle
-            >>> n = muscle.Muscle()
-            >>> res = n.get_parameters()
-            >>> [x.text for x in res.findAll("id")]
+            >>> from bioservices import MUSCLE
+            >>> m = MUSCLE()
+            >>> res = m.get_parameters()
+            >>> print(res)
 
         .. seealso:: :attr:`parameters` to get a list of the parameters without
            need to process the XML output.
@@ -120,12 +121,13 @@ class MUSCLE:
     def get_parameter_details(self, parameterId):
         """Get detailed information about a parameter.
 
-        :returns: An XML document providing details about the parameter or a list
-            of values that can take the parameters if the XML could be parsed.
+        :param str parameterId: a valid parameter name (see :attr:`parameters`)
+        :return: a dict with parameter details including name, description, and
+            allowed values
 
         For example::
 
-            >>> n.get_parameter_details("format")
+            >>> m.get_parameter_details("format")
 
         """
         if parameterId not in self.parameters:
@@ -140,12 +142,7 @@ class MUSCLE:
     def run(self, frmt=None, sequence=None, tree="none", email=None):
         """Submit a job with the specified parameters.
 
-        .. python ncbiblast_urllib2.py -D ENSEMBL --email "test@yahoo.com" --sequence
-        .. MDSTNVRSGMKSRKKKPKTTVIDDDDDCMTCSACQSKLVKISDITKVSLDYINTMRGNTLACAACGSSLKLLNDFAS
-        .. --program blastp --database uniprotkb
-
-
-        .. rubric:: Compulsary arguments
+        .. rubric:: Compulsory arguments
 
         :param str frmt: input format (e.g., fasta)
         :param str sequence: query sequence. The use of fasta formatted sequence is recommended.
@@ -155,8 +152,8 @@ class MUSCLE:
         :return: A jobid that can be analysed with :meth:`getResult`,
             :meth:`getStatus`, ...
 
-        The up to data values accepted for each of these parameters can be
-        retrieved from the :meth:`get_parameter_details`.
+        The up-to-date values accepted for each of these parameters can be
+        retrieved from :meth:`get_parameter_details`.
 
         For instance,::
 
@@ -175,7 +172,7 @@ class MUSCLE:
             frmt=['fasta','clw','clwstrict','html','msf','phyi','phys']
 
         The returned object is a jobid, which status can be checked. It must be
-        finished before analysing/geeting the results.
+        finished before analysing/getting the results.
 
         .. seealso:: :meth:`getResult`
 
@@ -195,11 +192,6 @@ class MUSCLE:
         # parameter structure
         params = {"format": frmt, "sequence": sequence, "email": email}
 
-        # headers is muscle is not required. If provided
-        # by the default values from bioservices, it does not
-        # work.
-        headers = {}
-
         # IMPORTANT: use data parameter, not params !!!
         res = self.services.http_post(
             "run",
@@ -214,7 +206,6 @@ class MUSCLE:
     def get_status(self, jobid):
         """Get status of a submitted job
 
-        :param str jobid:
         :param str jobid: a job identifier returned by :meth:`run`.
         :return: A string giving the jobid status (e.g. FINISHED).
 
@@ -242,12 +233,7 @@ class MUSCLE:
         """Get available result types for a finished job.
 
         :param str jobid: a job identifier returned by :meth:`run`.
-        :param bool verbose: print the identifiers together with their label,
-            mediaTypes, description and filesuffix.
-
-        :return: A dictionary, which keys correspond to the identifiers. Each
-            identifier is itself a dictionary containing the label, description,
-            file suffix and mediaType of the identifier.
+        :return: a list of result type identifier strings (e.g., ``["out", "sequence", "aln-fasta"]``)
         """
         if self.get_status(jobid) != "FINISHED":
             self.logging.warning("waiting for the job to be finished. May take a while")
@@ -268,7 +254,7 @@ class MUSCLE:
 
 
         :param str jobid: a job identifier returned by :meth:`run`.
-        :param str  resultType: type of result to retrieve. See :meth:`getResultTypes`.
+        :param str result_type: type of result to retrieve. See :meth:`get_result_types`.
 
         """
         if self.get_status(jobid) != "FINISHED":  # pragma: no cover
@@ -297,8 +283,8 @@ class MUSCLE:
     def wait(self, jobId, checkInterval=5, verbose=True):
         """This function checks the status of a jobid while it is running
 
-        :param str jobid: a job identifier returned by :meth:`run`.
-        :param int checkInterval: interval between requests in seconds.
+        :param str jobId: a job identifier returned by :meth:`run`.
+        :param int checkInterval: interval between status checks in seconds (default 5).
 
         """
         if checkInterval < 1:  # prgma: no cover

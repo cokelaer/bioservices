@@ -31,8 +31,6 @@
 
 """
 import base64
-import copy
-import json
 import webbrowser
 
 import pandas as pd
@@ -48,7 +46,7 @@ class WikiPathways:
     .. doctest::
 
        >>> from bioservices import WikiPathways
-       >>> s = Wikipathway()
+       >>> s = WikiPathways()
        >>> s.organism  # default organism
        'Homo sapiens'
 
@@ -182,7 +180,7 @@ class WikiPathways:
 
         """
         query = f"findInteractions?query={query}&format=json"
-        res = self.services.http_get(query)["result"]
+        self.services.http_get(query)["result"]
 
     def listPathways(self, organism=None):
         """Get a list of all available pathways.
@@ -192,7 +190,7 @@ class WikiPathways:
             :attr:`organism` attribute)
         :return: dataframe. Index are the pathways identifiers (e.g. WP1)
 
-        .. plot::
+        .. code-block:: python
 
             from bioservices import WikiPathways
             w = WikiPathways()
@@ -264,7 +262,7 @@ class WikiPathways:
 
         """
 
-        query = f"getPathwayHistory?pwId={pathwayId}&timestamp={data}&format=json"
+        query = f"getPathwayHistory?pwId={pathwayId}&timestamp={date}&format=json"
         return self.services.http_get(query)
 
     def getRecentChanges(self, timestamp):
@@ -461,7 +459,7 @@ class WikiPathways:
         try:
             data = request["data"]
             return base64.b64decode(data)
-        except:
+        except Exception:
             return request
 
     def findPathwaysByText(self, query, species=None):
@@ -499,7 +497,7 @@ class WikiPathways:
 
         try:
             data = pd.DataFrame(data).set_index("id")
-        except:
+        except Exception:
             pass
         return data
 

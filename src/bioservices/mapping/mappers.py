@@ -1,10 +1,10 @@
-import time
-from bioservices import Kegg, UniProt, KeggParser, UniChem, BioDBNet, HGNC
 from easydev import Logging
+
+from bioservices import HGNC, BioDBNet, UniChem, UniProt
 
 try:
     import pandas as pd
-except:
+except Exception:
     pass
 
 import os
@@ -132,7 +132,7 @@ class Mapper(Logging):
         correspond actually to the primary one : Q8NFV4
 
         """
-        b = biodbnet.BioDBNet()
+        b = BioDBNet()  # noqa: F821
         res2 = b.db2db(
             "Gene Symbol",
             [
@@ -143,13 +143,14 @@ class Mapper(Logging):
                 "KEGG Gene ID",
                 "Ensembl Gene ID",
             ],
-            res.keys()[0:2000],
+            list(res.keys())[0:2000],  # noqa: F821
         )
 
-        import pandas as pd
-        import StringIO
+        import io
 
-        c = pd.read_csv(StringIO.StringIO(res2), delimiter="\t", index_col="Gene Symbol")
+        import pandas as pd
+
+        c = pd.read_csv(io.StringIO(res2), delimiter="\t", index_col="Gene Symbol")
         return c
 
 
@@ -201,7 +202,7 @@ class HGNCMapper(object):
 
     def __init__(self, filename=None):
         self._hgnc_service = HGNC()
-        if filename == None:
+        if filename is None:
             self.alldata = self.load_all_hgnc()
             self.df = self.build_dataframe()
         else:
@@ -256,7 +257,7 @@ class KEGGMapper(object):
         print("Building the dataframe")
         try:
             self.df = self.build_dataframe()
-        except:
+        except Exception:
             print("error in build_dataframe")
 
     def _get_names(self):
@@ -334,7 +335,7 @@ class KEGGMapper(object):
 
             for entry, result in zip(entries, self.mcresults):
                 self.alldata[entry] = result
-        except:
+        except Exception:
             print("something wrng happened while scaning mcresults")
 
         # import pickle
@@ -362,5 +363,5 @@ def keggfunc(name):
         id_ = kegg.get(name)
         res = kegg.parse(id_)
         return res
-    except:
+    except Exception:
         return None

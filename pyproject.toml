@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "bioservices"
-version = "1.14.0"
+version = "1.15.0"
 description = "Access to Biological Web Services from Python"
 authors = [{name="Thomas Cokelaer", email="thomas.cokelaer@pasteur.fr"}]
 license = "GPLv3"
@@ -44,8 +44,7 @@ dependencies = [
     "requests (>=2.32.3,<3.0.0)",
     "lxml (>=5.3.0,<6.0.0)",
     "requests-cache (>=1.2.1,<2.0.0)",
-    "suds-community (>=1.2.0,<2.0.0)",
-    "wrapt (>=1.17.2,<2.0.0)",
+"wrapt (>=1.17.2,<2.0.0)",
     "xmltodict (>=0.14.2,<0.15.0)",
     "pandas (>2.2)",
     "numpy (>=1.23.2,<2.4)"
@@ -94,8 +93,10 @@ sphinx-gallery = "^0.15.0"
 
 
 [tool.pytest.ini_options]
+addopts = "--timeout=30"
 markers = [
     "notebook: marks tests as notebook execution tests (deselect with '-m \"not notebook\"')",
+    "flaky: marks tests that may fail intermittently due to network or service issues",
 ]
 
 

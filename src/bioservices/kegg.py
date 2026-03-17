@@ -19,8 +19,8 @@
 REST KEGG interface. There are additional methods and functionalities added by
 **BioServices**.
 
-.. note:: a previous imterface to the KEGG WSDL service was designed but the
-    WSDL closed in  Dec 2012.
+.. note:: a previous interface to the KEGG WSDL service was designed but the
+    WSDL closed in Dec 2012.
 
 .. topic:: What is KEGG ?
 
@@ -148,16 +148,11 @@ usually locus_tag or ncbi GeneID, or the primary gene name.
 
 
 """
-import re
-
-try:
-    from functools import reduce  # python3 compat
-except:
-    pass
-from bioservices.services import REST, BioServicesError
-import webbrowser
 import copy
+import webbrowser
+
 from bioservices import logger
+from bioservices.services import REST, BioServicesError
 
 logger.name = __name__
 
@@ -171,7 +166,7 @@ class KEGG:
     """Interface to the `KEGG <http://www.genome.jp/kegg/pathway.html>`_ service
 
     This class provides an interface to the KEGG REST API. The weblink tools
-    are partially accesible. All dbentries can be parsed into dictionaries using
+    are partially accessible. All dbentries can be parsed into dictionaries using
     the :class:`KEGGParser`
 
     Here are some examples. In order to retrieve the entry of the
@@ -252,10 +247,11 @@ class KEGG:
         """.. rubric:: Constructor
 
         :param bool verbose: prints informative messages
+        :param bool cache: set to True to enable HTTP caching
 
         """
         self.services = REST(name="KEGG", url="http://rest.kegg.jp", verbose=verbose, cache=cache)
-        self.easyXMLConversion = False
+        pass
         self._organism = None
 
         self._organisms = None
@@ -410,7 +406,7 @@ class KEGG:
         :attr:`pathwayIds` attribute (after defining the :attr:`organism` attribute).
 
         .. note:: If you set the query to a valid organism, then the second
-               argument rganism is irrelevant and ignored.
+               argument organism is irrelevant and ignored.
 
         .. note:: If the query is not a database or an organism, it is supposed
             to be a valid dbentries string and the maximum number of entries is 100.
@@ -473,7 +469,7 @@ class KEGG:
             # for keywords "shiga" and "toxin"
             s.find("genes", "shiga+toxin")
             # for keywords "shiga toxin"
-            s.find("genes", ""shiga toxin")
+            s.find("genes", '"shiga toxin"')
             # for chemical formula "C7H10O5"
             s.find("compound", "C7H10O5", "formula")
             # for chemical formula containing "O5" and "C7"
@@ -560,7 +556,6 @@ class KEGG:
           .. note::  The input is limited up to 10 entries (KEGG restriction).
         """
         _valid_options = ["aaseq", "ntseq", "mol", "kcf", "image", "kgml"]
-        _valid_db_options = ["compound", "drug"]
 
         # self._checkDB(database, mode="find")
         url = "get/" + dbentries
@@ -616,7 +611,7 @@ class KEGG:
             # conversion from NCBI GeneID to KEGG ID for E. coli genes
             conv("eco","ncbi-geneid")
             # inverse of the above example
-            conv("eco","ncbi-geneid")
+            conv("ncbi-geneid","eco")
             #conversion from KEGG ID to NCBI GI
             conv("ncbi-gi","hsa:10458+ece:Z5100")
 
@@ -633,7 +628,7 @@ class KEGG:
 
 
         .. warning:: call to this function may be long. conv("hsa", "uniprot") takes a minute
-            suprinsingly, conv("uniprot", "hsa") takes just a few seconds.
+            surprisingly, conv("uniprot", "hsa") takes just a few seconds.
 
         .. versionchanged:: 1.1
             the output is now a dictionary, not a list of tuples
@@ -687,7 +682,7 @@ class KEGG:
             t = [x.split("\t")[0] for x in res.strip().split("\n")]
             s = [x.split("\t")[1] for x in res.strip().split("\n")]
             return dict([(x, y) for x, y in zip(t, s)])
-        except:
+        except Exception:
             return res
 
     def link(self, target, source):
@@ -783,9 +778,11 @@ class KEGG:
     def save_pathway(self, pathId, filename, scale=None, keggid={}, params={}):
         """Save KEGG pathway in PNG format
 
-        :param  pathId: a valid pathway identifier
-        :param str filename: output PNG file
-        :param params: valid kegg params expected
+        :param str pathId: a valid pathway identifier (e.g., ``"hsa00010"``)
+        :param str filename: output PNG file path; if None, defaults to ``"{pathId}.png"``
+        :param float scale: optional scale factor for the pathway image
+        :param dict keggid: mapping of KEGG IDs to highlight on the pathway
+        :param dict params: additional POST parameters passed to the KEGG pathway viewer
         """
 
         import requests
@@ -1070,9 +1067,10 @@ class KEGG:
         output = {"relations": [], "entries": []}
         # Fixing bug #24 assembla
         if res is None:
-            res = self.services.easyXML(self.get(pathwayId, "kgml"))
-        else:
-            res = self.services.easyXML(res)
+            res = self.get(pathwayId, "kgml")
+        import bs4
+
+        res = bs4.BeautifulSoup(res, "xml")
 
         # read and parse the entries
         entries = [x for x in res.findAll("entry")]
@@ -1206,7 +1204,7 @@ class KEGG:
 
         try:
             parse = self.keggParser.parse(entry)
-        except:
+        except Exception:
             self.services.logging.warning("Could not parse the entry correctly.")
 
         return parse
@@ -1337,7 +1335,7 @@ class KEGGParser(object):
             elif len(line) == 0:
                 pass
             elif line[0] != " ":
-                if start == True:
+                if start is True:
                     start = False
                 else:
                     entries.append(entry)
@@ -1369,7 +1367,7 @@ class KEGGParser(object):
                 continue
             try:
                 output[k] = output[k].strip().replace(k, "", 1).strip()
-            except:  # skip the lists
+            except Exception:  # skip the lists
                 pass
 
         # Now, let us do the real stuff.
@@ -1445,7 +1443,7 @@ class KEGGParser(object):
                     for line in value.split("\n"):
                         try:
                             k, v = line.strip().split(None, 1)
-                        except:
+                        except Exception:
                             # self.services.logging.warning("empty line in %s %s" % (key, line))
                             k = line.strip()
                             v = ""
@@ -1459,7 +1457,7 @@ class KEGGParser(object):
                 for i, line in enumerate(value.split("\n")):
                     try:
                         k, v = line.strip().split(None, 1)
-                    except:
+                    except Exception:
                         # self.services.logging.warning("empty line in %s %s" % (key, line))
                         k = line.strip()
                         v = ""
@@ -1503,7 +1501,7 @@ class KEGGParser(object):
                 for line in value.split("\n"):
                     try:  # empty orthology in rc:RC00004
                         k, v = line.strip().split(None, 1)
-                    except:
+                    except Exception:
                         # self.services.logging.warning("empty line in %s %s" % (key, line))
                         k = line.strip()
                         v = ""
@@ -1517,7 +1515,7 @@ class KEGGParser(object):
                 for line in value.split("\n"):
                     try:  # empty orthology in rc:RC00004
                         k, v = line.strip().split(None, 1)
-                    except:
+                    except Exception:
                         # self.services.logging.warning("empty line in %s %s" % (key, line))
                         k = line.strip()
                         v = ""
@@ -1616,7 +1614,7 @@ class KEGGParser(object):
             else:
                 self.logging.warning(
                     """Found keyword %s, which has not special
-    parsing for now. please report this issue with the KEGG 
+    parsing for now. please report this issue with the KEGG
     identifier (%s) into github.com/bioservices. Thanks T.C."""
                     % (key, output["ENTRY"])
                 )
@@ -1741,7 +1739,7 @@ class KEGGParser(object):
             if this.strip().startswith("CHROMOSOME"):
                 try:
                     res["CHROMOSOME"] = this.strip().split(None, 1)[1]
-                except:
+                except Exception:
                     # genome:T00012 has no name
                     res["CHROMOSOME"] = this.strip()
             elif this.strip().startswith("LENGTH"):

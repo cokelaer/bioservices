@@ -3,7 +3,7 @@ BioPython
 
 :URL: http://biopython.org/DIST/docs/tutorial/Tutorial.html#chapter:Bio.AlignIO
 
-BioPython provides many tools for IO, algorithms and access to Web services. 
+BioPython provides many tools for IO, algorithms and access to Web services.
 BioServices provides access to many web services. This example shows how (i) to use
 BioServices to retrieve FASTA files and (ii) BioPython to play with the
 sequences.
@@ -28,7 +28,7 @@ First, let us retrieve two FASTA sequences and save them in 2 files::
 
 Now, on the BioPython side, we read the 2 sequences and introspect them::
 
-    >>> from Bio import AlignIO
+    >>> from Bio import SeqIO, AlignIO
     >>> record1 = SeqIO.read("akt1.fasta", "fasta")
     >>> record2 = SeqIO.read("akt2.fasta", "fasta")
     >>> record1 += "-"   # this is to have 2 sequences on same length as requested by the following function
@@ -38,11 +38,9 @@ Now, on the BioPython side, we read the 2 sequences and introspect them::
     >>> alignment.append(record2)
 
     >>> for record in alignment:
-    >>>     print(description)
+    >>>     print(record.description)
     sp|P31749|AKT1_HUMAN RAC-alpha serine/threonine-protein kinase OS=Homo sapiens GN=AKT1 PE=1 SV=2
     sp|P31751|AKT2_HUMAN RAC-beta serine/threonine-protein kinase OS=Homo sapiens GN=AKT2 PE=1 SV=2
 
 You are ready to play with BioPython multiple alignment tools. Please consult
 BioPython documentation for more examples.
-
-

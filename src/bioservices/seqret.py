@@ -33,9 +33,7 @@
 
 
 """
-import copy
 from bioservices.services import REST
-
 
 __all__ = ["Seqret"]
 
@@ -48,7 +46,7 @@ class Seqret:
         >>> from bioservices import *
         >>> s = Seqret()
 
-    The ReadSeq service was replaced by #the Seqret services (2015).
+    The ReadSeq service was replaced by the Seqret service (2015).
 
     .. versionchanged:: 0.15
 
@@ -57,7 +55,7 @@ class Seqret:
     def __init__(self, verbose=True):
         """.. rubric:: Constructor
 
-        :param bool verbose:
+        :param bool verbose: set to True to get informative messages
 
         """
         url = "https://www.ebi.ac.uk/Tools/services/rest/emboss_seqret"
@@ -87,13 +85,13 @@ class Seqret:
     def get_parameter_details(self, parameterId):
         """Get details of a specific parameter.
 
-        :param str parameter: identifier/name of the parameter to fetch details of.
+        :param str parameterId: identifier/name of the parameter to fetch details of.
         :return: a data structure describing the parameter and its values.
 
         ::
 
-            rs = ReadSeq()
-            print(rs.get_parameter_details("stype"))
+            s = Seqret()
+            print(s.get_parameter_details("stype"))
 
         """
         if parameterId not in self.parameters:
@@ -108,10 +106,11 @@ class Seqret:
 
         :param str email: user e-mail address.
         :param str title: job title.
-        :param params: parameters for the tool as returned by :meth:`get_parameter_details`.
+        :param kargs: additional tool parameters (e.g., ``sequence``, ``stype``,
+            ``inputformat``, ``outputformat``). See :meth:`get_parameter_details`.
         :return: string containing the job identifier (jobId).
 
-        Deprecated (olf readseq service)::
+        Deprecated format values from the old ReadSeq service::
 
             Format Name     Value
             Auto-detected   0
@@ -142,10 +141,10 @@ class Seqret:
 
         ::
 
-            s = readseq.Seqret()
+            s = Seqret()
             jobid = s.run("cokelaer@test.co.uk", "test", sequence=fasta, inputformat=8,
                 outputformat=2)
-            genbank = s.get_result(s._jobid)
+            genbank = s.get_result(jobid)
 
 
         """
@@ -211,9 +210,10 @@ class Seqret:
     def get_result(self, jobid, result_type="out"):
         """Get the result of a job of the specified type.
 
-        :param str jobid: job identifier.
-        :param parameters: optional list of wsRawOutputParameter used to
-            provide additional parameters for derived result types.
+        :param str jobid: job identifier returned by :meth:`run`.
+        :param str result_type: result type to retrieve (default ``"out"``).
+            See :meth:`get_result_types` for available types.
+        :return: the result as a string, or ``None`` if the job is not finished
         """
         if self.get_status(jobid) != "FINISHED":
             self.services.logging.warning("Your job is not finished yet. Try again later.")

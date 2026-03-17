@@ -29,8 +29,8 @@
 
 
 """
-from bioservices.services import REST
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
@@ -72,24 +72,22 @@ class DBFetch:
     def fetch(self, query, db="ena_sequence", format="default", style="raw", pageHtml=False):
         """Fetch an entry in a defined format and style.
 
-        :param str query: the entry identifier in db:id format (e.g. 'UniProtKB:WAP_RAT').
-        :param str format: the name of the format required (default to fasta).
-        :param str style: the name of the style required (raw, default, html)
-
-        :returns: The format of the response depends on the format/style
-            parameter.
-
+        :param str query: the entry identifier in db:id format (e.g. ``'UniProtKB:WAP_RAT'``)
+        :param str db: database name (default ``"ena_sequence"``)
+        :param str format: the name of the format required (default ``"default"``)
+        :param str style: the name of the style required: ``"raw"``, ``"default"``, or ``"html"``
+        :param bool pageHtml: if True, return the result wrapped in an HTML page
+        :return: entry data; format depends on the format/style parameters
 
         ::
 
             from bioservices import DBFetch
-            u = DBFfetch()
-            db.fetch(db="ena_sequence", format="fasta", query="L12344,L12345")
-            db.fetch(db="uniprot", format="fasta", query="P53503")
+            u = DBFetch()
+            u.fetch(db="ena_sequence", format="fasta", query="L12344,L12345")
+            u.fetch(db="uniprot", format="fasta", query="P53503")
 
-
-        If db is ommited, the default is ena_sequence.
-        If formatare ommited, the default is EMBL format
+        If *db* is omitted, the default is ``ena_sequence``.
+        If *format* is omitted, the default is EMBL format.
         The default style is raw data.
 
         """
@@ -106,7 +104,7 @@ class DBFetch:
         )
         try:
             res = res.content.decode()
-        except:
+        except Exception:
             pass
         return res
 
@@ -114,7 +112,7 @@ class DBFetch:
         """Get details describing specific database (data formats, styles)
 
         :param str db: a valid database.
-        :return: The output can be introspected and contains several attributes
+        :return: dict describing the database; can be introspected for formats, styles, etc.
 
         ::
 
@@ -130,10 +128,10 @@ class DBFetch:
         return res
 
     def get_all_database_info(self):
-        """Get details of all available databases, includes formats and result styles.
+        """Get details of all available databases, including formats and result styles.
 
-        :Returns: A list of data structures describing the databases. See
-            :meth:`getDatabaseInfo` for a description of the data structure.
+        :return: a dict of data structures describing the databases. See
+            :meth:`get_database_info` for a description of each entry.
         """
         return self.get_database_info()
 
@@ -169,7 +167,7 @@ class DBFetch:
         :param str db: database name to get available styles for (e.g. uniprotkb).
         :param str format: the data format to get available styles for (e.g. fasta).
 
-        :Returns: An array of strings containing the style names.
+        :return: list of style name strings
 
         ::
 
@@ -185,7 +183,7 @@ class DBFetch:
     def _getSupportedDBs(self):
         """Get a list of database names usable with DBFetch.
 
-        Buffered in _supportedDB.
+        Result is buffered in ``_supportedDBs``.
         """
         if self._supportedDBs:
             return self._supportedDBs

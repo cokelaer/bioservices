@@ -34,15 +34,11 @@
 
 
 """
-from bioservices import REST
-from bioservices.xmltools import bs4
 import easydev
-from bioservices import logger
+
+from bioservices import REST, logger
 
 logger.name = __name__
-
-
-from urllib.error import HTTPError
 
 
 __all__ = ["HGNC"]
@@ -57,7 +53,12 @@ class HGNC:
     """
 
     def __init__(self, verbose=False, cache=False):
-        url = "http://rest.genenames.org/"
+        """.. rubric:: Constructor
+
+        :param bool verbose: set to True to get more logging output
+        :param bool cache: set to True to enable HTTP caching
+        """
+        url = "http://rest.genenames.org"
         self.services = REST("HGNC", url=url, verbose=verbose, cache=cache)
 
         self._info = self.get_info()
@@ -65,26 +66,28 @@ class HGNC:
         self.stored_fields = self._info["storedFields"]
 
     def get_info(self, frmt="json"):
-        """Request information about the service
+        """Request information about the service.
 
-        Fields are when the server was last updated (lastModified),
-        the number of documents (numDoc), which fields can be queried
-        using search and fetch (searchableFields) and which fields may
-        be returned by fetch (storedFields).
+        Returns metadata including when the server was last updated
+        (``lastModified``), the number of documents (``numDoc``), which fields
+        can be queried using search and fetch (``searchableFields``), and which
+        fields may be returned by fetch (``storedFields``).
 
-
+        :param str frmt: response format (default ``"json"``)
+        :return: dict with service metadata
         """
         headers = self.services.get_headers(content=frmt)
         res = self.services.http_get("info", frmt=frmt, headers=headers)
         return res
 
     def fetch(self, database, query, frmt="json"):
-        """Retrieve particular records from a searchable fields
+        """Retrieve particular records from a searchable field.
 
-        Returned object is a json object with fields as in
-        :attr:`stored_field`, which is returned from :meth:`get_info` method.
+        :param str database: a valid searchable field name (see :attr:`searchable_fields`)
+        :param str query: the exact value to look up; no wildcards accepted
+        :param str frmt: response format (default ``"json"``)
+        :return: JSON object with fields as listed in :attr:`stored_fields`
 
-        Only one query at a time. No wild cards are accepted.
         ::
 
             >>> h = HGNC()
@@ -109,7 +112,12 @@ class HGNC:
         user could use the hgnc_id returned by search to then fire off a fetch
         request by hgnc_id.
 
-        :param database: if not provided, search all databases.
+        :param str database_or_query: field name to search (see :attr:`searchable_fields`),
+            or a free-text query if *query* is omitted (searches all fields)
+        :param str query: the pattern to search for; supports wildcards (``*``, ``?``)
+            and boolean operators (``AND``, ``OR``, ``NOT``)
+        :param str frmt: response format (default ``"json"``)
+        :return: JSON object with ``hgnc_id``, ``symbol``, and ``score`` for each hit
 
 
         ::

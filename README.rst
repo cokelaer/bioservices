@@ -103,6 +103,32 @@ organism::
 
 More examples and tutorials are available in the `On-line documentation <http://bioservices.readthedocs.io/>`_
 
+Command-Line Interface
+======================
+
+BioServices also ships a ``bioservices`` command-line tool for quick lookups
+without writing any Python code::
+
+    $ bioservices --help
+
+Four top-level commands are available:
+
+* **gene** — query gene data (info, name, ontology, expression, pathway, ortholog, id mapping)
+* **protein** — query protein data (search, sequence, structure, annotation, interaction, id mapping)
+* **taxonomy** — retrieve taxonomic information for a taxon ID
+* **download-accession** — download FASTA (and optionally GFF3/GenBank) for a sequence accession
+
+Examples::
+
+    $ bioservices gene info --gene-id 1017
+    $ bioservices gene name --symbol BRAF
+    $ bioservices protein search --query ZAP70 --organism human
+    $ bioservices protein structure --uniprot-id P43403
+    $ bioservices taxonomy --id 9606
+    $ bioservices download-accession --accession FN433596.1
+
+Full CLI reference: `CLI documentation <http://bioservices.readthedocs.io/en/main/cli.html>`_
+
 Notebooks
 =========
 
@@ -251,80 +277,65 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
-1.14.0    * Add EBI Proteins API service (new ``proteins`` module)
-          * Add STRING protein interaction database service (new ``string`` module)
-            equivalent to the ``STRINGdb`` Bioconductor package
-          * Add NCBI GEO (Gene Expression Omnibus) service (new ``geo`` module)
-            equivalent to the ``GEOquery`` Bioconductor package
-          * Update PubChem module to current PUG REST API; fix async listkey polling
-          * Fix caching fallback when sqlite3/requests_cache fails in REST services
-          * WikiPathways: fix savePathwayAs (TypeError) and switch to assets URL
+1.15.0    * **Drop WSDL support**: ``WSDLService`` class and ``suds-community``
+            dependency removed — all active services now use REST exclusively
+          * Remove obsolete ``_compat`` module (Python 2 shims); replace
+            ``pkg_resources`` with ``importlib.metadata``
+          * Documentation overhauled: new Quick Start, merged changelog,
+            contributors folded into Help & Credits, ChangeLog page removed
+          * Docstrings and code quality improvements
+          * CI: notebook test suite extended to all 17 notebooks; slow
+            ``unichem`` and ``quickgo`` tests marked ``flaky``
+1.14.0    * New ``proteins`` module (EBI Proteins API)
+          * New ``string`` module (STRING protein interaction database)
+          * New ``geo`` module (NCBI Gene Expression Omnibus)
+          * PubChem: update to current PUG REST API
           * Remove deprecated BioGRID and PSICQUIC services
-          * Fix circular import regression in services/apps/peptides
-          * Fix ReadTheDocs build: add sphinx_copybutton, fix docstring warnings
-          * Fix license: align pyproject.toml classifier and main.py to GPLv3
-          * Fix PRIDE service: handle list API responses and correct stats URL
-          * Fix Python 3.11/3.12 CI: numpy <2.4 constraint, lxml build deps
-          * Fix #297: clean up compound tutorial documentation
-1.13.0    * New ChEBI API (rest instead of SOAP)
-1.12.2    * add subcommand 'taxonomy' that uses eutils to search for taxon IDs
-1.12.1    * fix pyproject to use python>3.9 and pandas/numpy>2.2
-1.12.0    * Fix pyproject missing requirements
-          * Fix pkg_resources warning
-          * drop python 3.8, add py3.12
-1.11.2    * Update COG service to be more user-friendly and return all pages
-            by default
-          * uniprot set progress to False in the search method
-          * Merged #250 and #249 user PRs (compress option in uniprot module
-            and logging issue in biodbnet)
-1.11.1    * Fix regression i uniprot.mapping
-            (https://github.com/cokelaer/bioservices/issues/245)
-1.11.0    * Fix uniprot limitation of 25 results only (
-          * For developers: all services are now refactorised to use services
-            as an attribute rather than a parent class.
-          * Remove ReactomeOld and ReactomeAnalysis (deprecated)
-          * move rnaseq_ebi (deprecated) to attic for book_keeping
-1.10.4    * Fix v1.10.3 adding missing requirements.txt
-1.10.3    * Update pdb service to use v2 API
-          * remove biocarta (website not accesible anymore)
-          * Update Chembl (no API changes)
-1.10.2    * Fix #226 and applied PR from Fix from @GianArauz
-            https://github.com/cokelaer/bioservices/pull/232 about UniProt
-            error
-          * Update MANIFEST to fix #232
-1.10.1    * allow command line to download genbank and GFF
-          * update pride module to use new PRIDE API (July 2022)
-          * Fixed KEGG bug #225
-1.10.0    * Update uniprot to use the new API (june 2022)
-1.9.0     * Update unichem to reflect new API
-1.8.4     * biomodels. Fix #208
-          * KEGG: fixed #204 #202 and #203
-1.8.3     * Eutils: remove warning due to unreachable URL. Set REST as
-            attribute rather and inheritance.
-          * NEW biocontainers module
-          * KEGG: add save_pathway method. Fix parsing of structure/pdb entry
-          * remove deprecated function from Reactome
-1.8.2     * Fix suds package in code and requirements
-1.8.1     * Integrated a change made in KEGG service (DEFINITON was changed to
-            ORG_CODE)
-          * for developers: applied black on all modules
-          * switch suds-jurko to new suds community
-1.8.0     * add main standalone application.
-          * moved chemspider and clinvitae to the attic
-          * removed picr service, not active anymore
-1.4.X     * NEW RNAseq from EBI in rnaseq_ebi module
-          * Replaced deprecated HGNC with the official web service from genenames.org
-          * Fully updated EUtils since WSDL is now down; implementation uses REST now.
-          * Removed the apps/taxonomy module now part of http://github.com/biokit.
-1.3.X     * CACHE files are now stored in a general directory in the home
-          * New REST class to use **requests** package instead of urllib2.
-          * Creation of a global configuration file in .config/bioservice/bioservices.cfg
-          * NEW services: Reactome, Readseq, Ensembl, EUtils
-1.2.X     * NEW services: BioDBnet, BioDBNet, MUSCLE, PathwayCommons, GeneProf
-1.1.X     * NEW services: biocarta, pfam, ChEBI, UniChem
-1.0.0:    * first stable release
-0.9.X:    * NEW services: BioModels, Kegg, Reactome, Chembl, PICR, QuickGO,
-            Rhea, UniProt,WSDbfetch, NCBIblast, PSICQUIC, Wikipath
+1.13.0    * ChEBI: new REST API (replacing SOAP)
+1.12.2    * Add ``taxonomy`` CLI subcommand (via EUtils)
+1.11.0    * Remove ReactomeOld, ReactomeAnalysis, rnaseq_ebi (deprecated)
+1.10.3    * PDB: update to v2 API; remove biocarta (website no longer accessible)
+1.10.1    * PRIDE: update to new API (July 2022)
+1.10.0    * UniProt: update to new API (June 2022)
+1.9.0     * UniChem: update to new API
+1.8.3     * New ``biocontainers`` module
+1.8.0     * Remove chemspider, clinvitae, picr (deprecated)
+          * Add standalone ``bioservices`` CLI application
+1.7.12    * New ``cog`` module
+          * Deprecate PICR and TCGA modules
+          * PDB, ChEMBL, QuickGO, BioDBNet: new API
+1.7.5     * New ``mygeneinfo``, ``pdbe`` modules
+1.7.4     * New ``bigg`` module (BiGG models)
+          * BioModels: new REST API (replacing WSDL)
+          * Move miriam to attic (deprecated)
+1.7.0     * New ``panther`` module
+1.6.0     * ChEMBL: fully rewritten to new API
+1.5.2     * Reactome: new API
+1.5.0     * BioDBNet, WikiPathways: migrate from WSDL to REST
+          * QuickGO, DBFetch: new API
+          * Rename ``readseq`` to ``seqret`` (new API)
+1.4.8     * New ``omnipath`` module
+1.4.6     * New ``rnaseq_ebi`` module
+1.4.4     * New ``ena`` module
+1.4.1     * HGNC: replaced deprecated module with genenames.org service
+1.4.0     * EUtils: migrate from WSDL to REST
+          * Remove apps/taxonomy (moved to biokit)
+1.3.5     * New ``intact`` module (Intact Complex)
+1.3.4     * New ``pride`` module
+1.3.3     * New ``ensembl``, ``clinvitae`` modules
+1.3.1     * New ``readseq`` module
+1.3.0     * New REST class using ``requests`` (replacing urllib2)
+          * New ``eutils`` module
+          * Rename ``chembldb`` to ``chembl``; rename ``WikiPathway`` to ``WikiPathways``
+1.2.3     * New ``biodbnet``, ``pathwaycommons`` modules
+1.2.0     * New ``muscle``, ``geneprof`` modules
+1.1.2     * New ``biocarta``, ``pfam`` modules
+1.1.1     * New ``hgnc`` module
+1.1.0     * New ``chebi``, ``unichem`` modules
+1.0.4     * New ``pdb`` module (draft)
+1.0.0     * First stable release
+0.9.0     * Initial services: BioModels, KEGG, Reactome, ChEMBL, PICR, QuickGO,
+            Rhea, UniProt, WSDbfetch, NCBIblast, PSICQUIC, WikiPathways
 ========= ====================================================================
 
 

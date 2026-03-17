@@ -21,7 +21,7 @@
 .. topic:: What is MyGeneInfo ?
 
     :URL: https://mygene.info
-    :REST: https://mygeneinfo/v3.api/
+    :REST: https://mygene.info/v3/api/
 
     .. highlights::
 
@@ -55,6 +55,7 @@ class MyGeneInfo:
         """.. rubric:: Constructor
 
         :param bool verbose: prints informative messages (default is off)
+        :param bool cache: set to True to enable HTTP caching
 
         """
         url = "https://mygene.info/v3"
@@ -94,7 +95,7 @@ class MyGeneInfo:
 
         ::
 
-            mgi = MyGeneInfoe()
+            mgi = MyGeneInfo()
             mgi.get_genes(("301345,22637"))
             # first one is rat, second is mouse. This will return a 'notfound'
             # entry and the second entry as expected.
@@ -150,8 +151,8 @@ class MyGeneInfo:
 
         ::
 
-            mgi = MyGeneInfoe()
-            mgi.get_genes("301345")
+            mgi = MyGeneInfo()
+            mgi.get_one_gene("301345")
         """
         params = {"ids": geneid, "fields": fields}
         if email:  # pragma: no cover
@@ -200,7 +201,7 @@ class MyGeneInfo:
             0.
         :param sort: the comma-separated fields to sort on. Prefix with "-" for
             descending order, otherwise in ascending order. Default: sort by matching scores
-            in decending order.
+            in descending order.
         :param str facets: a single field or comma-separated fields to return
             facets, for example, "facets=taxid", "facets=taxid,type_of_gene".
         :param bool entrezonly: when passed as True, the query returns only the hits
@@ -215,9 +216,7 @@ class MyGeneInfo:
         :param str email: If you are regular users of this services, the
             mygeneinfo maintainers/authors encourage you to provide an email,
             so that we can better track the usage or follow up with you.
-
-
-
+        :return: a dict with ``total``, ``max_score``, ``took``, and ``hits`` fields
 
         """
         params = {"fields": fields, "size": size, "from": _from}
@@ -295,9 +294,17 @@ class MyGeneInfo:
         return res
 
     def get_metadata(self):
+        """Return metadata about the MyGeneInfo service (e.g., species, build dates).
+
+        :return: a dict with service metadata
+        """
         res = self.services.http_get(f"metadata", frmt="json")
         return res
 
     def get_taxonomy(self):
+        """Return the taxonomy information from the MyGeneInfo service metadata.
+
+        :return: a dict mapping species names to their taxonomy IDs
+        """
         res = self.services.http_get(f"metadata", frmt="json")
         return res["taxonomy"]

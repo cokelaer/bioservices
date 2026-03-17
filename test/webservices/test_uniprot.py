@@ -36,7 +36,7 @@ protein_queries = [
 ]
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def uniprot():
     u = UniProt(verbose=False, cache=False)
     u.services.logging.setLevel("ERROR")
@@ -106,6 +106,19 @@ def test_get_df(uniprot):
 
 def test_fasta(uniprot):
     "Q9Y617" in uniprot.get_fasta(["Q9Y617-1"])
+
+
+def test_get_next_link(uniprot):
+    # header contains a valid next link
+    headers = {"Link": '<https://rest.uniprot.org/idmapping/results/job123?cursor=abc>; rel="next"'}
+    link = uniprot._get_next_link(headers)
+    assert link == "https://rest.uniprot.org/idmapping/results/job123?cursor=abc"
+
+    # no Link header returns None
+    assert uniprot._get_next_link({}) is None
+
+    # Link header present but not a next-rel link returns None
+    assert uniprot._get_next_link({"Link": '<https://example.com>; rel="prev"'}) is None
 
 
 # https://github.com/cokelaer/bioservices/issues/245

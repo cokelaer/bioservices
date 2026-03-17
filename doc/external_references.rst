@@ -2,10 +2,19 @@ References to BioServices on the Web
 ===========================================
 
 
-* Galaxy: See the Log Archive at `Galaxy log archive <http://wiki.galaxyproject.org/Community/Log/2013/UsingBioServicesWithGalaxy>`_
-* EBI: See `EBI programming web services <http://www.ebi.ac.uk/Tools/webservices/tutorials/06_programming/python>`_
-* WikiPathways: `references <http://wikipathways.tumblr.com/search/bioservices>`_
-* http://www.scoop.it/t/bioinformatique
 * http://bioinfo-fr.net/bioservices-module-python
-*  http://devbio.eu/?p=resources&presel=bioinfo
-* biomartian from Endre Bakken Stovner https://github.com/endrebak/biomartian
+* bio.tools: `bioservices <https://bio.tools/bioservices>`_
+* ReadTheDocs: `Documentation <https://bioservices.readthedocs.io/>`_
+* PyPI: `Package <https://pypi.org/project/bioservices/>`_
+
+Scientific Literature
+======================
+
+The primary publication for BioServices is:
+
+* **BioServices: a common Python package to access biological Web Services programmatically**
+  * Thomas Cokelaer, Dennis Pultz, Lea M. Harder, Jordi Serra-Musach, Julio Saez-Rodriguez.
+  * *Bioinformatics*, 2013, 29 (24): 3241-3242.
+  * `DOI: 10.1093/bioinformatics/btt547 <https://doi.org/10.1093/bioinformatics/btt547>`_
+
+It has been cited by over 120 publications, including research on KEGG pathway reconstruction, RNASeq-er API, and systems pharmacology.

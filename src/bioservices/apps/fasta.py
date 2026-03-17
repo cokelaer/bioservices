@@ -1,9 +1,10 @@
 try:
     from collections import OrderedDict
-except:
+except Exception:
     # for python 2.6
     from ordereddict import OrderedDict
-from easydev.decorators import ifpylab, ifpandas
+
+from easydev.decorators import ifpandas, ifpylab
 
 __all__ = ["FASTA", "MultiFASTA"]
 
@@ -107,7 +108,7 @@ class MultiFASTA(object):
         for thisfasta in data.split(">")[1:]:
             f = FASTA()
             f._fasta = f._interpret(thisfasta)
-            if f.accession != None and f.accession not in self.ids:
+            if f.accession is not None and f.accession not in self.ids:
                 self._fasta[f.accession] = f
             else:
                 print("Accession %s is already in the ids list or could not be interpreted. skipped" % str(f.accession))
@@ -371,7 +372,7 @@ class FASTA(object):
             if res == "":
                 raise Exception
             self._fasta = res[:]
-        except:
+        except Exception:
             pass
 
     def save_fasta(self, filename):
@@ -380,7 +381,7 @@ class FASTA(object):
         :param str data: the FASTA contents
         :param str filename: where to save it
         """
-        if self._fasta == None:
+        if self._fasta is None:
             raise ValueError("No fasta was read or downloaded. Nothing to save.")
 
         fh = open(filename, "w")

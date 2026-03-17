@@ -15,7 +15,7 @@
 #  documentation: http://packages.python.org/bioservices
 #
 ##############################################################################
-"""Interface to the quickGO interface
+"""Interface to the QuickGO interface
 
 .. topic:: What is quickGO
 
@@ -30,8 +30,6 @@
         -- from QuickGO home page, Dec 2012
 
 """
-import json
-
 from bioservices.services import REST
 
 __all__ = ["QuickGO"]
@@ -57,6 +55,7 @@ class QuickGO:
         """.. rubric:: Constructor
 
         :param bool verbose: print informative messages.
+        :param bool cache: set to True to enable HTTP caching
 
         """
         # super(QuickGO, self).__init__(url="http://www.ebi.ac.uk/QuickGO-Old",
@@ -65,9 +64,10 @@ class QuickGO:
     def go_search(self, query, limit=600, page=1):
         """Searches a simple user query, e.g., query=apopto
 
-        :param str query:
-        :param int limit: max 600
-        :param int page:
+        :param str query: search term (e.g., ``"apopto"``)
+        :param int limit: maximum number of results to return (max 600)
+        :param int page: page number for paginated results (default 1)
+        :return: list of matching GO term results
 
 
         """
@@ -78,13 +78,15 @@ class QuickGO:
         res = self.services.http_get(url, frmt="json", params=params, headers=self.services.get_headers("json"))
         try:
             return res["results"]
-        except:  # pragma: no cover
+        except Exception:  # pragma: no cover
             return res
 
     def get_go_terms(self, query, max_number_of_pages=None):
         """Get information on all terms and page through the result
 
-        :param str query: terms as string of comma seperated values
+        :param str query: GO term ID(s) as a comma-separated string (e.g., ``"GO:0003824"``)
+        :param max_number_of_pages: maximum number of pages to retrieve
+        :return: list of GO term result dictionaries
         """
 
         query = query.replace(":", "%3A")
@@ -93,32 +95,46 @@ class QuickGO:
         results = self.services.http_get(url, frmt="json", params={}, headers=self.services.get_headers("json"))
         try:
             return results["results"]
-        except:  # pragma: no cover
+        except Exception:  # pragma: no cover
             return results
 
     def get_go_ancestors(self, query, relations="is_a,part_of,occurs_in,regulates"):
+        """Retrieve ancestors of given GO term(s).
 
+        :param str query: GO term ID(s) as a comma-separated string
+        :param str relations: comma-separated relationship types to traverse
+            (default ``"is_a,part_of,occurs_in,regulates"``)
+        :return: list of ancestor GO term results
+        """
         query = query.replace(":", "%3A")
         query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/ancestors".format(query)
         results = self.services.http_get(url, frmt="json", params={}, headers=self.services.get_headers("json"))
         try:
             return results["results"]
-        except:  # pragma: no cover
+        except Exception:  # pragma: no cover
             return results
 
     def get_go_children(self, query):
+        """Retrieve direct children of given GO term(s).
+
+        :param str query: GO term ID(s) as a comma-separated string
+        :return: list of child GO term results
+        """
         query = query.replace(":", "%3A")
         query = query.replace(",", "%2C")
         url = "services/ontology/go/terms/{}/children".format(query)
         results = self.services.http_get(url, frmt="json", params={}, headers=self.services.get_headers("json"))
         try:
             return results["results"]
-        except:  # pragma: no cover
+        except Exception:  # pragma: no cover
             return results
 
     def get_go_chart(self, query):
-        """
+        """Return a PNG chart image for the given GO term(s).
+
+        :param str query: GO term ID(s) as a comma-separated string
+        :return: raw PNG image bytes
 
         ::
 
@@ -135,10 +151,18 @@ class QuickGO:
         return res
 
     def get_go_paths(self, _from, _to, relations="is_a,part_of,occurs_in,regulates"):
-        """Retrieves the paths between two specified sets of ontology terms.
+        """Retrieve paths between two specified sets of ontology terms.
+
         Each path is formed from a list of (term, relationship, term) triples.
 
-            paths = go.go_terms_path("GO:0005215", "GO:0003674")
+        :param str _from: source GO term ID (e.g., ``"GO:0005215"``)
+        :param str _to: target GO term ID (e.g., ``"GO:0003674"``)
+        :param str relations: comma-separated relationship types to traverse
+        :return: dict with ``"results"`` key containing a list of paths
+
+        ::
+
+            paths = go.get_go_paths("GO:0005215", "GO:0003674")
             # First path is found as the first item in the "results"
             paths["results"][0]
 
@@ -191,9 +215,9 @@ class QuickGO:
             specify a limit of -1).
         :param int page: results may be stored on several pages. You must
             provide this number. There is no way to retrieve more than 100
-            results without calling  this function several times chanding this
+            results without calling  this function several times changing this
             parameter (default to 1).
-        :param char aspect: use this to limit the annotations returned to a
+        :param str aspect: use this to limit the annotations returned to a
             specific ontology or ontologies (Molecular Function, Biological
             Process or Cellular Component). The valid character can be F,P,C.
         :param str reference: PubMed or GO reference supporting annotation. Can refer to a
@@ -222,7 +246,7 @@ class QuickGO:
             is_a,part_of.
         :param str evidenceCodeUsage: Indicates how the evidence code terms
             within the annotations should be used. Is used in conjunction with
-            'evidenceCodeUsageRelationships' filter. E.g., descendants, exact<F12>
+            'evidenceCodeUsageRelationships' filter. E.g., descendants, exact
         :param str evidenceCodeUsageRelationships: The relationship between the
             provided 'evidenceCode' identifiers. Allows comma separated values. E.g.,
             is_a,part_of.
@@ -238,15 +262,13 @@ class QuickGO:
 
         ::
 
-            >>> print(s.Annotation(protein='P12345', frmt='tsv', col="ref,evidence",
-            ... reference='PMID:*'))
-            >>> print(s.Annotation(protein='P12345,Q4VCS5', frmt='tsv',
-            ...     col="ref,evidence",reference='PMID:,Reactome:'))
+            >>> print(go.Annotation(geneProductId='UniProtKB:P12345', reference='PMID:*'))
+            >>> print(go.Annotation(geneProductId='UniProtKB:P12345,UniProtKB:Q4VCS5',
+            ...     reference='PMID:,Reactome:'))
 
 
         """
         # _valid_formats = ["gaf", "gene2go", "proteinList", "fasta", "tsv", "dict"]
-        _valid_db = ["UniProtKB", "UniGene", "Ensembl"]
         _valid_aspect = ["P", "F", "C"]
         validity = {"includeFields": ["goName", "taxonName", "name", "synonyms"]}
 
@@ -353,7 +375,7 @@ or a string (e.g., 'PUBMED:') """
             import json
 
             res = json.loads(res)
-        except:
+        except Exception:
             pass
 
         return res
@@ -361,10 +383,12 @@ or a string (e.g., 'PUBMED:') """
     def Annotation_from_goid(self, goId, max_number_of_pages=25, **kargs):
         """Returns a DataFrame containing annotation on a given GO identifier
 
-        :param str protein: a GO identifier
-        :return: all outputs are stored into a Pandas.DataFrame data structure.
+        :param str goId: a GO identifier (e.g., ``"GO:0003824"``)
+        :param int max_number_of_pages: maximum number of result pages to fetch
+        :return: a ``pandas.DataFrame`` containing the annotation data, or a list
+            if pandas is not installed
 
-        All parameters from :math:`Annotation` are also valid except **format** that
+        All parameters from :meth:`Annotation` are also valid except **format** that
         is set to **tsv**  and cols that is made of all possible column names.
 
         """
@@ -385,7 +409,7 @@ or a string (e.g., 'PUBMED:') """
             import pandas as pd
 
             return pd.DataFrame(results)
-        except:
+        except Exception:
             self.logging.warning(
                 "Cannot return a DataFrame. Returns the list. If you want the dataframe, install pandas library"
             )
@@ -401,11 +425,18 @@ or a string (e.g., 'PUBMED:') """
         dbSubSet=None,
         proteome=None,
     ):
-        """ """
+        """Search for gene products matching a query string.
+
+        :param str query: search term
+        :param str taxonID: NCBI taxonomy ID to filter results (optional)
+        :param int page: page number for paginated results (default 1)
+        :param int limit: maximum number of results per page (max 100)
+        :param str type: gene product type filter (optional)
+        :param str dbSubSet: database subset filter (optional)
+        :param str proteome: proteome filter (optional)
+        :return: dict with gene product search results
+        """
         if isinstance(limit, int) is False or limit > 100 or limit < 0:
             raise TypeError("limit parameter must be an integer greater than zero and less than 100")
         if isinstance(page, int) is False or limit < 0:
             raise TypeError("page parameter must be an integer greater than zero")
-
-        # fill params with parameters that have default values.
-        params = {"limit": limit, "page": page}

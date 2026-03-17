@@ -44,8 +44,8 @@
         -- From PantherDB (about) , Feb 2020
 
 """
-from bioservices.services import REST
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
@@ -59,13 +59,13 @@ class Panther:
 
     ::
 
-        >>> from bioservics import Panther
+        >>> from bioservices import Panther
         >>> p = Panther()
         >>> p.get_supported_genomes()
         >>> p.get_ortholog("zap70", 9606)
 
 
-        >>> from bioservics import Panther
+        >>> from bioservices import Panther
         >>> p = Panther()
         >>> taxon = [x[0]['taxon_id'] for x in p.get_supported_genomes() if "coli" in x['name'].lower()]
         >>> # you may also use our method called search_organism
@@ -74,7 +74,7 @@ class Panther:
 
     The get_mapping returns for each gene ID the GO terms corresponding to each
     ID. Those go terms may belong to different categories (see
-    meth:`get_annotation_datasets`):
+    :meth:`get_annotation_datasets`):
 
     - MF for molecular function
     - BP for biological process
@@ -83,7 +83,7 @@ class Panther:
     - Pathway
 
     Note that results from the website application http://pantherdb.org/
-    do not agree with the oupput of the get_mapping service... Try out the dgt
+    do not agree with the output of the get_mapping service... Try out the dgt
     gene from ecoli for example
 
 
@@ -96,7 +96,8 @@ class Panther:
     def __init__(self, verbose=True, cache=False):
         """**Constructor**
 
-        :param verbose: set to False to prevent informative messages
+        :param bool verbose: set to False to prevent informative messages
+        :param bool cache: set to True to enable HTTP caching
         """
         # super(Panther, self).__init__(name="Panther", url=Panther._url,
         #       verbose=verbose, cache=cache)
@@ -130,7 +131,7 @@ class Panther:
         return res
 
     def get_taxon_id(self, pattern=None):
-        """return all taxons supported by the service
+        """Return all taxon IDs supported by the service.
 
         If pattern is provided, we filter the name to keep those that contain
         the filter. If only one is found, we return the name itself, otherwise a
@@ -151,14 +152,11 @@ class Panther:
     def get_mapping(self, gene_list, taxon):
         """Map identifiers
 
-        Each identifier to be delimited by comma i.e. ',. Maximum of 1000 Identifiers
-        can be any of the following: Ensemble gene identifier, Ensemble protein
-        identifier, Ensemble transcript identifier, Entrez gene id, gene symbol, NCBI
-        GI, HGNC Id, International protein index id, NCBI UniGene id, UniProt accession
-        and UniProt id
-
-        :param gene_list: see above
-        :param taxon: one taxon ID. See supported
+        :param str gene_list: comma-delimited gene identifiers (max 1000). Can be
+            any of: Ensembl gene/protein/transcript ID, Entrez gene id, gene symbol,
+            NCBI GI, HGNC Id, International protein index id, NCBI UniGene id,
+            UniProt accession or UniProt id.
+        :param taxon: one taxon ID. See
             :meth:`~bioservices.panther.Panther.get_supported_genomes`
 
         If an identifier is not found, information can be found in the
@@ -168,7 +166,7 @@ class Panther:
             unmapped and mapped genes. If there are not found identifiers,
             the input gene list and the mapped genes list do not have the same
             length. The input names are not stored in the output.
-            Developpers should be aware of that feature.
+            Developers should be aware of that feature.
 
         """
         params = {"geneInputList": gene_list, "organism": taxon}
@@ -213,7 +211,8 @@ class Panther:
         PANTHER pathway or Reactome pathway) of genes is overrepresented
         or underrepresented.
 
-        :param organism: a valid taxon ID
+        :param str gene_list: comma-delimited gene identifiers to test for enrichment
+        :param int organism: a valid taxon ID
         :param enrichment_test: either **Fisher** or **Binomial** test
         :param correction: correction for multiple testing. Either **FDR**,
             **Bonferonni**, or **None**.
@@ -223,13 +222,13 @@ class Panther:
         :param ref_gene_list: if not specified, the system will use all the genes
             for the specified organism. Otherwise, a list delimited by
             comma. Maximum of 100000 Identifiers can be any of the
-            following: Ensemble gene identifier, Ensemble protein
-            identifier, Ensemble transcript identifier, Entrez gene id,
+            following: Ensembl gene identifier, Ensembl protein
+            identifier, Ensembl transcript identifier, Entrez gene id,
             gene symbol, NCBI GI, HGNC Id, International protein index id,
-            NCBI UniGene id, UniProt accession andUniProt id.
+            NCBI UniGene id, UniProt accession and UniProt id.
 
         :return: a dictionary with the following keys. 'reference' contains the
-            orgnaism, 'input_list' is the input gene list with unmapped genes.
+            organism, 'input_list' is the input gene list with unmapped genes.
             'result' contains the list of candidates.
 
         ::
@@ -237,7 +236,7 @@ class Panther:
             >>> from bioservices import Panther
             >>> p = Panther()
             >>> res = p.get_enrichment('zap70,mek1,erk', 9606, "GO:0008150")
-            >>> For molecular function, use :
+            >>> # For molecular function, use:
             >>> res = p.get_enrichment('zap70,mek1,erk', 9606,
                     "ANNOT_TYPE_ID_PANTHER_GO_SLIM_MF")
 
@@ -266,9 +265,9 @@ class Panther:
             res = self.services.http_post("enrich/overrep", params=params, frmt="json")
             try:
                 return res["results"]
-            except:
+            except Exception:
                 return res
-        except:
+        except Exception:
             return res
 
     def get_annotation_datasets(self):
@@ -285,14 +284,14 @@ class Panther:
         ortholog genes in target organisms given a search organism,
         the search terms and a list of target organisms.
 
-        :param gene_list:
-        :param organism: a valid taxon ID
+        :param str gene_list: comma-delimited gene identifiers
+        :param int organism: a valid taxon ID
         :param target_organism: zero or more taxon IDs separated by ','. See
             :meth:`~bioservices.panther.Panther.get_supported_genomes`
         :param ortholog_type: optional parameter to specify ortholog type of target organism
         :return: a dictionary with "mapped" and "unmapped" keys, each of them
             being a list. For each unmapped gene, a dictionary with id and
-            organism is is returned. For the mapped gene, a list of ortholog is
+            organism is returned. For the mapped gene, a list of ortholog is
             returned.
 
         """
@@ -314,21 +313,21 @@ class Panther:
             # make sure we always have a list
             if isinstance(unmapped, dict):
                 unmapped = [unmapped]
-        except:
+        except Exception:
             unmapped = []
         res = {"unmapped": unmapped, "mapped": mapped}
 
         return res
 
     def get_homolog_position(self, gene, organism, position, ortholog_type="all"):
-        """
+        """Return the homolog at a given position in the family tree.
 
-        :param gene: Can be any of the following: Ensemble gene identifier,
-            Ensemble protein identifier, Ensemble transcript identifier, Entrez gene id,
-            gene symbol, NCBI GI, HGNC Id, International protein index id, NCBI UniGene id,
-            UniProt accession andUniProt id
-        :param organism: a valid taxon ID
-        :param ortholog_type: optional parameter to specify ortholog type of target organism
+        :param str gene: a gene identifier — can be any of: Ensembl gene/protein/transcript ID,
+            Entrez gene id, gene symbol, NCBI GI, HGNC Id, International protein index id,
+            NCBI UniGene id, UniProt accession or UniProt id
+        :param int organism: a valid taxon ID
+        :param int position: 1-based position in the gene family tree
+        :param str ortholog_type: ortholog type of target organism (``"LDO"`` or ``"all"``)
         """
         if "," in gene:
             logger.warning("did not expect a comma. Please provide only one gene name")

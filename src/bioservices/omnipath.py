@@ -29,15 +29,13 @@
 
 
 """
-from bioservices import REST
-from easydev import to_list
-from bioservices import logger
+from bioservices import REST, logger
 
 logger.name = __name__
 
 
 class OmniPath:
-    """Interface to the `OmniPath <http://www.ebi.ac.uk/unichem/>`_ service
+    """Interface to the `OmniPath <http://omnipathdb.org>`_ service
 
     .. doctest::
 
@@ -53,7 +51,8 @@ class OmniPath:
     def __init__(self, verbose=False, cache=False):
         """**Constructor** OmniPath
 
-        :param verbose: set to False to prevent informative messages
+        :param bool verbose: set to False to prevent informative messages
+        :param bool cache: set to True to enable HTTP caching
         """
         self.services = REST(name="OmniPath", url=OmniPath._url, verbose=verbose, cache=cache)
 
@@ -75,9 +74,9 @@ class OmniPath:
         :param str query: a valid uniprot identifier (e.g. P00533). It can also
             be a list of uniprot identifiers, or a string with
             comma-separated identifiers.
-        :param str fields: additional fields to be added to the output
-            (e.g., sources, references)
-        :param str frmt: format of the output (json or tabular)
+        :param list fields: additional fields to be added to the output
+            (e.g., ``["sources", "references"]``)
+        :param str frmt: format of the output (``"json"`` or ``"tsv"``)
 
 
         Example::
@@ -104,7 +103,7 @@ class OmniPath:
         else:
             try:  # if input is a string
                 query = query.replace(" ", "")
-            except:
+            except Exception:
                 pass
         assert frmt in ["json", "tsv"], "frmt must be set to json or tsv"
         params = {}
@@ -138,9 +137,10 @@ class OmniPath:
             be a list of uniprot identifiers, or a string with
             comma-separated identifiers.
         :param str ptm_type: restrict the output to this type of PTM
-            (e.g., phosphorylation)
-        :param str fields: additional fields to be added to the output
-            (e.g., sources, references)
+            (e.g., ``"phosphorylation"``)
+        :param list fields: additional fields to be added to the output
+            (e.g., ``["sources", "references"]``)
+        :param str frmt: format of the output (``"json"`` or ``"tsv"``)
 
 
         """
@@ -150,7 +150,7 @@ class OmniPath:
         else:
             try:  # if input is a string
                 query = query.replace(" ", "")
-            except:
+            except Exception:
                 pass
         assert frmt in ["json", "tsv"], "frmt must be set to json or tsv"
         params = {}

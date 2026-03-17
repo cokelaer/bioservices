@@ -30,14 +30,8 @@ bspath = configuration.user_config_dir
 # import bioservices.uniprot
 # bioservices.uniprot  # Stop flake8 error
 
-# settings and services must be imported first as many other modules depend on them
-from . import settings
-from .settings import *
-
-from . import services
-from .services import *
-
 # sub packages inside bioservices.
+# settings and services must be imported first as many other modules depend on them
 from . import (
     apps,
     arrayexpress,
@@ -75,11 +69,12 @@ from . import (
     quickgo,
     reactome,
     rhea,
+    services,
+    settings,
     string,
     unichem,
     uniprot,
     wikipathway,
-    xmltools,
 )
 from .arrayexpress import *
 from .bigg import BiGG
@@ -122,7 +117,6 @@ from .string import *
 from .unichem import *
 from .uniprot import *
 from .wikipathway import *
-from .xmltools import *
 
 # moved to attic in bioservices v1.6
 # from . import geneprof

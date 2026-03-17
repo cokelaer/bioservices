@@ -31,10 +31,8 @@
 .. versionadded:: 1.4.4
 
 """
-import os
-from bioservices.services import REST
-import webbrowser
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
@@ -43,63 +41,53 @@ __all__ = ["ENA"]
 
 
 class ENA:
-    """Interface to `ChEMBL <http://www.ebi.ac.uk/ena/index.php>`_
-
-    Here is a quick example to retrieve a target given its ChEMBL Id
+    """Interface to the `ENA <http://www.ebi.ac.uk/ena>`_ (European Nucleotide Archive)
 
     .. doctest::
 
         >>> from bioservices import ENA
         >>> s = ENA(verbose=False)
 
-
     Retrieve read domain metadata in XML format::
 
         print(e.get_data('ERA000092', 'xml'))
 
-    Retrieve assemble and annotated sequences in fasta format::
+    Retrieve assembled and annotated sequences in FASTA format::
 
         print(e.get_data('A00145', 'fasta'))
 
-    The range parameter can be used in combination to retrieve a subsequence
-    from sequence entry A00145 from bases 3 to 63 using ::
+    The range parameter can be used to retrieve a subsequence
+    from sequence entry A00145 from bases 3 to 63::
 
-        e.get_data('A00145', 'fasta', fasta_range=[3,63])
+        e.get_data('A00145', 'fasta', fasta_range=[3, 63])
 
-    Retrieve assembled and annotated subsequences in HTML format (same
-    as above but in HTML page).
+    Retrieve assembled and annotated subsequences in HTML format::
 
         e.view_data('A00145')
 
-
     Retrieve expanded CON records:
 
-    To retrieve expanded CON records use the expanded=true parameter. For
-    example, the expanded CON entry AL513382 in flat file format can be i
+    To retrieve expanded CON records use the ``expanded=True`` parameter. For
+    example, the expanded CON entry AL513382 in flat file format can be
     obtained as follows::
 
         e.get_data('AL513382', frmt='text', expanded=True)
 
-    Expanded CON records are different from CON records in two ways.
-    Firstly, the expanded CON records contain the full sequence in addition
-    to the contig assembly instructions. Secondly, if a CON record contains
-    only source or gap features the expanded CON records will also display
-    all features from the segment records.
+    Expanded CON records differ from CON records in two ways:
+    firstly, they contain the full sequence in addition to the contig assembly
+    instructions; secondly, if a CON record contains only source or gap
+    features, the expanded CON records will also display all features from the
+    segment records.
 
-    Retrieve assembled and annotated sequence header in flat file format
-
-    To retrieve assembled and annotated sequence header in flat file
-    format please use the header=true parameter, e.g.:
+    Retrieve assembled and annotated sequence header in flat file format using
+    the ``header=True`` parameter::
 
         e.get_data('BN000065', 'text', header=True)
 
-
-    Retrieve assembled and annotated sequence records using sequence
-    versions::
+    Retrieve assembled and annotated sequence records using sequence versions::
 
         e.get_data('AM407889.1', 'fasta')
         e.get_data('AM407889.2', 'fasta')
-
 
     """
 
@@ -122,17 +110,22 @@ class ENA:
         header=None,
         download=None,
     ):
-        """
+        """Retrieve an ENA entry in the specified format.
 
-        :param frmt : xml, text, fasta, fastq, html, embl but does depend on the
-            entry
+        :param str identifier: ENA accession or identifier (e.g. ``'AL513382'``)
+        :param str frmt: output format — one of ``xml``, ``text``, ``fasta``,
+            ``fastq``, ``html``, ``embl`` (availability depends on entry type)
+        :param list fasta_range: ``[start, end]`` base positions for subsequence
+            retrieval (FASTA only)
+        :param bool expanded: if True, return expanded CON records
+        :param bool header: if True, return only the sequence header
+        :param bool download: if True, return data as a downloadable file
 
-        Example:
+        ::
 
-            get_data("/AL513382", "embl")
+            get_data("AL513382", "embl")
 
-        ENA API changed in 2020 but we tried to keep the same services in this
-        method.
+        .. note:: The ENA API changed in 2020; this method wraps the current REST API.
         """
 
         url = f"{self.url}/{frmt}/{identifier}"
@@ -150,4 +143,5 @@ class ENA:
         pass
 
     def get_taxon(self, taxon):
+        """.. deprecated:: 7.8 — removed due to ENA API update."""
         print("deprecated since v.7.8 due to ENA update")

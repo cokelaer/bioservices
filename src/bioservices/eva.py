@@ -32,8 +32,8 @@
 
 
 """
-from bioservices.services import REST
 from bioservices import logger
+from bioservices.services import REST
 
 logger.name = __name__
 
@@ -67,6 +67,10 @@ class EVA:
         self.version = "v1"
 
     def fetch_allinfo(self, name):
-        """e.g., PRJEB4019"""
+        """Fetch summary information for a study by its accession.
+
+        :param str name: study accession (e.g., ``"PRJEB4019"``)
+        :return: study summary data
+        """
         res = self.services.http_get(self.version + "/studies/" + name + "/summary")
         return res
