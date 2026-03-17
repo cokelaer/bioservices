@@ -130,7 +130,7 @@ class ConfigReadOnly(object):
                         self.params[newkey][0] = cast(value)
                 else:
                     print("Warning:: found invalid option or section in %s (ignored):" % self.user_config_file_path)
-                    print("   %s %s" % (section, option))
+                    print("   %s %s" % (section, key))
 
     def _get_home(self):
         # This function should be robust
@@ -197,7 +197,7 @@ class ConfigReadOnly(object):
     user_cache_dir = property(_get_cache_dir, doc="return directory of the cache")
 
     def _get_config_file_path(self):
-        return self.user_config_dir + os.sep + self.config_file
+        return os.path.join(self.user_config_dir, self.config_file)
 
     user_config_file_path = property(_get_config_file_path, doc="return configuration filename (with fullpath)")
 
@@ -214,11 +214,11 @@ class ConfigReadOnly(object):
         # Let us create the directories by simply getting these 2 attributes:
         try:
             _ = self.user_config_dir
-        except:
+        except Exception:
             print("Could not retrieve or create the config file and/or directory in %s" % self.name)
         try:
             _ = self.user_cache_dir
-        except:
+        except Exception:
             print("Could not retrieve or create the cache file and/or directory in %s" % self.name)
         self.read_user_config_file_and_update_params()
 
@@ -253,7 +253,7 @@ class ConfigReadOnly(object):
                 value = self._default_params[key]
                 try:
                     fh.write("# {}\n{} = {}\n".format(value[2], option, value[0]))
-                except:
+                except Exception:
                     print("Could not write this value/option. skipped")
                     print(value, option)
 

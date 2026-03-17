@@ -75,7 +75,7 @@ class easyXML(object):
 
         try:
             self.root = ET.fromstring(self.data)
-        except:
+        except Exception:
             self.root = self.data[:]
         self._soup = None
         self.prettify = self.soup.prettify
@@ -125,7 +125,7 @@ class XMLObjectify(object):
 
         try:
             self.root = objectify.fromstring(obj.data)
-        except:
+        except Exception:
             # try something else
             self.root = objectify.fromstring(obj)
         self.obj = obj

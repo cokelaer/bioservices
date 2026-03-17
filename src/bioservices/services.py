@@ -233,7 +233,7 @@ class Service:
             try:
                 # python3
                 newres = binascii.a2b_base64(bytes(data, "utf-8"))
-            except:
+            except TypeError:
                 newres = binascii.a2b_base64(data)
             f.write(newres)
 
@@ -299,7 +299,7 @@ class WSDLService(Service):
                         ),
                     )
                 )
-            except:
+            except Exception:
                 print(method)
 
     def _get_methods(self):
@@ -601,7 +601,7 @@ class REST(RESTbase):
         if frmt == "json":
             try:
                 return res.json()
-            except:
+            except Exception:
                 return res
         # finally
         return res.content
@@ -626,7 +626,7 @@ class REST(RESTbase):
             self.logging.debug("grequests.map call done")
             return ret
         except Exception as err:
-            self.logging.warning("Error caught in async. " + err.message)
+            self.logging.warning("Error caught in async. " + str(err))
             return []
 
     def _get_all_urls(self, keys, frmt=None):
@@ -707,7 +707,7 @@ class REST(RESTbase):
             try:
                 # for python 3 compatibility
                 res = res.decode()
-            except:
+            except AttributeError:
                 pass
             return res
         except Exception as err:
@@ -761,7 +761,7 @@ class REST(RESTbase):
             res = self._interpret_returned_request(res, frmt)
             try:
                 return res.decode()
-            except:
+            except AttributeError:
                 self.logging.debug("BioServices:: Could not decode the response")
                 return res
         except Exception as err:
@@ -826,11 +826,9 @@ class REST(RESTbase):
             res = self._interpret_returned_request(res, frmt)
             try:
                 return res.decode()
-            except:
-                self.debug("BioServices:: Could not decode the response")
+            except AttributeError:
+                self.logging.debug("BioServices:: Could not decode the response")
                 return res
         except Exception as err:
             print(err)
             return None
-        except:
-            pass
