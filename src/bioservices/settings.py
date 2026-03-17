@@ -11,7 +11,7 @@ import shutil
 import appdirs
 from easydev import DynamicConfigParser, underline
 
-__all__ = ["defaultParams", "BioServicesConfig"]
+__all__ = ["defaultParams", "BioServicesConfig", "BioServicesAppDirs"]
 
 
 # first item if the value
@@ -42,6 +42,58 @@ defaultParams = {
 }
 
 
+class BioServicesAppDirs(appdirs.AppDirs):
+    """Extends :class:`appdirs.AppDirs` to allow user-defined config and cache directories.
+
+    When :attr:`user_config_dir` or :attr:`user_cache_dir` are set to a custom
+    path, those paths are used instead of the platform default ones computed by
+    :mod:`appdirs`.  This lets callers redirect the bioservices configuration
+    and cache to any location they choose::
+
+        from bioservices.settings import BioServicesConfig
+        cfg = BioServicesConfig(user_config_dir="/my/custom/config")
+
+    or after construction::
+
+        cfg.appdirs.user_config_dir = "/my/custom/config"
+        cfg.init()  # re-read config from the new location
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(BioServicesAppDirs, self).__init__(*args, **kwargs)
+        self._user_config_dir = None
+        self._user_cache_dir = None
+
+    def _get_user_config_dir(self):
+        if self._user_config_dir is not None:
+            return self._user_config_dir
+        return super(BioServicesAppDirs, self).user_config_dir
+
+    def _set_user_config_dir(self, path):
+        self._user_config_dir = path
+
+    user_config_dir = property(
+        _get_user_config_dir,
+        _set_user_config_dir,
+        doc="Path to the user configuration directory (read/write).",
+    )
+
+    def _get_user_cache_dir(self):
+        if self._user_cache_dir is not None:
+            return self._user_cache_dir
+        return super(BioServicesAppDirs, self).user_cache_dir
+
+    def _set_user_cache_dir(self, path):
+        self._user_cache_dir = path
+
+    user_cache_dir = property(
+        _get_user_cache_dir,
+        _set_user_cache_dir,
+        doc="Path to the user cache directory (read/write).",
+    )
+
+
 class ConfigReadOnly(object):
     """A generic Config file handler
 
@@ -57,12 +109,23 @@ class ConfigReadOnly(object):
 
     """
 
-    def __init__(self, name=None, default_params={}):
+    def __init__(self, name=None, default_params=None, user_config_dir=None, user_cache_dir=None):
         """name is going to be the generic name of the config folder
 
         e.g., /home/user/.config/<name>/<name>.cfg
 
+        :param name: application name used to derive platform-specific config
+            and cache paths (required).
+        :param default_params: dictionary of default configuration parameters.
+        :param user_config_dir: optional path that overrides the platform
+            default for the configuration directory.  When provided the config
+            file will be read from (and written to) this directory instead of
+            the one returned by :mod:`appdirs`.
+        :param user_cache_dir: optional path that overrides the platform
+            default for the cache directory.
         """
+        if default_params is None:
+            default_params = {}
         if name is None:
             raise Exception("Name parameter must be provided")
         else:
@@ -72,7 +135,11 @@ class ConfigReadOnly(object):
             self.params = copy.deepcopy(default_params)
 
             # useful tool to handle XDG config file, path and parameters
-            self.appdirs = appdirs.AppDirs(self.name)
+            self.appdirs = BioServicesAppDirs(self.name)
+            if user_config_dir is not None:
+                self.appdirs.user_config_dir = user_config_dir
+            if user_cache_dir is not None:
+                self.appdirs.user_cache_dir = user_cache_dir
 
             # useful tool to handle the config ini file
             self.config_parser = DynamicConfigParser()
@@ -266,8 +333,13 @@ class ConfigReadOnly(object):
 
 
 class BioServicesConfig(ConfigReadOnly):
-    def __init__(self):
-        super(BioServicesConfig, self).__init__(name="bioservices", default_params=defaultParams)
+    def __init__(self, user_config_dir=None, user_cache_dir=None):
+        super(BioServicesConfig, self).__init__(
+            name="bioservices",
+            default_params=defaultParams,
+            user_config_dir=user_config_dir,
+            user_cache_dir=user_cache_dir,
+        )
 
     # some aliases
     def _get_caching(self):

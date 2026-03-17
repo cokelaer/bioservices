@@ -13,7 +13,7 @@ from bioservices.chebi import _RELATION_TYPE_MAP, ChEBI, ChebiEntity
 from bioservices.chembl import ChEMBL
 from bioservices.rhea import Rhea
 from bioservices.services import REST, RESTbase, Service
-from bioservices.settings import BioServicesConfig, ConfigReadOnly, defaultParams
+from bioservices.settings import BioServicesAppDirs, BioServicesConfig, ConfigReadOnly, defaultParams
 from bioservices.string import STRING
 
 # ---------------------------------------------------------------------------
@@ -606,3 +606,84 @@ class TestBioServicesConfig:
     def test_caching_default_is_false(self):
         cfg = BioServicesConfig()
         assert cfg.CACHING is False
+
+
+# ---------------------------------------------------------------------------
+# BioServicesAppDirs
+# ---------------------------------------------------------------------------
+
+
+class TestBioServicesAppDirs:
+    def test_default_returns_appdirs_path(self):
+        """Without any override the paths come from appdirs."""
+        import appdirs as _appdirs
+
+        bd = BioServicesAppDirs("testapp")
+        expected = _appdirs.AppDirs("testapp").user_config_dir
+        assert bd.user_config_dir == expected
+
+    def test_set_user_config_dir(self):
+        bd = BioServicesAppDirs("testapp")
+        bd.user_config_dir = "/custom/config"
+        assert bd.user_config_dir == "/custom/config"
+
+    def test_set_user_cache_dir(self):
+        bd = BioServicesAppDirs("testapp")
+        bd.user_cache_dir = "/custom/cache"
+        assert bd.user_cache_dir == "/custom/cache"
+
+    def test_reset_user_config_dir_to_none_restores_default(self):
+        """Setting the override back to None reverts to the appdirs default."""
+        import appdirs as _appdirs
+
+        bd = BioServicesAppDirs("testapp")
+        expected = _appdirs.AppDirs("testapp").user_config_dir
+        bd.user_config_dir = "/custom/config"
+        bd.user_config_dir = None
+        assert bd.user_config_dir == expected
+
+
+# ---------------------------------------------------------------------------
+# Custom config dir in BioServicesConfig / ConfigReadOnly
+# ---------------------------------------------------------------------------
+
+
+class TestCustomConfigDir:
+    def test_constructor_custom_user_config_dir(self):
+        """Passing user_config_dir to BioServicesConfig uses that directory."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cfg = BioServicesConfig(user_config_dir=tmpdir)
+            assert cfg.user_config_dir == tmpdir
+
+    def test_constructor_custom_user_cache_dir(self):
+        """Passing user_cache_dir to BioServicesConfig uses that directory."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cfg = BioServicesConfig(user_cache_dir=tmpdir)
+            assert cfg.user_cache_dir == tmpdir
+
+    def test_config_file_created_in_custom_dir(self):
+        """Config file is written inside the custom directory."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cfg = BioServicesConfig(user_config_dir=tmpdir)
+            assert cfg.user_config_file_path.startswith(tmpdir)
+            assert os.path.isfile(cfg.user_config_file_path)
+
+    def test_post_construction_override_via_appdirs(self):
+        """user_config_dir can also be changed via cfg.appdirs after construction."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cfg = BioServicesConfig()
+            cfg.appdirs.user_config_dir = tmpdir
+            # user_config_dir property reads from appdirs each time
+            assert cfg.user_config_dir == tmpdir
+
+    def test_reinit_with_new_config_dir(self):
+        """Calling cfg.init() after changing appdirs.user_config_dir reads
+        configuration from the new location."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cfg = BioServicesConfig(user_config_dir=tmpdir)
+            assert cfg.user_config_dir == tmpdir
+            # Verify the config file was written in the custom directory
+            cfg_file = os.path.join(tmpdir, "bioservices.cfg")
+            assert os.path.isfile(cfg_file)
+            # Verify params are still accessible correctly after init
+            assert cfg.TIMEOUT == 30
