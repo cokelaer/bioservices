@@ -120,6 +120,12 @@ def test_genes(bigg):
     assert len(genes)
 
 
+def test_get_model(bigg):
+    model = bigg.get_model("e_coli_core")
+    assert keys_exists(model, ("model_bigg_id", "organism", "metabolite_count", "reaction_count", "gene_count"))
+    assert model["model_bigg_id"] == "e_coli_core"
+
+
 def test_universal(bigg):
     for type_ in ("metabolites", "reactions"):
         results = getattr(bigg, type_)()
@@ -129,6 +135,18 @@ def test_universal(bigg):
         assert keys_exists(result, ("bigg_id", "model_bigg_id", "name"))
 
         assert result["model_bigg_id"] == "Universal"
+
+
+def test_universal_single_metabolite(bigg):
+    met = bigg.metabolites(ids="atp")
+    assert keys_exists(met, ("bigg_id", "name", "formulae", "compartments_in_models", "old_identifiers"))
+    assert met["bigg_id"] == "atp"
+
+
+def test_universal_single_reaction(bigg):
+    rxn = bigg.reactions(ids="PFK")
+    assert keys_exists(rxn, ("bigg_id", "name", "models_containing_reaction"))
+    assert rxn["bigg_id"] == "PFK"
 
 
 def test_search(bigg):
