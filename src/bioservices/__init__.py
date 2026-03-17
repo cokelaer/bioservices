@@ -32,6 +32,12 @@ bspath = configuration.user_config_dir
 
 # sub packages inside bioservices.
 # settings and services must be imported first as many other modules depend on them
+from . import settings  # isort: skip
+from .settings import *  # isort: skip
+
+from . import services  # isort: skip
+from .services import *  # isort: skip
+
 from . import (
     apps,
     arrayexpress,
@@ -69,8 +75,6 @@ from . import (
     quickgo,
     reactome,
     rhea,
-    services,
-    settings,
     string,
     unichem,
     uniprot,
@@ -111,8 +115,6 @@ from .pubchem import *
 from .quickgo import *
 from .reactome import *
 from .rhea import *
-from .services import *
-from .settings import *
 from .string import *
 from .unichem import *
 from .uniprot import *
