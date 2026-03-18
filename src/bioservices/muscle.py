@@ -264,7 +264,9 @@ class MUSCLE:
         if self.get_status(jobid) != "FINISHED":  # pragma: no cover
             raise ValueError("job is not finished")
 
-        assert result_type in self.get_result_types(jobid)
+        valid = self.get_result_types(jobid)
+        if result_type not in valid:
+            raise ValueError(f"result_type must be one of {valid}")
         url = "/result/" + jobid + "/" + result_type
 
         if result_type in ["out", "sequence", "aln-fasta", "pim", "phylotree"]:

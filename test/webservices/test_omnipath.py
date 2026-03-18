@@ -1,5 +1,6 @@
-from bioservices import OmniPath
+import pytest
 
+from bioservices import OmniPath
 
 o = OmniPath(cache=True)
 
@@ -20,12 +21,6 @@ def test_inter():
     o.get_interactions("P00533,O15177,Q96FE5", frmt="json")
     o.get_interactions("P00533", frmt="json", fields=["sources", "references"])
 
-    try:
-        o.get_interactions("00553")
-        assert False
-    except:
-        assert True
-
 
 def test_ptms():
     o.get_ptms()
@@ -34,15 +29,9 @@ def test_ptms():
     o.get_ptms("P00533", frmt="json")
     o.get_ptms("P00533", frmt="json", fields=["sources", "references"])
 
-    try:
-        o.get_ptms("00553")
-        assert False
-    except:
-        assert True
-
 
 def test_get_resources():
-    res = o.get_resources()
+    o.get_resources()
 
 
 def test_info():

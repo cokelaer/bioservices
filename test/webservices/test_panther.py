@@ -1,6 +1,6 @@
 import pytest
-from bioservices.panther import Panther
 
+from bioservices.panther import Panther
 
 p = Panther()
 
@@ -53,13 +53,10 @@ def test_homolog_position():
 @pytest.mark.xfail(reason="too slow", method="thread")
 @pytest.mark.timeout(60)
 def test_supported_families():
-    res = p.get_supported_families()
-    res = p.get_supported_families(progress=False)
-    try:
-        res = p.get_supported_families(progress=False, N=2000)
-        assert False
-    except:
-        assert True
+    p.get_supported_families()
+    p.get_supported_families(progress=False)
+    with pytest.raises(Exception):
+        p.get_supported_families(progress=False, N=2000)
 
 
 def test_get_family_ortholog():
@@ -73,4 +70,4 @@ def test_get_family_msa():
 
 
 def test_get_tree_info():
-    res = p.get_tree_info("PTHR10000")
+    p.get_tree_info("PTHR10000")

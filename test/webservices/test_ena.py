@@ -9,7 +9,7 @@ def test_ena():
     e.get_data("ERA000092", "text")
     e.get_data("ERA000092", "fasta")
 
-    res = e.get_data("ERA000092", "fasta", fasta_range=[3, 63])
+    e.get_data("ERA000092", "fasta", fasta_range=[3, 63])
 
     e.get_data("AL513382", frmt="text", expanded=True)
 

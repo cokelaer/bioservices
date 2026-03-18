@@ -151,7 +151,8 @@ class Seqret:
         for k in kargs.keys():
             self.services.devtools.check_param_in_list(k, self.parameters)
 
-        assert "sequence" in kargs.keys()
+        if "sequence" not in kargs:
+            raise ValueError("'sequence' is a required keyword argument")
         params = {"email": email, "title": title}
 
         for k in [

@@ -106,7 +106,8 @@ class MyGeneInfo:
         if email:  # pragma: no cover
             params["email"] = email
 
-        assert dotfield in [True, False]
+        if dotfield not in [True, False]:
+            raise ValueError("dotfield must be True or False")
         params["dotfield"] = dotfield
 
         if species:
@@ -158,7 +159,8 @@ class MyGeneInfo:
         if email:  # pragma: no cover
             params["email"] = email
 
-        assert dotfield in [True, False]
+        if dotfield not in [True, False]:
+            raise ValueError("dotfield must be True or False")
         params["dotfield"] = dotfield
 
         res = self.services.http_get(f"gene/{geneid}", params=params, frmt="json")
@@ -223,16 +225,19 @@ class MyGeneInfo:
         if email:  # pragma: no cover
             params["email"] = email
 
-        assert dotfield in [True, False]
+        if dotfield not in [True, False]:
+            raise ValueError("dotfield must be True or False")
         params["dotfield"] = dotfield
 
         if sort:
             params["sort"] = sort
         if facets:  # pragma: no cover
             params["facets"] = sort
-        assert entrezonly in [True, False]
+        if entrezonly not in [True, False]:
+            raise ValueError("entrezonly must be True or False")
         params["entrezonly"] = entrezonly
-        assert ensemblonly in [True, False]
+        if ensemblonly not in [True, False]:
+            raise ValueError("ensemblonly must be True or False")
         params["ensemblonly"] = entrezonly
 
         res = self.services.http_get(f"query?q={query}", params=params, frmt="json")
@@ -277,7 +282,8 @@ class MyGeneInfo:
         params = {"fields": fields, "scopes": scopes}
         if email:  # pragma: no cover
             params["email"] = email
-        assert dotfield in [True, False]
+        if dotfield not in [True, False]:
+            raise ValueError("dotfield must be True or False")
         params["dotfield"] = dotfield
 
         res = self.services.http_post(

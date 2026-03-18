@@ -1,5 +1,6 @@
-from bioservices.dbfetch import DBFetch
 import pytest
+
+from bioservices.dbfetch import DBFetch
 
 
 @pytest.fixture
@@ -24,7 +25,7 @@ def test_getSupportedStyles(dbfetch):
 
 
 def test_fetchData(dbfetch):
-    res = dbfetch.fetch(style="raw", db="uniprotkb", format="fasta", query="zap70_human")
+    dbfetch.fetch(style="raw", db="uniprotkb", format="fasta", query="zap70_human")
 
 
 def test_getDatabaseInfo(dbfetch):
@@ -37,8 +38,5 @@ def test_getDatabaseInfoList(dbfetch):
 
 
 def test_wrong_db(dbfetch):
-    try:
+    with pytest.raises(Exception):
         dbfetch.fetch(db="niprot", query="P43403")
-        assert False
-    except:
-        assert True

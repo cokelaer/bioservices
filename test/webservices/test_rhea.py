@@ -9,5 +9,5 @@ def rhea():
 
 
 def test_rhea(rhea):
-    r1 = rhea.search("caffeine", limit=2)
-    df = rhea.query("rhea:10660")
+    rhea.search("caffeine", limit=2)
+    rhea.query("rhea:10660")

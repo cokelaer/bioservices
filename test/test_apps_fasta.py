@@ -1,13 +1,16 @@
-from bioservices.apps.fasta import FASTA, MultiFASTA
 import tempfile
+
 import pytest
+
+from bioservices.apps.fasta import FASTA, MultiFASTA
+
 
 @pytest.mark.flaky
 def test_fasta():
     fasta = FASTA()
     fasta.load_fasta(None)
     fasta.load_fasta("P43403")
-    fasta.load_fasta("P43403") # already there 
+    fasta.load_fasta("P43403")  # already there
     fasta.header
     fasta.gene_name
     fasta.sequence
@@ -19,20 +22,12 @@ def test_fasta():
     fh.delete = True
     fh.close()
 
+
 @pytest.mark.flaky
 def test_multi_fasta():
     klass = MultiFASTA()
 
-    try:
-        klass.fasta
-        assert False
-    except:
-        assert True
-    try:
-        f.header
-        assert False
-    except:
-        assert True
+    assert len(klass.fasta) == 0
 
     klass.load_fasta("P43403")
     klass.load_fasta("P43408")
@@ -46,4 +41,3 @@ def test_multi_fasta():
     klass.read_fasta(fh.name)
 
     klass.fasta["P43403"]
-

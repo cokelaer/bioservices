@@ -296,37 +296,48 @@ class QuickGO:
 
         if includeFields:
             for this in includeFields.split(","):
-                assert this in validity["includeFields"]
+                if this not in validity["includeFields"]:
+                    raise ValueError(f"includeFields value '{this}' must be one of {validity['includeFields']}")
             params["includeFields"] = includeFields
 
         if geneProductType:
             for this in geneProductType.split(","):
-                assert this in ["protein", "miRNA", "complex"]
+                if this not in ["protein", "miRNA", "complex"]:
+                    raise ValueError(f"geneProductType value '{this}' must be one of ['protein', 'miRNA', 'complex']")
             params["geneProductType"] = geneProductType
 
         if evidenceCode:
             params["evidenceCode"] = evidenceCode
 
         if evidenceCodeUsage:
-            assert evidenceCodeUsage in ["descendants", "exact"]
+            if evidenceCodeUsage not in ["descendants", "exact"]:
+                raise ValueError("evidenceCodeUsage must be 'descendants' or 'exact'")
             params["evidenceCodeUsage"] = evidenceCodeUsage
 
         if taxonUsage:
-            assert taxonUsage in ["descendants", "exact"]
+            if taxonUsage not in ["descendants", "exact"]:
+                raise ValueError("taxonUsage must be 'descendants' or 'exact'")
             params["taxonUsage"] = taxonUsage
 
         if goUsage:
-            assert goUsage in ["descendants", "exact", "slim"]
+            if goUsage not in ["descendants", "exact", "slim"]:
+                raise ValueError("goUsage must be 'descendants', 'exact', or 'slim'")
             params["goUsage"] = goUsage
 
         if evidenceCodeUsageRelationships:
             for this in evidenceCodeUsageRelationships.split(","):
-                assert this in ["part_of", "is_a", "regulates", "occurs_in"]
+                if this not in ["part_of", "is_a", "regulates", "occurs_in"]:
+                    raise ValueError(
+                        f"evidenceCodeUsageRelationships value '{this}' must be one of ['part_of', 'is_a', 'regulates', 'occurs_in']"
+                    )
             params["evidenceCodeUsageRelationships"] = evidenceCodeUsageRelationships
 
         if goUsageRelationships:
             for this in goUsageRelationships.split(","):
-                assert this in ["part_of", "is_a", "regulates", "occurs_in"]
+                if this not in ["part_of", "is_a", "regulates", "occurs_in"]:
+                    raise ValueError(
+                        f"goUsageRelationships value '{this}' must be one of ['part_of', 'is_a', 'regulates', 'occurs_in']"
+                    )
             params["goUsageRelationships"] = goUsageRelationships
 
         if geneProductId:

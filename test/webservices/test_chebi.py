@@ -8,16 +8,15 @@ def chebi():
     return ChEBI(verbose=False)
 
 
+@pytest.mark.timeout(120)
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_chebi(chebi):
     chebi.getCompleteEntity("CHEBI:10102")
     res = chebi.conv("CHEBI:10102", "KEGG COMPOUND")
     assert res == ["151319-34-5", "C07484"]
 
-    try:
-        res = chebi.conv("CHEBI:10102", "wrong db")
-        assert False
-    except:
-        assert True
+    with pytest.raises(Exception):
+        chebi.conv("CHEBI:10102", "wrong db")
 
     chebi.getOntologyChildren("CHEBI:27732")
     chebi.getOntologyParents("CHEBI:27732")

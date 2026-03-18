@@ -9,11 +9,11 @@ def quickgo():
 
 
 def test_annotation(quickgo):
-    res = quickgo.Annotation(taxonId="9606")
-    res = quickgo.Annotation(taxonId="9606", limit=100, aspect="F")
-    res = quickgo.Annotation(taxonId="9606", limit=100, geneProductType="protein")
-    res = quickgo.Annotation(taxonId="9606", limit=100, geneProductType="protein", assignedBy="UniProt")
-    res = quickgo.Annotation(taxonId="9606", evidenceCode="ECO:0000501")
+    quickgo.Annotation(taxonId="9606")
+    quickgo.Annotation(taxonId="9606", limit=100, aspect="F")
+    quickgo.Annotation(taxonId="9606", limit=100, geneProductType="protein")
+    quickgo.Annotation(taxonId="9606", limit=100, geneProductType="protein", assignedBy="UniProt")
+    quickgo.Annotation(taxonId="9606", evidenceCode="ECO:0000501")
 
 
 def test_annotations_from_goid(quickgo):
@@ -42,7 +42,7 @@ def test_go_children(quickgo):
 
 
 def test_go_chart(quickgo):
-    res = quickgo.get_go_chart("GO:0022804")
+    quickgo.get_go_chart("GO:0022804")
 
 
 @pytest.mark.flaky(max_runs=3, min_passes=1)

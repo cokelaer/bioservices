@@ -5,7 +5,7 @@ pdb = PDB(verbose=False)
 
 def test_similarity():
     seq = "VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTAVAHVDDMPNAL"
-    results = pdb.get_similarity_sequence(seq)
+    pdb.get_similarity_sequence(seq)
 
 
 def test_split_query():
@@ -30,7 +30,7 @@ def _test_get_current_ids():
 
 
 def test_pdb():
-    res = pdb.search(
+    pdb.search(
         {
             "query": {
                 "type": "group",

@@ -19,12 +19,12 @@ def test_get():
 
 def test_top_pathways():
     pc2 = pathwaycommons.PathwayCommons(verbose=False)
-    res = pc2.top_pathways()
+    pc2.top_pathways()
 
 
 def test_graph():
     pc2 = pathwaycommons.PathwayCommons(verbose=False)
-    res = pc2.graph(source="http://identifiers.org/uniprot/P20908", kind="neighborhood", frmt="EXTENDED_BINARY_SIF")
+    pc2.graph(source="http://identifiers.org/uniprot/P20908", kind="neighborhood", frmt="EXTENDED_BINARY_SIF")
 
     # res = pc2.graph(source="P20908", kind="neighborhood")
     # res = pc2.graph(source="COL5A1", kind="neighborhood")
@@ -33,7 +33,7 @@ def test_graph():
 
 def test_traverse():
     pc2 = pathwaycommons.PathwayCommons(verbose=False)
-    res = pc2.traverse(
+    pc2.traverse(
         uri=["http://identifiers.org/uniprot/P38398", "http://identifiers.org/uniprot/Q06609"],
         path="ProteinReference/organism",
     )
@@ -52,4 +52,4 @@ def test_sifgraph():
 
     pc2 = pathwaycommons.PathwayCommons(verbose=False)
     pc2.get_sifgraph_neighborhood("BRD4")
-    res = pc2.get_sifgraph_common_stream(["BRD4", "MYC"])
+    pc2.get_sifgraph_common_stream(["BRD4", "MYC"])

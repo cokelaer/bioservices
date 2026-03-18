@@ -506,11 +506,13 @@ class PathwayCommons:
         self.services.devtools.check_param_in_list(direction, self._valid_directions)
         if pattern:
             self.services.devtools.check_param_in_list(pattern, self._valid_patterns)
-        assert limit >= 1
+        if limit < 1:
+            raise ValueError("limit must be >= 1")
 
         if isinstance(source, str):
             source = [source]
-        assert isinstance(source, list)
+        if not isinstance(source, list):
+            raise TypeError("source must be a list")
         source = ",".join(source)
 
         params = {"source": source, "limit": limit, "direction": direction}
@@ -551,11 +553,13 @@ class PathwayCommons:
         self.services.devtools.check_param_in_list(direction, self._valid_directions)
         if pattern:
             self.services.devtools.check_param_in_list(pattern, self._valid_patterns)
-        assert limit >= 1
+        if limit < 1:
+            raise ValueError("limit must be >= 1")
 
         if isinstance(source, str):
             source = [source]
-        assert isinstance(source, list)
+        if not isinstance(source, list):
+            raise TypeError("source must be a list")
         source = ",".join(source)
 
         params = {"source": source, "limit": limit, "direction": direction}
@@ -592,11 +596,13 @@ class PathwayCommons:
         """
         if pattern:
             self.services.devtools.check_param_in_list(pattern, self._valid_patterns)
-        assert limit >= 1
+        if limit < 1:
+            raise ValueError("limit must be >= 1")
 
         if isinstance(source, str):
             source = [source]
-        assert isinstance(source, list)
+        if not isinstance(source, list):
+            raise TypeError("source must be a list")
         source = ",".join(source)
 
         params = {"source": source, "limit": limit, "directed": directed}
@@ -630,15 +636,18 @@ class PathwayCommons:
         """
         if pattern:
             self.services.devtools.check_param_in_list(pattern, self._valid_patterns)
-        assert limit >= 1
+        if limit < 1:
+            raise ValueError("limit must be >= 1")
 
         if isinstance(source, str):
             source = [source]
-        assert isinstance(source, list)
+        if not isinstance(source, list):
+            raise TypeError("source must be a list")
         source = ",".join(source)
         if isinstance(target, str):
             target = [target]
-        assert isinstance(target, list)
+        if not isinstance(target, list):
+            raise TypeError("target must be a list")
         target = ",".join(target)
 
         params = {"source": source, "target": target, "limit": limit}

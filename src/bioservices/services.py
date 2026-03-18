@@ -27,7 +27,7 @@ from easydev import DevTools
 
 from bioservices.settings import BioServicesConfig
 
-__all__ = ["Service", "BioServicesError", "REST"]
+__all__ = ["Service", "BioServicesError", "HTTPResponseError", "REST"]
 
 
 class BioServicesError(Exception):
@@ -36,6 +36,91 @@ class BioServicesError(Exception):
 
     def __str__(self):
         return repr(self.value)
+
+
+class HTTPResponseError(int):
+    """Returned when a remote service replies with a non-2xx HTTP status code.
+
+    Behaves exactly like an ``int`` so that existing code that does::
+
+        if res == 404: ...
+        if isinstance(res, int): ...
+
+    continues to work.  However, trying to use the return value as a mapping
+    or sequence — the most common source of the cryptic
+    ``TypeError: 'int' object is not subscriptable`` — raises a
+    :class:`BioServicesError` with a human-readable explanation instead.
+
+    Attributes
+    ----------
+    status_code : int
+        The HTTP status code (e.g. 404).
+    reason : str
+        The HTTP reason phrase (e.g. ``"Not Found"``).
+    url : str
+        The URL that produced the error.
+    """
+
+    # Map common status codes to a short user-facing hint.
+    _HINTS = {
+        400: "Check the query parameters — the server could not understand the request.",
+        401: "Authentication is required. Check your credentials or API token.",
+        403: "Access denied. You may not have permission to access this resource.",
+        404: "The requested resource was not found. Check the identifier or query.",
+        408: "The request timed out. The remote service may be busy; try again later.",
+        429: "Too many requests. Slow down or add a delay between calls.",
+        500: "Internal server error. The remote service is experiencing issues; try again later.",
+        503: "Service unavailable. The remote service is down or being maintained; try again later.",
+    }
+
+    status_code: int
+    reason: str
+    url: str
+
+    def __new__(cls, status_code, reason="", url=""):
+        obj = super().__new__(cls, status_code)
+        obj.status_code = int(status_code)
+        obj.reason = reason
+        obj.url = url
+        return obj
+
+    # ------------------------------------------------------------------ #
+    # Nicer representations                                                #
+    # ------------------------------------------------------------------ #
+
+    def __repr__(self):
+        return f"HTTPResponseError({self.status_code}: {self.reason})"
+
+    def __str__(self):
+        return f"HTTP {self.status_code} {self.reason}"
+
+    # ------------------------------------------------------------------ #
+    # Raise a friendly error whenever the caller treats the result as a   #
+    # dict, list, or other subscriptable / iterable object.               #
+    # ------------------------------------------------------------------ #
+
+    def _raise_friendly(self):
+        hint = self._HINTS.get(self.status_code, "Check the input and try again.")
+        url_part = f" (URL: {self.url!r})" if self.url else ""
+        raise BioServicesError(f"HTTP {self.status_code} {self.reason}{url_part}. {hint}")
+
+    def __getitem__(self, key):
+        self._raise_friendly()
+
+    def __iter__(self):
+        self._raise_friendly()
+
+    def __len__(self):
+        self._raise_friendly()
+
+    def keys(self):
+        self._raise_friendly()
+
+    def values(self):
+        self._raise_friendly()
+
+    def items(self):
+        self._raise_friendly()
 
 
 class Service:
@@ -446,9 +531,9 @@ class REST(RESTbase):
             return res
         # if a response, there is a status code that should be ok
         if not res.ok:
-            reason = res.reason
-            self.logging.warning("status is not ok with {0}".format(reason))
-            return res.status_code
+            url = getattr(res, "url", "")
+            self.logging.warning("HTTP %s %s%s", res.status_code, res.reason, f" ({url})" if url else "")
+            return HTTPResponseError(res.status_code, reason=res.reason, url=url)
         if frmt == "json":
             try:
                 return res.json()

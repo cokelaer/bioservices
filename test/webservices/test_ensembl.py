@@ -41,7 +41,7 @@ def test_get_genetree_by_member_id(ensembl):
 
 @pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_get_genetree_by_member_symbol(ensembl):
-    res = ensembl.get_genetree_by_member_symbol("human", "BRCA2", nh_format="simple")
+    ensembl.get_genetree_by_member_symbol("human", "BRCA2", nh_format="simple")
     # was working until dec 2014 then results changed. so not stable
     # assert res[0:200] == """((((((((ENSPFOP00000001575:0.046083,ENSXMAP00000006983:0.065551):0.43822,ENSONIP00000006940:0.359035):0.019582,((ENSTRUP00000015030:0.077336,ENSTNIP00000002435:0.099898):0.208834,ENSGACP00000015199:0."""
 

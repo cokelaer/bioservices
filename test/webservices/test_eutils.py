@@ -39,13 +39,13 @@ def test_espell(eutils):
 
 
 def test_esearch(eutils):
-    ret = eutils.ESearch("protein", "human", RetMax=5)
+    eutils.ESearch("protein", "human", RetMax=5)
 
 
 def test_elink(eutils):
-    ret = eutils.ELink(db="pubmed", dbfrom="pubmed", id="20210808", cmd="neighbor_score")
+    eutils.ELink(db="pubmed", dbfrom="pubmed", id="20210808", cmd="neighbor_score")
 
-    ret = eutils.ELink(db="pubmed", id="24064416")
+    eutils.ELink(db="pubmed", id="24064416")
 
     # assert len(ret.LinkSet[0].LinkSetDb[0].Link) > 10
 
@@ -90,12 +90,12 @@ def _test_gquery(eutils):
 
 @pytest.mark.xfail
 def test_efetch(eutils):
-    ret = eutils.EFetch("omim", "269840")
-    ret1 = eutils.EFetch("protein", "34577063", retmode="text", rettype="fasta", stand=1)
-    ret2 = eutils.EFetch("protein", "34577063", retmode="text", rettype="fasta", stand=2)
+    eutils.EFetch("omim", "269840")
+    eutils.EFetch("protein", "34577063", retmode="text", rettype="fasta", stand=1)
+    eutils.EFetch("protein", "34577063", retmode="text", rettype="fasta", stand=2)
     eutils.EFetch("protein", "34577063", retmode="text", rettype="fasta", strand=2, seq_start=10, seq_stop=20)
 
-    ret = eutils.EFetch("pubmed", "12091962,9997", retmode="xml", rettype="abstract")
+    eutils.EFetch("pubmed", "12091962,9997", retmode="xml", rettype="abstract")
     # sequences
     res1 = eutils.EFetch("protein", "352, 234", retmode="text", rettype="fasta")
     res2 = eutils.EFetch("protein", ["352", "234"], retmode="text", rettype="fasta")
@@ -120,30 +120,21 @@ def test_epost(eutils):
 
 
 def test_check_db(eutils):
-    try:
+    with pytest.raises(Exception):
         eutils._check_db("dummy")
-        assert False
-    except:
-        assert True
 
 
 def test_check_retmode(eutils):
-    try:
+    with pytest.raises(Exception):
         eutils._check_retmode("dummy")
-        assert False
-    except:
-        assert True
 
 
 def test_check_ids(eutils):
     assert eutils._check_ids(None) == None
 
     eutils._check_ids(",".join([str(x) for x in range(199)]))
-    try:
+    with pytest.raises(Exception):
         eutils._check_ids(",".join([str(x) for x in range(201)]))
-        assert False
-    except:
-        assert True
 
 
 def test_efetch_xml(eutils):

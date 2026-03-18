@@ -8,7 +8,7 @@ import pytest
 import requests
 from requests.models import Response
 
-from bioservices.services import REST, BioServicesError, Service
+from bioservices.services import REST, BioServicesError, HTTPResponseError, Service
 
 
 class test_Service(Service):
@@ -22,7 +22,7 @@ class test_Service(Service):
 
 def test_service():
     with patch("bioservices.services.urlopen", return_value=MagicMock()):
-        this = test_Service()
+        test_Service()
     # this.test_pubmed()
 
 
@@ -31,11 +31,8 @@ class test_REST(REST):
         super(test_REST, self).__init__("test", "http://www.uniprot.org", verbose=False)
 
     def test_request(self):
-        try:
+        with pytest.raises(Exception):
             self.request("dummy")
-            assert False
-        except:
-            assert True
 
 
 def test_rest():
@@ -47,14 +44,14 @@ def test_rest():
 def test_service_http_error_no_warning(caplog):
     """HTTPError (4xx/5xx) should not trigger an 'unreachable' warning (issue #285)."""
     with patch("bioservices.services.urlopen", side_effect=HTTPError(None, 404, "Not Found", {}, None)):
-        svc = Service("test", "http://example.com/api", verbose=True)
+        Service("test", "http://example.com/api", verbose=True)
     assert "cannot be reached" not in caplog.text
 
 
 def test_service_url_error_warns(caplog):
     """URLError (connection failure) should trigger an 'unreachable' warning."""
     with patch("bioservices.services.urlopen", side_effect=URLError("connection refused")):
-        svc = Service("test", "http://example.com/api", verbose=True)
+        Service("test", "http://example.com/api", verbose=True)
     assert "cannot be reached" in caplog.text
 
 
@@ -96,6 +93,97 @@ def test_install_cache_fallback_on_error(caplog):
 def test_bioservices_error():
     err = BioServicesError("something went wrong")
     assert "something went wrong" in str(err)
+
+
+# ---------------------------------------------------------------------------
+# HTTPResponseError
+# ---------------------------------------------------------------------------
+
+
+def test_http_response_error_is_int():
+    e = HTTPResponseError(404, reason="Not Found", url="http://example.com")
+    assert isinstance(e, int)
+    assert e == 404
+
+
+def test_http_response_error_attributes():
+    e = HTTPResponseError(403, reason="Forbidden", url="http://example.com/api")
+    assert e.status_code == 403
+    assert e.reason == "Forbidden"
+    assert e.url == "http://example.com/api"
+
+
+def test_http_response_error_repr():
+    e = HTTPResponseError(404, reason="Not Found")
+    assert "404" in repr(e)
+    assert "Not Found" in repr(e)
+
+
+def test_http_response_error_str():
+    e = HTTPResponseError(404, reason="Not Found")
+    assert "404" in str(e)
+    assert "Not Found" in str(e)
+
+
+def test_http_response_error_getitem_raises_friendly():
+    e = HTTPResponseError(404, reason="Not Found", url="http://example.com")
+    with pytest.raises(BioServicesError, match="404"):
+        _ = e["key"]
+
+
+def test_http_response_error_iter_raises_friendly():
+    e = HTTPResponseError(500, reason="Internal Server Error")
+    with pytest.raises(BioServicesError, match="500"):
+        list(e)
+
+
+def test_http_response_error_len_raises_friendly():
+    e = HTTPResponseError(403, reason="Forbidden")
+    with pytest.raises(BioServicesError):
+        len(e)
+
+
+def test_http_response_error_keys_raises_friendly():
+    e = HTTPResponseError(400, reason="Bad Request")
+    with pytest.raises(BioServicesError):
+        e.keys()
+
+
+def test_http_response_error_values_raises_friendly():
+    e = HTTPResponseError(400, reason="Bad Request")
+    with pytest.raises(BioServicesError):
+        e.values()
+
+
+def test_http_response_error_items_raises_friendly():
+    e = HTTPResponseError(400, reason="Bad Request")
+    with pytest.raises(BioServicesError):
+        e.items()
+
+
+def test_http_response_error_known_hint_in_message():
+    e = HTTPResponseError(429, reason="Too Many Requests", url="http://x.com")
+    with pytest.raises(BioServicesError, match="Slow down"):
+        e["result"]
+
+
+def test_http_response_error_unknown_status_fallback_hint():
+    e = HTTPResponseError(418, reason="I'm a Teapot")
+    with pytest.raises(BioServicesError, match="Check the input"):
+        e["result"]
+
+
+def test_interpret_bad_status_returns_http_response_error(rest):
+    mock_resp = MagicMock(spec=Response)
+    mock_resp.ok = False
+    mock_resp.reason = "Not Found"
+    mock_resp.status_code = 404
+    mock_resp.url = "http://example.com/missing"
+    result: HTTPResponseError = rest._interpret_returned_request(mock_resp, "json")
+    assert isinstance(result, HTTPResponseError)
+    assert result == 404
+    assert result.reason == "Not Found"
+    assert result.url == "http://example.com/missing"
 
 
 # ---------------------------------------------------------------------------

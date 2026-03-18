@@ -241,17 +241,21 @@ class Panther:
                     "ANNOT_TYPE_ID_PANTHER_GO_SLIM_MF")
 
         """
-        assert enrichment_test.lower() in ["fisher", "binomial"]
+        if enrichment_test.lower() not in ["fisher", "binomial"]:
+            raise ValueError("enrichment_test must be 'fisher' or 'binomial'")
         if correction is None:
             correction = "none"
 
-        assert correction.lower() in ["fdr", "bonferroni", "none"]
+        if correction.lower() not in ["fdr", "bonferroni", "none"]:
+            raise ValueError("correction must be 'fdr', 'bonferroni', or 'none'")
 
         # This is a bug in panther DB where they used bonferonni . should be
         # bonferroni...
         if correction.lower() == "bonferroni":
             correction = "bonferonni"
-        assert annotation in [x["id"] for x in self.get_annotation_datasets()]
+        valid_annotations = [x["id"] for x in self.get_annotation_datasets()]
+        if annotation not in valid_annotations:
+            raise ValueError(f"annotation must be one of {valid_annotations}")
 
         params = {"enrichmentTestType": enrichment_test.upper()}
         params["organism"] = organism
@@ -295,7 +299,8 @@ class Panther:
             returned.
 
         """
-        assert ortholog_type in ["LDO", "all"]
+        if ortholog_type not in ["LDO", "all"]:
+            raise ValueError("ortholog_type must be 'LDO' or 'all'")
         params = {
             "geneInputList": gene_list,
             "organism": organism,
@@ -331,8 +336,10 @@ class Panther:
         """
         if "," in gene:
             logger.warning("did not expect a comma. Please provide only one gene name")
-        assert ortholog_type in ["LDO", "all"]
-        assert position >= 1
+        if ortholog_type not in ["LDO", "all"]:
+            raise ValueError("ortholog_type must be 'LDO' or 'all'")
+        if position < 1:
+            raise ValueError("position must be >= 1")
         params = {
             "gene": gene,
             "organism": organism,

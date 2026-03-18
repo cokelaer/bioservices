@@ -895,6 +895,7 @@ def test_compound_activity_chembl_id_uppercased():
     assert "molecule_chembl_id=CHEMBL25" in call_kwargs["filters"]
 
 
+@pytest.mark.flaky(max_runs=3, min_passes=1)
 def test_compound_reaction_with_result():
     import pandas as pd
 

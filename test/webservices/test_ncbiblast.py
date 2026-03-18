@@ -17,25 +17,19 @@ def test_param(ncbi):
 
 
 def test_paramdetails(ncbi):
-    names = ncbi.get_parameter_details("matrix")
-    try:
-        names = ncbi.get_parameter_details("matrixddddd")
-        assert False
-    except:
-        assert True
+    ncbi.get_parameter_details("matrix")
+    with pytest.raises(Exception):
+        ncbi.get_parameter_details("matrixddddd")
 
 
 @pytest.mark.xfail(reason="too slow", method="thread")
 @pytest.mark.timeout(10)
 def test_run(ncbi):
 
-    try:
+    with pytest.raises(Exception):
         ncbi.jobid = ncbi.run(
             program="blastp", sequence=ncbi._sequence_example, stype="protein", database="uniprotkb_viruses"
-        )
-        assert False  # missing email argument
-    except:
-        assert True
+        )  # missing email argument
     ncbi.jobid = ncbi.run(
         program="blastp",
         sequence=ncbi._sequence_example,
@@ -44,9 +38,9 @@ def test_run(ncbi):
         email="cokelaer@ebi.ac.uk",
         matrix="BLOSUM45",
     )
-    res = ncbi.get_result(ncbi.jobid, "out")
+    ncbi.get_result(ncbi.jobid, "out")
 
-    res = ncbi.get_result_types(ncbi.jobid)
+    ncbi.get_result_types(ncbi.jobid)
 
 
 def test_attributse(ncbi):

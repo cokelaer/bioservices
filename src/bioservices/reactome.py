@@ -168,10 +168,14 @@ class Reactome:
         :return: raw image data if *filename* is not set; ``None`` after saving otherwise
 
         """
-        assert ext in ["png", "jpg", "jpeg", "svg", "gif"]
-        assert quality in range(11)
-        assert diagramProfile in ["Modern", "Standard"]
-        assert analysisProfile in ["Standard", "Strosobar", "Copper Plus"]
+        if ext not in ["png", "jpg", "jpeg", "svg", "gif"]:
+            raise ValueError("ext must be one of: png, jpg, jpeg, svg, gif")
+        if quality not in range(11):
+            raise ValueError("quality must be between 0 and 10")
+        if diagramProfile not in ["Modern", "Standard"]:
+            raise ValueError("diagramProfile must be 'Modern' or 'Standard'")
+        if analysisProfile not in ["Standard", "Strosobar", "Copper Plus"]:
+            raise ValueError("analysisProfile must be 'Standard', 'Strosobar', or 'Copper Plus'")
 
         params = {
             "diagramProfile": diagramProfile,

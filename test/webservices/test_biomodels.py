@@ -28,11 +28,8 @@ def test_get_model(biomodels):
     res = biomodels.get_model("BIOMD0000000100")
     assert res["submissionId"] == "MODEL4589754842"
 
-    try:
-        res = biomodels.get_model("BIOMD0000000100", frmt="dummy")
-        assert False
-    except:
-        assert True
+    with pytest.raises(Exception):
+        biomodels.get_model("BIOMD0000000100", frmt="dummy")
 
 
 def test_get_model_files(biomodels):
@@ -66,13 +63,8 @@ def test_search(biomodels):
     assert res["queryParameters"]["sortBy"] == "id"
     assert res["queryParameters"]["sortDirection"] == "asc"
 
-    try:
+    with pytest.raises(Exception):
         biomodels.search(modelID, sort="id-asffc")
-        assert False
-    except ValueError:
-        assert True
-    except:
-        assert True
 
 
 # too slow
@@ -86,7 +78,7 @@ def _test_search_download(biomodels):
 
 
 def test_search_parameters(biomodels):
-    res = biomodels.search_parameter("MAPK", size=100, sort="entity")
+    biomodels.search_parameter("MAPK", size=100, sort="entity")
 
 
 def test_get_p2m_representatives(biomodels):

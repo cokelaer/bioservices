@@ -1,8 +1,8 @@
-from bioservices.chembl import ChEMBL
-import pytest
 import os
 
+import pytest
 
+from bioservices.chembl import ChEMBL
 
 SMILE = "CC(=O)Oc1ccccc1C(=O)O"
 INCHIKEY = "BSYNRYMUTXBXSQ-UHFFFAOYSA-N"
@@ -12,12 +12,6 @@ INCHIKEY = "BSYNRYMUTXBXSQ-UHFFFAOYSA-N"
 def chembl():
     c = ChEMBL(verbose=False, cache=False)
     c.TIMEOUT = 60
-    c.default_extension = "xml"
-    try:
-        c.default_extension = "xmlf"
-        assert False
-    except:
-        assert True
     return c
 
 
@@ -94,7 +88,7 @@ def test_activity(chembl):
         "mechanism",
         "metabolism",
         "molecule_form",
-        #"protein_class",
+        # "protein_class",
         "source",
         "target",
         "target_component",
@@ -119,7 +113,7 @@ def test_ATC(chembl):
 
 
 def _test_search_protein_class(chembl):
-    res1715 = chembl.get_protein_class(1715)
+    chembl.get_protein_class(1715)
     # no good example. This returns noting but at least calls the method
     chembl.search_protein_class("CAMK")
 
@@ -212,15 +206,15 @@ def test_similarity(chembl):
 
 
 def test_get_approved_drugs(chembl):
-    res = chembl.get_approved_drugs(maxdrugs=20)
+    chembl.get_approved_drugs(maxdrugs=20)
 
 
 # FIXME: this was failing on march 2020 . still failing june 2020
 @pytest.mark.xfail
 def test_image(chembl):
-    res = chembl.get_image("CHEMBL25", view=False)
+    chembl.get_image("CHEMBL25", view=False)
     os.remove("CHEMBL25.png")
-    res = chembl.get_image("CHEMBL25", view=False, format="svg")
+    chembl.get_image("CHEMBL25", view=False, format="svg")
     os.remove("CHEMBL25.svg")
 
 
@@ -259,11 +253,8 @@ def test_ordering(chembl):
     # triple key: FIXME no exqample
 
     # more:
-    try:
+    with pytest.raises(Exception):
         chembl.order_by(res, "test__test__test__test")
-        assert False
-    except:
-        assert True
 
 
 # very slow and probably useless now.
@@ -280,4 +271,4 @@ def __test_limit(chembl):
 
 # very very slow
 def __test_compounds2accession(chembl):
-    res = chembl.compounds2accession("CHEMBL4")
+    chembl.compounds2accession("CHEMBL4")

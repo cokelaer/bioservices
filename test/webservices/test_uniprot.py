@@ -51,11 +51,8 @@ def test_mapping(uniprot):
     assert len(res["results"]) == 1
     assert len(res["failedIds"]) == 1
 
-    try:
-        res = uniprot.mapping("UniProtKB_AC-ID", "KEGGDUMMY", "P43403,P123456")
-        assert False
-    except:
-        assert True
+    with pytest.raises(Exception):
+        uniprot.mapping("UniProtKB_AC-ID", "KEGGDUMMY", "P43403,P123456")
 
 
 def test_retrieve(uniprot):
@@ -89,7 +86,7 @@ def test_search(uniprot):
 
     uniprot.search("ZAP70_HUMAN", frmt="tsv", columns="sequence", limit=1)
 
-    data = uniprot.search("+OR+".join(protein_queries), columns="accession,lineage", frmt="tsv", limit=10)
+    uniprot.search("+OR+".join(protein_queries), columns="accession,lineage", frmt="tsv", limit=10)
 
 
 def test_quick_search(uniprot):
@@ -101,7 +98,7 @@ def test_uniref(uniprot):
 
 
 def test_get_df(uniprot):
-    df = uniprot.get_df("acc:P43403", limit=10)
+    uniprot.get_df("acc:P43403", limit=10)
 
 
 def test_fasta(uniprot):

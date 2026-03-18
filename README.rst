@@ -279,13 +279,17 @@ Version   Description
 ========= ====================================================================
 1.15.0    * **Drop WSDL support**: ``WSDLService`` class and ``suds-community``
             dependency removed — all active services now use REST exclusively
+          * **New** ``HTTPResponseError`` type: HTTP errors are now returned as
+            a rich object that behaves like ``int`` for backwards compatibility
+            but raises a descriptive ``BioServicesError`` when mistakenly used
+            as a dict or sequence (replaces silent ``TypeError`` crashes)
+          * **New** ``BioServicesError`` exception exported from
+            ``bioservices.services`` and usable directly: ``from bioservices
+            import BioServicesError``
           * Remove obsolete ``_compat`` module (Python 2 shims); replace
             ``pkg_resources`` with ``importlib.metadata``
           * Documentation overhauled: new Quick Start, merged changelog,
             contributors folded into Help & Credits, ChangeLog page removed
-          * Docstrings and code quality improvements
-          * CI: notebook test suite extended to all 17 notebooks; slow
-            ``unichem`` and ``quickgo`` tests marked ``flaky``
 1.14.0    * New ``proteins`` module (EBI Proteins API)
           * New ``string`` module (STRING protein interaction database)
           * New ``geo`` module (NCBI Gene Expression Omnibus)

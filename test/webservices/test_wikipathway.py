@@ -16,11 +16,8 @@ def test_organism(wikipath):
     wikipath.organism = "Homo sapiens"
     assert wikipath.organism == "Homo sapiens"
 
-    try:
+    with pytest.raises(ValueError):
         wikipath.organism = "Homo sapi"
-        assert False
-    except ValueError:
-        assert True
 
     assert len(wikipath.organisms) > 2  # check it is not empty
 
@@ -51,19 +48,19 @@ def test_getPathwayInfo(wikipath):
 
 
 def test_getPathwayAs(wikipath):
-    res = wikipath._getPathwayAs("WP4", filetype="png")
+    wikipath._getPathwayAs("WP4", filetype="png")
 
 
 @pytest.mark.xfail(reason="too slow", method="thread")
 @pytest.mark.timeout(30)
 def test_findPathwaysByText(wikipath):
-    res = wikipath.findPathwaysByText(query="p53")
-    res = wikipath.findPathwaysByText(query="p53", species="Homo sapiens")
+    wikipath.findPathwaysByText(query="p53")
+    wikipath.findPathwaysByText(query="p53", species="Homo sapiens")
     assert len(wikipath.findPathwaysByText(query="p53 OR mapk", species="Homo sapiens")) > 0
 
 
 def test_getOntologyTersmByPathway(wikipath):
-    res = wikipath.getOntologyTermsByPathway("WP4")
+    wikipath.getOntologyTermsByPathway("WP4")
 
 
 def _test_getCurationTags(wikipath):
@@ -108,43 +105,28 @@ def test_getPathwaysByParentOntologyTerm(wikipath):
 
 
 def test_createPathway(wikipath):
-    try:
+    with pytest.raises(NotImplementedError):
         wikipath.createPathway("", "")
-        assert False
-    except NotImplementedError:
-        assert True
 
 
 def test_updatePathwa(wikipath):
-    try:
+    with pytest.raises(NotImplementedError):
         wikipath.updatePathway("", "", "")
-        assert False
-    except NotImplementedError:
-        assert True
 
 
 def test_saveCurationTag(wikipath):
-    try:
+    with pytest.raises(NotImplementedError):
         wikipath.saveCurationTag("", "", "")
-        assert False
-    except NotImplementedError:
-        assert True
 
 
 def test_login(wikipath):
-    try:
+    with pytest.raises(NotImplementedError):
         wikipath.login("dummy", "dummy")
-        assert False
-    except NotImplementedError:
-        assert True
 
 
 def test_remoceCurationTag(wikipath):
-    try:
+    with pytest.raises(NotImplementedError):
         wikipath.removeCurationTag("dummy", "dummy")
-        assert False
-    except NotImplementedError:
-        assert True
 
 
 # FIXME SLOW

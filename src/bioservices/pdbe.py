@@ -71,7 +71,8 @@ class PDBe:
 
         if isinstance(pdbid, str):
             for item in pdbid.split(","):
-                assert len(item) == 4, "a 4-character PDB id code is required"
+                if len(item) != 4:
+                    raise ValueError("a 4-character PDB id code is required")
         else:
             raise TypeError(
                 "pdb id must be either a 4-character pdb id, a list of valid PDB ids, or a string made of pdb ids, separated by commas"

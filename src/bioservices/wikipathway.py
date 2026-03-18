@@ -317,7 +317,8 @@ class WikiPathways:
         .. note:: use :meth:`savePathwayAs` to save into a file.
         """
         valids = ["gpml", "png", "svg", "pdf"]
-        assert filetype in valids, f"filetype must be in {valids}"
+        if filetype not in valids:
+            raise ValueError(f"filetype must be in {valids}")
 
         url = f"https://www.wikipathways.org/wikipathways-assets/pathways/{pathwayId}/{pathwayId}.{filetype}"
         res = self.services.http_get(url, frmt="txt")

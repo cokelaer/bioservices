@@ -31,7 +31,7 @@ def test_get_compounds(unichem):
 def test_get_sources_by_inchikey(unichem):
 
     inchikey = "AAOVKJBEBIDNHE-UHFFFAOYSA-N"
-    res = unichem.get_sources_by_inchikey(inchikey)
+    unichem.get_sources_by_inchikey(inchikey)
     assert unichem.get_sources_by_inchikey("AAOV") == {}
     assert unichem.get_sources_by_inchikey(["AAOV"]) == {"AAOV": {}}
 

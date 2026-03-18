@@ -745,7 +745,7 @@ class EUtils:
             raise ValueError("One of db or dbfrom parameter must be provided")
 
         if "cmd" in kargs.keys():
-            assert kargs["cmd"] in [
+            if kargs["cmd"] not in [
                 "neighbor",
                 "neighbor_score",
                 "neighbor_history",
@@ -755,7 +755,10 @@ class EUtils:
                 "ncheck",
                 "llinkslib",
                 "prlinks",
-            ]
+            ]:
+                raise ValueError(
+                    f"cmd must be one of {['neighbor', 'neighbor_score', 'neighbor_history', 'acheck', 'llinks', 'lcheck', 'ncheck', 'llinkslib', 'prlinks']}"
+                )
             cmd = kargs["cmd"]
         else:
             cmd = None

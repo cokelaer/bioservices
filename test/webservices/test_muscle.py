@@ -12,11 +12,8 @@ def test_muscle():
     m = MUSCLE(verbose=False)
     m.parameters
     m.get_parameter_details("format")
-    try:
+    with pytest.raises(Exception):
         m.get_parameter_details("formattt")
-        assert False
-    except:
-        assert True
 
     u = uniprot.UniProt(verbose=False)
     f1 = u.get_fasta("P18812")

@@ -1,5 +1,6 @@
-from bioservices import KEGG, KEGGParser
 import pytest
+
+from bioservices import KEGG, KEGGParser
 
 
 @pytest.fixture(scope="module")
@@ -60,11 +61,8 @@ def test_get(kegg):
 
 def test_checkDB(kegg):
     for this in ["info", "list", "find", "link"]:
-        try:
+        with pytest.raises(Exception):
             kegg._checkDB("dummy", this)
-            assert False
-        except:
-            assert True
         kegg._checkDB("pathway", this)
 
 
@@ -78,7 +76,7 @@ def test_org_conv(kegg):
 
 
 def test_parse_kgml_pathway(kegg):
-    res = kegg.parse_kgml_pathway("hsa04660")
+    kegg.parse_kgml_pathway("hsa04660")
 
 
 # Minimal KGML XML shared fixture used for offline unit tests below
@@ -205,11 +203,8 @@ def test_lookfor(kegg):
 
 def test_organism(kegg):
     kegg.organism = "hsa"
-    try:
+    with pytest.raises(Exception):
         kegg.organism = "dummy"
-        assert False
-    except:
-        assert True
 
 
 def test_pathwayIDs(kegg):
@@ -219,11 +214,8 @@ def test_pathwayIDs(kegg):
 
 def test_info(kegg):
     kegg.dbinfo("hsa")
-    try:
+    with pytest.raises(Exception):
         kegg.dbinfo("dummy")
-        assert False
-    except:
-        assert True
 
 
 def test_list_pathway(kegg):
@@ -240,18 +232,13 @@ def test_list(kegg):
     kegg.list("cpd:C01290+gl:G00092")  # returns the list of a compound entry and a glycan entry
     kegg.list("C01290+G00092")  # same as above
 
-    # invalid queries:
-    try:
+    # invalid queries: organism set but query is not pathway/module → raises
+    with pytest.raises(Exception):
         kegg.list("drug", "hsa")
-        assert False
-    except:
-        assert True
 
-    try:
-        kegg.list("dumy")
-        assert False
-    except:
-        assert True
+    # unknown database → KEGG returns an HTTP error code
+    res = kegg.list("dumy")
+    assert isinstance(res, int)
 
 
 def test_find(kegg):
@@ -267,13 +254,10 @@ def test_get(kegg):
     kegg.get("C01290+G00092")
     kegg.get("hsa:10458+ece:Z5100")
     kegg.get("hsa:10458+ece:Z5100", "aaseq")
-    res = kegg.get("hsa05130", "image")
-    try:
+    kegg.get("hsa05130", "image")
+    with pytest.raises(Exception):
         kegg.get("hsa05130", "imagffe")
-        assert False
-    except:
-        assert True
-    res = kegg.get("network:nt06214")
+    kegg.get("network:nt06214")
 
 
 def test_parse(kegg, parse_input):
@@ -285,29 +269,19 @@ def test_parse(kegg, parse_input):
 def test_conv(kegg):
     kegg.conv("ncbi-gi", "hsa:10458+ece:Z5100")
 
-    try:
+    # invalid target → raises ValueError before any HTTP call
+    with pytest.raises(Exception):
         kegg.conv("unipro", "hsa")
-        assert False
-    except:
-        assert True
 
-    try:
-        kegg.conv("uniprot", "hs")
-        assert False
-    except:
-        assert True
-
-    try:
+    with pytest.raises(Exception):
         kegg.conv("hs", "unipro")
-        assert False
-    except:
-        assert True
 
-    try:
-        kegg.conv("hsa", "unipr")
-        assert False
-    except:
-        assert True
+    # valid target but invalid/unknown source → KEGG returns an HTTP error code
+    res = kegg.conv("uniprot", "hs")
+    assert isinstance(res, int)
+
+    res = kegg.conv("hsa", "unipr")
+    assert isinstance(res, int)
 
     # asc contains 1500. Try to get even samller to spped up tests.
     # kegg.conv("asc", "uniprot")
@@ -326,7 +300,7 @@ def test_show_pathway(kegg, tmp_path):
 
 
 def pathway2sif(kegg):
-    sif = kegg.pathway2sif("path:hsa05416")
+    kegg.pathway2sif("path:hsa05416")
 
 
 def test_KEGGParser(kegg):

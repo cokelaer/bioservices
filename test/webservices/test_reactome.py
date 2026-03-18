@@ -30,13 +30,13 @@ def test_diseases_doid(reactome):
 
 @skiptravis
 def test_exporter_diagram(reactome):
-    res = reactome.get_exporter_diagram("R-HSA-5674003", ext="png")
-    res = reactome.get_exporter_diagram("R-HSA-5674003", ext="jpg")
-    res = reactome.get_exporter_diagram("R-HSA-5674003", ext="jpg", quality=1)
-    res = reactome.get_exporter_diagram("R-HSA-5674003", ext="jpg", quality=1, diagramProfile="Standard")
+    reactome.get_exporter_diagram("R-HSA-5674003", ext="png")
+    reactome.get_exporter_diagram("R-HSA-5674003", ext="jpg")
+    reactome.get_exporter_diagram("R-HSA-5674003", ext="jpg", quality=1)
+    reactome.get_exporter_diagram("R-HSA-5674003", ext="jpg", quality=1, diagramProfile="Standard")
 
     with TempFile(suffix=".png") as fout:
-        res = reactome.get_exporter_diagram(109581, ext="png", filename=fout.name)
+        reactome.get_exporter_diagram(109581, ext="png", filename=fout.name)
 
 
 def test_complex_subunits(reactome):

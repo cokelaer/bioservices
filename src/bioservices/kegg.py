@@ -826,7 +826,8 @@ class KEGG:
 
     def _get_database(self, dbname, mode=0):
         res = self.list(dbname)
-        assert mode in [0, 1]
+        if mode not in [0, 1]:
+            raise ValueError("mode must be 0 or 1")
         return [x.split()[mode] for x in res.split("\n") if len(x)]
 
     def _get_organisms(self):
@@ -1089,7 +1090,8 @@ class KEGG:
         relations = [(x.get("entry1"), x.get("entry2"), x.get("type")) for x in res.findAll("relation")]
         subtypes = [x.findAll("subtype") for x in res.findAll("relation")]
 
-        assert len(subtypes) == len(relations)
+        if len(subtypes) != len(relations):
+            raise ValueError("subtypes and relations must have the same length")
 
         for relation, subtype in zip(relations, subtypes):
             if len(subtype) == 0:
@@ -1689,7 +1691,8 @@ class KEGGParser(object):
             elif gene is True:
                 res['GENE'] += this.strip()
             else:
-                assert gene is False
+                if gene is not False:
+                    raise ValueError("gene must be False")
                 res['SEQUENCE'] = this.strip()
         return res
         """

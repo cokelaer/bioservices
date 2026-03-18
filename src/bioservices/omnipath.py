@@ -63,7 +63,8 @@ class OmniPath:
 
     def get_network(self, frmt="json"):
         """Get basic statistics about the whole network including sources"""
-        assert frmt in ["json", "tsv"], "frmt must be set to json or tsv"
+        if frmt not in ["json", "tsv"]:
+            raise ValueError("frmt must be set to json or tsv")
         res = self.services.http_get("network", frmt=frmt, params={"format": frmt})
 
         return res
@@ -105,7 +106,8 @@ class OmniPath:
                 query = query.replace(" ", "")
             except Exception:
                 pass
-        assert frmt in ["json", "tsv"], "frmt must be set to json or tsv"
+        if frmt not in ["json", "tsv"]:
+            raise ValueError("frmt must be set to json or tsv")
         params = {}
         params["format"] = frmt
         from easydev import to_list
@@ -152,7 +154,8 @@ class OmniPath:
                 query = query.replace(" ", "")
             except Exception:
                 pass
-        assert frmt in ["json", "tsv"], "frmt must be set to json or tsv"
+        if frmt not in ["json", "tsv"]:
+            raise ValueError("frmt must be set to json or tsv")
         params = {}
         params["format"] = frmt
         if len(fields):

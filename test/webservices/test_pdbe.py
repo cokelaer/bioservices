@@ -1,4 +1,5 @@
 import pytest
+
 from bioservices import PDBe
 
 
@@ -270,11 +271,11 @@ class TestGetCarbohydratePolymer:
 
 class TestInvalidInput:
     def test_id_too_long(self, pdbe):
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             pdbe.get_summary("sdklfjslkdfj")
 
     def test_id_too_short(self, pdbe):
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             pdbe.get_summary("1c")
 
     def test_wrong_type(self, pdbe):
@@ -282,9 +283,9 @@ class TestInvalidInput:
             pdbe.get_summary(12345)
 
     def test_invalid_id_in_list(self, pdbe):
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             pdbe.get_summary(["1cbs", "bad"])
 
     def test_invalid_id_in_comma_separated(self, pdbe):
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             pdbe.get_summary("1cbs,bad")

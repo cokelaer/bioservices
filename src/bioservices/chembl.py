@@ -316,7 +316,7 @@ class ChEMBL:
                                       'molecule_chembl_id=CHEMBL25'])
 
 
-    Obtain he pChEMBL value for compound and target::
+    Obtain the pChEMBL value for compound and target::
 
         res = c.get_activity(filters=['pchembl_value__isnull=False',
                                       'molecule_chembl_id=CHEMBL25',
@@ -465,12 +465,14 @@ class ChEMBL:
             del params["filters"]
         elif isinstance(params["filters"], list):
             for filter in params["filters"]:
-                assert filter.count("=") == 1
+                if filter.count("=") != 1:
+                    raise ValueError("Each filter must contain exactly one '=' character")
                 key, value = filter.split("=")
                 params[key] = value
             del params["filters"]
         else:
-            assert params["filters"].count("=") == 1
+            if params["filters"].count("=") != 1:
+                raise ValueError("Each filter must contain exactly one '=' character")
             k, v = params["filters"].split("=")
             del params["filters"]
             params[k] = v
@@ -485,7 +487,8 @@ class ChEMBL:
             res = self.services.http_get("{}/{}".format(name, query), params=params)
             self._check_request(res)
         elif isinstance(query, list):
-            assert params["limit"] <= 1000, "limit must be less than 1000"
+            if params["limit"] > 1000:
+                raise ValueError("limit must be less than 1000")
             ids = ";".join([str(x) for x in query])
             res = self.services.http_get("{}/set/{}".format(name, ids), params=params)
             self._check_request(res)
@@ -503,8 +506,10 @@ class ChEMBL:
 
     def _search(self, name, query, params):
         # Check the validity of limits
-        assert params["limit"] > 0, "limits must be less than 1000"
-        assert params["limit"] <= 1000, "limits must be positive"
+        if params["limit"] <= 0:
+            raise ValueError("limit must be positive")
+        if params["limit"] > 1000:
+            raise ValueError("limit must be less than 1000")
         res = self.services.http_get("{}/search.{}?q={}".format(name, self.format, query), params=params)
 
         if isinstance(res, int):
@@ -809,8 +814,10 @@ class ChEMBL:
         # we use quote to format the SMILE/InChIKey for URL encoding
         structure = quote(structure)
 
-        assert isinstance(similarity, int)
-        assert similarity >= 70 and similarity <= 100, "similarity must be in the range [70, 100]"
+        if not isinstance(similarity, int):
+            raise TypeError("similarity must be an integer")
+        if not (70 <= similarity <= 100):
+            raise ValueError("similarity must be in the range [70, 100]")
         params = {"limit": limit, "offset": offset, "filters": filters}
         query = None
         return self._get_this_service("similarity/{}/{}".format(structure, similarity), query, params=params)
