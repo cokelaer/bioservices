@@ -288,6 +288,15 @@ Version   Description
             import BioServicesError``
           * Remove obsolete ``_compat`` module (Python 2 shims); replace
             ``pkg_resources`` with ``importlib.metadata``
+          * Code quality: replaced ``assert`` statements in production code
+            with ``ValueError``/``TypeError``; fixed bare ``except:`` clauses,
+            unused imports, and undefined name bugs across 15+ modules
+          * Test quality: replaced ``try/assert False/except/assert True``
+            anti-patterns with ``pytest.raises``; intermittent tests marked
+            ``flaky`` or ``xfail``; slow tests given per-test timeout overrides
+          * Bug fixes: ``reactome.py`` SVG save path, ``pathwaycommons.py``
+            ``isinstance`` typo, ``settings.py`` loop variable, ``ensembl.py``
+            ``NotImplementedError`` typo, ``wikipathway.py`` API response handling
           * Documentation overhauled: new Quick Start, merged changelog,
             contributors folded into Help & Credits, ChangeLog page removed
 1.14.0    * New ``proteins`` module (EBI Proteins API)

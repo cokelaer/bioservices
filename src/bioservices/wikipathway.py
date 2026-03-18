@@ -223,8 +223,10 @@ class WikiPathways:
         url = "getPathway?pwId=%s" % pathwayId
         url += "&revision=%s&format=json" % revision
         request = self.services.http_get(url)
-
-        return request["pathway"]
+        try:
+            return request["pathway"]
+        except TypeError:
+            pass
 
     def getPathwayInfo(self, pathwayId):
         """Get some general info about the pathway.
