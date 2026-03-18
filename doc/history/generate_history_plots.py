@@ -89,9 +89,39 @@ def plot_commits_over_time() -> None:
     )
     rolling = series.rolling(6, min_periods=1).mean()
 
+    # Cap y-axis at the 97th percentile so that a single large spike (e.g. an
+    # AI-assisted burst) does not compress all other activity into a flat
+    # baseline.  Bars that exceed the cap are drawn with hatching and annotated.
+    positive_vals = series.values[series.values > 0]
+    if len(positive_vals) == 0:
+        print("  [warn] no positive commit counts – skipping commits_over_time")
+        return
+    cap = float(np.percentile(positive_vals, 97)) * 1.3
+    cap = max(cap, 50)   # never cap below 50
+    ymax = cap * 1.08
+
     fig, ax = plt.subplots(figsize=(14, 4))
-    ax.bar(series.index, series.values, width=20, color="#4C72B0",
+
+    # Draw normal bars; clip overflowing bars and annotate them
+    bar_vals = series.values.copy()
+    overflow = bar_vals > cap
+    bar_vals_clipped = np.where(overflow, cap, bar_vals)
+
+    ax.bar(series.index, bar_vals_clipped, width=20, color="#4C72B0",
            alpha=0.55, label="Monthly commits")
+
+    # Hatched top-cap pattern + annotation for overflow bars
+    for idx in np.where(overflow)[0]:
+        ax.bar(series.index[idx], cap, width=20, color="#4C72B0",
+               alpha=0.75, hatch="////", edgecolor="#4C72B0")
+        ax.annotate(
+            f"{int(series.values[idx])}",
+            xy=(series.index[idx], cap),
+            xytext=(0, 4), textcoords="offset points",
+            ha="center", va="bottom", fontsize=8, color="#333",
+            fontweight="bold",
+        )
+
     ax.plot(rolling.index, rolling.values, color="#DD8452",
             linewidth=2, label="6-month rolling avg")
 
@@ -102,20 +132,19 @@ def plot_commits_over_time() -> None:
         ("2020-01", "2022-12", "#FFDAC1", "API modernisation\n(v1.7–1.11)"),
         ("2023-01", "2026-06", "#C7CEEA", "Maintenance &\nAI-assisted (v1.12+)"),
     ]
-    ymax = series.max() * 1.15
     for start, end, color, label in eras:
         ax.axvspan(pd.Timestamp(start), pd.Timestamp(end),
                    alpha=0.25, color=color, label=label)
 
     ax.set_xlim(pd.Timestamp("2012-10"), pd.Timestamp("2026-06"))
     ax.set_ylim(0, ymax)
-    ax.set_xlabel("Date", fontsize=11)
-    ax.set_ylabel("Number of commits", fontsize=11)
+    ax.set_xlabel("Date", fontsize=12)
+    ax.set_ylabel("Number of commits", fontsize=12)
     ax.set_title("BioServices – Commit Activity over Time (non-merge commits)",
                  fontsize=13, fontweight="bold")
     ax.xaxis.set_major_locator(mdates.YearLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
-    ax.legend(loc="upper left", fontsize=8, ncol=2)
+    ax.legend(loc="upper left", fontsize=11, ncol=2)
     ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
     _save(fig, "commits_over_time.png")
@@ -252,40 +281,74 @@ def plot_services_timeline() -> None:
     services = sorted(_SERVICES, key=lambda x: (x[1], x[2]))
     categories = sorted(set(s[1] for s in services))
 
-    fig_height = max(6, len(services) * 0.32)
-    fig, ax = plt.subplots(figsize=(13, fig_height))
+    # Extra bottom margin for the legend
+    fig_height = max(8, len(services) * 0.36 + 1.5)
+    fig, ax = plt.subplots(figsize=(14, fig_height))
+
+    # Reserve bottom space for the legend
+    fig.subplots_adjust(bottom=0.18)
+
+    ARROW_EXTRA = 0.55   # how far beyond END_YEAR the arrow tip extends
+    BAR_END     = END_YEAR + 0.2  # where active bars visually stop (arrow starts)
 
     yticks, ylabels = [], []
     for i, (name, cat, added, depr) in enumerate(services):
         color = _CATEGORY_COLORS.get(cat, "#888888")
-        end = depr if depr else END_YEAR + 0.5
         alpha = 0.4 if depr else 0.85
-        ax.barh(i, end - added, left=added, height=0.65,
-                color=color, alpha=alpha, edgecolor="white", linewidth=0.5)
+
         if depr:
-            ax.text(end + 0.05, i, "✕", va="center", fontsize=7, color="#888")
+            width = depr - added
+            ax.barh(i, width, left=added, height=0.65,
+                    color=color, alpha=alpha, edgecolor="white", linewidth=0.5)
+            ax.text(depr + 0.08, i, "✕", va="center", fontsize=9,
+                    color="#666", fontweight="bold")
+        else:
+            # Draw bar stopping just before the arrow
+            width = BAR_END - added
+            ax.barh(i, width, left=added, height=0.65,
+                    color=color, alpha=alpha, edgecolor="white", linewidth=0.5)
+            # Arrow from bar end toward the right to emphasise continuity
+            ax.annotate(
+                "",
+                xy=(BAR_END + ARROW_EXTRA, i),
+                xytext=(BAR_END, i),
+                arrowprops=dict(
+                    arrowstyle="->",
+                    color=color,
+                    lw=1.8,
+                    mutation_scale=12,
+                ),
+            )
+
         yticks.append(i)
         ylabels.append(name.replace(".py", ""))
 
     ax.set_yticks(yticks)
-    ax.set_yticklabels(ylabels, fontsize=7.5)
-    ax.set_xlabel("Year", fontsize=11)
+    ax.set_yticklabels(ylabels, fontsize=9.5)
+    ax.set_xlabel("Year", fontsize=12)
     ax.set_title("BioServices – Service Modules Timeline",
                  fontsize=13, fontweight="bold")
-    ax.set_xlim(2012, END_YEAR + 1)
+    ax.set_xlim(2012, END_YEAR + 1.2)
     ax.xaxis.set_major_locator(plt.MultipleLocator(1))
     ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: str(int(x))))
     ax.grid(axis="x", alpha=0.3)
     ax.invert_yaxis()
 
-    # Legend for categories
+    # Legend for categories — 4 columns, larger font, placed below the chart
     legend_patches = [
         mpatches.Patch(color=_CATEGORY_COLORS[c], label=c, alpha=0.85)
         for c in categories if c in _CATEGORY_COLORS
     ]
-    ax.legend(handles=legend_patches, loc="lower right",
-              fontsize=7, ncol=2, title="Category")
-    fig.tight_layout()
+    ax.legend(
+        handles=legend_patches,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.10),
+        fontsize=10,
+        ncol=4,
+        title="Category",
+        title_fontsize=11,
+        frameon=True,
+    )
     _save(fig, "services_timeline.png")
 
 
@@ -372,6 +435,27 @@ def _count_py_lines(ref: str) -> int:
         return 0
 
 
+def _thin_labels(df: pd.DataFrame, min_gap_days: int = 150) -> pd.Series:
+    """Return a boolean mask marking which rows should receive a tag label.
+
+    Within clusters of releases that are within *min_gap_days* of each other,
+    only the **newest** release in the cluster gets a label.
+    """
+    df = df.reset_index(drop=True)
+    keep = pd.Series(False, index=df.index)
+    n = len(df)
+    i = 0
+    while i < n:
+        # Expand the current cluster: keep stepping forward while the next
+        # point is still within min_gap_days of the current one.
+        j = i
+        while j + 1 < n and (df.loc[j + 1, "date"] - df.loc[j, "date"]).days <= min_gap_days:
+            j += 1
+        keep[j] = True   # keep the newest (last) in the cluster
+        i = j + 1
+    return keep
+
+
 def plot_codebase_growth() -> None:
     raw_tags = _run("git tag --sort=version:refname")
     tags = [t for t in raw_tags.splitlines() if t.strip()]
@@ -391,7 +475,7 @@ def plot_codebase_growth() -> None:
 
     df = pd.DataFrame(records)
     df["date"] = pd.to_datetime(df["date"])
-    df = df.sort_values("date")
+    df = df.sort_values("date").reset_index(drop=True)
 
     # Also sample HEAD
     head_loc = _count_py_lines("HEAD")
@@ -399,31 +483,93 @@ def plot_codebase_growth() -> None:
                                "loc": head_loc}])
     df = pd.concat([df, head_row], ignore_index=True)
 
-    fig, ax = plt.subplots(figsize=(12, 4))
-    ax.fill_between(df["date"], df["loc"], alpha=0.25, color="#4C72B0")
-    ax.plot(df["date"], df["loc"], "o-", color="#4C72B0",
-            linewidth=2, markersize=6)
+    # --- Broken y-axis: bottom stub (0→gap) + top (data range) ---------------
+    # LOC_AXIS_STEP: granularity used when rounding the bottom of the top
+    # y-axis down to a "clean" value (e.g. 20 000, 25 000 …).
+    LOC_AXIS_STEP = 5_000
+    data_min = int(df["loc"].min())
+    data_max = int(df["loc"].max())
+    # Round down to the nearest LOC_AXIS_STEP for the bottom of the top axis
+    top_ymin = max(0, (data_min // LOC_AXIS_STEP) * LOC_AXIS_STEP - LOC_AXIS_STEP)
+    top_ymax = data_max + (data_max - top_ymin) * 0.12   # 12 % head-room
 
-    for _, row in df[df["tag"] != "HEAD"].iterrows():
-        ax.annotate(
-            row["tag"],
-            xy=(row["date"], row["loc"]),
-            xytext=(0, 8), textcoords="offset points",
-            ha="center", fontsize=6.5, rotation=45,
-            color="#333",
-        )
+    fig, (ax_top, ax_bot) = plt.subplots(
+        2, 1, figsize=(12, 5),
+        gridspec_kw={"height_ratios": [4, 1]},
+        sharex=True,
+    )
+    fig.subplots_adjust(hspace=0.05)
 
-    ax.set_xlabel("Date", fontsize=11)
-    ax.set_ylabel("Total Python lines of code", fontsize=11)
-    ax.set_title("BioServices – Codebase Growth (Python LOC at each release)",
-                 fontsize=13, fontweight="bold")
-    ax.xaxis.set_major_locator(mdates.YearLocator())
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
-    ax.yaxis.set_major_formatter(
+    # Both axes share the same data / line
+    for ax in (ax_top, ax_bot):
+        ax.fill_between(df["date"], df["loc"], alpha=0.20, color="#4C72B0")
+        ax.plot(df["date"], df["loc"], "o-", color="#4C72B0",
+                linewidth=2, markersize=6)
+
+    ax_top.set_ylim(top_ymin, top_ymax)
+    ax_bot.set_ylim(0, top_ymin * 0.25)   # small stub showing 0-baseline
+
+    # Hide the inter-axes spines
+    ax_top.spines.bottom.set_visible(False)
+    ax_bot.spines.top.set_visible(False)
+    ax_top.tick_params(labelbottom=False, bottom=False)
+
+    # Draw the diagonal "//" break marks
+    d = 0.018
+    break_kw = dict(color="k", clip_on=False, linewidth=0.9, zorder=10)
+    ax_top.plot(
+        [-d, +d], [-d, +d],
+        transform=ax_top.transAxes, **break_kw,
+    )
+    ax_top.plot(
+        [1 - d, 1 + d], [-d, +d],
+        transform=ax_top.transAxes, **break_kw,
+    )
+    ax_bot.plot(
+        [-d, +d], [1 - d, 1 + d],
+        transform=ax_bot.transAxes, **break_kw,
+    )
+    ax_bot.plot(
+        [1 - d, 1 + d], [1 - d, 1 + d],
+        transform=ax_bot.transAxes, **break_kw,
+    )
+
+    # Tag annotations — thin out clustered labels
+    label_df = df[df["tag"] != "HEAD"].reset_index(drop=True)
+    keep_mask = _thin_labels(label_df)
+
+    # Compute y-range of top axis to offset label above top limit
+    for idx, row in label_df[keep_mask].iterrows():
+        # Only annotate on top axis (where the data sits)
+        if row["loc"] >= top_ymin:
+            ax_top.annotate(
+                row["tag"],
+                xy=(row["date"], row["loc"]),
+                xytext=(0, 8), textcoords="offset points",
+                ha="center", fontsize=7.5, rotation=45,
+                color="#333",
+                clip_on=False,
+            )
+
+    # Shared x-axis formatting (applied to bottom axis which owns the ticks)
+    ax_bot.xaxis.set_major_locator(mdates.YearLocator())
+    ax_bot.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+
+    # Y-axis labels
+    ax_top.set_ylabel("Python lines of code", fontsize=11)
+    ax_bot.set_yticks([0])
+    ax_top.yaxis.set_major_formatter(
         plt.FuncFormatter(lambda x, _: f"{int(x):,}")
     )
-    ax.grid(alpha=0.3)
-    fig.tight_layout()
+    ax_bot.yaxis.set_major_formatter(
+        plt.FuncFormatter(lambda x, _: f"{int(x):,}")
+    )
+
+    ax_bot.set_xlabel("Date", fontsize=11)
+    ax_top.set_title("BioServices – Codebase Growth (Python LOC at each release)",
+                     fontsize=13, fontweight="bold")
+    ax_top.grid(alpha=0.3)
+    ax_bot.grid(alpha=0.3)
     _save(fig, "codebase_growth.png")
 
 
