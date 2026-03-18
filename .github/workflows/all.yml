@@ -1,0 +1,92 @@
+name: Trigger All Workflows
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+  notebooks:
+    uses: ./.github/workflows/notebooks.yml
+  arrayexpress:
+    uses: ./.github/workflows/arrayexpress.yml
+  bigg:
+    uses: ./.github/workflows/bigg.yml
+  biocontainers:
+    uses: ./.github/workflows/biocontainers.yml
+  biodbnet:
+    uses: ./.github/workflows/biodbnet.yml
+  biomart:
+    uses: ./.github/workflows/biomart.yml
+  biomodels:
+    uses: ./.github/workflows/biomodels.yml
+  chebi:
+    uses: ./.github/workflows/chebi.yml
+  chembl:
+    uses: ./.github/workflows/chembl.yml
+  cog:
+    uses: ./.github/workflows/cog.yml
+  dbfetch:
+    uses: ./.github/workflows/dbfetch.yml
+  ena:
+    uses: ./.github/workflows/ena.yml
+  ensembl:
+    uses: ./.github/workflows/ensembl.yml
+  eutils:
+    uses: ./.github/workflows/eutils.yml
+  eva:
+    uses: ./.github/workflows/eva.yml
+  geo:
+    uses: ./.github/workflows/geo.yml
+  hgnc:
+    uses: ./.github/workflows/hgnc.yml
+  intact_complex:
+    uses: ./.github/workflows/intact_complex.yml
+  kegg:
+    uses: ./.github/workflows/kegg.yml
+  muscle:
+    uses: ./.github/workflows/muscle.yml
+  mygeneinfo:
+    uses: ./.github/workflows/mygeneinfo.yml
+  ncbiblast:
+    uses: ./.github/workflows/ncbiblast.yml
+  omicsdi:
+    uses: ./.github/workflows/omicsdi.yml
+  omnipath:
+    uses: ./.github/workflows/omnipath.yml
+  panther:
+    uses: ./.github/workflows/panther.yml
+  pathwaycommons:
+    uses: ./.github/workflows/pathwaycommons.yml
+  pdb:
+    uses: ./.github/workflows/pdb.yml
+  pdbe:
+    uses: ./.github/workflows/pdbe.yml
+  pfam:
+    uses: ./.github/workflows/pfam.yml
+  pride:
+    uses: ./.github/workflows/pride.yml
+  proteins:
+    uses: ./.github/workflows/proteins.yml
+  pubchem:
+    uses: ./.github/workflows/pubchem.yml
+  quickgo:
+    uses: ./.github/workflows/quickgo.yml
+  reactome:
+    uses: ./.github/workflows/reactome.yml
+  rhea:
+    uses: ./.github/workflows/rhea.yml
+  rnaseq_ebi:
+    uses: ./.github/workflows/rnaseq_ebi.yml
+  seqret:
+    uses: ./.github/workflows/seqret.yml
+  string:
+    uses: ./.github/workflows/string.yml
+  unichem:
+    uses: ./.github/workflows/unichem.yml
+  uniprot:
+    uses: ./.github/workflows/uniprot.yml
+  wikipathway:
+    uses: ./.github/workflows/wikipathway.yml
