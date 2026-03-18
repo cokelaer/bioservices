@@ -199,7 +199,6 @@ html_logo = "_static/bioservices2_256.png"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 
-# the copybutton.js must be copied there:
 html_static_path = ["_static"]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
