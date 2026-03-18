@@ -277,18 +277,6 @@ class NCBIblast:
             raise TypeError("database must be a string or a list of strings")
         params["database"] = databases
 
-        """
-parser.add_option('--seqrange', help='region within input to use as query')
-# General options
-parser.add_option('--title', help='job title')
-parser.add_option('--outfile', help='file name for results')
-parser.add_option('--outformat', help='output format for results')
-parser.add_option('--async', action='store_true', help='asynchronous mode')
-parser.add_option('--jobid', help='job identifier')
-parser.add_option('--polljob', action="store_true", help='get job result')
-parser.add_option('--status', action="store_true", help='get job status')
-parser.add_option('--resultTypes', action='store_true', help='get result types')
-    """
         # IMPORTANT: use data parameter, not params !!!
         res = self.services.http_post(
             "run",

@@ -278,7 +278,7 @@ def annotation(**kwargs):
 @click.option(
     "--taxid",
     default=9606,
-    type=click.INT,
+    type=int,
     help="NCBI taxonomy ID (default: 9606 for Homo sapiens)",
 )
 def interaction(**kwargs):
@@ -537,7 +537,7 @@ def pathway(**kwargs):
 @click.option(
     "--taxid",
     default=9606,
-    type=click.INT,
+    type=int,
     help="NCBI taxonomy ID of the query organism (default: 9606 for Homo sapiens)",
 )
 def ortholog(**kwargs):
@@ -632,7 +632,7 @@ def compound(**kwargs):
     type=click.Choice(["chembl", "chebi"]),
     help="Database to search (default: chembl)",
 )
-@click.option("--limit", default=10, type=click.INT, help="Maximum number of results (default: 10)")
+@click.option("--limit", default=10, type=int, help="Maximum number of results (default: 10)")
 def compound_search(**kwargs):
     """Search for compounds by name or keyword.
 
@@ -717,7 +717,7 @@ def compound_structure(**kwargs):
     type=click.STRING,
     help="ChEMBL compound identifier (e.g. CHEMBL25)",
 )
-@click.option("--limit", default=10, type=click.INT, help="Maximum number of results (default: 10)")
+@click.option("--limit", default=10, type=int, help="Maximum number of results (default: 10)")
 @click.option(
     "--type",
     "activity_type",
@@ -753,7 +753,7 @@ def activity(**kwargs):
 
 @compound.command()
 @click.option("--query", required=True, type=click.STRING, help="Compound name, ChEBI ID, EC number, or Rhea ID")
-@click.option("--limit", default=10, type=click.INT, help="Maximum number of results (default: 10)")
+@click.option("--limit", default=10, type=int, help="Maximum number of results (default: 10)")
 def reaction(**kwargs):
     """Search for biochemical reactions involving a compound using Rhea.
 

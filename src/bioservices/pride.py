@@ -224,7 +224,7 @@ class PRIDE:
         params["sortConditions"] = sortConditions
         params["sortDirection"] = sortDirection
 
-        res = self.services.http_get(f"proteinevidences", params=params)
+        res = self.services.http_get("proteinevidences", params=params)
         return res
 
     def get_peptide_evidence(
@@ -275,7 +275,7 @@ class PRIDE:
         params["page"] = page
         params["sortConditions"] = sortConditions
 
-        res = self.services.http_get(f"peptideevidences", params=params)
+        res = self.services.http_get("peptideevidences", params=params)
         return res
 
     def get_stats(self, name):

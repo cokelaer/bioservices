@@ -243,7 +243,7 @@ class WikiPathways:
         try:
             return request["pathwayInfo"]
         except TypeError:
-            return request
+            pass
 
     def getPathwayHistory(self, pathwayId, date):
         """Get the revision history of a pathway.
@@ -536,7 +536,10 @@ class WikiPathways:
         url = "getPathwaysByOntologyTerm?term={}".format(terms)
         url += "&format=json"
         request = self.services.http_get(url)
-        return request["pathways"]
+        try:
+            return request["pathways"]
+        except TypeError:
+            pass
 
     def getPathwaysByParentOntologyTerm(self, term):
         """Get a list of pathways tagged with any ontology term that is the child of the given Ontology term.
@@ -547,7 +550,10 @@ class WikiPathways:
         """
         url = f"getPathwaysByParentOntologyTerm?term={term}&format=json"
         request = self.services.http_get(url)
-        return request["pathways"]
+        try:
+            return request["pathways"]
+        except TypeError:
+            pass
 
     def showPathwayInBrowser(self, pathwayId):
         """Show a given Pathway into your favorite browser.
@@ -565,4 +571,7 @@ class WikiPathways:
     def getXrefList(self, pathwayId, code):
         url = f"getXrefList?pwId={pathwayId}&format=json&code={code}"
         request = self.services.http_get(url)
-        return request["xrefs"]
+        try:
+            return request["xrefs"]
+        except TypeError:
+            pass

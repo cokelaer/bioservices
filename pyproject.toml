@@ -92,6 +92,9 @@ sphinx-rtd-theme = "^2.0.0"
 sphinx-gallery = "^0.15.0"
 
 
+[tool.ruff.lint.per-file-ignores]
+"src/bioservices/__init__.py" = ["F401"]
+
 [tool.pytest.ini_options]
 addopts = "--timeout=30"
 markers = [

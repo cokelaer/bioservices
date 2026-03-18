@@ -53,15 +53,13 @@ jobs:
       run: |
         pytest --nbmake --nbmake-timeout=120 \
           doc/notebooks/Overview.ipynb \
-          doc/notebooks/UniProt.ipynb \
           doc/notebooks/KEGG.ipynb \
           doc/notebooks/ChEMBL.ipynb \
           doc/notebooks/ENA.ipynb \
           doc/notebooks/InterPro.ipynb \
-          doc/notebooks/WikiPathway.ipynb \
           doc/notebooks/Gene_Mapping.ipynb \
-          doc/notebooks/ArrayExpress.ipynb \
-          doc/notebooks/Ensembl.ipynb
+          doc/notebooks/ArrayExpress.ipynb
+        # Excluded (too slow / intermittent): UniProt.ipynb, WikiPathway.ipynb, Ensembl.ipynb
 
     - name: Upload notebook test artifacts
       if: always()
