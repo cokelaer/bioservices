@@ -3,7 +3,8 @@ name: Trigger All Workflows
 on:
   workflow_dispatch:
 
-permissions: {}
+permissions:
+  contents: read
 
 jobs:
   ci:
