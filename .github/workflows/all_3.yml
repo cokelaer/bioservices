@@ -1,0 +1,30 @@
+name: Trigger Workflows Batch 3
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  muscle:
+    uses: ./.github/workflows/muscle.yml
+  mygeneinfo:
+    uses: ./.github/workflows/mygeneinfo.yml
+  ncbiblast:
+    uses: ./.github/workflows/ncbiblast.yml
+  omicsdi:
+    uses: ./.github/workflows/omicsdi.yml
+  omnipath:
+    uses: ./.github/workflows/omnipath.yml
+  panther:
+    uses: ./.github/workflows/panther.yml
+  pathwaycommons:
+    uses: ./.github/workflows/pathwaycommons.yml
+  pdb:
+    uses: ./.github/workflows/pdb.yml
+  pdbe:
+    uses: ./.github/workflows/pdbe.yml
+  pfam:
+    uses: ./.github/workflows/pfam.yml

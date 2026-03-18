@@ -1,0 +1,30 @@
+name: Trigger Workflows Batch 2
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cog:
+    uses: ./.github/workflows/cog.yml
+  dbfetch:
+    uses: ./.github/workflows/dbfetch.yml
+  ena:
+    uses: ./.github/workflows/ena.yml
+  ensembl:
+    uses: ./.github/workflows/ensembl.yml
+  eutils:
+    uses: ./.github/workflows/eutils.yml
+  eva:
+    uses: ./.github/workflows/eva.yml
+  geo:
+    uses: ./.github/workflows/geo.yml
+  hgnc:
+    uses: ./.github/workflows/hgnc.yml
+  intact_complex:
+    uses: ./.github/workflows/intact_complex.yml
+  kegg:
+    uses: ./.github/workflows/kegg.yml
