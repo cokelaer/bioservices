@@ -159,6 +159,9 @@ class BioModels:
 
         res = self.services.http_get("model/download/{}".format(model_id), params=params)
 
+        if not hasattr(res, "content"):
+            return
+
         if filename:
             self.services.logging.info("Saving {}".format(filename))
             if output_filename is None:

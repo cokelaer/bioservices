@@ -1,4 +1,3 @@
-from . import fasta
-from .fasta import *
-
-from . import peptides
+from . import fasta, peptides
+from .fasta import FASTA, MultiFASTA
+from .peptides import Peptides

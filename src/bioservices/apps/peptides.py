@@ -1,5 +1,8 @@
-from bioservices.uniprot import UniProt
 import re
+
+from bioservices.uniprot import UniProt
+
+__all__ = ["Peptides"]
 
 
 class Peptides(object):
@@ -27,7 +30,6 @@ class Peptides(object):
         seq = self.u.get_fasta(uniprot_name)
         seq = "".join(seq.split("\n")[1:])
         return seq
-
 
     def get_phosphosite_position(self, uniprot_name, peptide):
         if uniprot_name not in self.sequences.keys():

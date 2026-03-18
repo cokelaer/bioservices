@@ -24,6 +24,10 @@ def biomodels():
     return BioModels(verbose=False)
 
 
+_xfail_403 = pytest.mark.xfail(reason="BioModels API returns HTTP 403 from CI environments", strict=False)
+
+
+@_xfail_403
 def test_get_model(biomodels):
     res = biomodels.get_model("BIOMD0000000100")
     assert res["submissionId"] == "MODEL4589754842"
@@ -32,11 +36,13 @@ def test_get_model(biomodels):
         biomodels.get_model("BIOMD0000000100", frmt="dummy")
 
 
+@_xfail_403
 def test_get_model_files(biomodels):
     res = biomodels.get_model_files(modelID)
     assert "main" in res.keys()
 
 
+@_xfail_403
 def test_get_model_download(biomodels):
     with TempFile(suffix=".zip") as fout:
         biomodels.get_model_download(modelID, output_filename=fout.name)
@@ -46,6 +52,7 @@ def test_get_model_download(biomodels):
         biomodels.get_model_download(modelID, filename="BIOMD0000000100.png", output_filename=fout.name)
 
 
+@_xfail_403
 def test_get_p2m_representative(biomodels):
     models = biomodels.get_p2m_missing()
     modelID = models[0]
@@ -53,6 +60,7 @@ def test_get_p2m_representative(biomodels):
     assert res["requestedModelId"] == modelID
 
 
+@_xfail_403
 def test_search(biomodels):
 
     res = biomodels.search("XXXXXXXXXXXXX")
@@ -81,6 +89,7 @@ def test_search_parameters(biomodels):
     biomodels.search_parameter("MAPK", size=100, sort="entity")
 
 
+@_xfail_403
 def test_get_p2m_representatives(biomodels):
     models = "BMID000000112902,BMID000000009880,BMID000000027397"
     res = biomodels.get_p2m_representatives(models)
@@ -91,6 +100,7 @@ def test_get_p2m_representatives(biomodels):
     assert sorted(models) == sorted(res.keys())
 
 
+@_xfail_403
 def test_get_pdgsmm_representative(biomodels):
     models = biomodels.get_pdgsmm_missing()
     modelID = models[0]
@@ -98,6 +108,7 @@ def test_get_pdgsmm_representative(biomodels):
     assert res["requestedModelId"] == modelID
 
 
+@_xfail_403
 def test_get_pdgsmm_representatives(biomodels):
     models = "MODEL1707110145,MODEL1707112456,MODEL1707115900"
     res = biomodels.get_pdgsmm_representatives(models)
