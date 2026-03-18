@@ -1,6 +1,7 @@
 name: intact_complex Testing
 
 on:
+  workflow_call:
   workflow_dispatch:
   push:
     branches:

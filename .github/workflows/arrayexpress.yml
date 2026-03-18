@@ -1,6 +1,7 @@
 name: arrayexpress Testing
 
 on:
+  workflow_call:
   workflow_dispatch:
   push:
     branches:
