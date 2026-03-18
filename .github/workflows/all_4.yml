@@ -1,0 +1,32 @@
+name: Trigger Workflows Batch 4
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pride:
+    uses: ./.github/workflows/pride.yml
+  proteins:
+    uses: ./.github/workflows/proteins.yml
+  pubchem:
+    uses: ./.github/workflows/pubchem.yml
+  quickgo:
+    uses: ./.github/workflows/quickgo.yml
+  reactome:
+    uses: ./.github/workflows/reactome.yml
+  rhea:
+    uses: ./.github/workflows/rhea.yml
+  seqret:
+    uses: ./.github/workflows/seqret.yml
+  string:
+    uses: ./.github/workflows/string.yml
+  unichem:
+    uses: ./.github/workflows/unichem.yml
+  uniprot:
+    uses: ./.github/workflows/uniprot.yml
+  wikipathway:
+    uses: ./.github/workflows/wikipathway.yml

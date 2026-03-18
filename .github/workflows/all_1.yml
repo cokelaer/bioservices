@@ -1,0 +1,30 @@
+name: Trigger Workflows Batch 1
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+  notebooks:
+    uses: ./.github/workflows/notebooks.yml
+  arrayexpress:
+    uses: ./.github/workflows/arrayexpress.yml
+  bigg:
+    uses: ./.github/workflows/bigg.yml
+  biocontainers:
+    uses: ./.github/workflows/biocontainers.yml
+  biodbnet:
+    uses: ./.github/workflows/biodbnet.yml
+  biomart:
+    uses: ./.github/workflows/biomart.yml
+  biomodels:
+    uses: ./.github/workflows/biomodels.yml
+  chebi:
+    uses: ./.github/workflows/chebi.yml
+  chembl:
+    uses: ./.github/workflows/chembl.yml
