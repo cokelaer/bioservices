@@ -31,7 +31,6 @@ services = [
     "quickgo",
     "reactome",
     "rhea",
-    "rnaseq_ebi",
     "seqret",
     "unichem",
     "uniprot",
