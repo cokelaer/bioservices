@@ -81,6 +81,10 @@ def plot_commits_over_time() -> None:
         [line.strip()[:10] for line in raw.splitlines() if line.strip()],
         errors="coerce",
     ).dropna()
+    if len(dates) == 0:
+        print("  [warn] no valid dates in git log – skipping commits_over_time")
+        return
+
     series = (
         pd.Series(1, index=dates)
         .resample("ME")
@@ -89,39 +93,11 @@ def plot_commits_over_time() -> None:
     )
     rolling = series.rolling(6, min_periods=1).mean()
 
-    # Cap y-axis at the 97th percentile so that a single large spike (e.g. an
-    # AI-assisted burst) does not compress all other activity into a flat
-    # baseline.  Bars that exceed the cap are drawn with hatching and annotated.
-    positive_vals = series.values[series.values > 0]
-    if len(positive_vals) == 0:
-        print("  [warn] no positive commit counts – skipping commits_over_time")
-        return
-    cap = float(np.percentile(positive_vals, 97)) * 1.3
-    cap = max(cap, 50)   # never cap below 50
-    ymax = cap * 1.08
+    ymax = series.max() * 1.15
 
     fig, ax = plt.subplots(figsize=(14, 4))
-
-    # Draw normal bars; clip overflowing bars and annotate them
-    bar_vals = series.values.copy()
-    overflow = bar_vals > cap
-    bar_vals_clipped = np.where(overflow, cap, bar_vals)
-
-    ax.bar(series.index, bar_vals_clipped, width=20, color="#4C72B0",
+    ax.bar(series.index, series.values, width=20, color="#4C72B0",
            alpha=0.55, label="Monthly commits")
-
-    # Hatched top-cap pattern + annotation for overflow bars
-    for idx in np.where(overflow)[0]:
-        ax.bar(series.index[idx], cap, width=20, color="#4C72B0",
-               alpha=0.75, hatch="////", edgecolor="#4C72B0")
-        ax.annotate(
-            f"{int(series.values[idx])}",
-            xy=(series.index[idx], cap),
-            xytext=(0, 4), textcoords="offset points",
-            ha="center", va="bottom", fontsize=8, color="#333",
-            fontweight="bold",
-        )
-
     ax.plot(rolling.index, rolling.values, color="#DD8452",
             linewidth=2, label="6-month rolling avg")
 
@@ -281,12 +257,9 @@ def plot_services_timeline() -> None:
     services = sorted(_SERVICES, key=lambda x: (x[1], x[2]))
     categories = sorted(set(s[1] for s in services))
 
-    # Extra bottom margin for the legend
+    # Extra bottom margin is no longer needed — legend is inside the axes
     fig_height = max(8, len(services) * 0.36 + 1.5)
     fig, ax = plt.subplots(figsize=(14, fig_height))
-
-    # Reserve bottom space for the legend
-    fig.subplots_adjust(bottom=0.18)
 
     ARROW_EXTRA = 0.55   # how far beyond END_YEAR the arrow tip extends
     BAR_END     = END_YEAR + 0.2  # where active bars visually stop (arrow starts)
@@ -321,7 +294,7 @@ def plot_services_timeline() -> None:
             )
 
         yticks.append(i)
-        ylabels.append(name.replace(".py", ""))
+        ylabels.append(name.replace(".py", "").capitalize())
 
     ax.set_yticks(yticks)
     ax.set_yticklabels(ylabels, fontsize=9.5)
@@ -334,15 +307,14 @@ def plot_services_timeline() -> None:
     ax.grid(axis="x", alpha=0.3)
     ax.invert_yaxis()
 
-    # Legend for categories — 4 columns, larger font, placed below the chart
+    # Legend for categories — 4 columns, larger font, placed inside lower-left
     legend_patches = [
         mpatches.Patch(color=_CATEGORY_COLORS[c], label=c, alpha=0.85)
         for c in categories if c in _CATEGORY_COLORS
     ]
     ax.legend(
         handles=legend_patches,
-        loc="upper center",
-        bbox_to_anchor=(0.5, -0.10),
+        loc="lower left",
         fontsize=10,
         ncol=4,
         title="Category",
@@ -554,6 +526,10 @@ def plot_codebase_growth() -> None:
     # Shared x-axis formatting (applied to bottom axis which owns the ticks)
     ax_bot.xaxis.set_major_locator(mdates.YearLocator())
     ax_bot.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+    # Ensure the x-axis spans the full project history
+    x_start = df["date"].min() - pd.DateOffset(months=6)
+    x_end   = df["date"].max() + pd.DateOffset(months=6)
+    ax_bot.set_xlim(x_start, x_end)
 
     # Y-axis labels
     ax_top.set_ylabel("Python lines of code", fontsize=11)
