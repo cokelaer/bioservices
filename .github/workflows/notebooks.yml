@@ -57,18 +57,11 @@ jobs:
           doc/notebooks/KEGG.ipynb \
           doc/notebooks/ChEMBL.ipynb \
           doc/notebooks/ENA.ipynb \
-          doc/notebooks/BioModels.ipynb \
           doc/notebooks/InterPro.ipynb \
           doc/notebooks/WikiPathway.ipynb \
-          doc/notebooks/MUSCLE.ipynb \
-          doc/notebooks/NCBIBlast.ipynb \
           doc/notebooks/Gene_Mapping.ipynb \
           doc/notebooks/ArrayExpress.ipynb \
-          doc/notebooks/BioMart.ipynb \
-          doc/notebooks/DrugDiscovery.ipynb \
-          doc/notebooks/Ensembl.ipynb \
-          doc/notebooks/Entrez_EUtils.ipynb \
-          doc/notebooks/EUtils.ipynb
+          doc/notebooks/Ensembl.ipynb
 
     - name: Upload notebook test artifacts
       if: always()

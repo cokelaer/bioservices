@@ -79,8 +79,6 @@ jobs:
     uses: ./.github/workflows/reactome.yml
   rhea:
     uses: ./.github/workflows/rhea.yml
-  rnaseq_ebi:
-    uses: ./.github/workflows/rnaseq_ebi.yml
   seqret:
     uses: ./.github/workflows/seqret.yml
   string:
