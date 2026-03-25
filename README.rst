@@ -277,6 +277,11 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.16.0    * **New** ``ncbiblastapi`` module: wraps NCBI's own BLAST URL API,
+            submitting jobs directly to NCBI (``blastn``, ``blastp``,
+            ``blastx``, ``tblastn``, ``tblastx``) with support for NCBI
+            databases (``nt``, ``nr``, ``refseq_genomic``, …) and optional
+            API key for higher rate limits
 1.15.0    * **Drop WSDL support**: ``WSDLService`` class and ``suds-community``
             dependency removed — all active services now use REST exclusively
           * **New** ``HTTPResponseError`` type: HTTP errors are now returned as

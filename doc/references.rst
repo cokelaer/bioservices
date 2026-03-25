@@ -194,6 +194,14 @@ NCBIblast
     :undoc-members:
     :synopsis:
 
+NCBIBlastAPI
+============
+
+.. automodule:: bioservices.ncbiblastapi
+    :members:
+    :undoc-members:
+    :synopsis:
+
 OmniPath Commons
 =========================
 

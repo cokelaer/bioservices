@@ -62,6 +62,7 @@ from . import (
     muscle,
     mygeneinfo,
     ncbiblast,
+    ncbiblastapi,
     omicsdi,
     omnipath,
     panther,
@@ -102,6 +103,7 @@ from .kegg import *
 from .muscle import *
 from .mygeneinfo import *
 from .ncbiblast import *
+from .ncbiblastapi import *
 from .omicsdi import OmicsDI
 from .omnipath import *
 from .panther import *
