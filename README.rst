@@ -223,6 +223,8 @@ mygeneinfo            .. image:: https://github.com/cokelaer/bioservices/actions
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/mygeneinfo.yml
 ncbiblast             .. image:: https://github.com/cokelaer/bioservices/actions/workflows/ncbiblast.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/ncbiblast.yml
+ncbiblastapi          .. image:: https://github.com/cokelaer/bioservices/actions/workflows/ncbiblastapi.yml/badge.svg
+                         :target: https://github.com/cokelaer/bioservices/actions/workflows/ncbiblastapi.yml
 omicsdi               .. image:: https://github.com/cokelaer/bioservices/actions/workflows/omicsdi.yml/badge.svg
                          :target: https://github.com/cokelaer/bioservices/actions/workflows/omicsdi.yml
 omnipath              .. image:: https://github.com/cokelaer/bioservices/actions/workflows/omnipath.yml/badge.svg
