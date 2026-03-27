@@ -223,14 +223,18 @@ class NCBIBlastAPI:
         response.raise_for_status()
         return response.text
 
-    def wait(self, rid, rtoe=None):
+    def wait(self, rid, rtoe=None, timeout=600):
         """Block until the job identified by *rid* is finished.
 
         :param str rid: request ID returned by :meth:`run`.
         :param int rtoe: estimated wait time in seconds returned by
             :meth:`run`.  When provided, the first poll is delayed by
             *rtoe* seconds so NCBI is not hit unnecessarily early.
-        :returns: final status string (``"READY"`` or ``"FAILED"``).
+        :param int timeout: maximum number of seconds to wait before giving
+            up and returning ``"TIMEOUT"`` (default: 600 s / 10 min).
+            Set to ``None`` to wait indefinitely.
+        :returns: final status string (``"READY"``, ``"FAILED"``,
+            ``"UNKNOWN"``, or ``"TIMEOUT"``).
         :rtype: str
 
         """
@@ -238,12 +242,17 @@ class NCBIBlastAPI:
             self.services.logging.info(f"Waiting {rtoe}s before first poll (RTOE from NCBI)…")
             time.sleep(max(rtoe, self.check_interval))
 
-        while True:
+        elapsed = 0
+        while timeout is None or elapsed < timeout:
             status = self.get_status(rid)
-            self.services.logging.info(f"Job {rid}: {status}")
+            self.services.logging.info(f"Job {rid}: {status} ({elapsed}s elapsed)")
             if status in ("READY", "FAILED", "UNKNOWN"):
                 return status
             time.sleep(self.check_interval)
+            elapsed += self.check_interval
+
+        self.services.logging.warning(f"Job {rid} timed out after {timeout}s.")
+        return "TIMEOUT"
 
     # ------------------------------------------------------------------
     # Private helpers
