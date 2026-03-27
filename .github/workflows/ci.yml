@@ -48,5 +48,5 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest -n 1 --cov-report term --cov=bioservices.services --cov bioservices.xmltools test/test_*py
+        pytest -n auto --dist worksteal --cov-report term --cov=bioservices.services --cov bioservices.xmltools test/test_*py
 

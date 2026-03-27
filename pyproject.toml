@@ -100,6 +100,7 @@ addopts = "--timeout=30"
 markers = [
     "notebook: marks tests as notebook execution tests (deselect with '-m \"not notebook\"')",
     "flaky: marks tests that may fail intermittently due to network or service issues",
+    "network: marks tests that require a live network connection to an external service",
 ]
 
 

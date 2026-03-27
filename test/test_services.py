@@ -1,6 +1,7 @@
 import binascii
 import os
 import tempfile
+import time
 from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError, URLError
 
@@ -8,7 +9,13 @@ import pytest
 import requests
 from requests.models import Response
 
-from bioservices.services import REST, BioServicesError, HTTPResponseError, Service
+from bioservices.services import (
+    REST,
+    BioServicesError,
+    HTTPResponseError,
+    RESTbase,
+    Service,
+)
 
 
 class test_Service(Service):
@@ -191,20 +198,6 @@ def test_interpret_bad_status_returns_http_response_error(rest):
 # ---------------------------------------------------------------------------
 
 
-@pytest.fixture
-def svc():
-    with patch("bioservices.services.urlopen", return_value=MagicMock()):
-        s = Service("testsvc", "http://example.com/api", verbose=False)
-    return s
-
-
-@pytest.fixture
-def rest():
-    with patch("bioservices.services.urlopen", return_value=MagicMock()):
-        r = REST("testrest", "http://example.com/api", verbose=False)
-    return r
-
-
 def test_service_str(svc):
     assert "testsvc" in str(svc)
 
@@ -337,3 +330,233 @@ def test_rest_http_get_list_sync(rest):
     with patch.object(rest, "get_one", return_value={}) as mock_get:
         results = rest.http_get(["q1", "q2"], frmt="json")
     assert len(results) == 2
+
+
+# ---------------------------------------------------------------------------
+# REST.http_get — single-query and async paths
+# ---------------------------------------------------------------------------
+
+
+def test_rest_http_get_single_query(rest, mocker):
+    """Single string query should build headers and delegate to get_one."""
+    mock_get_one = mocker.patch.object(rest, "get_one", return_value={"result": "ok"})
+    result = rest.http_get("proteins/P12345", frmt="json")
+    assert result == {"result": "ok"}
+    mock_get_one.assert_called_once()
+
+
+def test_rest_http_get_large_list_uses_async(rest, mocker):
+    """Lists larger than ASYNC_THRESHOLD (10) should use the async path."""
+    queries = [f"q{i}" for i in range(11)]
+    mock_async = mocker.patch.object(rest, "get_async", return_value=[{}] * 11)
+    rest.http_get(queries, frmt="json")
+    mock_async.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# REST.get_headers — parametrize over content types
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "content,expected_mime",
+    [
+        ("json", "application/json"),
+        ("xml", "application/xml"),
+        ("txt", "text/plain"),
+        ("text", "text/plain"),
+        ("fasta", "text/x-fasta"),
+        ("bed", "text/x-bed"),
+        ("png", "image/png"),
+        ("gff3", "text/x-gff3"),
+        ("yaml", "text/x-yaml"),
+        ("default", "application/x-www-form-urlencoded"),
+    ],
+)
+def test_rest_get_headers_content_types(rest, content, expected_mime):
+    headers = rest.get_headers(content=content)
+    assert headers["Accept"] == expected_mime
+    assert headers["Content-Type"] == expected_mime
+    assert "User-Agent" in headers
+
+
+# ---------------------------------------------------------------------------
+# REST._build_url — parametrize over URL patterns
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "query,expected",
+    [
+        (None, "http://example.com/api"),
+        ("proteins/P12345", "http://example.com/api/proteins/P12345"),
+        ("http://other.com/resource", "http://other.com/resource"),
+        ("https://secure.com/data", "https://secure.com/data"),
+    ],
+)
+def test_rest_build_url_parametrized(rest, query, expected):
+    assert rest._build_url(query) == expected
+
+
+# ---------------------------------------------------------------------------
+# HTTPResponseError — parametrize hint messages for all known status codes
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "status_code,hint_fragment",
+    [
+        (400, "query parameters"),
+        (401, "Authentication"),
+        (403, "Access denied"),
+        (404, "resource was not found"),
+        (408, "timed out"),
+        (429, "Slow down"),
+        (500, "Internal server error"),
+        (503, "Service unavailable"),
+        (418, "Check the input"),  # unknown code → fallback hint
+    ],
+)
+def test_http_response_error_hint_messages(status_code, hint_fragment):
+    e = HTTPResponseError(status_code, reason="test", url="http://x.com")
+    with pytest.raises(BioServicesError, match=hint_fragment):
+        e["key"]
+
+
+# ---------------------------------------------------------------------------
+# REST._calls — rate-limiting behaviour
+# ---------------------------------------------------------------------------
+
+
+def test_calls_first_call_no_sleep(rest, mocker):
+    """The very first call (last_call == 0) should never sleep."""
+    rest._last_call = 0
+    mock_sleep = mocker.patch("bioservices.services.time.sleep")
+    rest._calls()
+    mock_sleep.assert_not_called()
+    assert rest._last_call > 0
+
+
+def test_calls_rate_limiting_sleeps(rest, mocker):
+    """A call made immediately after another should trigger a sleep."""
+    rest.requests_per_sec = 1  # time_lapse = 1.0 s
+    rest._last_call = time.time()  # pretend last call was just now
+    mock_sleep = mocker.patch("bioservices.services.time.sleep")
+    rest._calls()
+    mock_sleep.assert_called_once()
+
+
+def test_calls_no_sleep_when_sufficient_gap(rest, mocker):
+    """A call made long after the previous one should not sleep."""
+    rest.requests_per_sec = 10  # time_lapse = 0.1 s
+    rest._last_call = time.time() - 2.0  # 2 seconds ago — well past the limit
+    mock_sleep = mocker.patch("bioservices.services.time.sleep")
+    rest._calls()
+    mock_sleep.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# REST.clear_cache
+# ---------------------------------------------------------------------------
+
+
+def test_rest_clear_cache(rest, mocker):
+    mock_clear = mocker.patch("requests_cache.clear")
+    rest.clear_cache()
+    mock_clear.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# REST._get_all_urls
+# ---------------------------------------------------------------------------
+
+
+def test_rest_get_all_urls(rest):
+    keys = ["proteins/P12345", "proteins/P67890"]
+    urls = list(rest._get_all_urls(keys))
+    assert urls == [
+        "http://example.com/api/proteins/P12345",
+        "http://example.com/api/proteins/P67890",
+    ]
+
+
+# ---------------------------------------------------------------------------
+# REST.post_one / http_post
+# ---------------------------------------------------------------------------
+
+
+def test_rest_http_post_delegates_to_post_one(rest, mocker):
+    mock_post_one = mocker.patch.object(rest, "post_one", return_value={"ok": True})
+    rest.http_post("submit", data={"seq": "ATGC"}, frmt="json")
+    mock_post_one.assert_called_once()
+
+
+def test_rest_http_post_custom_headers_preserved(rest, mocker):
+    mock_post_one = mocker.patch.object(rest, "post_one", return_value={"ok": True})
+    custom = {"X-Custom": "val"}
+    rest.http_post("submit", headers=custom, frmt="json")
+    call_kwargs = mock_post_one.call_args[1]
+    assert call_kwargs["headers"] == custom
+
+
+def test_rest_post_one_bytes_result_decoded(rest, mocker):
+    mocker.patch.object(rest, "_calls")
+    mock_resp = MagicMock(spec=Response)
+    mocker.patch.object(rest.session, "post", return_value=mock_resp)
+    mocker.patch.object(rest, "_interpret_returned_request", return_value=b"hello")
+    result = rest.post_one(query="submit", frmt="xml")
+    assert result == "hello"
+
+
+def test_rest_post_one_non_bytes_result_returned_as_is(rest, mocker):
+    mocker.patch.object(rest, "_calls")
+    mock_resp = MagicMock(spec=Response)
+    mocker.patch.object(rest.session, "post", return_value=mock_resp)
+    mocker.patch.object(rest, "_interpret_returned_request", return_value={"key": "val"})
+    result = rest.post_one(query="submit", frmt="json")
+    assert result == {"key": "val"}
+
+
+def test_rest_post_one_exception_returns_none(rest, mocker):
+    mocker.patch.object(rest, "_calls")
+    mocker.patch.object(rest.session, "post", side_effect=Exception("network error"))
+    result = rest.post_one(query="submit", frmt="json")
+    assert result is None
+
+
+# ---------------------------------------------------------------------------
+# REST.delete_one / http_delete
+# ---------------------------------------------------------------------------
+
+
+def test_rest_delete_one_bytes_result_decoded(rest, mocker):
+    mocker.patch.object(rest, "_calls")
+    mock_resp = MagicMock(spec=Response)
+    mocker.patch.object(rest.session, "delete", return_value=mock_resp)
+    mocker.patch.object(rest, "_interpret_returned_request", return_value=b"deleted")
+    result = rest.delete_one(query="resource/123", frmt="json")
+    assert result == "deleted"
+
+
+def test_rest_delete_one_exception_returns_none(rest, mocker):
+    mocker.patch.object(rest, "_calls")
+    mocker.patch.object(rest.session, "delete", side_effect=Exception("network error"))
+    result = rest.delete_one(query="resource/123", frmt="json")
+    assert result is None
+
+
+def test_rest_http_delete_delegates_to_delete_one(rest, mocker):
+    mock_delete_one = mocker.patch.object(rest, "delete_one", return_value="ok")
+    rest.http_delete("resource/123", frmt="json")
+    mock_delete_one.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# RESTbase — abstract HTTP methods raise NotImplementedError
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("method", ["http_get", "http_post", "http_put", "http_delete"])
+def test_restbase_abstract_methods_raise(restbase, method):
+    with pytest.raises(NotImplementedError):
+        getattr(restbase, method)()
