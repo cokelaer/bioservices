@@ -19,6 +19,7 @@ services = [
     "muscle",
     "mygeneinfo",
     "ncbiblast",
+    "ncbiblastapi",
     "omicsdi",
     "omnipath",
     "panther",

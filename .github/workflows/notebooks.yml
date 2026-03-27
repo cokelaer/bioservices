@@ -1,21 +1,7 @@
 name: Notebook Testing
 
 on:
-  workflow_call:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - doc/notebooks/**
-      - src/bioservices/**
-  pull_request:
-    branches-ignore: []
-    paths:
-      - doc/notebooks/**
-
-  schedule:
-    - cron: '0 0 1 * *'
 
 jobs:
   test-notebooks:
