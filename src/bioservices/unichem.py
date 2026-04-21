@@ -115,6 +115,18 @@ class UniChem:
         self._data_source = _data["sources"]
         self.source_ids = {x["name"]: x["sourceID"] for x in self._data_source}
 
+    @staticmethod
+    def _http_response_to_error(res):
+        """Convert an HTTP error response (integer status code) to a dict with an 'error' key.
+
+        :param res: the response from :meth:`~bioservices.REST.http_get` or similar.
+        :return: ``{"error": "<HTTP status and reason>"}`` if *res* is an integer (i.e. an
+            ``HTTPResponseError``), otherwise *res* is returned unchanged.
+        """
+        if isinstance(res, int):
+            return {"error": str(res)}
+        return res
+
     def get_id_from_name(self, name):
         """Return the ID of a source given its name.
 
@@ -162,12 +174,11 @@ class UniChem:
             data = {}
             for x in inchikey:
                 res = self.services.http_get(f"rest/inchi/{x}")
-                data[x] = {} if res == 500 else res
+                data[x] = self._http_response_to_error(res)
             return data
         else:
             res = self.services.http_get(f"rest/inchi/{inchikey}")
-            res = {} if res == 500 else res
-            return res
+            return self._http_response_to_error(res)
 
     def get_sources_by_inchikey(self, inchikey):
         """Get sources by inchikey
@@ -184,12 +195,11 @@ class UniChem:
             data = {}
             for x in inchikey:
                 res = self.services.http_get(f"rest/inchikey/{x}")
-                data[x] = {} if res == 500 else res
+                data[x] = self._http_response_to_error(res)
             return data
         else:
             res = self.services.http_get(f"rest/inchikey/{inchikey}")
-            res = {} if res == 500 else res
-            return res
+            return self._http_response_to_error(res)
 
     def get_sources_by_inchikey_verbose(self, inchikey):
         """Get sources by inchikey
@@ -206,12 +216,11 @@ class UniChem:
             data = {}
             for x in inchikey:
                 res = self.services.http_get(f"rest/verbose_inchikey/{x}")
-                data[x] = {} if res == 500 else res
+                data[x] = self._http_response_to_error(res)
             return data
         else:
             res = self.services.http_get(f"rest/verbose_inchikey/{inchikey}")
-            res = {} if res == 500 else res
-            return res
+            return self._http_response_to_error(res)
 
     def get_all_src_ids(self):
         """Obtain all src_ids of sources available in UniChem
