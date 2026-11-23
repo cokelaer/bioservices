@@ -8,10 +8,10 @@ import errno
 import os
 import shutil
 
-import appdirs
+import platformdirs
 from easydev import DynamicConfigParser, underline
 
-__all__ = ["defaultParams", "BioServicesConfig"]
+__all__ = ["defaultParams", "BioServicesConfig", "BioServicesAppDirs"]
 
 
 # first item if the value
@@ -42,10 +42,56 @@ defaultParams = {
 }
 
 
+class BioServicesAppDirs:
+    """Platform config/cache directories, with user-defined overrides.
+
+    The defaults come from :func:`platformdirs.user_config_dir` and
+    :func:`platformdirs.user_cache_dir`. Setting :attr:`user_config_dir` or
+    :attr:`user_cache_dir` to a path overrides them; setting them back to
+    ``None`` restores the platform default::
+
+        from bioservices.settings import BioServicesConfig
+        cfg = BioServicesConfig(user_config_dir="/my/custom/config")
+
+    or after construction::
+
+        cfg.appdirs.user_config_dir = "/my/custom/config"
+        cfg.init()  # re-read config from the new location
+
+    """
+
+    def __init__(self, appname):
+        self.appname = appname
+        self._user_config_dir = None
+        self._user_cache_dir = None
+
+    @property
+    def user_config_dir(self):
+        """Path to the user configuration directory (read/write)."""
+        if self._user_config_dir is not None:
+            return self._user_config_dir
+        return platformdirs.user_config_dir(self.appname)
+
+    @user_config_dir.setter
+    def user_config_dir(self, path):
+        self._user_config_dir = None if path is None else str(path)
+
+    @property
+    def user_cache_dir(self):
+        """Path to the user cache directory (read/write)."""
+        if self._user_cache_dir is not None:
+            return self._user_cache_dir
+        return platformdirs.user_cache_dir(self.appname)
+
+    @user_cache_dir.setter
+    def user_cache_dir(self, path):
+        self._user_cache_dir = None if path is None else str(path)
+
+
 class ConfigReadOnly(object):
     """A generic Config file handler
 
-    Uses appdirs from pypi to handle the XDG protocol
+    Uses platformdirs from pypi to handle the XDG protocol
 
     Read the configuration in the XDG directory. If not found, the
     config and cache directories are created. Then, reads the configuration
@@ -57,12 +103,23 @@ class ConfigReadOnly(object):
 
     """
 
-    def __init__(self, name=None, default_params={}):
+    def __init__(self, name=None, default_params=None, user_config_dir=None, user_cache_dir=None):
         """name is going to be the generic name of the config folder
 
         e.g., /home/user/.config/<name>/<name>.cfg
 
+        :param name: application name used to derive platform-specific config
+            and cache paths (required).
+        :param default_params: dictionary of default configuration parameters.
+        :param user_config_dir: optional path that overrides the platform
+            default for the configuration directory.  When provided the config
+            file will be read from (and written to) this directory instead of
+            the one returned by :mod:`platformdirs`.
+        :param user_cache_dir: optional path that overrides the platform
+            default for the cache directory.
         """
+        if default_params is None:
+            default_params = {}
         if name is None:
             raise Exception("Name parameter must be provided")
         else:
@@ -72,7 +129,11 @@ class ConfigReadOnly(object):
             self.params = copy.deepcopy(default_params)
 
             # useful tool to handle XDG config file, path and parameters
-            self.appdirs = appdirs.AppDirs(self.name)
+            self.appdirs = BioServicesAppDirs(self.name)
+            if user_config_dir is not None:
+                self.appdirs.user_config_dir = user_config_dir
+            if user_cache_dir is not None:
+                self.appdirs.user_cache_dir = user_cache_dir
 
             # useful tool to handle the config ini file
             self.config_parser = DynamicConfigParser()
@@ -266,8 +327,26 @@ class ConfigReadOnly(object):
 
 
 class BioServicesConfig(ConfigReadOnly):
-    def __init__(self):
-        super(BioServicesConfig, self).__init__(name="bioservices", default_params=defaultParams)
+    """Configuration of bioservices.
+
+    The config and cache directories default to the platform ones. They can be
+    overridden with the ``user_config_dir`` / ``user_cache_dir`` arguments or,
+    so that every service picks them up, with the ``BIOSERVICES_CONFIG_DIR``
+    and ``BIOSERVICES_CACHE_DIR`` environment variables. Arguments take
+    precedence over environment variables.
+    """
+
+    def __init__(self, user_config_dir=None, user_cache_dir=None):
+        if user_config_dir is None:
+            user_config_dir = os.environ.get("BIOSERVICES_CONFIG_DIR") or None
+        if user_cache_dir is None:
+            user_cache_dir = os.environ.get("BIOSERVICES_CACHE_DIR") or None
+        super(BioServicesConfig, self).__init__(
+            name="bioservices",
+            default_params=defaultParams,
+            user_config_dir=user_config_dir,
+            user_cache_dir=user_cache_dir,
+        )
 
     # some aliases
     def _get_caching(self):

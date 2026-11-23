@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 import time
+from pathlib import Path
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
@@ -13,7 +14,12 @@ from bioservices.chebi import _RELATION_TYPE_MAP, ChEBI, ChebiEntity
 from bioservices.chembl import ChEMBL
 from bioservices.rhea import Rhea
 from bioservices.services import REST, RESTbase, Service
-from bioservices.settings import BioServicesConfig, ConfigReadOnly, defaultParams
+from bioservices.settings import (
+    BioServicesAppDirs,
+    BioServicesConfig,
+    ConfigReadOnly,
+    defaultParams,
+)
 from bioservices.string import STRING
 
 # ---------------------------------------------------------------------------
@@ -1260,3 +1266,81 @@ class TestSTRING:
         assert params["required_score"] == 500
         assert "background_string_identifiers" in params
         assert "caller_identity" in params
+
+
+# ---------------------------------------------------------------------------
+# BioServicesAppDirs
+# ---------------------------------------------------------------------------
+
+
+class TestBioServicesAppDirs:
+    def test_default_returns_platformdirs_path(self):
+        import platformdirs
+
+        bd = BioServicesAppDirs("testapp")
+        assert bd.user_config_dir == platformdirs.user_config_dir("testapp")
+        assert bd.user_cache_dir == platformdirs.user_cache_dir("testapp")
+
+    def test_set_dirs(self):
+        bd = BioServicesAppDirs("testapp")
+        bd.user_config_dir = "/custom/config"
+        bd.user_cache_dir = "/custom/cache"
+        assert bd.user_config_dir == "/custom/config"
+        assert bd.user_cache_dir == "/custom/cache"
+
+    def test_reset_to_none_restores_default(self):
+        import platformdirs
+
+        bd = BioServicesAppDirs("testapp")
+        bd.user_config_dir = "/custom/config"
+        bd.user_config_dir = None
+        assert bd.user_config_dir == platformdirs.user_config_dir("testapp")
+
+    def test_accepts_pathlib(self):
+        bd = BioServicesAppDirs("testapp")
+        bd.user_config_dir = Path("/custom/config")
+        assert bd.user_config_dir == str(Path("/custom/config"))
+
+
+# ---------------------------------------------------------------------------
+# Custom config dir in BioServicesConfig / ConfigReadOnly
+# ---------------------------------------------------------------------------
+
+
+class TestCustomConfigDir:
+    def test_constructor_dirs(self, tmp_path):
+        cfg = BioServicesConfig(user_config_dir=str(tmp_path / "cfg"), user_cache_dir=str(tmp_path / "cache"))
+        assert cfg.user_config_dir == str(tmp_path / "cfg")
+        assert cfg.user_cache_dir == str(tmp_path / "cache")
+
+    def test_config_file_created_in_custom_dir(self, tmp_path):
+        cfg = BioServicesConfig(user_config_dir=str(tmp_path))
+        assert cfg.user_config_file_path.startswith(str(tmp_path))
+        assert os.path.isfile(cfg.user_config_file_path)
+
+    def test_reinit_reads_new_config_dir(self, tmp_path):
+        cfg = BioServicesConfig(user_config_dir=str(tmp_path / "a"))
+        assert cfg.TIMEOUT == 30
+        other = tmp_path / "b"
+        other.mkdir()
+        (other / "bioservices.cfg").write_text("[general]\ntimeout = 77\n")
+        cfg.appdirs.user_config_dir = str(other)
+        cfg.init()
+        assert cfg.TIMEOUT == 77
+
+    def test_environment_variables(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("BIOSERVICES_CONFIG_DIR", str(tmp_path / "cfg"))
+        monkeypatch.setenv("BIOSERVICES_CACHE_DIR", str(tmp_path / "cache"))
+        cfg = BioServicesConfig()
+        assert cfg.user_config_dir == str(tmp_path / "cfg")
+        assert cfg.user_cache_dir == str(tmp_path / "cache")
+
+    def test_argument_beats_environment(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("BIOSERVICES_CONFIG_DIR", str(tmp_path / "env"))
+        cfg = BioServicesConfig(user_config_dir=str(tmp_path / "arg"))
+        assert cfg.user_config_dir == str(tmp_path / "arg")
+
+    def test_service_uses_environment(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("BIOSERVICES_CONFIG_DIR", str(tmp_path))
+        svc = Service("dummy", url="http://example.org")
+        assert svc.settings.user_config_dir == str(tmp_path)
