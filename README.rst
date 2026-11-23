@@ -13,8 +13,8 @@ BIOSERVICES: access to biological web services programmatically
 .. image:: https://github.com/cokelaer/bioservices/actions/workflows/ci.yml/badge.svg
    :target: https://github.com/cokelaer/bioservices/actions/workflows/ci.yml
 
-.. image:: http://readthedocs.org/projects/bioservices/badge/?version=main
-    :target: http://bioservices.readthedocs.org/en/main/?badge=main
+.. image:: https://app.readthedocs.org/projects/bioservices/badge/?version=latest
+    :target: https://bioservices.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
 .. image:: https://static.pepy.tech/personalized-badge/bioservices?period=month&units=international_system&left_color=black&right_color=orange&left_text=Downloads
@@ -127,7 +127,7 @@ Examples::
     $ bioservices taxonomy --id 9606
     $ bioservices download-accession --accession FN433596.1
 
-Full CLI reference: `CLI documentation <http://bioservices.readthedocs.io/en/main/cli.html>`_
+Full CLI reference: `CLI documentation <https://bioservices.readthedocs.io/en/latest/cli.html>`_
 
 Notebooks
 =========
