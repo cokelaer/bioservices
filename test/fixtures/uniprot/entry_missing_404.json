@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "GET",
+    "params": null,
+    "url": "https://rest.uniprot.org/uniprotkb/A0A000A0A9.json"
+  },
+  "response": {
+    "body": {
+      "messages": [
+        "Resource not found"
+      ],
+      "url": "http://rest.uniprot.org/uniprotkb/A0A000A0A9"
+    },
+    "headers": {
+      "content-type": "application/json"
+    },
+    "reason": "Not Found",
+    "status_code": 404,
+    "truncated": false
+  }
+}

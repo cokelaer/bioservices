@@ -3,6 +3,7 @@ import pytest
 from bioservices.apps import download_fasta as df
 
 
+@pytest.mark.network
 @pytest.mark.flaky
 def test_download():
 

@@ -5,6 +5,7 @@ import pytest
 from bioservices.apps.fasta import FASTA, MultiFASTA
 
 
+@pytest.mark.network
 @pytest.mark.flaky
 def test_fasta():
     fasta = FASTA()
@@ -23,6 +24,7 @@ def test_fasta():
     fh.close()
 
 
+@pytest.mark.network
 @pytest.mark.flaky
 def test_multi_fasta():
     klass = MultiFASTA()

@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "GET",
+    "params": null,
+    "url": "https://rest.uniprot.org/uniprotkb/NOTAREALACCESSION.json"
+  },
+  "response": {
+    "body": {
+      "messages": [
+        "The 'accession' value has invalid format. It should be a valid UniProtKB accession"
+      ],
+      "url": "http://rest.uniprot.org/uniprotkb/NOTAREALACCESSION"
+    },
+    "headers": {
+      "content-type": "application/json"
+    },
+    "reason": "Bad Request",
+    "status_code": 400,
+    "truncated": false
+  }
+}

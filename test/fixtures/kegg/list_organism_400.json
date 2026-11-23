@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "params": null,
+    "url": "https://rest.kegg.jp/list/organism"
+  },
+  "response": {
+    "body": "",
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "reason": "Bad Request",
+    "status_code": 400,
+    "truncated": false
+  }
+}
