@@ -45,7 +45,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        poetry run pytest --cov-report term --cov=bioservices.seqret test/webservices/test_seqret.py
+        poetry run pytest --cov-report term --cov=bioservices test/webservices/test_seqret.py
 
 
 
