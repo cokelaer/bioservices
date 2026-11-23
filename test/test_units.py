@@ -1,4 +1,5 @@
 """Pure unit tests (no network calls) for ChEBI, ChEMBL, Rhea, Settings, Services, and STRING."""
+
 import errno
 import os
 import sys
@@ -13,7 +14,7 @@ from requests.models import Response
 from bioservices.chebi import _RELATION_TYPE_MAP, ChEBI, ChebiEntity
 from bioservices.chembl import ChEMBL
 from bioservices.rhea import Rhea
-from bioservices.services import REST, RESTbase, Service
+from bioservices.services import REST, BioServicesError, RESTbase, Service
 from bioservices.settings import (
     BioServicesAppDirs,
     BioServicesConfig,
@@ -634,17 +635,21 @@ class TestConfigReadOnlyBranches:
     def test_type_mismatch_casts_value(self):
         cfg = BioServicesConfig()
         # "5" is str, but general.max_retries expects int → cast int("5") = 5
-        with patch.object(cfg.config_parser, "read"), patch.object(
-            cfg.config_parser, "sections", return_value=["general"]
-        ), patch.object(cfg.config_parser, "section2dict", return_value={"max_retries": "5"}):
+        with (
+            patch.object(cfg.config_parser, "read"),
+            patch.object(cfg.config_parser, "sections", return_value=["general"]),
+            patch.object(cfg.config_parser, "section2dict", return_value={"max_retries": "5"}),
+        ):
             cfg.read_user_config_file_and_update_params()
         assert cfg.params["general.max_retries"][0] == 5
 
     def test_invalid_key_is_skipped(self):
         cfg = BioServicesConfig()
-        with patch.object(cfg.config_parser, "read"), patch.object(
-            cfg.config_parser, "sections", return_value=["general"]
-        ), patch.object(cfg.config_parser, "section2dict", return_value={"no_such_option": "value"}):
+        with (
+            patch.object(cfg.config_parser, "read"),
+            patch.object(cfg.config_parser, "sections", return_value=["general"]),
+            patch.object(cfg.config_parser, "section2dict", return_value={"no_such_option": "value"}),
+        ):
             cfg.read_user_config_file_and_update_params()  # must not raise
 
     def test_get_home_import_error_falls_back_to_env(self, monkeypatch):
@@ -673,8 +678,9 @@ class TestConfigReadOnlyBranches:
 
     def test_get_and_create_failure_returns_none(self):
         cfg = BioServicesConfig()
-        with patch("os.path.exists", return_value=False), patch.object(
-            cfg, "_mkdirs", side_effect=Exception("permission denied")
+        with (
+            patch("os.path.exists", return_value=False),
+            patch.object(cfg, "_mkdirs", side_effect=Exception("permission denied")),
         ):
             result = cfg._get_and_create("/nonexistent/path")
         assert result is None
@@ -833,17 +839,21 @@ class TestRESTSession:
 
     def test_delete_cache_user_confirms(self):
         r = _make_rest()
-        with patch("os.path.exists", return_value=True), patch("builtins.input", return_value="y"), patch(
-            "os.remove"
-        ) as mock_remove:
+        with (
+            patch("os.path.exists", return_value=True),
+            patch("builtins.input", return_value="y"),
+            patch("os.remove") as mock_remove,
+        ):
             r.delete_cache()
         mock_remove.assert_called_once()
 
     def test_delete_cache_user_declines(self):
         r = _make_rest()
-        with patch("os.path.exists", return_value=True), patch("builtins.input", return_value="n"), patch(
-            "os.remove"
-        ) as mock_remove:
+        with (
+            patch("os.path.exists", return_value=True),
+            patch("builtins.input", return_value="n"),
+            patch("os.remove") as mock_remove,
+        ):
             r.delete_cache()
         mock_remove.assert_not_called()
 
@@ -1344,3 +1354,45 @@ class TestCustomConfigDir:
         monkeypatch.setenv("BIOSERVICES_CONFIG_DIR", str(tmp_path))
         svc = Service("dummy", url="http://example.org")
         assert svc.settings.user_config_dir == str(tmp_path)
+
+
+# ---------------------------------------------------------------------------
+# KEGG: list/organism rejected with HTTP 400 (issue #349)
+# ---------------------------------------------------------------------------
+
+GENOME_LIST = "T01001\thsa; Homo sapiens (human)\nT01005\tptr; Pan troglodytes (chimpanzee)\n"
+ORGANISM_LIST = (
+    "T01001\thsa\tHomo sapiens (human)\tEukaryotes;Animals\nT01005\tptr\tPan troglodytes (chimpanzee)\tEukaryotes\n"
+)
+
+
+def _kegg_with_http(responses):
+    from bioservices.kegg import KEGG
+
+    k = KEGG()
+    k.services.http_get = MagicMock(side_effect=lambda url, frmt=None, **kw: responses[url])
+    return k
+
+
+def _http_400(url):
+    from bioservices.services import HTTPResponseError
+
+    return HTTPResponseError(400, "Bad Request", url)
+
+
+class TestKEGGOrganismFallback:
+    def test_organism_list_used_when_available(self):
+        k = _kegg_with_http({"list/organism": ORGANISM_LIST})
+        assert k.organismIds == ["hsa", "ptr"]
+        assert k.organismTnumbers == ["T01001", "T01005"]
+
+    def test_fallback_to_genome_on_http_400(self):
+        k = _kegg_with_http({"list/organism": _http_400("list/organism"), "list/genome": GENOME_LIST})
+        assert k.organismIds == ["hsa", "ptr"]
+        assert k.organismTnumbers == ["T01001", "T01005"]
+        assert k.lookfor_organism("human") == ["T01001 hsa Homo sapiens (human)"]
+
+    def test_clear_error_when_everything_fails(self):
+        k = _kegg_with_http({"list/organism": _http_400("list/organism"), "list/genome": _http_400("list/genome")})
+        with pytest.raises(BioServicesError):
+            k.organismIds

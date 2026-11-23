@@ -284,6 +284,9 @@ Version   Description
             ``BIOSERVICES_CONFIG_DIR`` and ``BIOSERVICES_CACHE_DIR`` environment
             variables (closes #180)
           * Use ``platformdirs`` instead of ``appdirs``
+          * ``KEGG``: fall back to ``list/genome`` when KEGG rejects ``list/organism``
+            with HTTP 400 (fixes ``organismIds``, #349), and raise a clear
+            ``BioServicesError`` instead of ``AttributeError`` on HTTP errors
           * Remove the upper version pins on ``numpy`` and ``easydev``
           * Tests calling live web services are skipped unless ``--network``
             is passed to pytest

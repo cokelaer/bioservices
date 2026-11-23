@@ -152,7 +152,7 @@ import copy
 import webbrowser
 
 from bioservices import logger
-from bioservices.services import REST, BioServicesError
+from bioservices.services import REST, BioServicesError, HTTPResponseError
 
 logger.name = __name__
 
@@ -273,6 +273,8 @@ class KEGG:
         if req.endswith("Ids"):
             db = req[0:-3]
             res = self.list(db)
+            if isinstance(res, HTTPResponseError):
+                raise BioServicesError("Could not retrieve the list of %s from KEGG: %s" % (db, res))
             if db in ["", ""]:
                 Ids = [x.split()[1] for x in res.split("\n") if len(x)]
             else:
@@ -445,7 +447,28 @@ class KEGG:
             url += "/" + organism
 
         res = self.services.http_get(url, "txt")
+        if query == "organism" and not organism and isinstance(res, HTTPResponseError):
+            res = self._list_organism_from_genome()
         return res
+
+    def _list_organism_from_genome(self):
+        """Fallback for ``list/organism``, which KEGG REST may reject with HTTP 400.
+
+        The ``list/genome`` endpoint provides the same T numbers and organism
+        codes. Its lines are converted to the layout of ``list/organism``
+        (``T number<TAB>code<TAB>name``), without the taxonomy column.
+        """
+        res = self.services.http_get("list/genome", "txt")
+        if isinstance(res, HTTPResponseError):
+            return res
+        lines = []
+        for line in res.split("\n"):
+            if not line.strip():
+                continue
+            tnumber, _, definition = line.partition("\t")
+            code, _, name = definition.partition(";")
+            lines.append("\t".join([tnumber.strip(), code.strip(), name.strip()]))
+        return "\n".join(lines)
 
     def find(self, database, query, option=None):
         """finds entries with matching query keywords or other query data in a given database
@@ -825,9 +848,11 @@ class KEGG:
     databases = property(_get_db, doc="Returns list of valid KEGG databases.")
 
     def _get_database(self, dbname, mode=0):
-        res = self.list(dbname)
         if mode not in [0, 1]:
             raise ValueError("mode must be 0 or 1")
+        res = self.list(dbname)
+        if isinstance(res, HTTPResponseError):
+            raise BioServicesError("Could not retrieve the list of %s from KEGG: %s" % (dbname, res))
         return [x.split()[mode] for x in res.split("\n") if len(x)]
 
     def _get_organisms(self):
