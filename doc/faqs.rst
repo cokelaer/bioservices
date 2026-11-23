@@ -67,6 +67,39 @@ Or you can use the uniprot mapping function::
     u.mapping(to="KEGG_ID", fr="ACC", query="ZAP70_HUMAN")
 
 
+How to change the location of the configuration directory ?
+-------------------------------------------------------------
+
+By default, the configuration file (``bioservices.cfg``) and the local
+requests cache are stored in the platform's user configuration directory
+(e.g., ``~/.config/bioservices`` on Linux), as given by
+`platformdirs <https://pypi.org/project/platformdirs/>`_.
+You can use another location by setting the ``BIOSERVICES_CONFIG_DIR``
+environment variable before starting Python; all services will use it::
+
+    export BIOSERVICES_CONFIG_DIR=/my/custom/config
+
+The user cache directory can be set the same way with ``BIOSERVICES_CACHE_DIR``.
+
+From Python, you can pass the locations when creating the configuration::
+
+    from bioservices.settings import BioServicesConfig
+    cfg = BioServicesConfig(user_config_dir="/my/custom/config")
+
+or change them on an existing service and reload the configuration::
+
+    from bioservices import UniProt
+    u = UniProt()
+    u.settings.appdirs.user_config_dir = "/my/custom/config"
+    u.settings.init()
+
+Arguments take precedence over environment variables. Setting a directory back
+to ``None`` restores the platform default.
+
+.. note:: The local requests cache file is stored in the configuration
+    directory, so ``BIOSERVICES_CACHE_DIR`` does not move it.
+
+
 Specific Usage
 ===================
 

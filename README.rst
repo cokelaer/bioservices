@@ -279,6 +279,14 @@ Changelog
 ========= ====================================================================
 Version   Description
 ========= ====================================================================
+1.16.1    * **New** custom configuration location: ``BioServicesConfig`` accepts
+            ``user_config_dir`` and ``user_cache_dir``, also settable with the
+            ``BIOSERVICES_CONFIG_DIR`` and ``BIOSERVICES_CACHE_DIR`` environment
+            variables (closes #180)
+          * Use ``platformdirs`` instead of ``appdirs``
+          * Remove the upper version pins on ``numpy`` and ``easydev``
+          * Tests calling live web services are skipped unless ``--network``
+            is passed to pytest
 1.16.0    * **New** ``ncbiblastapi`` module: wraps NCBI's own BLAST URL API,
             submitting jobs directly to NCBI (``blastn``, ``blastp``,
             ``blastx``, ``tblastn``, ``tblastx``) with support for NCBI
