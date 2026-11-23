@@ -28,7 +28,7 @@ BIOSERVICES: access to biological web services programmatically
 
 
 
-:Python_version_available: BioServices is tested for Python 3.9, 3.10, 3.11, 3.12
+:Python_version_available: BioServices is tested for Python 3.10, 3.11, 3.12
 :Contributions: Please join https://github.com/cokelaer/bioservices
 :Issues: Please use https://github.com/cokelaer/bioservices/issues
 :How to cite: Cokelaer et al. *BioServices: a common Python package to access biological Web Services programmatically*
@@ -283,6 +283,7 @@ Version   Description
             ``user_config_dir`` and ``user_cache_dir``, also settable with the
             ``BIOSERVICES_CONFIG_DIR`` and ``BIOSERVICES_CACHE_DIR`` environment
             variables (closes #180)
+          * Drop Python 3.9 support (end of life; no longer available on GitHub runners)
           * Use ``platformdirs`` instead of ``appdirs``
           * ``KEGG``: fall back to ``list/genome`` when KEGG rejects ``list/organism``
             with HTTP 400 (fixes ``organismIds``, #349), and raise a clear
