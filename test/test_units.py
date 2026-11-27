@@ -1396,3 +1396,93 @@ class TestKEGGOrganismFallback:
         k = _kegg_with_http({"list/organism": _http_400("list/organism"), "list/genome": _http_400("list/genome")})
         with pytest.raises(BioServicesError):
             k.organismIds
+
+
+# ---------------------------------------------------------------------------
+# UniProt: mapping() pagination duplicates failedIds (issue #348)
+# ---------------------------------------------------------------------------
+
+
+def _make_uniprot():
+    from bioservices.uniprot import UniProt
+
+    with patch("bioservices.services.urlopen", return_value=MagicMock()):
+        return UniProt(verbose=False)
+
+
+class TestUniProtMappingPagination:
+    def test_multipage_does_not_duplicate_failed_ids(self):
+        u = _make_uniprot()
+        failed = ["BAD1", "BAD2"]
+        pages = [
+            (
+                {"results": [{"from": f"A{i}", "to": f"B{i}"} for i in range(25)], "failedIds": failed},
+                {
+                    "X-Total-Results": "100",
+                    "Link": '<https://rest.uniprot.org/idmapping/results/j1?cursor=c2>; rel="next"',
+                },
+            ),
+            (
+                {"results": [{"from": f"A{i}", "to": f"B{i}"} for i in range(25, 50)], "failedIds": list(failed)},
+                {
+                    "X-Total-Results": "100",
+                    "Link": '<https://rest.uniprot.org/idmapping/results/j1?cursor=c3>; rel="next"',
+                },
+            ),
+            (
+                {"results": [{"from": f"A{i}", "to": f"B{i}"} for i in range(50, 75)], "failedIds": list(failed)},
+                {
+                    "X-Total-Results": "100",
+                    "Link": '<https://rest.uniprot.org/idmapping/results/j1?cursor=c4>; rel="next"',
+                },
+            ),
+            (
+                {"results": [{"from": f"A{i}", "to": f"B{i}"} for i in range(75, 100)], "failedIds": list(failed)},
+                {"X-Total-Results": "100"},
+            ),
+        ]
+        idx = [0]
+
+        def fake_get(url, frmt="json", **kw):
+            data, headers = pages[idx[0]]
+            idx[0] += 1
+            u.services.last_response = MagicMock(headers=headers)
+            return data
+
+        u.services.http_post = MagicMock(return_value={"jobId": "j1"})
+        u.services.http_get = MagicMock(side_effect=fake_get)
+
+        res = u.mapping("UniProtKB_AC-ID", "KEGG", "dummy", progress=False)
+        assert len(res["results"]) == 100
+        assert res["failedIds"] == ["BAD1", "BAD2"]
+        assert failed == ["BAD1", "BAD2"]
+
+    def test_multipage_stops_when_next_link_missing(self):
+        u = _make_uniprot()
+        page1 = {"results": [{"from": f"A{i}", "to": f"B{i}"} for i in range(25)], "failedIds": ["BAD1"]}
+
+        def fake_get(url, frmt="json", **kw):
+            u.services.last_response = MagicMock(headers={"X-Total-Results": "50"})
+            return page1
+
+        u.services.http_post = MagicMock(return_value={"jobId": "j1"})
+        u.services.http_get = MagicMock(side_effect=fake_get)
+
+        res = u.mapping("UniProtKB_AC-ID", "KEGG", "dummy", progress=False)
+        assert len(res["results"]) == 25
+        assert res["failedIds"] == ["BAD1"]
+        assert u.services.http_get.call_count == 1
+
+    def test_single_page_without_failed_ids(self):
+        u = _make_uniprot()
+        page1 = {"results": [{"from": "P43403", "to": "hsa:7535"}]}
+
+        def fake_get(url, frmt="json", **kw):
+            u.services.last_response = MagicMock(headers={"X-Total-Results": "1"})
+            return page1
+
+        u.services.http_post = MagicMock(return_value={"jobId": "j1"})
+        u.services.http_get = MagicMock(side_effect=fake_get)
+
+        res = u.mapping("UniProtKB_AC-ID", "KEGG", "P43403", progress=False)
+        assert res == {"results": [{"from": "P43403", "to": "hsa:7535"}], "failedIds": []}

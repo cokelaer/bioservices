@@ -478,15 +478,16 @@ class UniProt:
             # once ready, we can process the data
             if results != 500 and "results" in results:
                 total = int(self.services.last_response.headers["X-Total-Results"])
-                batches = results["results"]
-                fails = results.get("failedIds", [])
+                batches = list(results["results"])
+                fails = list(results.get("failedIds", []))
 
                 size = 25
                 for x in tqdm.tqdm(range(size, total, size), disable=not progress):
                     link = self._get_next_link(self.services.last_response.headers)
+                    if not link:
+                        break
                     batch = self.services.http_get(link, frmt="json")
                     batches += batch["results"]
-                    fails += results.get("failedIds", [])
                 return {"results": batches, "failedIds": fails}
 
             else:  # pragma: no cover
